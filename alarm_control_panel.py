@@ -378,6 +378,7 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
                     target_state = arm_mode_to_state(self._arm_mode)
                     await self._async_process_command(target_state)
 
+                now = dt_util.utcnow()
                 self._timer = async_track_point_in_time(
                     self._hass,
                     async_initialization_timer_finished,
