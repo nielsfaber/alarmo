@@ -35,16 +35,86 @@ The integration is comparable with the [Manual Alarm](https://www.home-assistant
 2. Restart HA to load the changes.
   
 ## Planned improvements
+* Add the project to HACS.
 * Add support for skipping the arming delay.
 * Add support for bypassing failed sensors.
 * MQTT support for control + status reporting of the system from 3rd party applications.
 * Implement lock-out time when too many incorrect pincodes are entered.
 * Extend support for action configuration.
-* Adding translations to push notifications.
+* Adding translations for push notifications and the frontend.
 
 ## Usage
 
-Usage instructions will follow soon.
+### Alarm functionality
+The following diagram describes the operational states of the alarm and provides a simplified overview of the functionality.
+
+![](https://raw.githubusercontent.com/nielsfaber/alarmo/main/screenshots/states.png)
+
+
+### Arm modes
+The alarm can be activated (armed) in a certain *mode*. This mode defines a certain set of sensors and represents the security zone (or perimeter).
+
+The following modes are supported:
+* Armed away
+* Armed night
+* Armed home: 
+* Armed custom bypass (let's just call it *armed custom* from now on)
+
+In the tab *general* you can find the settings for each mode.
+There are flip switches to enable/disable modes.
+
+### Sensors
+
+Currently Alarmo supports sensors of type `binary_sensor`.
+They should show up automatically in the *sensors* tab. 
+You card will show a 'add to alarm' button for each sensor. After clicking, you will see a dialog where you can set the modes in which the sensor should work.
+
+#### Immediate sensors
+When the alarm is armed with an immediate sensor, this sensor will trigger the alarm directly instead of waiting for the entry delay.
+
+It is recommended to set this for safety devices (smoke detectors, gas sensors, etc.).
+
+Example of other use cases: in mode *armed away* you would normally leave and enter the house via a door. 
+If a window is opened when the alarm is armed, this means bad news. The siren should be enabled ASAP.
+
+Note: an immediate sensor must be *off* before you can enable the alarm. It is not allowed to be *on* while you are leaving the house.
+
+### Codes and users
+
+By default, the alarm has no code and can be locked and unlocked by anyone who has access to HA.
+It is recommended to set a code for *disarming* the alarm as minumum security level.
+
+To do so, go to the *codes* tab, and enable the setting 'use disarm code'.
+
+Next, set up a user and give it a name and code.
+It is recommended to use the same name as your HA account, but this is not required.
+
+#### Codes
+A code can be a sequence of digits (4 or more) or contain a mix of letters, characters etc.
+Make sure to use a code that matches with the code format setting in the *codes* tab.
+This setting is detected by the alarm panel card, and will automatically show either a number pad or a text field.
+
+Your code is stored completely secure. It is encrypted in the same way as your login credentials, and stored in the HA storage registry. When you enter a code, this will be encrypted too, and the encrypted values will be compared for a match.
+So it is impossible to recover your pin code.
+This also means that if you lose your pincode, you cannot unlock the alarm (there is no backup code!)
+
+#### Admin permissions
+The Alarmo panel is restricted to admin (administrator) users only.
+
+There are two ways for reaching the Alarmo panel:
+* Being logged in in HA with an account that has administrator permissions
+* Being logged in in HA with a normal user account, but having a user set up in Alarmo with matching username, and marking it as admin.
+
+### Lovelace alarm panel card
+The [Lovelace alarm panel card](https://www.home-assistant.io/lovelace/alarm-panel/) is an excellent companion for Alarmo.
+It is highly recommended to use it for controlling the alarm.
+
+This card will show you the current state of the alarm, and will allow you to enter a pin (the format is automatically detected).
+
+Make sure that the card is configured with the same modes (they are referred to as `states` in the card), as you have set up in Alarmo.
+There is currently no functionality in place to detect this setting automatically.
+
+
 <!-- ### Alarm modes
  -->
 
