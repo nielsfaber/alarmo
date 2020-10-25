@@ -40,7 +40,7 @@ export class AlarmViewGeneral extends LitElement {
     this.alarmEntity = this.hass!.states[entity_id] as AlarmEntity;
     this.modeList = importModes(this.alarmEntity);
 
-    this.trigger_time = importDelayConfig(this.alarmEntity, EAlarmModes.ArmedAway).trigger;
+    this.trigger_time = importDelayConfig(this.alarmEntity, EAlarmModes.ArmedAway).trigger / 60;
     this.disarm_after_trigger = importGeneralConfig(this.alarmEntity).disarm_after_trigger;
   }
 
@@ -62,15 +62,15 @@ export class AlarmViewGeneral extends LitElement {
             Time during which the siren will sound
           </span>
           <labeled-slider
-            unit="seconds"
+            unit="minutes"
             min="0"
-            max="7200"
-            step="10"
+            max="60"
+            step="1"
             zeroValue="infinite"
             value=${this.trigger_time}
             @change=${(ev: Event) => {
-              this.trigger_time = Number((ev.target as HTMLInputElement).value);
-            }}
+        this.trigger_time = Number((ev.target as HTMLInputElement).value);
+      }}
           >
           </labeled-slider>
         </settings-row>
@@ -83,8 +83,8 @@ export class AlarmViewGeneral extends LitElement {
           <ha-switch
             ?checked=${this.disarm_after_trigger}
             @change=${(ev: Event) => {
-              this.disarm_after_trigger = (ev.target as HTMLInputElement).checked;
-            }}
+        this.disarm_after_trigger = (ev.target as HTMLInputElement).checked;
+      }}
           >
           </ha-switch>
         </settings-row>
@@ -146,7 +146,7 @@ export class AlarmViewGeneral extends LitElement {
     const call: editGeneralSchema = {
       entity_id: getAlarmEntity(this.hass),
       edit_general: {
-        trigger_time: { seconds: this.trigger_time },
+        trigger_time: { minutes: this.trigger_time },
         disarm_after_trigger: this.disarm_after_trigger,
       },
     };

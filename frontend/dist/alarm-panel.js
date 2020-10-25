@@ -405,7 +405,7 @@ const Z=e=>t=>"function"==typeof t?((e,t)=>(window.customElements.define(e,t),t)
       ::slotted(ha-switch) {
         padding: 16px 0;
       }
-    `}};t([K({type:Boolean,reflect:!0})],We.prototype,"narrow",void 0),t([K({type:Boolean,attribute:"three-line"})],We.prototype,"threeLine",void 0),We=t([Z("settings-row")],We);let Je=class extends ae{constructor(){super(...arguments),this.modeList=[],this.trigger_time=0,this.disarm_after_trigger=!1}shouldUpdate(e){if(!this.hass)return!0;const t=e.get("hass");return!t||1!=e.size||t.states[He(t)]!==this.hass.states[He(this.hass)]&&(this.updateForm(),!0)}updateForm(){if(!this.hass)return;const e=He(this.hass);this.alarmEntity=this.hass.states[e],this.modeList=Ye(this.alarmEntity),this.trigger_time=Re(this.alarmEntity,Oe.ArmedAway).trigger,this.disarm_after_trigger=qe(this.alarmEntity).disarm_after_trigger}firstUpdated(){(async()=>{await Me()})(),this.updateForm()}render(){return this.alarmEntity?H`
+    `}};t([K({type:Boolean,reflect:!0})],We.prototype,"narrow",void 0),t([K({type:Boolean,attribute:"three-line"})],We.prototype,"threeLine",void 0),We=t([Z("settings-row")],We);let Je=class extends ae{constructor(){super(...arguments),this.modeList=[],this.trigger_time=0,this.disarm_after_trigger=!1}shouldUpdate(e){if(!this.hass)return!0;const t=e.get("hass");return!t||1!=e.size||t.states[He(t)]!==this.hass.states[He(this.hass)]&&(this.updateForm(),!0)}updateForm(){if(!this.hass)return;const e=He(this.hass);this.alarmEntity=this.hass.states[e],this.modeList=Ye(this.alarmEntity),this.trigger_time=Re(this.alarmEntity,Oe.ArmedAway).trigger/60,this.disarm_after_trigger=qe(this.alarmEntity).disarm_after_trigger}firstUpdated(){(async()=>{await Me()})(),this.updateForm()}render(){return this.alarmEntity?H`
       <ha-card header="General settings">
         <div class="card-content"></div>
 
@@ -415,10 +415,10 @@ const Z=e=>t=>"function"==typeof t?((e,t)=>(window.customElements.define(e,t),t)
             Time during which the siren will sound
           </span>
           <labeled-slider
-            unit="seconds"
+            unit="minutes"
             min="0"
-            max="7200"
-            step="10"
+            max="60"
+            step="1"
             zeroValue="infinite"
             value=${this.trigger_time}
             @change=${e=>{this.trigger_time=Number(e.target.value)}}
@@ -487,7 +487,7 @@ const Z=e=>t=>"function"==typeof t?((e,t)=>(window.customElements.define(e,t),t)
       >
         An extra mode for defining your own security perimeter.
       </alarm-mode-card>
-    `:H``}saveClick(){if(!this.hass)return;const e={entity_id:He(this.hass),edit_general:{trigger_time:{seconds:this.trigger_time},disarm_after_trigger:this.disarm_after_trigger}};this.hass.callService("alarmo","edit_config",e)}static get styles(){return se`
+    `:H``}saveClick(){if(!this.hass)return;const e={entity_id:He(this.hass),edit_general:{trigger_time:{minutes:this.trigger_time},disarm_after_trigger:this.disarm_after_trigger}};this.hass.callService("alarmo","edit_config",e)}static get styles(){return se`
       ${Fe}
     `}};t([K()],Je.prototype,"hass",void 0),t([K()],Je.prototype,"alarmEntity",void 0),t([K()],Je.prototype,"modeList",void 0),t([K()],Je.prototype,"trigger_time",void 0),t([K()],Je.prototype,"disarm_after_trigger",void 0),Je=t([Z("alarm-view-general")],Je);let Ze=class extends ae{async showDialog(e){this._params=e,this.selection=e.config,await this.updateComplete}async closeDialog(){this._params=void 0}render(){if(!this._params)return H``;const e=Ye(this.hass.states[He(this.hass)]),t=this.hass.states[this._params.entity_id];return H`
       
@@ -1079,7 +1079,7 @@ const Z=e=>t=>"function"==typeof t?((e,t)=>(window.customElements.define(e,t),t)
       </ha-card>
     `}saveClick(){if(!this.hass||!this)return;let e={entity_id:He(this.hass),edit_actions:{}};this.pushEnabled&&(e=Object.assign(Object.assign({},e),{edit_actions:Object.assign(Object.assign({},e.edit_actions),{push_target:this.pushTarget})})),this.sirenEnabled&&(e=Object.assign(Object.assign({},e),{edit_actions:Object.assign(Object.assign({},e.edit_actions),{siren_entity:this.sirenEntity})})),this.hass.callService("alarmo","edit_config",e)}static get styles(){return se`
       ${Fe}
-    `}};t([K()],it.prototype,"hass",void 0),t([K()],it.prototype,"alarmEntity",void 0),t([K()],it.prototype,"pushEnabled",void 0),t([K()],it.prototype,"pushTarget",void 0),t([K()],it.prototype,"sirenEnabled",void 0),t([K()],it.prototype,"sirenEntity",void 0),it=t([Z("alarm-view-actions")],it),e.MyAlarmPanel=class extends ae{firstUpdated(){(async()=>{await Me()})()}render(){const e=this.hass.user;let t=e.is_admin;const s=this.hass.states[He(this.hass)],i=Object.entries(s.attributes.users).map(([e,t])=>ze(e,Number(t)));return i.find(t=>t.name==e.name)&&(t=i.find(t=>t.name==e.name).is_admin),t?H`
+    `}};t([K()],it.prototype,"hass",void 0),t([K()],it.prototype,"alarmEntity",void 0),t([K()],it.prototype,"pushEnabled",void 0),t([K()],it.prototype,"pushTarget",void 0),t([K()],it.prototype,"sirenEnabled",void 0),t([K()],it.prototype,"sirenEntity",void 0),it=t([Z("alarm-view-actions")],it),e.MyAlarmPanel=class extends ae{firstUpdated(){(async()=>{await Me()})()}render(){const e=this.hass.user;let t=e.is_admin;const s=this.hass.states[He(this.hass)],i=Object.entries(s.attributes.users).map(([e,t])=>ze(e,Number(t)));return!t&&i.find(t=>t.name==e.name)&&(t=i.find(t=>t.name==e.name).is_admin),t?H`
       <ha-app-layout>
         <app-header fixed slot="header">
           <app-toolbar>

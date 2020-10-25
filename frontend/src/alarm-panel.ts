@@ -23,7 +23,7 @@ export class MyAlarmPanel extends LitElement {
     let is_admin = user.is_admin;
     const alarmEntity = this.hass.states[getAlarmEntity(this.hass)];
     const users = Object.entries(alarmEntity.attributes.users).map(([k, v]) => importUserConfig(k, Number(v)));
-    if (users.find(e => e.name == user.name)) is_admin = users.find(e => e.name == user.name)!.is_admin;
+    if (!is_admin && users.find(e => e.name == user.name)) is_admin = users.find(e => e.name == user.name)!.is_admin;
 
     if (!is_admin) return html`
       <div class="view">
