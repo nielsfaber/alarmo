@@ -1,0 +1,6 @@
+*.DS_Store
+__pycache__
+.vscode
+frontend/node_modules
+._*
+README.html
