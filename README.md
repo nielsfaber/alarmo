@@ -1,9 +1,10 @@
 # Alarmo
-Easy to use alarm system integration for Home Assistant
+This is an alarm system integration for Home Assistant. It provides a user interface for setting your own alarm system completely from the browser.
 
 ## Introduction
 This is an integration for the `alarm_control_panel` domain in HA.
-It allows to combine sensors and create a security system for your house. The system is completely managed from your browser. 
+It allows to combine existing sensors for creating a security system for your house. 
+The integration is comparable with the [Manual Alarm](https://www.home-assistant.io/integrations/manual/) in HA, but also has some additional features that makes it easier to use. 
 
 ### Features
 * Fully compatible with Home Assistant and the [Alarm Panel Card](https://www.home-assistant.io/lovelace/alarm-panel/).
@@ -16,13 +17,10 @@ It allows to combine sensors and create a security system for your house. The sy
 * Receive push notifications when anything changes in the alarm.
 * Activate a siren when the alarm is triggered.
 
-### Planned improvements
-* Add support for skipping the arming delay.
-* Add support for bypassing failed sensors.
-* MQTT support for control + status reporting of the system from 3rd party applications.
-* Implement lock-out time when too many incorrect pincodes are entered.
-* Extend support for action configuration.
-* Adding translations to push notifications.
+### Preview
+
+![](https://raw.githubusercontent.com/nielsfaber/alarmo/main/screenshots/Preview.png)
+
 
 ## Installation
 
@@ -36,9 +34,17 @@ It allows to combine sensors and create a security system for your house. The sy
 1. Download the [latest release](https://github.com/nielsfaber/alarmo/releases) as a zip file and extract it into the `custom_components` folder in your HA installation, overwriting the previous installation.
 2. Restart HA to load the changes.
   
+## Planned improvements
+* Add support for skipping the arming delay.
+* Add support for bypassing failed sensors.
+* MQTT support for control + status reporting of the system from 3rd party applications.
+* Implement lock-out time when too many incorrect pincodes are entered.
+* Extend support for action configuration.
+* Adding translations to push notifications.
+
 ## Usage
 
-TBD
+Usage instructions will follow soon.
 <!-- ### Alarm modes
  -->
 
