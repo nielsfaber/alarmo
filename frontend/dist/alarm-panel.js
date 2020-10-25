@@ -665,7 +665,7 @@ const Z=e=>t=>"function"==typeof t?((e,t)=>(window.customElements.define(e,t),t)
 
       <ha-card header="Add sensors">
         <div class="card-content">
-          Add more sensors. Make sure that your sensors have a friendly_name, so you can identify them.s
+          Add more sensors. Make sure that your sensors have a friendly_name, so you can identify them.
         </div>
 
         ${this.addSensorsList()}
@@ -711,6 +711,10 @@ const Z=e=>t=>"function"==typeof t?((e,t)=>(window.customElements.define(e,t),t)
         </settings-row>
       `}static get styles(){return se`
       ${Fe}
+
+      ha-card > :last-child {
+        margin-bottom: 20px;
+      }
     `}};t([K()],Ke.prototype,"hass",void 0),t([K()],Ke.prototype,"_sensors",void 0),Ke=t([Z("alarm-view-sensors")],Ke);let Qe=class extends ae{constructor(){super(...arguments),this.name="",this.code="",this.codeConfirm="",this.error="",this.is_admin=!1,this.can_arm=!1,this.can_disarm=!1}async showDialog(e){this._params=e,await this.updateComplete}async closeDialog(){this._params=void 0}render(){return this._params?H`
       <ha-dialog open .heading=${!0} @closed=${this.closeDialog} @close-dialog=${this.closeDialog}>
         <mwc-button slot="primaryAction" @click=${this.confirmClick}>

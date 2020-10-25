@@ -59,7 +59,7 @@ export class AlarmViewSensors extends LitElement {
 
       <ha-card header="Add sensors">
         <div class="card-content">
-          Add more sensors. Make sure that your sensors have a friendly_name, so you can identify them.s
+          Add more sensors. Make sure that your sensors have a friendly_name, so you can identify them.
         </div>
 
         ${this.addSensorsList()}
@@ -201,6 +201,10 @@ export class AlarmViewSensors extends LitElement {
   static get styles(): CSSResult {
     return css`
       ${commonStyle}
+
+      ha-card > :last-child {
+        margin-bottom: 20px;
+      }
     `;
   }
 }
