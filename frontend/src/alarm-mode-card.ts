@@ -73,8 +73,8 @@ export class AlarmModeCard extends LitElement {
           zeroValue="none"
           value=${this.config?.leave}
           @change=${ev => {
-            Object.assign(this.config, { leave: Number(ev.target.value) });
-          }}
+        Object.assign(this.config, { leave: Number(ev.target.value) });
+      }}
         >
         </labeled-slider>
       </settings-row>
@@ -93,8 +93,8 @@ export class AlarmModeCard extends LitElement {
           zeroValue="none"
           value=${this.config?.entry}
           @change=${ev => {
-            Object.assign(this.config, { leave: Number(ev.target.value) });
-          }}
+        Object.assign(this.config, { entry: Number(ev.target.value) });
+      }}
         >
         </labeled-slider>
       </settings-row>
@@ -130,6 +130,7 @@ export class AlarmModeCard extends LitElement {
         },
       },
     };
+    console.log(call);
     this.hass.callService(platform, editConfigService, call);
   }
 

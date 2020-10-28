@@ -371,11 +371,11 @@ const Z=e=>t=>"function"==typeof t?((e,t)=>(window.customElements.define(e,t),t)
           step="10"
           zeroValue="none"
           value=${null===(t=this.config)||void 0===t?void 0:t.entry}
-          @change=${e=>{Object.assign(this.config,{leave:Number(e.target.value)})}}
+          @change=${e=>{Object.assign(this.config,{entry:Number(e.target.value)})}}
         >
         </labeled-slider>
       </settings-row>
-    `:H``}toggleEnable(e){if(!this.hass||!this.mode||!this.config)return;const t=e.target.checked,s={entity_id:He(this.hass),edit_mode:{mode:this.mode,enabled:t,delays:{leave:{seconds:this.config.leave},entry:{seconds:this.config.entry}}}};this.hass.callService("alarmo","edit_config",s)}updateConfig(){if(!this.hass||!this.mode||!this.config)return;const e={entity_id:He(this.hass),edit_mode:{mode:this.mode,delays:{leave:{seconds:this.config.leave},entry:{seconds:this.config.entry}}}};this.hass.callService("alarmo","edit_config",e)}};Be.styles=se`
+    `:H``}toggleEnable(e){if(!this.hass||!this.mode||!this.config)return;const t=e.target.checked,s={entity_id:He(this.hass),edit_mode:{mode:this.mode,enabled:t,delays:{leave:{seconds:this.config.leave},entry:{seconds:this.config.entry}}}};this.hass.callService("alarmo","edit_config",s)}updateConfig(){if(!this.hass||!this.mode||!this.config)return;const e={entity_id:He(this.hass),edit_mode:{mode:this.mode,delays:{leave:{seconds:this.config.leave},entry:{seconds:this.config.entry}}}};console.log(e),this.hass.callService("alarmo","edit_config",e)}};Be.styles=se`
     ${Fe}
   `,t([K()],Be.prototype,"hass",void 0),t([K({type:String})],Be.prototype,"header",void 0),t([K({type:Boolean})],Be.prototype,"enabled",void 0),t([K({type:String})],Be.prototype,"mode",void 0),t([K({type:Object})],Be.prototype,"config",void 0),Be=t([Z("alarm-mode-card")],Be);let We=class extends ae{constructor(){super(...arguments),this.threeLine=!1}render(){return H`
       <style>

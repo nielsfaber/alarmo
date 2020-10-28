@@ -12,7 +12,7 @@ from homeassistant.components.alarm_control_panel import (
 from homeassistant.helpers import config_validation as cv
 from homeassistant.components.alarm_control_panel import DOMAIN as PLATFORM
 
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 NAME = "Alarmo"
 MANUFACTURER = "@nielsfaber"
 
