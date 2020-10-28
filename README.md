@@ -57,7 +57,7 @@ The alarm can be activated (armed) in a certain *mode*. This mode defines a cert
 The following modes are supported:
 * Armed away
 * Armed night
-* Armed home: 
+* Armed home
 * Armed custom bypass (let's just call it *armed custom* from now on)
 
 In the tab *general* you can find the settings for each mode.
