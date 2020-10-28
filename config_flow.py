@@ -5,7 +5,6 @@ from homeassistant import config_entries
 
 from .const import (
     DOMAIN,
-    VERSION as _VERSION,
     NAME,
     ATTR_USERS,
 )
@@ -14,7 +13,7 @@ from .const import (
 class AlarmoConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Config flow for Alarmo."""
 
-    VERSION = _VERSION
+    VERSION = "1.0.0"
     CONNECTION_CLASS = config_entries.CONN_CLASS_LOCAL_POLL
 
     async def async_step_user(self, user_input=None):
