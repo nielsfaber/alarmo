@@ -2,20 +2,15 @@
 import logging
 import bcrypt
 import base64
-import copy
-from datetime import timedelta
 
 from homeassistant.components.alarm_control_panel import DOMAIN as PLATFORM
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
-    EVENT_HOMEASSISTANT_STARTED,
     ATTR_CODE,
 )
 from homeassistant.core import HomeAssistant, asyncio
 from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers import service
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers.event import async_call_later, async_track_state_change
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .const import (
@@ -23,18 +18,14 @@ from .const import (
     NAME,
     VERSION,
     MANUFACTURER,
-    ATTR_USERS,
-    ATTR_NAME,
-    ATTR_CONFIG,
-    ATTR_CODE_NEW,
+    ATTR_REMOVE,
+    ATTR_OLD_CODE,
 )
-
-from .helpers import (
-    export_user_config,
-)
+from .store import async_get_registry
+from .panel import async_register_panel
+from .websockets import async_register_websockets
 
 _LOGGER = logging.getLogger(__name__)
-SCAN_INTERVAL = timedelta(seconds=30)
 
 
 async def async_setup(hass, config):
@@ -46,7 +37,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up Alarmo integration from a config entry."""
     session = async_get_clientsession(hass)
 
-    coordinator = AlarmoCoordinator(hass, session, entry)
+    store = await async_get_registry(hass)
+    coordinator = AlarmoCoordinator(hass, session, entry, store)
 
     device_registry = await dr.async_get_registry(hass)
     device_registry.async_get_or_create(
@@ -59,16 +51,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     )
 
     hass.data.setdefault(DOMAIN, {})
-    hass.data[DOMAIN][entry.entry_id] = coordinator
+    hass.data[DOMAIN] = coordinator
 
     if entry.unique_id is None:
-        hass.config_entries.async_update_entry(
-            entry, unique_id=coordinator.id, data={ATTR_USERS: []}
-        )
+        hass.config_entries.async_update_entry(entry, unique_id=coordinator.id, data={})
 
     hass.async_create_task(
         hass.config_entries.async_forward_entry_setup(entry, PLATFORM)
     )
+
+    # Register the panel (frontend)
+    await async_register_panel(hass)
+
+    # Websocket support
+    await async_register_websockets(hass)
 
     return True
 
@@ -86,110 +82,99 @@ async def async_unload_entry(hass, entry):
 
 
 class AlarmoCoordinator(DataUpdateCoordinator):
-    """Define an object to hold Alarmom device."""
+    """Define an object to hold Alarmo device."""
 
-    def __init__(self, hass, session, entry):
+    def __init__(self, hass, session, entry, store):
         """Initialize."""
         self.id = entry.unique_id
         self.hass = hass
         self.entry = entry
+        self.store = store
+        self.config_callback = None
+        self.sensor_callback = None
+        self.automation_callback = None
 
         super().__init__(hass, _LOGGER, name=DOMAIN)
 
-        self.stored_data = dict(entry.data)
+    def async_update_config(self, data):
+        self.store.async_update_config(data)
+        self.config_callback()
 
-    async def _async_update_data(self):
-        """Update data via library."""
-        return True
+    def async_update_mode_config(self, mode: str, data: dict):
+        self.store.async_update_mode_config(mode, data)
+        self.config_callback()
 
-    def async_update_storage(self, data):
-        self.hass.config_entries.async_update_entry(self.entry, data=data)
-        self.stored_data = data
+    def async_update_sensor_config(self, entity_id: str, data: dict):
+        if ATTR_REMOVE in data:
+            self.store.async_delete_sensor(entity_id)
+        elif self.store.async_get_sensor(entity_id):
+            self.store.async_update_sensor(entity_id, data)
+        else:
+            self.store.async_create_sensor(entity_id, data)
 
-    def create_user(self, kwargs):
-        name = kwargs[ATTR_NAME]
-        code = kwargs[ATTR_CODE]
-        config = export_user_config(kwargs)
+        self.sensor_callback()
 
-        # check if user name exists
-        if ATTR_USERS in self.stored_data:
-            for user in self.stored_data[ATTR_USERS]:
-                if user[ATTR_NAME] == name:
-                    return False
+    def async_update_user_config(self, user_id: str = None, data: dict = {}):
 
-        hashed = bcrypt.hashpw(code.encode("utf-8"), bcrypt.gensalt(rounds=12))
-        hashed = base64.b64encode(hashed)
-
-        entry = {ATTR_NAME: name, ATTR_CONFIG: config, ATTR_CODE: hashed.decode()}
-        users = copy.deepcopy(self.stored_data[ATTR_USERS])
-        users.append(entry)
-        self.async_update_storage({ATTR_USERS: copy.deepcopy(users)})
-        return True
-
-    def remove_user(self, name):
-        if not name or not ATTR_USERS in self.stored_data:
-            return False
-
-        res = False
-        users = copy.deepcopy(self.stored_data[ATTR_USERS])
-        for i in range(len(users)):
-            user = users[i]
-            if user[ATTR_NAME] == name:
-                users.pop(i)
-                res = True
-                break
-
-        if res:
-            self.async_update_storage({ATTR_USERS: copy.deepcopy(users)})
-
-        return res
-
-    def edit_user(self, kwargs):
-        name = kwargs[ATTR_NAME]
-        code = kwargs[ATTR_CODE]
-        code_new = kwargs[ATTR_CODE_NEW]
-        config = export_user_config(kwargs)
-
-        res = False
-        users = copy.deepcopy(self.stored_data[ATTR_USERS])
-        for i in range(len(users)):
-            if users[i][ATTR_NAME] == name:
-                user = users[i]
-
-                if code and code_new:
-                    res = self.coordinator.authenticate_user(code)
-                    if res and res[ATTR_NAME] == name:
-                        hashed = bcrypt.hashpw(
-                            code_new.encode("utf-8"), bcrypt.gensalt(rounds=12)
-                        )
-                        hashed = base64.b64encode(hashed)
-                        user[ATTR_CODE] = hashed
-
-                user[ATTR_CONFIG] = config
-                users[i] = user
-                res = True
-
-        if res:
-            self.async_update_storage({ATTR_USERS: copy.deepcopy(users)})
-
-        return res
-
-    def authenticate_user(self, code):
-        if not self.stored_data[ATTR_USERS]:
+        if ATTR_REMOVE in data:
+            self.store.async_delete_user(user_id)
             return
 
-        for user in self.stored_data[ATTR_USERS]:
-            hash = base64.b64decode(user[ATTR_CODE])
-            if bcrypt.checkpw(code.encode("utf-8"), hash):
+        if ATTR_CODE in data and data[ATTR_CODE]:
+            hashed = bcrypt.hashpw(
+                data[ATTR_CODE].encode("utf-8"), bcrypt.gensalt(rounds=12)
+            )
+            hashed = base64.b64encode(hashed)
+            data[ATTR_CODE] = hashed.decode()
+
+        if not user_id:
+            self.store.async_create_user(data)
+        else:
+            if ATTR_CODE in data:
+                if ATTR_OLD_CODE not in data:
+                    return False
+                elif not self.async_authenticate_user(data[ATTR_OLD_CODE], user_id):
+                    return False
+                else:
+                    del data[ATTR_OLD_CODE]
+                    self.store.async_update_user(user_id, data)
+            else:
+                self.store.async_update_user(user_id, data)
+
+    def async_authenticate_user(self, code: str, user_id: str = None):
+        if not user_id:
+            users = self.store.async_get_users()
+        else:
+            users = {
+                user_id: self.store.async_get_user(user_id)
+            }
+
+        for (user_id, user) in users.items():
+            if not user[ATTR_CODE] and not code:
                 return user
+            elif user[ATTR_CODE]:
+                hash = base64.b64decode(user[ATTR_CODE])
+                if bcrypt.checkpw(code.encode("utf-8"), hash):
+                    return user
+
         return
 
-    def get_users(self):
-        users = self.stored_data[ATTR_USERS] if ATTR_USERS in self.stored_data else []
+    def register_config_callback(self, callback_func):
+        self.config_callback = callback_func
 
-        output = {}
+    def register_sensor_callback(self, callback_func):
+        self.sensor_callback = callback_func
 
-        for user in users:
-            output[user[ATTR_NAME]] = user[ATTR_CONFIG]
+    def register_automation_callback(self, callback_func):
+        self.automation_callback = callback_func
 
-        return output
+    def async_update_automation_config(self, automation_id: str = None, data: dict = {}):
+
+        if ATTR_REMOVE in data:
+            self.store.async_delete_automation(automation_id)
+        elif not automation_id:
+            self.store.async_create_automation(data)
+        else:
+            self.store.async_update_automation(automation_id, data)
+
+        self.automation_callback()

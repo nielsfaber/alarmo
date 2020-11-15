@@ -1,46 +1,29 @@
 """Initialization of Alarmo alarm_control_panel platform."""
 import datetime
-import copy
 import logging
-import datetime
+import json
 
 # from homeassistant.components.alarm_control_panel import DOMAIN as PLATFORM
 from homeassistant.core import (
     HomeAssistant,
     callback,
 )
-from homeassistant.helpers import entity_platform
 from homeassistant.helpers.event import (
     async_track_point_in_time,
-    async_track_state_change,
 )
-from homeassistant.helpers.service import async_call_from_config
 from homeassistant.helpers.restore_state import RestoreEntity
 import homeassistant.util.dt as dt_util
 from homeassistant.components.alarm_control_panel import (
     AlarmControlPanelEntity,
-    FORMAT_NUMBER as CODE_FORMAT_NUMBER,
-    FORMAT_TEXT as CODE_FORMAT_TEXT,
     ATTR_CODE_ARM_REQUIRED,
 )
 
 from .helpers import (
-    modes_to_supported_features,
-    supported_features_to_modes,
-    import_sensor_config,
-    export_sensor_config,
-    state_to_arm_mode,
-    arm_mode_to_state,
-    export_delay_config,
-    import_delay_config,
-    import_user_config,
-    export_generic_config,
-    import_generic_config,
+    calculate_supported_features,
+    supported_modes,
 )
 
 from homeassistant.const import (
-    ATTR_CODE,
-    ATTR_ENTITY_ID,
     ATTR_CODE_FORMAT,
     STATE_ALARM_ARMED_AWAY,
     STATE_ALARM_ARMED_HOME,
@@ -50,8 +33,8 @@ from homeassistant.const import (
     STATE_ALARM_TRIGGERED,
     STATE_ALARM_PENDING,
     STATE_ALARM_ARMING,
-    STATE_UNKNOWN,
-    ATTR_STATE,
+    ATTR_MODE,
+    ATTR_NAME,
 )
 from .const import (
     DOMAIN,
@@ -59,64 +42,40 @@ from .const import (
     NAME,
     MANUFACTURER,
     ALARM_ENTITY,
-    SERVICE_EDIT_CONFIG,
-    SCHEMA_EDIT_CONFIG,
-    COMMAND_REMOVE_SENSOR,
-    COMMAND_EDIT_SENSOR,
-    COMMAND_EDIT_MODE,
-    ATTR_MODE,
-    ATTR_MODES,
-    ATTR_IMMEDIATE,
-    ATTR_DELAYS,
-    ATTR_SENSORS,
-    ATTR_USERS,
-    ATTR_SUPPORTED_FEATURES,
-    ATTR_ENABLED,
-    DEFAULT_CONFIG_MODES,
-    DEFAULT_CONFIG_DELAYS,
     EVENT_LEAVE,
     EVENT_ARM,
     EVENT_ENTRY,
     EVENT_TRIGGER,
-    SENSOR_STATES_OPEN,
-    SENSOR_STATES_CLOSED,
-    SENSOR_STATE_OPEN,
-    SENSOR_STATE_CLOSED,
-    SENSOR_STATE_INDETERMINATE,
-    ATTR_NAME,
-    ATTR_REMOVE,
-    ATTR_CODE_DISARM_REQUIRED,
-    ATTR_CONFIG,
-    ATTR_CAN_ARM,
-    ATTR_CAN_DISARM,
-    ATTR_TRIGGER_TIME,
-    ATTR_DISARM_AFTER_TRIGGER,
-    ATTR_LAST_STATE,
-    ATTR_EVENT,
-    ATTR_OPEN_SENSORS,
-    ATTR_PUSH_TARGET,
-    ATTR_SIREN_ENTITY,
     INITIALIZATION_TIME,
+    ARM_MODES,
+    ATTR_MODES,
+    ATTR_CODE_DISARM_REQUIRED,
+    ATTR_ENABLED,
+    ATTR_REQUIRE_CODE,
 )
-from .panel import async_register_panel
+from homeassistant.components.mqtt import (
+    DOMAIN as ATTR_MQTT,
+    CONF_STATE_TOPIC,
+    CONF_COMMAND_TOPIC,
+)
+from homeassistant.components.mqtt.alarm_control_panel import (
+    DEFAULT_ARM_NIGHT as COMMAND_ARM_NIGHT,
+    DEFAULT_ARM_AWAY as COMMAND_ARM_AWAY,
+    DEFAULT_ARM_HOME as COMMAND_ARM_HOME,
+    DEFAULT_ARM_CUSTOM_BYPASS as COMMAND_ARM_CUSTOM_BYPASS,
+    DEFAULT_DISARM as COMMAND_DISARM,
+)
+
+import homeassistant.components.mqtt as mqtt
+
+from .sensors import SensorHandler
+from .automations import AutomationHandler
 
 _LOGGER = logging.getLogger(__name__)
 
-ARMED_STATES = [
-    STATE_ALARM_ARMED_AWAY,
-    STATE_ALARM_ARMED_HOME,
-    STATE_ALARM_ARMED_NIGHT,
-    STATE_ALARM_ARMED_CUSTOM_BYPASS,
-]
-
-
-def entity_exists_in_hass(hass, entity_id):
-    """Check that an entity exists."""
-    return hass.states.get(entity_id) is not None
-
 
 async def async_setup(hass, config):
-    """Track states and offer events for binary sensors."""
+    """Track states and offer events for alarm_control_panel."""
     return True
 
 
@@ -128,51 +87,45 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 async def async_setup_entry(hass, config_entry, async_add_devices):
     """Set up the Alarmo entities. """
     _LOGGER.debug("async_setup_entry")
-    coordinator = hass.data[DOMAIN][config_entry.entry_id]
+    coordinator = hass.data[DOMAIN]
 
     # Create alarm entity
-    entity = AlarmoEntity(hass=hass, coordinator=coordinator, entity_id=ALARM_ENTITY)
+
+    entity = AlarmoEntity(
+        hass=hass,
+        coordinator=coordinator,
+        entity_id=ALARM_ENTITY,
+    )
 
     async_add_devices([entity])
 
-    # register services
-    platform = entity_platform.current_platform.get()
+    # # register services
+    # platform = entity_platform.current_platform.get()
 
-    platform.async_register_entity_service(
-        SERVICE_EDIT_CONFIG, SCHEMA_EDIT_CONFIG, "async_edit_config"
-    )
-
-    # Register the panel
-    await async_register_panel(hass)
+    # platform.async_register_entity_service(
+    #     SERVICE_EDIT_CONFIG, SCHEMA_EDIT_CONFIG, "async_edit_config"
+    # )
 
 
 class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
     """Defines a base alarm_control_panel entity."""
 
-    def __init__(self, hass, coordinator, entity_id: str) -> None:
+    def __init__(self, hass: HomeAssistant, coordinator, entity_id: str) -> None:
         """Initialize the alarm_control_panel entity."""
         self.coordinator = coordinator
         self.entity_id = entity_id
         self._name = NAME
         self._state = None
         self._hass = hass
-        self._code_format = CODE_FORMAT_NUMBER
-        self._code_arm_required = False
-        self._code_disarm_required = False
-        self._disarm_after_trigger = False
-        self._code = None
-        self._config = {
-            ATTR_MODES: DEFAULT_CONFIG_MODES,
-            ATTR_DELAYS: DEFAULT_CONFIG_DELAYS,
-            ATTR_SENSORS: {},
-            ATTR_USERS: self.coordinator.get_users(),
-            ATTR_CONFIG: import_generic_config(0),
-        }
+        self._config = None
+        self.sensors = SensorHandler(hass, coordinator, self)
+        self.automations = AutomationHandler(hass, coordinator, self)
         self._timer = None
-        self._sensor_listener = None
         self._arm_mode = None
         self._push_target = None
         self._siren_entity = None
+        self._changed_by = None
+        self._mqtt_enabled = False
 
     @property
     def device_info(self) -> dict:
@@ -210,7 +163,20 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
     @property
     def code_format(self):
         """Return one or more digits/characters."""
-        return self._code_format
+        if (
+            not self._config[ATTR_CODE_ARM_REQUIRED]
+            and not self._config[ATTR_CODE_DISARM_REQUIRED]
+        ):
+            return None
+        else:
+            return self._config[ATTR_CODE_FORMAT]
+
+    @property
+    def changed_by(self):
+        _LOGGER.debug("changed_by")
+        """Last change triggered by."""
+        _LOGGER.debug(self._changed_by)
+        return self._changed_by
 
     @property
     def state(self):
@@ -220,581 +186,427 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
     @property
     def supported_features(self) -> int:
         """Return the list of supported features."""
-        return modes_to_supported_features(self._config[ATTR_MODES])
+        if not self._config:
+            return None
+
+        return calculate_supported_features(self._config)
 
     @property
     def code_arm_required(self):
         """Whether the code is required for arm actions."""
-        return self._code_arm_required
+        if not self._config:
+            return None
+        return self._config[ATTR_CODE_ARM_REQUIRED]
+
+    @property
+    def arm_mode(self):
+        """Return the arm mode."""
+        return self._arm_mode
 
     @property
     def device_state_attributes(self):
         """Return the data of the entity."""
 
-        output = {
-            ATTR_CONFIG: export_generic_config(self._config[ATTR_CONFIG]),
-            ATTR_SENSORS: {
-                entity: export_sensor_config(val)
-                for entity, val in self._config[ATTR_SENSORS].items()
-            },
-            ATTR_DELAYS: export_delay_config(self._config[ATTR_DELAYS]),
-            ATTR_USERS: self._config[ATTR_USERS],
+        return {
+            "changed_by": self._changed_by,
+            "arm_mode": self._arm_mode,
         }
-        if self._arm_mode:
-            output[ATTR_MODE] = self._arm_mode
-        if self._push_target:
-            output[ATTR_PUSH_TARGET] = self._push_target
-        if self._siren_entity:
-            output[ATTR_SIREN_ENTITY] = self._siren_entity
 
-        return output
+    @callback
+    def async_reload_config(self):
+        """triggered when config changes."""
+        self._config = self.coordinator.store.async_get_config()
+        self.async_write_ha_state()
 
     def _validate_code(self, code, state):
         """Validate given code."""
-        if (
-            not self._config[ATTR_CONFIG][ATTR_CODE_DISARM_REQUIRED]
-            and state == STATE_ALARM_DISARMED
-        ):
+
+        if state == STATE_ALARM_DISARMED and not self._config[ATTR_CODE_ARM_REQUIRED]:
             return True
-        elif not self._code_arm_required and state in ARMED_STATES:
-            return True
-        elif not len(self._config[ATTR_USERS]):
+        elif state != STATE_ALARM_DISARMED and not self._config[ATTR_CODE_DISARM_REQUIRED]:
             return True
         elif not code or not len(code):
             return False
 
-        res = self.coordinator.authenticate_user(code)
+        res = self.coordinator.async_authenticate_user(code)
         if not res:
-            _LOGGER.debug("authenticated failed")
+            _LOGGER.debug("authentication failed")
             return False
 
-        user_config = import_user_config(res[ATTR_CONFIG])
-        if not user_config[ATTR_CAN_ARM] and state in ARMED_STATES:
-            return False
-        elif not user_config[ATTR_CAN_DISARM] and state == STATE_ALARM_DISARMED:
-            return False
         _LOGGER.debug("authenticated by user {}".format(res[ATTR_NAME]))
         return True
 
-    async def async_alarm_disarm(self, code=None):
+    async def async_alarm_disarm(self, code=None, skip_code=False):
         """Send disarm command."""
         _LOGGER.debug("alarm_disarm")
-        if not self._validate_code(code, STATE_ALARM_DISARMED):
+
+        if self._state == STATE_ALARM_DISARMED:
+            _LOGGER.warning("Cannot go to state {} from state {}.".format(STATE_ALARM_DISARMED, self._state))
             return
+        elif not self._validate_code(code, STATE_ALARM_DISARMED) and not skip_code:
+            _LOGGER.warning("Wrong code provided.")
+            return
+        else:
+            self._changed_by = None
+            await self.async_update_state(STATE_ALARM_DISARMED)
 
-        await self._async_process_command(STATE_ALARM_DISARMED)
-
-    async def async_alarm_arm_away(self, code=None):
+    async def async_alarm_arm_away(self, code=None, skip_code=False):
         """Send arm away command."""
         _LOGGER.debug("alarm_arm_away")
-        if self._state != STATE_ALARM_DISARMED or not self._validate_code(
-            code, STATE_ALARM_ARMED_AWAY
-        ):
+
+        if STATE_ALARM_ARMED_AWAY not in supported_modes(self._config):
+            _LOGGER.warning("Mode ARMED_AWAY is not enabled, ignoring.")
             return
+        elif self._state != STATE_ALARM_DISARMED:
+            _LOGGER.warning("Cannot go to state {} from state {}.".format(STATE_ALARM_ARMED_AWAY, self._state))
+            return
+        elif not self._validate_code(code, STATE_ALARM_ARMED_AWAY) and not skip_code:
+            _LOGGER.warning("Wrong code provided.")
+            return
+        else:
+            self._changed_by = None
+            await self.async_arm(STATE_ALARM_ARMED_AWAY)
 
-        await self._async_process_command(STATE_ALARM_ARMED_AWAY)
-
-    async def async_alarm_arm_home(self, code=None):
+    async def async_alarm_arm_home(self, code=None, skip_code=False):
         """Send arm home command."""
         _LOGGER.debug("alarm_arm_home")
-        if self._state != STATE_ALARM_DISARMED or not self._validate_code(
-            code, STATE_ALARM_ARMED_HOME
-        ):
+
+        if STATE_ALARM_ARMED_HOME not in supported_modes(self._config):
+            _LOGGER.warning("Mode ARMED_HOME is not enabled, ignoring.")
             return
+        elif self._state != STATE_ALARM_DISARMED:
+            _LOGGER.warning("Cannot go to state {} from state {}.".format(STATE_ALARM_ARMED_HOME, self._state))
+            return
+        elif not self._validate_code(code, STATE_ALARM_ARMED_HOME) and not skip_code:
+            _LOGGER.warning("Wrong code provided.")
+            return
+        else:
+            self._changed_by = None
+            await self.async_arm(STATE_ALARM_ARMED_HOME)
 
-        await self._async_process_command(STATE_ALARM_ARMED_HOME)
-
-    async def async_alarm_arm_night(self, code=None):
+    async def async_alarm_arm_night(self, code=None, skip_code=False):
         """Send arm night command."""
         _LOGGER.debug("alarm_arm_night")
-        if self._state != STATE_ALARM_DISARMED or not self._validate_code(
-            code, STATE_ALARM_ARMED_NIGHT
-        ):
+
+        if STATE_ALARM_ARMED_NIGHT not in supported_modes(self._config):
+            _LOGGER.warning("Mode ARMED_NIGHT is not enabled, ignoring.")
             return
-
-        await self._async_process_command(STATE_ALARM_ARMED_NIGHT)
-
-    async def async_alarm_arm_custom_bypass(self, code=None):
-        """Send arm night command."""
-        _LOGGER.debug("alarm_arm_night")
-        if self._state != STATE_ALARM_DISARMED or not self._validate_code(
-            code, STATE_ALARM_ARMED_CUSTOM_BYPASS
-        ):
+        elif self._state != STATE_ALARM_DISARMED:
+            _LOGGER.warning("Cannot go to state {} from state {}.".format(STATE_ALARM_ARMED_NIGHT, self._state))
             return
+        elif not self._validate_code(code, STATE_ALARM_ARMED_NIGHT) and not skip_code:
+            _LOGGER.warning("Wrong code provided.")
+            return
+        else:
+            self._changed_by = None
+            await self.async_arm(STATE_ALARM_ARMED_NIGHT)
 
-        await self._async_process_command(STATE_ALARM_ARMED_CUSTOM_BYPASS)
+    async def async_alarm_arm_custom_bypass(self, code=None, skip_code=False):
+        """Send arm custom bypass command."""
+        _LOGGER.debug("alarm_arm_custom_bypass")
+
+        if STATE_ALARM_ARMED_CUSTOM_BYPASS not in supported_modes(self._config):
+            _LOGGER.warning("Mode ARMED_CUSTOM_BYPASS is not enabled, ignoring.")
+            return
+        elif self._state != STATE_ALARM_DISARMED:
+            _LOGGER.warning("Cannot go to state {} from state {}.".format(STATE_ALARM_ARMED_CUSTOM_BYPASS, self._state))
+            return
+        elif not self._validate_code(code, STATE_ALARM_ARMED_CUSTOM_BYPASS) and not skip_code:
+            _LOGGER.warning("Wrong code provided.")
+            return
+        else:
+            self._changed_by = None
+            await self.async_arm(STATE_ALARM_ARMED_CUSTOM_BYPASS)
 
     async def async_added_to_hass(self):
         """Connect to dispatcher listening for entity data notifications."""
         await super().async_added_to_hass()
         _LOGGER.debug("async_added_to_hass")
+
+        # load the configuration and make sure that it is reloaded on changes
+        self._config = self.coordinator.store.async_get_config()
+        self.coordinator.register_config_callback(self.async_reload_config)
+
+        if self._config[ATTR_MQTT] and self._config[ATTR_MQTT][ATTR_ENABLED]:
+            self._mqtt_enabled = True
+            await self._subscribe_topics()
+
         state = await self.async_get_last_state()
 
-        # restore previous configuration
+        # restore previous state
         if state:
-            if ATTR_SUPPORTED_FEATURES in state.attributes:
-                self._config[ATTR_MODES] = supported_features_to_modes(
-                    state.attributes[ATTR_SUPPORTED_FEATURES]
-                )
 
-            if ATTR_SENSORS in state.attributes:
-                config = {
-                    entity: import_sensor_config(val)
-                    for entity, val in state.attributes[ATTR_SENSORS].items()
-                }
-                self._config[ATTR_SENSORS] = config
-
-            if ATTR_DELAYS in state.attributes:
-                self._config[ATTR_DELAYS] = import_delay_config(
-                    state.attributes[ATTR_DELAYS], self._config[ATTR_MODES]
-                )
-
-            if ATTR_CONFIG in state.attributes:
-                self._config[ATTR_CONFIG] = import_generic_config(
-                    state.attributes[ATTR_CONFIG]
-                )
-
-            if "code_arm_required" in state.attributes:
-                self._code_arm_required = state.attributes["code_arm_required"]
-
-            if "code_format" in state.attributes:
-                self._code_format = state.attributes["code_format"]
-
+            # get arm mode
             if ATTR_MODE in state.attributes:
                 self._arm_mode = state.attributes[ATTR_MODE]
 
-            if ATTR_PUSH_TARGET in state.attributes:
-                self._push_target = state.attributes[ATTR_PUSH_TARGET]
-
-            if ATTR_SIREN_ENTITY in state.attributes:
-                self._siren_entity = state.attributes[ATTR_SIREN_ENTITY]
+            if "changed_by" in state.attributes:
+                self._changed_by = state.attributes["changed_by"]
 
             # restore previous state
-            if state.state in ARMED_STATES:
+            if state.state in ARM_MODES:
 
-                @callback
-                async def async_initialization_timer_finished(now):
-                    """Update state at a scheduled point in time."""
-                    target_state = arm_mode_to_state(self._arm_mode)
-                    await self._async_process_command(target_state)
-
-                now = dt_util.utcnow()
-                self._timer = async_track_point_in_time(
-                    self._hass,
-                    async_initialization_timer_finished,
-                    now + INITIALIZATION_TIME,
-                )
-                await self._async_register_sensor_listeners()
+                self.async_set_timer(INITIALIZATION_TIME, self.async_initialization_timer_finished)
 
             elif state.state == STATE_ALARM_ARMING:
-                target_state = arm_mode_to_state(self._arm_mode)
-                await self._async_process_command(target_state)
+                await self.async_arm(self.arm_mode)
             elif state.state == STATE_ALARM_PENDING:
-                await self._async_process_command(
-                    STATE_ALARM_TRIGGERED, skip_delay=True
-                )
+                await self.async_trigger(skip_delay=True)
             elif state.state == STATE_ALARM_TRIGGERED:
-                await self._async_process_command(STATE_ALARM_TRIGGERED)
+                await self.async_trigger()
             else:
-                self._state = STATE_ALARM_DISARMED
-
-            # # fallback in case restore was unsuccessful
-            # if not self._state:
-            #     _LOGGER.error("failed to initialize state! falling back to disarmed")
-            #     self._state = STATE_ALARM_DISARMED
+                await self.async_update_state(STATE_ALARM_DISARMED)
 
         else:
-            self._state = STATE_ALARM_DISARMED
+            await self.async_update_state(STATE_ALARM_DISARMED)
 
         self.async_write_ha_state()
 
-    @callback
-    async def async_edit_config(
-        self,
-        edit_sensor=None,
-        remove_sensor=None,
-        edit_mode=None,
-        edit_general=None,
-        add_user=None,
-        edit_user=None,
-        config_code=None,
-        edit_actions=None,
-    ):
-
-        if (
-            self._state != STATE_ALARM_DISARMED
-        ):  # only allow configuration changes when disarmed!
-            return
-
-        if edit_sensor:  # add or update a sensor
-            entity = edit_sensor[ATTR_ENTITY_ID]
-            config = self._config[ATTR_SENSORS]
-            config[entity] = edit_sensor
-            self._config[ATTR_SENSORS] = copy.deepcopy(config)
-
-        elif remove_sensor:
-            entity = remove_sensor[ATTR_ENTITY_ID]
-            config = self._config[ATTR_SENSORS]
-            if entity in config:
-                del config[entity]
-            self._config[ATTR_SENSORS] = copy.deepcopy(config)
-
-        elif edit_mode:
-            mode = edit_mode[ATTR_MODE]
-            if (
-                ATTR_ENABLED in edit_mode and not edit_mode[ATTR_ENABLED]
-            ):  # remove a mode
-                if mode in self._config[ATTR_MODES]:  # remove it from the list
-                    self._config[ATTR_MODES].remove(mode)
-                for (event, cfg) in self._config[ATTR_DELAYS].items():
-                    if mode in cfg:  # remove delay properties
-                        del self._config[ATTR_DELAYS][event][mode]
-            else:
-                if not mode in self._config[ATTR_MODES]:  # add a new mode
-                    self._config[ATTR_MODES].append(mode)
-                    for event in [EVENT_LEAVE, EVENT_ENTRY, EVENT_TRIGGER]:
-                        if not event in self._config[ATTR_DELAYS]:
-                            self._config[ATTR_DELAYS][event] = {}
-                        if (
-                            not mode in self._config[ATTR_DELAYS][event]
-                        ):  # add delay properties
-                            self._config[ATTR_DELAYS][event][mode] = None
-
-                if ATTR_DELAYS in edit_mode:
-                    for (event, val) in edit_mode[ATTR_DELAYS].items():
-                        self._config[ATTR_DELAYS][event][mode] = val
-
-        elif edit_general:
-            if ATTR_TRIGGER_TIME in edit_general:
-                if not EVENT_TRIGGER in self._config[ATTR_DELAYS]:
-                    self._config[ATTR_DELAYS][EVENT_TRIGGER] = {}
-                for mode in self._config[ATTR_MODES]:
-                    self._config[ATTR_DELAYS][EVENT_TRIGGER][mode] = edit_general[
-                        ATTR_TRIGGER_TIME
-                    ]
-
-            if ATTR_DISARM_AFTER_TRIGGER in edit_general:
-                self._config[ATTR_CONFIG][ATTR_DISARM_AFTER_TRIGGER] = edit_general[
-                    ATTR_DISARM_AFTER_TRIGGER
-                ]
-
-        elif add_user:
-            self.coordinator.create_user(add_user)
-            self._config[ATTR_USERS] = self.coordinator.get_users()
-
-        elif edit_user:
-            name = edit_user[ATTR_NAME]
-
-            if ATTR_REMOVE in edit_user and edit_user[ATTR_REMOVE]:
-                self.coordinator.remove_user(name)
-            else:
-                self.coordinator.edit_user(edit_user)
-
-            self._config[ATTR_USERS] = self.coordinator.get_users()
-
-        elif config_code:
-            self._code_arm_required = config_code[ATTR_CODE_ARM_REQUIRED]
-            self._config[ATTR_CONFIG][ATTR_CODE_DISARM_REQUIRED] = config_code[
-                ATTR_CODE_DISARM_REQUIRED
-            ]
-            self._code_format = config_code[ATTR_CODE_FORMAT]
-
-        elif edit_actions:
-            if ATTR_PUSH_TARGET in edit_actions:
-                self._push_target = edit_actions[ATTR_PUSH_TARGET]
-            else:
-                self._push_target = None
-
-            if ATTR_SIREN_ENTITY in edit_actions:
-                self._siren_entity = edit_actions[ATTR_SIREN_ENTITY]
-            else:
-                self._siren_entity = None
-
-        self._state = STATE_ALARM_DISARMED  # make sure there is something to update
-        self.async_write_ha_state()
-
-    def _validate_sensors(self, event=None, state_filter=None):
-        open_sensors = {}  # empty dict = falsy
-
-        for entity, config in self._config[ATTR_SENSORS].items():
-            if not self._arm_mode in config[ATTR_MODES]:
-                continue
-            elif not config[ATTR_IMMEDIATE] and event == EVENT_LEAVE:
-                continue
-
-            state = self.hass.states.get(entity)
-
-            if not state or not state.state:
-                open_sensors[entity] = SENSOR_STATE_INDETERMINATE
-            elif state.state in SENSOR_STATES_OPEN:
-                open_sensors[entity] = SENSOR_STATE_OPEN
-            elif state.state not in SENSOR_STATES_CLOSED:
-                open_sensors[entity] = SENSOR_STATE_INDETERMINATE
-
-        if state_filter:
-            open_sensors = {k: v for k, v in open_sensors.items() if v == state_filter}
-
-        return open_sensors
+    async def async_will_remove_from_hass(self):
+        _LOGGER.debug("async_will_remove_from_hass")
 
     def get_delay_config(self, event):
-        if not event in self._config[ATTR_DELAYS]:
+        """Get datetime object for delay time."""
+        if not self.arm_mode and event in [EVENT_LEAVE, EVENT_ENTRY]:
             return None
-        cfg = self._config[ATTR_DELAYS][event]
 
-        if type(cfg) == type({}):
-            if self._arm_mode in cfg:
-                return cfg[self._arm_mode]
-            else:
-                return None
-        else:
-            return cfg
+        if event == EVENT_LEAVE and self._config[ATTR_MODES][self.arm_mode]["leave_time"]:
+            return datetime.timedelta(seconds=self._config[ATTR_MODES][self.arm_mode]["leave_time"])
 
-    async def _async_process_command(self, state, skip_delay=False):
-        """Update the state."""
-        _LOGGER.debug("request to update state to {}".format(state))
-        if self._state == state:
+        elif event == EVENT_ENTRY and self._config[ATTR_MODES][self.arm_mode]["entry_time"]:
+            return datetime.timedelta(seconds=self._config[ATTR_MODES][self.arm_mode]["entry_time"])
+
+        elif event == EVENT_TRIGGER and self._config["trigger_time"]:
+            return datetime.timedelta(seconds=self._config["trigger_time"])
+
+        return None
+
+    async def async_update_state(self, state):
+        _LOGGER.debug("async_update_state")
+        _LOGGER.debug(state)
+        if state == self._state:
             return
 
-        previous_state = self._state
-        now = dt_util.utcnow()
+        await self.sensors.async_update_listener(state)
 
-        # ARM request
-        if state in ARMED_STATES:
-            self._arm_mode = state_to_arm_mode(state)
+        last_state = self._state
+        self._state = state
 
-            if (
-                previous_state != STATE_ALARM_DISARMED or skip_delay
-            ):  # immediate arm event
-                open_sensors = self._validate_sensors(event=EVENT_ARM)
+        if self._mqtt_enabled:
+            mqtt.async_publish(self._hass, self._config[ATTR_MQTT][CONF_STATE_TOPIC], state)
 
-                if open_sensors:  # abort the arm
-                    self._unregister_sensor_listeners()
-                    self._state = STATE_ALARM_DISARMED
-                else:
-                    await self._async_register_sensor_listeners()
-                    self._state = state
-                await self._async_handle_actions(
-                    last_state=previous_state, open_sensors=open_sensors
-                )
+        await self.automations.async_handle_state_update(state=state, last_state=last_state)
 
-            else:  # normal arm event (from disarmed)
-                delay = self.get_delay_config(EVENT_LEAVE)
-                if not delay:  # immediate arming
-                    await self._async_process_command(state, skip_delay=True)
-                    return
-
-                open_sensors = self._validate_sensors(event=EVENT_LEAVE)
-                if not open_sensors:
-                    await self._async_register_sensor_listeners()
-
-                    @callback
-                    async def async_leave_timer_finished(now):
-                        """Update state at a scheduled point in time."""
-                        _LOGGER.debug("async_leave_timer_finished")
-                        await self._async_process_command(state)
-
-                    self._timer = async_track_point_in_time(
-                        self._hass, async_leave_timer_finished, now + delay
-                    )
-                    self._state = STATE_ALARM_ARMING
-
-                await self._async_handle_actions(
-                    last_state=previous_state, open_sensors=open_sensors
-                )
-
-        # DISARM request
-        elif state == STATE_ALARM_DISARMED:
-            self._unregister_sensor_listeners()
-            self._cancel_timer()
-            self._state = STATE_ALARM_DISARMED
-            await self._async_handle_actions(last_state=previous_state)
-
-        # TRIGGER request
-        elif state == STATE_ALARM_TRIGGERED:
-            if previous_state == STATE_ALARM_PENDING or skip_delay:
-
-                self._cancel_timer()
-                self._unregister_sensor_listeners()
-                delay = self.get_delay_config(EVENT_TRIGGER)
-
-                if delay:  # max trigger time configured
-
-                    @callback
-                    async def async_trigger_timer_finished(now):
-                        """Update state at a scheduled point in time."""
-
-                        _LOGGER.debug("async_trigger_timer_finished")
-                        target_state = (
-                            STATE_ALARM_DISARMED
-                            if self._disarm_after_trigger
-                            else arm_mode_to_state(self._arm_mode)
-                        )
-                        await self._async_process_command(target_state)
-
-                    self._timer = async_track_point_in_time(
-                        self._hass, async_trigger_timer_finished, now + delay
-                    )
-
-                self._state = STATE_ALARM_TRIGGERED
-                await self._async_handle_actions(last_state=previous_state)
-
-            else:
-                delay = self.get_delay_config(EVENT_ENTRY)
-                if not delay:  # immediate triggering
-                    await self._async_process_command(state, skip_delay=True)
-                    return
-
-                @callback
-                async def async_entry_timer_finished(now):
-                    """Update state at a scheduled point in time."""
-
-                    _LOGGER.debug("async_entry_timer_finished")
-                    await self._async_process_command(STATE_ALARM_TRIGGERED)
-
-                self._timer = async_track_point_in_time(
-                    self._hass, async_entry_timer_finished, now + delay
-                )
-                self._state = STATE_ALARM_PENDING
-                await self._async_handle_actions(last_state=previous_state)
+        self.async_cancel_timer()
 
         self.async_write_ha_state()
+        _LOGGER.debug("write state")
 
-    async def _async_register_sensor_listeners(self):
-        @callback
-        async def async_sensor_state_changed(entity, old_state, new_state):
-            _LOGGER.debug(
-                "entity {} changed: old_state={}, new_state={}".format(
-                    entity, old_state, new_state
-                )
-            )
-            sensor_config = self._config[ATTR_SENSORS][entity]
+    async def async_arm(self, arm_mode, skip_delay=False):
+        """Update the state."""
+        _LOGGER.debug("request to update state to {}".format(arm_mode))
 
-            if not self._state and not self._validate_sensors(
-                event=EVENT_ARM, state_filter=SENSOR_STATE_INDETERMINATE
-            ):
-                self._cancel_timer()
-                target_state = arm_mode_to_state(self._arm_mode)
-                await self._async_process_command(target_state, skip_delay=True)
+        self._arm_mode = arm_mode
+        leave_delay = self.get_delay_config(EVENT_LEAVE)
 
-            elif self._state == STATE_ALARM_ARMING:
-                open_sensors = self._validate_sensors(event=EVENT_LEAVE)
-                if open_sensors:  # abort arming
-                    await self._async_process_command(
-                        STATE_ALARM_TRIGGERED, skip_delay=True
-                    )
-                    self._unregister_sensor_listeners()
-                    self._state = STATE_ALARM_DISARMED
-                    await self._async_handle_actions(
-                        last_state=STATE_ALARM_ARMING, open_sensors=open_sensors
-                    )
+        # ARM request
 
-            elif self._state in ARMED_STATES or self._state == STATE_ALARM_PENDING:
-                open_sensors = self._validate_sensors(event=EVENT_ENTRY)
-                if open_sensors:
-                    if (
-                        sensor_config[ATTR_IMMEDIATE]
-                        and self._state != STATE_ALARM_TRIGGERED
-                    ):
-                        await self._async_process_command(
-                            STATE_ALARM_TRIGGERED, skip_delay=True
-                        )
-                    elif self._state in ARMED_STATES:
-                        await self._async_process_command(STATE_ALARM_TRIGGERED)
+        if self._state != STATE_ALARM_DISARMED or skip_delay:  # immediate arm event
+            res = self.sensors.validate_event(event=EVENT_ARM)
+            _LOGGER.debug(res)
 
-        self._unregister_sensor_listeners()
+            if not res:
+                # there where errors -> abort the arm
+                await self.async_update_state(STATE_ALARM_DISARMED)
+            else:
+                # proceed the arm
+                await self.async_update_state(arm_mode)
 
-        entities = []
-        for entity, config in self._config[ATTR_SENSORS].items():
-            if self._arm_mode in config[ATTR_MODES]:
-                entities.append(entity)
+        else:  # normal arm event (from disarmed)
 
-        self._sensor_listener = async_track_state_change(
-            self.coordinator.hass, entities, async_sensor_state_changed
-        )
+            if not leave_delay:
+                # no delay configured -> run function again but skip the delay
+                self.async_arm(arm_mode, skip_delay=True)
 
-    def _unregister_sensor_listeners(self):
-        if self._sensor_listener:
-            self._sensor_listener()
+            else:
+                # proceed to arming
+                res = self.sensors.validate_event(event=EVENT_LEAVE)
+                _LOGGER.debug(res)
+                if res:
+                    await self.async_update_state(STATE_ALARM_ARMING)
+                    self.async_set_timer(leave_delay, self.async_leave_timer_finished)
+                else:
+                    await self.async_update_state(STATE_ALARM_DISARMED)
 
-        self._sensor_listener = None
+    async def async_trigger(self, skip_delay=False):
+        """Trigger request. Will only be called the first time a sensor trips."""
 
-    def _cancel_timer(self):
+        trigger_time = self.get_delay_config(EVENT_TRIGGER)
+        entry_delay = self.get_delay_config(EVENT_ENTRY)
+
+        if self._state == STATE_ALARM_PENDING or skip_delay or not entry_delay:
+            # countdown finished or immediate trigger event
+            await self.async_update_state(STATE_ALARM_TRIGGERED)
+
+            if trigger_time:
+                # there is a max. trigger time configured
+                self.async_set_timer(trigger_time, self.async_trigger_timer_finished)
+
+        else:  # to pending state
+            await self.async_update_state(STATE_ALARM_PENDING)
+            self.async_set_timer(entry_delay, self.async_entry_timer_finished)
+
+    @callback
+    async def async_initialization_timer_finished(self, now):
+        """Update state at a scheduled point in time."""
+        await self.async_arm(self.arm_mode)
+
+    @callback
+    async def async_leave_timer_finished(self, now):
+        """Update state at a scheduled point in time."""
+        _LOGGER.debug("async_leave_timer_finished")
+        await self.async_arm(self.arm_mode)
+
+    @callback
+    async def async_trigger_timer_finished(self, now):
+        """Update state at a scheduled point in time."""
+
+        _LOGGER.debug("async_trigger_timer_finished")
+        if self._disarm_after_trigger:
+            await self.async_update_state(STATE_ALARM_DISARMED)
+        else:
+            await self.async_arm(self.arm_mode)
+
+    @callback
+    async def async_entry_timer_finished(self, now):
+        """Update state at a scheduled point in time."""
+
+        _LOGGER.debug("async_entry_timer_finished")
+        await self.async_trigger()
+
+    def async_cancel_timer(self):
         if self._timer:
             self._timer()
 
         self._timer = None
 
-    async def _async_handle_actions(self, last_state=None, open_sensors=None):
-        message = ""
-        state = self._state
+    def async_set_timer(self, delay: datetime.timedelta, cb_func):
+        self.async_cancel_timer()
+        now = dt_util.utcnow()
 
-        def format_open_sensors():
-            items = []
-            for (entity, status) in open_sensors.items():
-                state = self.hass.states.get(entity)
-                if state and "friendly_name" in state.attributes:
-                    name = state.attributes["friendly_name"]
-                else:
-                    name = entity.split(".")[1]
+        self._timer = async_track_point_in_time(
+            self._hass, cb_func, now + delay
+        )
 
-                items.append("{} is {}".format(name, status))
-            return ", ".join(items)
+    async def _subscribe_topics(self):
 
-        if state and self._siren_entity:
-            siren_state = self.hass.states.get(self._siren_entity)
-            if not siren_state:
-                _LOGGER.warning("Siren entity is not found")
-            elif state == STATE_ALARM_TRIGGERED and siren_state.state != "on":
-                _LOGGER.info("Activating siren")
-                await async_call_from_config(
-                    self.hass,
-                    {
-                        "service": "switch.turn_on",
-                        "entity_id": self._siren_entity,
-                    },
-                )
-            elif state != STATE_ALARM_TRIGGERED and siren_state.state == "on":
-                _LOGGER.info("Deactivating siren")
-                await async_call_from_config(
-                    self.hass,
-                    {
-                        "service": "switch.turn_off",
-                        "entity_id": self._siren_entity,
-                    },
-                )
+        @callback
+        async def async_message_received(msg):
 
-        if state == STATE_ALARM_ARMING:
-            message = "Time to leave the house. The alarm will be set to mode {} soon.".format(
-                self._arm_mode
-            )
-        elif state in ARMED_STATES:
-            message = "The alarm is now ON (in {} mode).".format(self._arm_mode)
-        elif state == STATE_ALARM_TRIGGERED:
-            message = "The alarm is triggered!!"
-        elif state == STATE_ALARM_DISARMED and last_state:
-            if open_sensors:
-                message = "Failed to turn on the alarm, because: {}.".format(
-                    format_open_sensors()
-                )
-            else:
-                message = "The alarm is now OFF."
-        elif state == STATE_ALARM_DISARMED and not last_state:
-            if open_sensors:
-                message = "Failed to restore the alarm state, because: {}.".format(
-                    format_open_sensors()
-                )
+            try:
+                payload = json.loads(msg.payload)
+                command = payload["command"] if "command" in payload else None
+                code = payload["code"] if "code" in payload else None
+            except ValueError:
+                command = msg.payload
+                code = None
 
-        if not message:
-            return
+            if command not in (
+                COMMAND_DISARM,
+                COMMAND_ARM_AWAY,
+                COMMAND_ARM_NIGHT,
+                COMMAND_ARM_HOME,
+                COMMAND_ARM_CUSTOM_BYPASS,
+            ):
+                _LOGGER.warning("Received unexpected payload: %s", payload)
+                return
 
-        _LOGGER.info(message)
+            skip_code = not self._config[ATTR_MQTT][ATTR_REQUIRE_CODE]
 
-        if self._push_target:
-            service_call = {
-                "service": "notify.{}".format(self._push_target),
-                "data": {"title": "Message from Alarmo", "message": message},
-            }
-            await async_call_from_config(
-                self.hass,
-                service_call,
-            )
+            if command == COMMAND_DISARM:
+                await self.async_alarm_disarm(code, skip_code)
+            elif command == COMMAND_ARM_AWAY:
+                await self.async_alarm_arm_away(code, skip_code)
+            elif command == COMMAND_ARM_NIGHT:
+                await self.async_alarm_arm_night(code, skip_code)
+            elif command == COMMAND_ARM_HOME:
+                await self.async_alarm_arm_home(code, skip_code)
+            elif command == COMMAND_ARM_CUSTOM_BYPASS:
+                await self.async_alarm_arm_custom_bypass(code, skip_code)
+
+        await mqtt.async_subscribe(self._hass, self._config[ATTR_MQTT][CONF_COMMAND_TOPIC], async_message_received)
+
+# async def _async_handle_actions(self, last_state=None, open_sensors=None):
+#     message = ""
+#     state = self._state
+
+#     def format_open_sensors():
+#         items = []
+#         for (entity, status) in open_sensors.items():
+#             state = self.hass.states.get(entity)
+#             if state and "friendly_name" in state.attributes:
+#                 name = state.attributes["friendly_name"]
+#             else:
+#                 name = entity.split(".")[1]
+
+#             items.append("{} is {}".format(name, status))
+#         return ", ".join(items)
+
+#     if state and self._siren_entity:
+#         siren_state = self.hass.states.get(self._siren_entity)
+#         if not siren_state:
+#             _LOGGER.warning("Siren entity is not found")
+#         elif state == STATE_ALARM_TRIGGERED and siren_state.state != "on":
+#             _LOGGER.info("Activating siren")
+#             await async_call_from_config(
+#                 self.hass,
+#                 {
+#                     "service": "switch.turn_on",
+#                     "entity_id": self._siren_entity,
+#                 },
+#             )
+#         elif state != STATE_ALARM_TRIGGERED and siren_state.state == "on":
+#             _LOGGER.info("Deactivating siren")
+#             await async_call_from_config(
+#                 self.hass,
+#                 {
+#                     "service": "switch.turn_off",
+#                     "entity_id": self._siren_entity,
+#                 },
+#             )
+
+#     if state == STATE_ALARM_ARMING:
+#         message = "Time to leave the house. The alarm will be set to mode {} soon.".format(
+#             self._arm_state
+#         )
+#     elif state in ARM_MODES:
+#         message = "The alarm is now ON (in {} mode).".format(self._arm_state)
+#     elif state == STATE_ALARM_TRIGGERED:
+#         message = "The alarm is triggered!!"
+#     elif state == STATE_ALARM_DISARMED and last_state:
+#         if open_sensors:
+#             message = "Failed to turn on the alarm, because: {}.".format(
+#                 format_open_sensors()
+#             )
+#         else:
+#             message = "The alarm is now OFF."
+#     elif state == STATE_ALARM_DISARMED and not last_state:
+#         if open_sensors:
+#             message = "Failed to restore the alarm state, because: {}.".format(
+#                 format_open_sensors()
+#             )
+
+#     if not message:
+#         return
+
+#     _LOGGER.info(message)
+
+#     if self._push_target:
+#         service_call = {
+#             "service": "notify.{}".format(self._push_target),
+#             "data": {"title": "Message from Alarmo", "message": message},
+#         }
+#         await async_call_from_config(
+#             self.hass,
+#             service_call,
+#         )

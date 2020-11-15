@@ -4,3 +4,5 @@ __pycache__
 frontend/node_modules
 ._*
 README.html
+package-lock.json
+report/

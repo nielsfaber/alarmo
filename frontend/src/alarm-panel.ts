@@ -2,47 +2,35 @@ import { LitElement, html, customElement, property, CSSResult, css } from 'lit-e
 import { HomeAssistant, navigate } from 'custom-card-helpers';
 import { loadHaForm } from './load-ha-form';
 
-import './view-general.ts';
-import './view-sensors.ts';
-import './view-codes.ts';
-import './view-actions.ts';
+import './views/view-general.ts';
+import './views/view-sensors.ts';
+import './views/view-codes.ts';
+import './views/view-actions.ts';
 import { commonStyle } from './styles';
-import { getAlarmEntity } from './helpers';
-import { importUserConfig } from './interface';
 
 @customElement('alarm-panel')
 export class MyAlarmPanel extends LitElement {
   @property() public hass!: HomeAssistant;
+  @property({ type: Boolean, reflect: true }) public narrow!: boolean;
 
   firstUpdated() {
-    (async () => await loadHaForm())();
+    (async () => {
+      await loadHaForm();
+      this.requestUpdate();
+    })();
   }
 
   render() {
-    const user = this.hass.user;
-    let is_admin = user.is_admin;
-    const alarmEntity = this.hass.states[getAlarmEntity(this.hass)];
-    const users = Object.entries(alarmEntity.attributes.users).map(([k, v]) => importUserConfig(k, Number(v)));
-    if (!is_admin && users.find(e => e.name == user.name)) is_admin = users.find(e => e.name == user.name)!.is_admin;
-
-    if (!is_admin) return html`
-      <div class="view">
-        <ha-card header="Alarmo">
-          <div class="card-content">
-            Hi there ${user.name}!<br><br>
-            It looks like you don't have the appropriate permissions to configure Alarmo :(
-          </div>
-        </ha-card>
-      </div>
-    `;
-    else {
-
-
-      return html`
+    if (!customElements.get('ha-app-layout')) return html`loading...`;
+    return html`
       <ha-app-layout>
         <app-header fixed slot="header">
           <app-toolbar>
-            <ha-menu-button .hass=${this.hass}></ha-menu-button>
+            <ha-menu-button
+              .hass=${this.hass}
+              .narrow=${this.narrow}
+            >
+            </ha-menu-button>
             <div main-title>
               Alarm panel
             </div>
@@ -72,33 +60,56 @@ export class MyAlarmPanel extends LitElement {
         ${this.getView()}
       </div>
     `;
-    }
   }
 
   getPath() {
-    return window.location.pathname.split('/').pop();
+    return window.location.pathname.split('/');
   }
 
   getView() {
     const path = this.getPath();
-    if (path == 'general' || !path || path == 'alarmo') {
-      return html`
-        <alarm-view-general .hass=${this.hass}> </alarm-view-general>
+    const view = path[2] || "general";
+    const args = path.slice(3);
+
+    switch (view) {
+      case "general":
+        return html`
+        <alarm-view-general
+          .hass=${this.hass}
+          .narrow=${this.narrow}
+          .path=${args.length ? args : null}
+        ></alarm-view-general>
       `;
-    } else if (path == 'sensors') {
-      return html`
-        <alarm-view-sensors .hass=${this.hass}> </alarm-view-sensors>
+      case "sensors":
+        return html`
+        <alarm-view-sensors
+          .hass=${this.hass}
+          .narrow=${this.narrow}
+          .path=${args.length ? args : null}
+        >
+        </alarm-view-sensors>
       `;
-    } else if (path == 'codes') {
-      return html`
-        <alarm-view-codes .hass=${this.hass}> </alarm-view-codes>
+      case "codes":
+        return html`
+        <alarm-view-codes
+          .hass=${this.hass}
+          .narrow=${this.narrow}
+          .path=${args.length ? args : null}
+        >
+        </alarm-view-codes>
       `;
-    } else if (path == 'actions') {
-      return html`
-        <alarm-view-actions .hass=${this.hass}> </alarm-view-actions>
+      case "actions":
+        return html`
+        <alarm-view-actions
+          .hass=${this.hass}
+          .narrow=${this.narrow}
+          .path=${args.length ? args : null}
+        >
+        </alarm-view-actions>
       `;
+      default:
+        return html`no view`;
     }
-    return html``;
   }
 
   handlePageSelected(ev) {
@@ -128,6 +139,7 @@ export class MyAlarmPanel extends LitElement {
       }
 
       ha-app-layout {
+        display: block;
         z-index: 2;
       }
 
@@ -137,9 +149,18 @@ export class MyAlarmPanel extends LitElement {
       }
 
       .view {
+        height: calc(100vh - 112px);
         display: flex;
         justify-content: center;
-        padding-top: 50px;
+      }
+
+      .view > * {
+        width: 600px;
+        max-width: 600px;
+      }
+
+      .view > *:last-child {
+        margin-bottom: 20px;
       }
     `;
   }

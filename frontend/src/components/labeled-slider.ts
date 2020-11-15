@@ -65,6 +65,9 @@ export class LabeledSlider extends LitElement {
 
   static styles = css`
     :host {
+      display: flex;
+      flex-direction: column;
+      min-width: 250px;
     }
 
     div.container {
@@ -72,7 +75,6 @@ export class LabeledSlider extends LitElement {
       grid-template-columns: 1fr 100px;
       grid-template-rows: min-content;
       grid-template-areas: 'slider value';
-      width: 100%;
     }
 
     div.slider {
@@ -90,8 +92,8 @@ export class LabeledSlider extends LitElement {
     }
 
     ha-slider {
-      width: 100%;
       --paper-slider-pin-start-color: var(--primary-color);
+      width: 100%;
     }
 
     .disabled {

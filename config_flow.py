@@ -6,7 +6,6 @@ from homeassistant import config_entries
 from .const import (
     DOMAIN,
     NAME,
-    ATTR_USERS,
 )
 
 
@@ -23,4 +22,4 @@ class AlarmoConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         await self.async_set_unique_id(id)
         self._abort_if_unique_id_configured(updates=user_input)
 
-        return self.async_create_entry(title=NAME, data={ATTR_USERS: []})
+        return self.async_create_entry(title=NAME, data={})

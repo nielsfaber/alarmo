@@ -20,130 +20,104 @@ export interface AlarmEntity extends HassEntity {
   };
 }
 
-export enum EAlarmModes {
-  ArmedAway = 'away',
-  ArmedHome = 'home',
-  ArmedNight = 'night',
-  ArmedCustom = 'custom',
+export enum EArmModes {
+  ArmedAway = 'armed_away',
+  ArmedHome = 'armed_home',
+  ArmedNight = 'armed_night',
+  ArmedCustom = 'armed_custom_bypass',
 }
 
-export interface SensorConfig {
-  modes: EAlarmModes[];
-  immediate: boolean;
-  arm_on_close: boolean;
-  allow_open: boolean;
+export type AlarmoModeConfig = {
+  enabled: boolean,
+  leave_time: number,
+  entry_time: number,
 }
 
-export interface DelayConfig {
-  entry: number;
-  leave: number;
-  trigger: number;
+
+export type AlarmoConfig = {
+  code_arm_required: boolean,
+  code_disarm_required: boolean,
+  code_format: 'number' | 'text',
+  trigger_time: number,
+  disarm_after_trigger: boolean,
+  modes: Record<EArmModes, AlarmoModeConfig>,
+  mqtt: MqttConfig
 }
 
-export interface UserConfig {
-  name: string;
-  is_admin: boolean;
-  can_arm: boolean;
-  can_disarm: boolean;
+export type AlarmoSensor = {
+  entity_id: string,
+  name?: string,
+  modes: EArmModes[]
+  immediate: boolean,
+  arm_on_close: boolean,
+  allow_open: boolean,
+  always_on: boolean,
 }
 
-export interface GeneralConfig {
-  code_arm_required: boolean;
-  code_disarm_required: boolean;
-  code_format: 'number' | 'text';
-  disarm_after_trigger: boolean;
+export type AlarmoUser = {
+  user_id?: string,
+  name: string,
+  code: string,
+  old_code?: string,
+  is_admin: boolean,
+  can_arm: boolean,
+  can_disarm: boolean
 }
 
-export interface ActionConfig {
-  pushEnabled: boolean,
-  pushTarget: string,
-  sirenEnabled: boolean,
-  sirenEntity: string,
+export type Trigger = {
+  state?: string,
+  event?: string;
 }
 
-export type editSensorSchema = {
-  entity_id: string;
-  edit_sensor: {
-    entity_id: string;
-    modes: EAlarmModes[];
-    immediate?: boolean;
-    arm_on_close?: boolean;
-    allow_open?: boolean;
-  };
-};
+export type Action = {
+  service: string,
+  entity_id?: string,
+  service_data?: Dictionary<any>
+}
 
-export type removeSensorSchema = {
-  entity_id: string;
-  remove_sensor: {
-    entity_id: string;
-  };
-};
+export type NotificationAction = {
+  service: string,
+  service_data: Dictionary<any> & {
+    title?: string,
+    message: string
+  }
+}
 
-export type editModeSchema = {
-  entity_id: string;
-  edit_mode: {
-    mode: EAlarmModes;
-    enabled?: boolean;
-    delays?: {
-      leave?: { minutes?: number; seconds?: number };
-      entry?: { minutes?: number; seconds?: number };
-    };
-  };
-};
+export enum EAlarmStates {
+  Disarmed = "disarmed",
+  Armed = "armed",
+  Triggered = "triggered",
+  Pending = "pending",
+  Arming = "arming"
+}
 
-export type editGeneralSchema = {
-  entity_id: string;
-  edit_general: {
-    trigger_time?: { minutes?: number; seconds?: number };
-    disarm_after_trigger?: boolean;
-  };
-};
+export enum EAlarmEvents {
+  Failure = "alarmo_failure",
+}
 
-export type addUserSchema = {
-  entity_id: string;
-  add_user: {
-    name: string;
-    code: string;
-    is_admin: boolean;
-    can_arm: boolean;
-    can_disarm: boolean;
-  };
-};
-
-export type editUserSchema = {
-  entity_id: string;
-  edit_user: {
-    name: string;
-    code: string;
-    code_new: string;
-    is_admin: boolean;
-    can_arm: boolean;
-    can_disarm: boolean;
-  };
-};
-
-export type removeUserSchema = {
-  entity_id: string;
-  edit_user: {
-    name: string;
-    remove: boolean;
-  };
-};
-
-export type configCodeSchema = {
-  entity_id: string;
-  config_code: {
-    code_arm_required: boolean;
-    code_disarm_required: boolean;
-    code_format: 'number' | 'text';
-  };
-};
+export interface AlarmoAutomation {
+  automation_id?: string,
+  name?: string,
+  triggers: Trigger[],
+  actions: Action[],
+  enabled?: boolean,
+  modes?: EArmModes[],
+  is_notification?: boolean,
+}
 
 
-export type editActionsSchema = {
-  entity_id: string;
-  edit_actions: {
-    push_target?: string;
-    siren_entity?: string;
-  };
-};
+export interface AlarmoNotification extends AlarmoAutomation {
+  automation_id?: string,
+  name?: string,
+  triggers: Trigger[],
+  actions: NotificationAction[],
+  enabled?: boolean,
+  modes?: EArmModes[]
+}
+
+export type MqttConfig = {
+  enabled: boolean,
+  state_topic: string,
+  command_topic: string,
+  require_code: boolean,
+}

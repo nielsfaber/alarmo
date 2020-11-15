@@ -28,6 +28,7 @@
     "@rollup/plugin-json": "^4.0.0",
     "@typescript-eslint/eslint-plugin": "^2.6.0",
     "@typescript-eslint/parser": "^2.6.0",
+    "ajv": "^6.12.6",
     "custom-card-helpers": "^1.6.5",
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.0.0",

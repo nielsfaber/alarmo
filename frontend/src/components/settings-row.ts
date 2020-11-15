@@ -3,21 +3,16 @@ import { css, CSSResult, customElement, html, LitElement, property, SVGTemplateR
 @customElement('settings-row')
 export class SettingsRow extends LitElement {
   @property({ type: Boolean, reflect: true }) public narrow!: boolean;
-
+  @property({ type: Boolean, reflect: true }) large?: boolean;
   @property({ type: Boolean, attribute: 'three-line' })
   public threeLine = false;
 
   protected render(): SVGTemplateResult {
     return html`
-      <style>
-        paper-item-body {
-          padding-right: 16px;
-        }
-      </style>
-      <paper-item-body ?two-line=${!this.threeLine} ?three-line=${this.threeLine}>
+      <div class="info">
         <slot name="heading"></slot>
-        <div secondary><slot name="description"></slot></div>
-      </paper-item-body>
+        <div class="secondary"><slot name="description"></slot></div>
+      </div>
       <slot></slot>
     `;
   }
@@ -26,19 +21,29 @@ export class SettingsRow extends LitElement {
     return css`
       :host {
         display: flex;
-        padding: 0 16px;
-        align-content: normal;
-        align-self: auto;
+        flex-direction: row;
+        padding: 0px 16px;
         align-items: center;
+        min-height: 72px;
       }
       :host([narrow]) {
         align-items: normal;
         flex-direction: column;
         border-top: 1px solid var(--divider-color);
-        padding-bottom: 8px;
+        padding: 16px 16px;
+      }
+      :host([large]) {
+        align-items: normal;
+        flex-direction: column;
       }
       ::slotted(ha-switch) {
         padding: 16px 0;
+      }
+      .info {
+        flex: 1 0 60px;
+      }
+      .secondary {
+        color: var(--secondary-text-color);
       }
     `;
   }

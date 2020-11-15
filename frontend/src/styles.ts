@@ -4,8 +4,7 @@ export const commonStyle = css`
   ha-card {
     display: flex;
     flex-direction: column;
-    width: 600px;
-    margin: 20px 0px;
+    margin: 5px;
   }
 
   .card-header {
@@ -48,6 +47,10 @@ export const commonStyle = css`
     --mdc-theme-primary: var(--error-color);
   }
 
+  mwc-button.disabled.active {
+    opacity: 0.5;
+  }
+
   div.entity-row {
     display: flex;
     align-items: center;
@@ -72,7 +75,11 @@ export const commonStyle = css`
     flex: 0 0 40px;
   }
 
-  labeled-slider {
-    width: 300px;
+  ha-dialog div.wrapper {
+    margin-bottom: -20px;
+  }
+
+  paper-textarea {
+    width: 100%;
   }
 `;
