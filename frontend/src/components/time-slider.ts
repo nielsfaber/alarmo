@@ -1,7 +1,12 @@
 import { LitElement, html, customElement, css, property } from 'lit-element';
+import { localize } from '../../localize/localize';
+import { HomeAssistant } from 'custom-card-helpers';
 
-@customElement('labeled-slider')
-export class LabeledSlider extends LitElement {
+@customElement('time-slider')
+export class TimeSlider extends LitElement {
+
+  hass?: HomeAssistant;
+
   @property({ type: Number })
   min = 0;
 
@@ -9,10 +14,12 @@ export class LabeledSlider extends LitElement {
   max = 100;
 
   @property({ type: Number })
-  step = 1;
+  step = 10;
 
   @property({ type: Number })
   value = 0;
+
+  @property() scaleFactor = 1;
 
   @property({ type: String })
   unit = '';
@@ -23,13 +30,21 @@ export class LabeledSlider extends LitElement {
   @property({ type: String })
   zeroValue?: string;
 
+  firstUpdated() {
+    if (this.unit == "min") this.scaleFactor = 1 / 60;
+    if (this.unit == "min") this.step = 1;
+  }
+
   render() {
     return html`
       <div class="container">
         <div class="slider">
           ${this.getSlider()}
         </div>
-        <div class="value${this.disabled ? ' disabled' : ''}">
+        <div
+          class="value${this.disabled ? ' disabled' : ''}"
+          @click=${this.toggleUnit}
+        >
           ${this.getValue()}
         </div>
       </div>
@@ -37,21 +52,32 @@ export class LabeledSlider extends LitElement {
   }
 
   getValue() {
-    const value = Number(this.value);
+    let value = Number(Math.round(this.value * this.scaleFactor));
     if (!value && this.zeroValue) {
       return this.zeroValue;
     }
-    return `${value} ${this.unit}`;
+    return `${value} ${this.getUnit()}`;
+  }
+
+  getUnit() {
+    switch (this.unit) {
+      case "sec":
+        return localize("components.time_slider.seconds", this.hass!.language);
+      case "min":
+        return localize("components.time_slider.minutes", this.hass!.language);
+      default:
+        return "";
+    }
   }
 
   getSlider() {
     return html`
       <ha-slider
         pin
-        min=${this.min}
-        max=${this.max}
+        min=${Math.round(this.min * this.scaleFactor)}
+        max=${Math.round(this.max * this.scaleFactor)}
         step=${this.step}
-        value=${this.value}
+        value=${Math.round(this.value * this.scaleFactor)}
         ?disabled=${this.disabled}
         @change=${this.updateValue}
       ></ha-slider>
@@ -60,7 +86,13 @@ export class LabeledSlider extends LitElement {
 
   updateValue(e: Event) {
     const value = Number((e.target as HTMLInputElement).value);
-    this.value = value;
+    this.value = Math.round(value / this.scaleFactor);
+  }
+
+  toggleUnit() {
+    this.unit = this.unit == "min" ? "sec" : "min";
+    this.scaleFactor = (this.unit == "min") ? 1 / 60 : 1;
+    this.step = (this.unit == "min") ? 1 : 10;
   }
 
   static styles = css`
@@ -72,7 +104,7 @@ export class LabeledSlider extends LitElement {
 
     div.container {
       display: grid;
-      grid-template-columns: 1fr 100px;
+      grid-template-columns: 1fr 60px;
       grid-template-rows: min-content;
       grid-template-areas: 'slider value';
     }
@@ -89,6 +121,8 @@ export class LabeledSlider extends LitElement {
       min-width: 40px;
       display: flex;
       align-items: center;
+      justify-content: flex-end;
+      cursor: pointer;
     }
 
     ha-slider {
