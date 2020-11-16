@@ -144,7 +144,7 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
         text: true
       },
       remarks: {
-        title: "Remarks",
+        title: localize("panels.codes.cards.user_management.table.remarks", this.hass.language),
         width: "40%",
         hide: this.narrow,
         text: true
@@ -157,7 +157,7 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
         id: item.user_id!,
         icon: html`<ha-icon icon="mdi:account-outline"></ha-icon>`,
         name: prettyPrint(item.name),
-        remarks: item.is_admin ? 'administrator' : ''
+        remarks: item.is_admin ? localize("panels.codes.cards.user_management.table.administrator", this.hass!.language) : ''
       };
       return output;
     });

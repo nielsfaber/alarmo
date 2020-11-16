@@ -15,6 +15,7 @@ import { SubscribeMixin } from '../subscribe-mixin';
 import { localize } from '../../localize/localize';
 import { TableColumn, TableData } from '../components/alarmo-table';
 import { defaultSensorConfig, isValidSensor } from '../data/sensors';
+import { IconArmedAway, IconArmedHome } from '../const';
 
 @customElement('alarm-view-sensors')
 export class AlarmViewSensors extends SubscribeMixin(LitElement) {
@@ -92,7 +93,7 @@ export class AlarmViewSensors extends SubscribeMixin(LitElement) {
       },
       name: {
         title: this.hass.localize("ui.components.area-picker.add_dialog.name"),
-        width: "40%",
+        width: "50%",
         grow: true,
         text: true
       },
@@ -100,6 +101,11 @@ export class AlarmViewSensors extends SubscribeMixin(LitElement) {
         title: this.hass.localize("ui.components.entity.entity-picker.entity"),
         width: "40%",
         hide: this.narrow,
+        text: true,
+      },
+      modes: {
+        title: localize("panels.sensors.cards.sensors.table.arm_modes", this.hass.language),
+        width: "25%",
         text: true
       }
 
@@ -109,6 +115,9 @@ export class AlarmViewSensors extends SubscribeMixin(LitElement) {
         icon: html`<state-badge .hass=${this.hass} .stateObj=${this.hass!.states[item.id]}></state-badge>`,
         name: this.sensors[item.id].name || prettyPrint(item.name),
         id: item.id,
+        modes: this.sensors[item.id].always_on
+          ? localize("panels.sensors.cards.sensors.table.always_on", this.hass!.language)
+          : this.sensors[item.id].modes.filter(e => this.config?.modes[e].enabled).map(e => localize(`common.modes_short.${e}`, this.hass!.language)).join(", ")
       };
       return output;
     });

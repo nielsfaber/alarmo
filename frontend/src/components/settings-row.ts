@@ -23,7 +23,7 @@ export class SettingsRow extends LitElement {
         display: flex;
         flex-direction: row;
         padding: 0px 16px;
-        align-items: center;
+        align-items: flex-start;
         min-height: 72px;
       }
       :host([narrow]) {

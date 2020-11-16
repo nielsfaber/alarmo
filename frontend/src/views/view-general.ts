@@ -4,7 +4,7 @@ import { loadHaForm } from '../load-ha-form';
 import { AlarmoConfig, EArmModes } from '../types';
 import { commonStyle } from '../styles';
 
-import '../components/labeled-slider';
+import '../components/time-slider';
 import '../cards/alarm-mode-card';
 import '../components/settings-row.ts';
 import '../cards/mqtt-config-card.ts';
@@ -73,24 +73,23 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
         </div>
 
         <settings-row .narrow=${this.narrow}>
-          <span slot="heading">${localize("panels.general.fields.trigger_time.heading", this.hass.language)}</span>
-          <span slot="description">${localize("panels.general.fields.trigger_time.description", this.hass.language)}</span>
-          <labeled-slider
-            unit="minutes"
-            min="0"
-            max="60"
-            step="1"
-            zeroValue="infinite"
-            value=${Math.round(this.data!.trigger_time! / 60)}
-            @change=${(ev: Event) => this.data = { ...this.data, trigger_time: Number((ev.target as HTMLInputElement).value) * 60 }}
+          <span slot="heading">${localize("panels.general.cards.general.fields.trigger_time.heading", this.hass.language)}</span>
+          <span slot="description">${localize("panels.general.cards.general.fields.trigger_time.description", this.hass.language)}</span>
+          <time-slider
+            .hass=${this.hass}
+            unit="min"
+            max="3600"
+            zeroValue=${localize("components.time_slider.infinite", this.hass.language)}
+            value=${Math.round(this.data!.trigger_time!)}
+            @change=${(ev: Event) => this.data = { ...this.data, trigger_time: Number((ev.target as HTMLInputElement).value) }}
         }}
           >
-          </labeled-slider>
+          </time-slider>
         </settings-row>
 
         <settings-row .narrow=${this.narrow}>
-          <span slot="heading">${localize("panels.general.fields.disarm_after_trigger.heading", this.hass.language)}</span>
-          <span slot="description">${localize("panels.general.fields.disarm_after_trigger.description", this.hass.language)}</span>
+          <span slot="heading">${localize("panels.general.cards.general.fields.disarm_after_trigger.heading", this.hass.language)}</span>
+          <span slot="description">${localize("panels.general.cards.general.fields.disarm_after_trigger.description", this.hass.language)}</span>
           <ha-switch
             ?checked=${this.data!.disarm_after_trigger}
             @change=${(ev: Event) => this.data = { ...this.data, disarm_after_trigger: (ev.target as HTMLInputElement).checked }}
@@ -100,8 +99,8 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
         </settings-row>
 
         <settings-row .narrow=${this.narrow}>
-          <span slot="heading">Enable MQTT</span>
-          <span slot="description">Allow the alarm panel to be controlled through MQTT</span>
+          <span slot="heading">${localize("panels.general.cards.general.fields.enable_mqtt.heading", this.hass.language)}</span>
+          <span slot="description">${localize("panels.general.cards.general.fields.enable_mqtt.description", this.hass.language)}</span>
           <ha-switch
             ?checked=${this.data?.mqtt?.enabled}
             @change=${(ev: Event) => { this.data = { ...this.data!, mqtt: { ...this.data!.mqtt!, enabled: (ev.target as HTMLInputElement).checked } } }}
@@ -117,7 +116,7 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
             outlined
             @click=${() => navigate(this, "/alarmo/general/mqtt_configuration", true)}
           >
-            Setup MQTT
+            ${localize("panels.general.cards.general.actions.setup_mqtt", this.hass.language)}
           </mwc-button>
         </div>
         `

@@ -49,42 +49,38 @@ export class MqttConfigCard extends SubscribeMixin(LitElement) {
     return html`
       <ha-card>
         <div class="card-header">
-          <div class="name">
-            ${localize("panels.general.cards.general.title", this.hass.language)}
-          </div>
+          <div class="name">${localize("panels.general.cards.mqtt.title", this.hass.language)}</div>
           <ha-icon-button
             icon="hass:close"
             @click=${this.cancelClick}
           >
           </ha-icon-button>
         </div>
-        <div class="card-content">
-          ${localize("panels.general.cards.general.description", this.hass.language)}
-        </div>
+        <div class="card-content">${localize("panels.general.cards.mqtt.description", this.hass.language)}</div>
 
         <settings-row .narrow=${this.narrow}>
-          <span slot="heading">State topic</span>
-          <span slot="description">Topic on which state updates are published</span>
+          <span slot="heading">${localize("panels.general.cards.mqtt.fields.state_topic.heading", this.hass.language)}</span>
+          <span slot="description">${localize("panels.general.cards.mqtt.fields.state_topic.description", this.hass.language)}</span>
           <paper-input
-            label="State topic"
+            label="${localize("panels.general.cards.mqtt.fields.state_topic.heading", this.hass.language)}"
             value=${this.selection.state_topic}
             @change=${(ev: Event) => { this.selection = { ...this.selection!, state_topic: (ev.target as HTMLInputElement).value } }}
           ></paper-input>
         </settings-row>
 
         <settings-row .narrow=${this.narrow}>
-          <span slot="heading">Command topic</span>
-          <span slot="description">Topic on which arm/disarm commands are sent</span>
+          <span slot="heading">${localize("panels.general.cards.mqtt.fields.command_topic.heading", this.hass.language)}</span>
+          <span slot="description">${localize("panels.general.cards.mqtt.fields.command_topic.description", this.hass.language)}</span>
           <paper-input
-            label="Command topic"
+            label="${localize("panels.general.cards.mqtt.fields.command_topic.heading", this.hass.language)}"
             value=${this.selection.command_topic}
             @change=${(ev: Event) => { this.selection = { ...this.selection!, command_topic: (ev.target as HTMLInputElement).value } }}
           ></paper-input>
         </settings-row>
 
         <settings-row .narrow=${this.narrow}>
-          <span slot="heading">Require code</span>
-          <span slot="description">Require a code </span>
+          <span slot="heading">${localize("panels.general.cards.mqtt.fields.require_code.heading", this.hass.language)}</span>
+          <span slot="description">${localize("panels.general.cards.mqtt.fields.require_code.description", this.hass.language)}</span>
           <ha-switch
             ?checked=${this.selection.require_code}
             @change=${(ev: Event) => { this.selection = { ...this.selection!, require_code: (ev.target as HTMLInputElement).checked } }}

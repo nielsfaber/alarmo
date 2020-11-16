@@ -2,7 +2,7 @@ import { LitElement, html, customElement, property } from 'lit-element';
 import { HomeAssistant } from 'custom-card-helpers';
 import { EArmModes, AlarmoModeConfig } from '../types';
 
-import '../components/labeled-slider';
+import '../components/time-slider';
 import { commonStyle } from '../styles';
 import { localize } from '../../localize/localize';
 import { saveModeConfig } from '../data/websockets';
@@ -50,35 +50,33 @@ export class AlarmModeCard extends LitElement {
       this.enabled
         ? html`
           <settings-row .narrow=${this.narrow}>
-            <span slot="heading">${localize("panels.general.fields.leave_time.heading", this.hass.language)}</span>
-            <span slot="description">${localize("panels.general.fields.leave_time.description", this.hass.language)}</span>
-            <labeled-slider
+            <span slot="heading">${localize("panels.general.cards.common.fields.leave_time.heading", this.hass.language)}</span>
+            <span slot="description">${localize("panels.general.cards.common.fields.leave_time.description", this.hass.language)}</span>
+            <time-slider
+              .hass=${this.hass}
               ?disabled=${!this.enabled}
-              unit="seconds"
-              min="0"
+              unit="sec"
               max="180"
-              step="10"
-              zeroValue="none"
+              zeroValue=${localize("components.time_slider.none", this.hass.language)}
               value=${this.leave_time}
               @change=${ev => { this.leave_time = Number(ev.target.value); }}
             >
-            </labeled-slider>
+            </time-slider>
           </settings-row>
 
           <settings-row .narrow=${this.narrow}>
-            <span slot="heading">${localize("panels.general.fields.entry_time.heading", this.hass.language)}</span>
-            <span slot="description">${localize("panels.general.fields.entry_time.description", this.hass.language)}</span>
-            <labeled-slider
+            <span slot="heading">${localize("panels.general.cards.common.fields.entry_time.heading", this.hass.language)}</span>
+            <span slot="description">${localize("panels.general.cards.common.fields.entry_time.description", this.hass.language)}</span>
+            <time-slider
+              .hass=${this.hass}
               ?disabled=${!this.enabled}
-              unit="seconds"
-              min="0"
+              unit="sec"
               max="180"
-              step="10"
-              zeroValue="none"
+              zeroValue=${localize("components.time_slider.none", this.hass.language)}
               value=${this.entry_time}
               @change=${ev => { this.entry_time = Number(ev.target.value); }}
             >
-            </labeled-slider>
+            </time-slider>
           </settings-row>
           ` : ''
       }

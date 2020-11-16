@@ -12,6 +12,7 @@ import { commonStyle } from '../styles';
 import { fetchAutomations, saveAutomation } from '../data/websockets';
 import { TableColumn } from '../components/alarmo-table';
 import { handleError } from '../helpers';
+import { localize } from '../../localize/localize';
 
 @customElement('alarm-view-actions')
 export class AlarmViewActions extends SubscribeMixin(LitElement) {
@@ -78,7 +79,7 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
           text: true
         },
         enabled: {
-          title: "Enabled",
+          title: localize("panels.actions.cards.notifications.table.enabled", this.hass.language),
           width: "68px",
           align: "center"
         },
@@ -110,11 +111,8 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
 
       return html`
 
-      <ha-card header="Notifications">
-        <div class="card-content">
-          In this panel, you can manage automations triggered by state change of Alarmo.
-        </div>
-
+      <ha-card header="${localize("panels.actions.cards.notifications.title", this.hass.language)}">
+        <div class="card-content">${localize("panels.actions.cards.notifications.description", this.hass.language)}</div>
         
       <alarmo-table
         ?selectable=${true}
@@ -125,25 +123,22 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
           navigate(this, `/alarmo/actions/edit_notification/${id}`, true);
         }}
       >
-        No actions yet
+        ${localize("panels.actions.cards.notifications.table.no_items", this.hass.language)}
       </alarmo-table>
 
         <div class="card-actions">
           <mwc-button
             @click=${this.addNotificationClick}
           >
-            new notification
+            ${localize("panels.actions.cards.notifications.actions.new_notification", this.hass.language)}
           </mwc-button>
         </div>
       </ha-card>
 
       
-      <ha-card header="Actions">
-        <div class="card-content">
-          In this panel, you can manage automations triggered by state change of Alarmo.
-        </div>
-
-        
+      <ha-card header="${localize("panels.actions.cards.actions.title", this.hass.language)}">
+        <div class="card-content">${localize("panels.actions.cards.actions.description", this.hass.language)}</div>
+                
       <alarmo-table
         ?selectable=${true}
         .columns=${columns}
@@ -153,7 +148,7 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
           navigate(this, `/alarmo/actions/edit_action/${id}`, true);
         }}
       >
-        No actions yet
+        ${localize("panels.actions.cards.actions.table.no_items", this.hass.language)}
       </alarmo-table>
 
         <div class="card-actions">
@@ -161,7 +156,7 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
             @click=${() => { }}
             disabled
           >
-            TBD
+            ${localize("panels.actions.cards.actions.actions.new_action", this.hass.language)}
           </mwc-button>
         </div>
       </ha-card>
