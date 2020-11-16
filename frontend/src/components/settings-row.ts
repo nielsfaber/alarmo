@@ -23,7 +23,7 @@ export class SettingsRow extends LitElement {
         display: flex;
         flex-direction: row;
         padding: 0px 16px;
-        align-items: flex-start;
+        align-items: center;
         min-height: 72px;
       }
       :host([narrow]) {
@@ -35,6 +35,9 @@ export class SettingsRow extends LitElement {
       :host([large]) {
         align-items: normal;
         flex-direction: column;
+        border-top: 1px solid var(--divider-color);
+        border-bottom: 1px solid var(--divider-color);
+        padding: 16px 16px;
       }
       ::slotted(ha-switch) {
         padding: 16px 0;

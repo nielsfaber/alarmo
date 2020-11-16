@@ -185,6 +185,7 @@ export class AlarmViewSensors extends SubscribeMixin(LitElement) {
         checkbox: html`
         <ha-checkbox
           @change=${(e: Event) => this.toggleSelect(e, item.id)}
+          ?checked=${this.addSelection.includes(item.id)}
         >
         </ha-checkbox>`,
         icon: html`<state-badge .hass=${this.hass} .stateObj=${this.hass!.states[item.id]}></state-badge>`,

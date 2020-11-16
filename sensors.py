@@ -31,6 +31,10 @@ from .const import (
     ATTR_MODES,
 )
 
+from .automations import (
+    EVENT_ARM_FAILURE
+)
+
 ATTR_IMMEDIATE = "immediate"
 ATTR_ALWAYS_ON = "always_on"
 ATTR_ARM_ON_CLOSE = "arm_on_close"
@@ -82,9 +86,8 @@ class SensorHandler:
                 if not state_filter or state_filter == STATE_UNKNOWN:
                     open_sensors[entity] = state.state
 
+        # store the entities that are in violation
         if open_sensors and not self.alarm_entity._changed_by:
-            _LOGGER.debug("OPEN SENSORS")
-            _LOGGER.debug(open_sensors)
             self.alarm_entity._changed_by = open_sensors
 
         return not open_sensors  # empty dict = false
@@ -105,6 +108,7 @@ class SensorHandler:
 
         # arming while immediate sensor is triggered -> cancel arm
         elif self.alarm_entity.state == STATE_ALARM_ARMING and not self.validate_event(event=EVENT_LEAVE):
+            await self.alarm_entity.automations.async_handle_event(event=EVENT_ARM_FAILURE)
             await self.alarm_entity.async_update_state(STATE_ALARM_DISARMED)
 
         # alarm is armed -> check if need to be triggered

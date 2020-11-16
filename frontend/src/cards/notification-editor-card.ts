@@ -5,7 +5,7 @@ import { localize } from '../../localize/localize';
 
 import '../components/alarmo-multi-select';
 
-import { triggerOptions, targetOptions, defaultNotificationData } from '../data/notifications';
+import { triggerOptions, targetOptions, defaultNotificationData, messagePlaceHolder } from '../data/notifications';
 import { AlarmoNotification } from '../types';
 import { fetchAutomations, deleteAutomation, saveAutomation } from '../data/websockets';
 import { handleError, omit } from '../helpers';
@@ -51,7 +51,10 @@ export class NotificationEditorCard extends LitElement {
 
   <div style="text-align: right; padding: 0px 16px 16px 16px">
     <mwc-button @click=${this.toggleYaml}>
-      ${this.yamlMode ? "Edit in UI" : "Edit as YAML"}
+      ${this.yamlMode
+        ? localize("panels.actions.cards.new_notification.actions.ui_mode", this.hass.language)
+        : localize("panels.actions.cards.new_notification.actions.yaml_mode", this.hass.language)
+      }
     </mwc-button>
   </div>
 
@@ -113,9 +116,9 @@ export class NotificationEditorCard extends LitElement {
 
     <paper-textarea
       label="${localize("panels.actions.cards.new_notification.fields.message.heading", this.hass.language)}"
-      placeholder=""
+      placeholder=${messagePlaceHolder(this.data)}
       value=${this.data.actions[0].service_data.message || ""}
-      @change=${(ev: Event) => this.updateMessage((ev.target as HTMLInputElement).value)}
+      @blur=${(ev: Event) => { this.updateMessage((ev.target as HTMLInputElement).value) }}
     >
     </paper-textarea>
   </settings-row>
@@ -220,7 +223,9 @@ export class NotificationEditorCard extends LitElement {
 
 
   private saveClick(ev: Event) {
-    saveAutomation(this.hass, { ...this.data, is_notification: true })
+    let data = { ...this.data, is_notification: true };
+    if (this.item) data = { ...data, automation_id: this.item };
+    saveAutomation(this.hass, data)
       .catch(e => handleError(e, ev))
       .then(() => { this.cancelClick() });
   }

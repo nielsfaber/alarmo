@@ -92,7 +92,7 @@ export enum EAlarmStates {
 }
 
 export enum EAlarmEvents {
-  Failure = "alarmo_failure",
+  ArmFailure = "arm_failure",
 }
 
 export interface AlarmoAutomation {

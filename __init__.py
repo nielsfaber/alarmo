@@ -77,7 +77,9 @@ async def async_unload_entry(hass, entry):
         )
     )
     if unload_ok:
-        hass.data[DOMAIN].pop(entry.entry_id)
+        coordinator = hass.data[DOMAIN]
+        await coordinator.async_delete()
+        del hass.data[DOMAIN]
     return unload_ok
 
 
@@ -178,3 +180,6 @@ class AlarmoCoordinator(DataUpdateCoordinator):
             self.store.async_update_automation(automation_id, data)
 
         self.automation_callback()
+
+    async def async_delete(self):
+        await self.store.async_delete()

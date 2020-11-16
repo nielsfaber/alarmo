@@ -82,4 +82,8 @@ export const commonStyle = css`
   paper-textarea {
     width: 100%;
   }
+
+  a { 
+    color: var(--primary-color);
+  }
 `;

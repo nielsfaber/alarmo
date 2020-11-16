@@ -192,6 +192,11 @@ class AlarmoStorage:
 
         return store_data
 
+    async def async_delete(self):
+        """Delete config."""
+        _LOGGER.warning("Removing alarmo configuration data!")
+        await self._store.async_remove()
+
     @callback
     def async_get_config(self):
         return attr.asdict(self.config)
@@ -310,8 +315,6 @@ class AlarmoStorage:
         """Get an existing AutomationEntry by id."""
         res = {}
         for (key, val) in self.automations.items():
-            _LOGGER.debug(key)
-            _LOGGER.debug(val)
             res[key] = attr.asdict(val)
         return res
 

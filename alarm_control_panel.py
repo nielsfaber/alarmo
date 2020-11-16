@@ -34,7 +34,6 @@ from homeassistant.const import (
     STATE_ALARM_PENDING,
     STATE_ALARM_ARMING,
     ATTR_MODE,
-    ATTR_NAME,
 )
 from .const import (
     DOMAIN,
@@ -52,6 +51,7 @@ from .const import (
     ATTR_CODE_DISARM_REQUIRED,
     ATTR_ENABLED,
     ATTR_REQUIRE_CODE,
+    ATTR_DISARM_AFTER_TRIGGER,
 )
 from homeassistant.components.mqtt import (
     DOMAIN as ATTR_MQTT,
@@ -69,7 +69,10 @@ from homeassistant.components.mqtt.alarm_control_panel import (
 import homeassistant.components.mqtt as mqtt
 
 from .sensors import SensorHandler
-from .automations import AutomationHandler
+from .automations import (
+    AutomationHandler,
+    EVENT_ARM_FAILURE,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -86,7 +89,6 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
 async def async_setup_entry(hass, config_entry, async_add_devices):
     """Set up the Alarmo entities. """
-    _LOGGER.debug("async_setup_entry")
     coordinator = hass.data[DOMAIN]
 
     # Create alarm entity
@@ -130,7 +132,6 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
     @property
     def device_info(self) -> dict:
         """Return info for device registry."""
-        _LOGGER.debug("device info")
         device = self.coordinator.id
         return {
             "identifiers": {(DOMAIN, device)},
@@ -173,9 +174,7 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
 
     @property
     def changed_by(self):
-        _LOGGER.debug("changed_by")
         """Last change triggered by."""
-        _LOGGER.debug(self._changed_by)
         return self._changed_by
 
     @property
@@ -230,10 +229,8 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
 
         res = self.coordinator.async_authenticate_user(code)
         if not res:
-            _LOGGER.debug("authentication failed")
             return False
 
-        _LOGGER.debug("authenticated by user {}".format(res[ATTR_NAME]))
         return True
 
     async def async_alarm_disarm(self, code=None, skip_code=False):
@@ -382,8 +379,6 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
         return None
 
     async def async_update_state(self, state):
-        _LOGGER.debug("async_update_state")
-        _LOGGER.debug(state)
         if state == self._state:
             return
 
@@ -400,11 +395,9 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
         self.async_cancel_timer()
 
         self.async_write_ha_state()
-        _LOGGER.debug("write state")
 
     async def async_arm(self, arm_mode, skip_delay=False):
         """Update the state."""
-        _LOGGER.debug("request to update state to {}".format(arm_mode))
 
         self._arm_mode = arm_mode
         leave_delay = self.get_delay_config(EVENT_LEAVE)
@@ -413,10 +406,10 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
 
         if self._state != STATE_ALARM_DISARMED or skip_delay:  # immediate arm event
             res = self.sensors.validate_event(event=EVENT_ARM)
-            _LOGGER.debug(res)
 
             if not res:
                 # there where errors -> abort the arm
+                await self.automations.async_handle_event(event=EVENT_ARM_FAILURE)
                 await self.async_update_state(STATE_ALARM_DISARMED)
             else:
                 # proceed the arm
@@ -431,7 +424,6 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
             else:
                 # proceed to arming
                 res = self.sensors.validate_event(event=EVENT_LEAVE)
-                _LOGGER.debug(res)
                 if res:
                     await self.async_update_state(STATE_ALARM_ARMING)
                     self.async_set_timer(leave_delay, self.async_leave_timer_finished)
@@ -464,15 +456,15 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
     @callback
     async def async_leave_timer_finished(self, now):
         """Update state at a scheduled point in time."""
-        _LOGGER.debug("async_leave_timer_finished")
+        # _LOGGER.debug("async_leave_timer_finished")
         await self.async_arm(self.arm_mode)
 
     @callback
     async def async_trigger_timer_finished(self, now):
         """Update state at a scheduled point in time."""
 
-        _LOGGER.debug("async_trigger_timer_finished")
-        if self._disarm_after_trigger:
+        # _LOGGER.debug("async_trigger_timer_finished")
+        if self._config[ATTR_DISARM_AFTER_TRIGGER]:
             await self.async_update_state(STATE_ALARM_DISARMED)
         else:
             await self.async_arm(self.arm_mode)
@@ -481,7 +473,7 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
     async def async_entry_timer_finished(self, now):
         """Update state at a scheduled point in time."""
 
-        _LOGGER.debug("async_entry_timer_finished")
+        # _LOGGER.debug("async_entry_timer_finished")
         await self.async_trigger()
 
     def async_cancel_timer(self):
@@ -535,78 +527,3 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
                 await self.async_alarm_arm_custom_bypass(code, skip_code)
 
         await mqtt.async_subscribe(self._hass, self._config[ATTR_MQTT][CONF_COMMAND_TOPIC], async_message_received)
-
-# async def _async_handle_actions(self, last_state=None, open_sensors=None):
-#     message = ""
-#     state = self._state
-
-#     def format_open_sensors():
-#         items = []
-#         for (entity, status) in open_sensors.items():
-#             state = self.hass.states.get(entity)
-#             if state and "friendly_name" in state.attributes:
-#                 name = state.attributes["friendly_name"]
-#             else:
-#                 name = entity.split(".")[1]
-
-#             items.append("{} is {}".format(name, status))
-#         return ", ".join(items)
-
-#     if state and self._siren_entity:
-#         siren_state = self.hass.states.get(self._siren_entity)
-#         if not siren_state:
-#             _LOGGER.warning("Siren entity is not found")
-#         elif state == STATE_ALARM_TRIGGERED and siren_state.state != "on":
-#             _LOGGER.info("Activating siren")
-#             await async_call_from_config(
-#                 self.hass,
-#                 {
-#                     "service": "switch.turn_on",
-#                     "entity_id": self._siren_entity,
-#                 },
-#             )
-#         elif state != STATE_ALARM_TRIGGERED and siren_state.state == "on":
-#             _LOGGER.info("Deactivating siren")
-#             await async_call_from_config(
-#                 self.hass,
-#                 {
-#                     "service": "switch.turn_off",
-#                     "entity_id": self._siren_entity,
-#                 },
-#             )
-
-#     if state == STATE_ALARM_ARMING:
-#         message = "Time to leave the house. The alarm will be set to mode {} soon.".format(
-#             self._arm_state
-#         )
-#     elif state in ARM_MODES:
-#         message = "The alarm is now ON (in {} mode).".format(self._arm_state)
-#     elif state == STATE_ALARM_TRIGGERED:
-#         message = "The alarm is triggered!!"
-#     elif state == STATE_ALARM_DISARMED and last_state:
-#         if open_sensors:
-#             message = "Failed to turn on the alarm, because: {}.".format(
-#                 format_open_sensors()
-#             )
-#         else:
-#             message = "The alarm is now OFF."
-#     elif state == STATE_ALARM_DISARMED and not last_state:
-#         if open_sensors:
-#             message = "Failed to restore the alarm state, because: {}.".format(
-#                 format_open_sensors()
-#             )
-
-#     if not message:
-#         return
-
-#     _LOGGER.info(message)
-
-#     if self._push_target:
-#         service_call = {
-#             "service": "notify.{}".format(self._push_target),
-#             "data": {"title": "Message from Alarmo", "message": message},
-#         }
-#         await async_call_from_config(
-#             self.hass,
-#             service_call,
-#         )

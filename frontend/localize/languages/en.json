@@ -281,6 +281,10 @@
               "heading": "Target",
               "description": "Device to send the push message to"
             }
+          },
+          "actions": {
+            "ui_mode": "Edit as YAML",
+            "yaml_mode": "Edit in UI"
           }
         }
       }
