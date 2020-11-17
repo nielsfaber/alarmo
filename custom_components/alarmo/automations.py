@@ -120,6 +120,9 @@ class AutomationHandler:
             )
 
     def async_format_sensor_info(self, open_sensors: dict):
+        if not open_sensors:
+            return ""
+
         sensor_config = self.coordinator.store.async_get_sensors()
 
         output = []
