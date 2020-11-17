@@ -229,7 +229,8 @@ class AlarmoStorage:
     @callback
     def async_get_sensor(self, entity_id) -> SensorEntry:
         """Get an existing SensorEntry by id."""
-        return self.sensors.get(entity_id)
+        res = self.sensors.get(entity_id)
+        return attr.asdict(res) if res else None
 
     @callback
     def async_get_sensors(self):
@@ -269,7 +270,8 @@ class AlarmoStorage:
     @callback
     def async_get_user(self, user_id) -> UserEntry:
         """Get an existing UserEntry by id."""
-        return self.users.get(user_id)
+        res = self.users.get(user_id)
+        return attr.asdict(res) if res else None
 
     @callback
     def async_get_users(self):
@@ -304,11 +306,6 @@ class AlarmoStorage:
         new = self.users[user_id] = attr.evolve(old, **changes)
         self.async_schedule_save()
         return new
-
-    @callback
-    def async_get_automation(self, automation_id) -> AutomationEntry:
-        """Get an existing AutomationEntry by id."""
-        return self.automations.get(automation_id)
 
     @callback
     def async_get_automations(self):
