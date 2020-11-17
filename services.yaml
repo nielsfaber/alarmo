@@ -1,6 +1,0 @@
-edit_config:
-  description: Update the config from the frontend.
-  fields:
-    entity_id:
-      description: Name of the entity to set
-      example: "alarm_control_panel.alarmo"
