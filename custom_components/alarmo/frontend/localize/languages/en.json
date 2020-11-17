@@ -1,0 +1,293 @@
+{
+  "common": {
+    "modes_long": {
+      "armed_away": "Armed Away",
+      "armed_home": "Armed Home",
+      "armed_night": "Armed Night",
+      "armed_custom": "Armed Custom"
+    },
+    "modes_short": {
+      "armed_away": "Away",
+      "armed_home": "Home",
+      "armed_night": "Night",
+      "armed_custom": "Custom"
+    }
+  },
+  "components": {
+    "time_slider": {
+      "seconds": "sec",
+      "minutes": "min",
+      "infinite": "infinite",
+      "none": "none"
+    }
+  },
+  "panels": {
+    "general": {
+      "cards": {
+        "general": {
+          "title": "General settings",
+          "description": "This panel defines some settings that apply to all arm modes.",
+          "fields": {
+            "trigger_time": {
+              "heading": "Trigger time",
+              "description": "Time during which the siren will sound"
+            },
+            "disarm_after_trigger": {
+              "heading": "Disarm after trigger",
+              "description": "After trigger time has expired, disarm the alarm instead of returning to armed state."
+            },
+            "enable_mqtt": {
+              "heading": "Enable MQTT",
+              "description": "Allow the alarm panel to be controlled through MQTT."
+            }
+          },
+          "actions": {
+            "setup_mqtt": "MQTT Configuration"
+          }
+        },
+        "common": {
+          "fields": {
+            "leave_time": {
+              "heading": "Leave time",
+              "description": "After trigger time has expired, disarm the alarm instead of returning to armed state."
+            },
+            "entry_time": {
+              "heading": "Entry time",
+              "description": "After trigger time has expired, disarm the alarm instead of returning to armed state."
+            }
+          }
+        },
+        "armed_away": {
+          "description": "Armed away will be used when all people left the house. All doors and windows allowing access to the house will be guarded, as well as motion sensors inside the house."
+        },
+        "armed_home": {
+          "description": "Armed home (also known as armed stay) will be used when setting the alarm while people are in the house. All doors and windows allowing access to the house will be guarded, but not motion sensors inside the house."
+        },
+        "armed_night": {
+          "description": "Armed night will be used when setting the alarm before going to sleep. All doors and windows allowing access to the house will be guarded, and selected motion sensors (downstairs) in the house."
+        },
+        "armed_custom": {
+          "description": "An extra mode for defining your own security perimeter."
+        },
+        "mqtt": {
+          "title": "MQTT configuration",
+          "description": "This panel can be used for configuration of the MQTT interface.",
+          "fields": {
+            "state_topic": {
+              "heading": "State topic",
+              "description": "Topic on which state updates are published"
+            },
+            "command_topic": {
+              "heading": "Command topic",
+              "description": "Topic on which arm/disarm commands are sent."
+            },
+            "require_code": {
+              "heading": "Require code",
+              "description": "Require the code to be sent with the command."
+            }
+          }
+        }
+      }
+    },
+    "sensors": {
+      "cards": {
+        "sensors": {
+          "title": "Sensors",
+          "description": "Currently configured sensors. Click on an entity to make changes.",
+          "no_items": "There are no sensors added to the alarm yet. Make sure to add them first.",
+          "table": {
+            "arm_modes": "Arm Modes",
+            "always_on": "(Always)"
+          }
+        },
+        "add_sensors": {
+          "title": "Add Sensors",
+          "description": "Add more sensors. Make sure that your sensors have a friendly_name, so you can identify them.",
+          "no_items": "There are no available HA entities that can be configured for the alarm. Make sure to include entities of the type binary_sensor.",
+          "actions": {
+            "add_to_alarm": "add to alarm"
+          }
+        },
+        "editor": {
+          "title": "Edit Sensor",
+          "description": "Configuring the sensor settings of '{entity}'.",
+          "fields": {
+            "name": {
+              "heading": "Name",
+              "description": "Overwrite friendly name."
+            },
+            "always_on": {
+              "heading": "Always on",
+              "description": "Sensor should always trigger the alarm."
+            },
+            "modes": {
+              "heading": "Enabled modes",
+              "description": "Alarm modes in which this sensor is active."
+            },
+            "immediate": {
+              "heading": "Immediate",
+              "description": "Sensor should skip the delay."
+            },
+            "allow_open": {
+              "heading": "Allow open",
+              "description": "Allow this sensor to remain active shortly after leaving."
+            }
+          }
+        }
+      },
+      "dialogs": {
+        "sensor": {
+          "title": "Configuration for '{entity}'",
+          "actions": {
+            "remove": "remove"
+          },
+          "fields": {
+            "enabled_modes": {
+              "heading": "Alarm modes in which this sensor is active"
+            },
+            "immediate": {
+              "heading": "This sensor should trigger the alarm immediately"
+            }
+          }
+        }
+      }
+    },
+    "codes": {
+      "cards": {
+        "codes": {
+          "title": "Codes",
+          "description": "Change settings for the code.",
+          "fields": {
+            "code_arm_required": {
+              "heading": "Use arm code",
+              "description": "Require a code for arming the alarm"
+            },
+            "code_disarm_required": {
+              "heading": "Use disarm code",
+              "description": "Require a code for disarming the alarm"
+            },
+            "code_format": {
+              "heading": "Code format",
+              "description": "Sets the input type for Lovelace alarm card.",
+              "code_format_number": "pincode",
+              "code_format_text": "password"
+            }
+          }
+        },
+        "user_management": {
+          "title": "User management",
+          "description": "Each user has its own code to arm/disarm the alarm.",
+          "no_items": "There are no users yet",
+          "table": {
+            "remarks": "Remarks",
+            "administrator": "Administrator"
+          },
+          "actions": {
+            "new_user": "new user"
+          }
+        },
+        "new_user": {
+          "title": "Create new user",
+          "description": "Users can be created for providing access to operating the alarm.",
+          "fields": {
+            "name": {
+              "heading": "Name",
+              "description": "Name of the user."
+            },
+            "code": {
+              "heading": "Code",
+              "description": "Code for this user."
+            },
+            "confirm_code": {
+              "heading": "Confirm code",
+              "description": "Repeat the code."
+            },
+            "is_admin": {
+              "heading": "User is administrator",
+              "description": "Allow user to make changes"
+            },
+            "can_arm": {
+              "heading": "Allow user to arm the alarm",
+              "description": "Entering this code activates the alarm"
+            },
+            "can_disarm": {
+              "heading": "Allow user to disarm the alarm",
+              "description": "Entering this code deactivates the alarm"
+            }
+          },
+          "errors": {
+            "no_name": "No name provided.",
+            "no_code": "Code should have 4 characters/numbers minimum.",
+            "code_mismatch": "The codes don't match."
+          }
+        },
+        "edit_user": {
+          "title": "Edit User",
+          "description": "Change configuration for user '{name}'.",
+          "fields": {
+            "old_code": {
+              "heading": "Current code",
+              "description": "Current code, leave empty to leave unchanged."
+            }
+          },
+          "errors": {}
+        }
+      }
+    },
+    "actions": {
+      "cards": {
+        "notifications": {
+          "title": "Notifications",
+          "description": "Using this panel, you can manage notifications to be sent when during a certain alarm event",
+          "table": {
+            "enabled": "Enabled",
+            "no_items": "There are no notifications created yet."
+          },
+          "actions": {
+            "new_notification": "new notification"
+          }
+        },
+        "actions": {
+          "title": "Actions",
+          "description": "This panel is still in development. It will be used for switching devices.",
+          "table": {
+            "no_items": "There are no actions created yet."
+          },
+          "actions": {
+            "new_action": "new action"
+          }
+        },
+        "new_notification": {
+          "title": "Create notification",
+          "description": "Create a new notification.",
+          "fields": {
+            "name": {
+              "heading": "Name",
+              "description": "Description for this notification"
+            },
+            "event": {
+              "heading": "Event",
+              "description": "When should the notification be sent"
+            },
+            "title": {
+              "heading": "Title",
+              "description": "Title for the notification message"
+            },
+            "message": {
+              "heading": "Message",
+              "description": "Content of the notification message"
+            },
+            "target": {
+              "heading": "Target",
+              "description": "Device to send the push message to"
+            }
+          },
+          "actions": {
+            "ui_mode": "Edit as YAML",
+            "yaml_mode": "Edit in UI"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,8 +1,10 @@
 *.DS_Store
-__pycache__
+custom_components/alarmo/__pycache__/*
 .vscode
-frontend/node_modules
+custom_components/alarmo/frontend/node_modules
 ._*
 README.html
 package-lock.json
-report/
+custom_components/alarmo/__pycache__/*
+*__pycache__**
+*.pyc
