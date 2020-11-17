@@ -7,6 +7,7 @@ import './views/view-sensors.ts';
 import './views/view-codes.ts';
 import './views/view-actions.ts';
 import { commonStyle } from './styles';
+import { VERSION } from './const';
 
 @customElement('alarm-panel')
 export class MyAlarmPanel extends LitElement {
@@ -36,6 +37,9 @@ export class MyAlarmPanel extends LitElement {
             </ha-menu-button>
             <div main-title>
               Alarm panel
+            </div>
+            <div class="version">
+              ${VERSION}
             </div>
           </app-toolbar>
           <paper-tabs
@@ -164,6 +168,10 @@ export class MyAlarmPanel extends LitElement {
 
       .view > *:last-child {
         margin-bottom: 20px;
+      }
+
+      .version {
+        font-size: 14px;
       }
     `;
   }
