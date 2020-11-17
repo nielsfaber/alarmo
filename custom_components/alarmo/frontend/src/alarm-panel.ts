@@ -18,6 +18,9 @@ export class MyAlarmPanel extends LitElement {
       await loadHaForm();
       this.requestUpdate();
     })();
+    window.addEventListener("location-changed", () => {
+      this.requestUpdate();
+    });
   }
 
   render() {
