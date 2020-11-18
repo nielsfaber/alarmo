@@ -220,9 +220,9 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
     def _validate_code(self, code, state):
         """Validate given code."""
 
-        if state == STATE_ALARM_DISARMED and not self._config[ATTR_CODE_ARM_REQUIRED]:
+        if state == STATE_ALARM_DISARMED and not self._config[ATTR_CODE_DISARM_REQUIRED]:
             return True
-        elif state != STATE_ALARM_DISARMED and not self._config[ATTR_CODE_DISARM_REQUIRED]:
+        elif state != STATE_ALARM_DISARMED and not self._config[ATTR_CODE_ARM_REQUIRED]:
             return True
         elif not code or not len(code):
             return False
