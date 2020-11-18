@@ -41,7 +41,8 @@ export type AlarmoConfig = {
   trigger_time: number,
   disarm_after_trigger: boolean,
   modes: Record<EArmModes, AlarmoModeConfig>,
-  mqtt: MqttConfig
+  mqtt: MqttConfig,
+  version: string
 }
 
 export type AlarmoSensor = {

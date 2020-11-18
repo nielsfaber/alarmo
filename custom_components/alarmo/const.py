@@ -88,3 +88,4 @@ ATTR_EVENT = "event"
 ATTR_REQUIRE_CODE = "require_code"
 
 ATTR_IS_NOTIFICATION = "is_notification"
+ATTR_VERSION = "version"

@@ -8,20 +8,22 @@ import './views/view-codes.ts';
 import './views/view-actions.ts';
 import { commonStyle } from './styles';
 import { VERSION } from './const';
+import { AlarmoConfig } from './types';
 
 @customElement('alarm-panel')
 export class MyAlarmPanel extends LitElement {
   @property() public hass!: HomeAssistant;
   @property({ type: Boolean, reflect: true }) public narrow!: boolean;
 
-  firstUpdated() {
-    (async () => {
-      await loadHaForm();
-      this.requestUpdate();
-    })();
+  config?: AlarmoConfig;
+
+  async firstUpdated() {
     window.addEventListener("location-changed", () => {
       this.requestUpdate();
     });
+
+    await loadHaForm();
+    this.requestUpdate();
   }
 
   render() {
@@ -39,7 +41,7 @@ export class MyAlarmPanel extends LitElement {
               Alarm panel
             </div>
             <div class="version">
-              ${VERSION}
+              v${VERSION}
             </div>
           </app-toolbar>
           <paper-tabs
@@ -172,6 +174,8 @@ export class MyAlarmPanel extends LitElement {
 
       .version {
         font-size: 14px;
+        font-weight: 500;
+        color: rgba(var(--rgb-text-primary-color), 0.9);
       }
     `;
   }

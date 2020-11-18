@@ -25,6 +25,7 @@ from homeassistant.components.alarm_control_panel import (
 
 from .const import (
     DOMAIN,
+    VERSION,
     ATTR_MODES,
     ARM_MODES,
     ATTR_CODE_DISARM_REQUIRED,
@@ -45,6 +46,7 @@ from .const import (
     ATTR_EVENT,
     ATTR_REQUIRE_CODE,
     ATTR_IS_NOTIFICATION,
+    ATTR_VERSION,
 )
 
 from homeassistant.components.mqtt import (
@@ -256,6 +258,7 @@ def websocket_get_config(hass, connection, msg):
     """Publish config data."""
     coordinator = hass.data[DOMAIN]
     config = coordinator.store.async_get_config()
+    config[ATTR_VERSION] = VERSION
     connection.send_result(msg["id"], config)
 
 
