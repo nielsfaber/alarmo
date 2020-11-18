@@ -1342,7 +1342,7 @@ const K=window.ShadowRoot&&(void 0===window.ShadyCSS||window.ShadyCSS.nativeShad
 
       
 
-    `}};t([G()],Ct.prototype,"hass",void 0),t([G()],Ct.prototype,"narrow",void 0),t([G()],Ct.prototype,"path",void 0),t([G()],Ct.prototype,"alarmEntity",void 0),t([G()],Ct.prototype,"automations",void 0),Ct=t([Z("alarm-view-actions")],Ct),e.MyAlarmPanel=class extends ae{firstUpdated(){(async()=>{await Ne(),this.requestUpdate()})()}render(){return customElements.get("ha-app-layout")?V`
+    `}};t([G()],Ct.prototype,"hass",void 0),t([G()],Ct.prototype,"narrow",void 0),t([G()],Ct.prototype,"path",void 0),t([G()],Ct.prototype,"alarmEntity",void 0),t([G()],Ct.prototype,"automations",void 0),Ct=t([Z("alarm-view-actions")],Ct),e.MyAlarmPanel=class extends ae{async firstUpdated(){window.addEventListener("location-changed",()=>{this.requestUpdate()}),await Ne(),this.requestUpdate()}render(){return customElements.get("ha-app-layout")?V`
       <ha-app-layout>
         <app-header fixed slot="header">
           <app-toolbar>
@@ -1353,6 +1353,9 @@ const K=window.ShadowRoot&&(void 0===window.ShadyCSS||window.ShadyCSS.nativeShad
             </ha-menu-button>
             <div main-title>
               Alarm panel
+            </div>
+            <div class="version">
+              v${"1.1.1"}
             </div>
           </app-toolbar>
           <paper-tabs
@@ -1444,5 +1447,11 @@ const K=window.ShadowRoot&&(void 0===window.ShadyCSS||window.ShadyCSS.nativeShad
 
       .view > *:last-child {
         margin-bottom: 20px;
+      }
+
+      .version {
+        font-size: 14px;
+        font-weight: 500;
+        color: rgba(var(--rgb-text-primary-color), 0.9);
       }
     `}},t([G()],e.MyAlarmPanel.prototype,"hass",void 0),t([G({type:Boolean,reflect:!0})],e.MyAlarmPanel.prototype,"narrow",void 0),e.MyAlarmPanel=t([Z("alarm-panel")],e.MyAlarmPanel)}({});
