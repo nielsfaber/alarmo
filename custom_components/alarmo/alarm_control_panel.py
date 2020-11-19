@@ -419,7 +419,7 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
 
             if not leave_delay:
                 # no delay configured -> run function again but skip the delay
-                self.async_arm(arm_mode, skip_delay=True)
+                await self.async_arm(arm_mode, skip_delay=True)
 
             else:
                 # proceed to arming
