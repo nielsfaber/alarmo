@@ -98,13 +98,13 @@ class AlarmoCoordinator(DataUpdateCoordinator):
 
         super().__init__(hass, _LOGGER, name=DOMAIN)
 
-    def async_update_config(self, data):
+    async def async_update_config(self, data):
         self.store.async_update_config(data)
-        self.config_callback()
+        await self.config_callback()
 
-    def async_update_mode_config(self, mode: str, data: dict):
+    async def async_update_mode_config(self, mode: str, data: dict):
         self.store.async_update_mode_config(mode, data)
-        self.config_callback()
+        await self.config_callback()
 
     def async_update_sensor_config(self, entity_id: str, data: dict):
         if ATTR_REMOVE in data:

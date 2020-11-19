@@ -95,7 +95,7 @@ class AlarmoConfigView(HomeAssistantView):
         """Handle config update request."""
         hass = request.app["hass"]
         coordinator = hass.data[DOMAIN]
-        coordinator.async_update_config(data)
+        await coordinator.async_update_config(data)
         request.app["hass"].bus.async_fire(EVENT)
         return self.json({"success": True})
 
@@ -122,7 +122,7 @@ class AlarmoModeView(HomeAssistantView):
         coordinator = hass.data[DOMAIN]
         mode = data[ATTR_MODE]
         del data[ATTR_MODE]
-        coordinator.async_update_mode_config(mode, data)
+        await coordinator.async_update_mode_config(mode, data)
         request.app["hass"].bus.async_fire(EVENT)
         return self.json({"success": True})
 

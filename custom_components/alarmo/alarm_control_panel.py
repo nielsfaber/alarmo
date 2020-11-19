@@ -127,7 +127,7 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
         self._push_target = None
         self._siren_entity = None
         self._changed_by = None
-        self._mqtt_enabled = False
+        self._subscribed_topics = []
 
     @property
     def device_info(self) -> dict:
@@ -212,9 +212,16 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
         }
 
     @callback
-    def async_reload_config(self):
+    async def async_reload_config(self):
         """triggered when config changes."""
+        old_config = self._config
         self._config = self.coordinator.store.async_get_config()
+
+        if old_config[ATTR_MQTT] != self._config[ATTR_MQTT]:
+            await self._unsubscribe_topics()
+            if self._config[ATTR_MQTT][ATTR_ENABLED]:
+                await self._subscribe_topics()
+
         self.async_write_ha_state()
 
     def _validate_code(self, code, state):
@@ -324,8 +331,7 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
         self._config = self.coordinator.store.async_get_config()
         self.coordinator.register_config_callback(self.async_reload_config)
 
-        if self._config[ATTR_MQTT] and self._config[ATTR_MQTT][ATTR_ENABLED]:
-            self._mqtt_enabled = True
+        if self._config[ATTR_MQTT][ATTR_ENABLED]:
             await self._subscribe_topics()
 
         state = await self.async_get_last_state()
@@ -361,6 +367,7 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
 
     async def async_will_remove_from_hass(self):
         _LOGGER.debug("async_will_remove_from_hass")
+        self._unsubscribe_topics()
 
     def get_delay_config(self, event):
         """Get datetime object for delay time."""
@@ -387,7 +394,7 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
         last_state = self._state
         self._state = state
 
-        if self._mqtt_enabled:
+        if self._config[ATTR_MQTT][ATTR_ENABLED]:
             mqtt.async_publish(self._hass, self._config[ATTR_MQTT][CONF_STATE_TOPIC], state)
 
         await self.automations.async_handle_state_update(state=state, last_state=last_state)
@@ -491,7 +498,6 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
         )
 
     async def _subscribe_topics(self):
-
         @callback
         async def async_message_received(msg):
 
@@ -526,4 +532,13 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
             elif command == COMMAND_ARM_CUSTOM_BYPASS:
                 await self.async_alarm_arm_custom_bypass(code, skip_code)
 
-        await mqtt.async_subscribe(self._hass, self._config[ATTR_MQTT][CONF_COMMAND_TOPIC], async_message_received)
+        subscription = await mqtt.async_subscribe(
+            self._hass,
+            self._config[ATTR_MQTT][CONF_COMMAND_TOPIC],
+            async_message_received,
+        )
+        self._subscribed_topics.append(subscription)
+
+    async def _unsubscribe_topics(self):
+        while self._subscribed_topics:
+            self._subscribed_topics.pop()()
