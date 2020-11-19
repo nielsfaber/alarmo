@@ -1355,7 +1355,7 @@ const K=window.ShadowRoot&&(void 0===window.ShadyCSS||window.ShadyCSS.nativeShad
               Alarm panel
             </div>
             <div class="version">
-              v${"1.1.1"}
+              v${"1.1.2"}
             </div>
           </app-toolbar>
           <paper-tabs
