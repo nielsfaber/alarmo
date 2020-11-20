@@ -8,6 +8,7 @@ import { UnsubscribeFunc } from 'home-assistant-js-websocket';
 
 import '../components/settings-row.ts';
 import '../cards/notification-editor-card.ts';
+import '../cards/automation-editor-card.ts';
 import { commonStyle } from '../styles';
 import { fetchAutomations, saveAutomation } from '../data/websockets';
 import { TableColumn } from '../components/alarmo-table';
@@ -67,6 +68,27 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
         </notification-editor-card>
       `;
     }
+    else if (this.path && this.path.length && this.path[0] == "new_action") {
+      return html`
+        <automation-editor-card
+          .hass=${this.hass}
+          .narrow=${this.narrow}
+        >
+
+        </automation-editor-card>
+      `;
+    }
+    else if (this.path && this.path.length == 2 && this.path[0] == "edit_action") {
+      return html`
+        <automation-editor-card
+          .hass=${this.hass}
+          .narrow=${this.narrow}
+          item=${this.path[1]}
+        >
+
+        </automation-editor-card>
+      `;
+    }
     else {
       const columns: Dictionary<TableColumn> = {
         type: {
@@ -101,7 +123,7 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
         .filter(e => !e.is_notification)
         .map(e => Object({
           id: e.automation_id,
-          type: html`<ha-icon icon="hass:message-text-outline"></ha-icon>`,
+          type: html`<ha-icon icon="hass:flash"></ha-icon>`,
           name: e.name,
           enabled: html`<ha-switch
         ?checked=${e.enabled}
@@ -153,8 +175,7 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
 
         <div class="card-actions">
           <mwc-button
-            @click=${() => { }}
-            disabled
+            @click=${this.addActionClick}
           >
             ${localize("panels.actions.cards.actions.actions.new_action", this.hass.language)}
           </mwc-button>
@@ -172,6 +193,10 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
 
   addNotificationClick() {
     navigate(this, "/alarmo/actions/new_notification", true);
+  }
+
+  addActionClick() {
+    navigate(this, "/alarmo/actions/new_action", true);
   }
 
   static get styles(): CSSResult {

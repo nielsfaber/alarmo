@@ -1,7 +1,8 @@
 import { LitElement, html, customElement, css, property } from 'lit-element';
+import { HomeAssistant } from 'custom-card-helpers';
 
-type OptionValue = string | Number;
-type ChangeEvent = Event & { target: { selectedItem: any } };
+type OptionValue = string;
+
 export interface Option {
   name?: string,
   value: OptionValue
@@ -9,22 +10,22 @@ export interface Option {
 
 export type OptionList = Option[];
 
-@customElement('alarmo-multi-select')
-export class AlarmoMultiSelect extends LitElement {
+@customElement('alarmo-multi-entity-select')
+export class AlarmoMultiEntitySelect extends LitElement {
+  hass?: HomeAssistant;
 
-  @property() label: string = "";
+  @property() includeDomains: string[] = [];
   @property() options: OptionList = [];
   @property() value: OptionValue[] = [];
-  @property({ type: Boolean }) disabled?;
 
   @property() numOptions = 1;
 
   firstUpdated() {
-    if (!this.value) this.value = [];
     if (this.value.length > 1) this.numOptions = this.value.length;
   }
 
   render() {
+    if (!this.hass) return html``;
     return html`
       <div class="container">
       ${[...Array(this.numOptions).keys()].map((i) => this.renderSelect(i))}
@@ -34,21 +35,20 @@ export class AlarmoMultiSelect extends LitElement {
 
   renderSelect(index: number) {
     return html`
-      <div>
-      <paper-dropdown-menu
-          label=${this.label}
-          ?disabled=${this.disabled}
-      >
-        <paper-listbox
-          slot="dropdown-content"
-          selected=${this.getSelected(index)}
-          @selected-item-changed=${(ev: ChangeEvent) => this.selectedChange(ev, index)}
-        >
-          ${this.renderOptions(index)}
-        </paper-listbox>
-      </paper-dropdown-menu>
-      ${this.renderButton(index)}
-  </div>`;
+      <div class="container-item">
+        <div class="dropdown-holder">
+          <ha-entity-picker
+            @change=${(ev: Event) => { this.selectedChange(ev, index) }}
+            .includeDomains=${this.includeDomains}
+            .hass=${this.hass}
+            value=${this.getValue(index)}
+            .allowCustomEntity=${true}
+          ></ha-entity-picker>
+        </div>
+        <div class="icon-holder">
+          ${this.renderButton(index)}
+        </div>
+      </div>`;
   }
 
   renderButton(index: number) {
@@ -62,30 +62,29 @@ export class AlarmoMultiSelect extends LitElement {
       return html`<ha-icon class="disabled" icon="hass:plus"></ha-icon>`;
   }
 
-  private renderOptions(index: number) {
-    const list = this.value.slice(0, index).concat(this.value.slice(index + 1))
-    return this.options
-      .filter(e => e.value)
-      .map(el => html`
-      <paper-item
-    value="${el.value}"
-    ?disabled=${list.includes(el.value)}
-      >
-      ${el.name || el.value}
-    </paper-item>
-      `);
-  }
-  private getSelected(index: number) {
-    return this.options.filter(e => e.value).findIndex(e => e.value == this.value[index]);
+  private getValue(index: number) {
+    if (index > (this.value.length - 1)) return "";
+    return this.value[index];
   }
 
-  private selectedChange(ev: ChangeEvent, index: number) {
-    if (!ev.target.selectedItem) return;
-    const value = ev.target.selectedItem.getAttribute('value');
+  private entityFilter(entityId: string, index: number) {
+    const list = this.value.slice(0, index).concat(this.value.slice(index + 1));
+    return !list.includes(entityId);
+  }
 
-    this.value = (this.value.length == index)
+  private selectedChange(ev: Event, index: number) {
+    let value = (ev.target as HTMLInputElement).value;
+
+    if (!this.entityFilter(value, index)) {
+      this.removeOption(index);
+      return;
+    }
+
+    const newValue = (this.value.length == index)
       ? [...this.value, value]
-      : this.value.slice(0, index).concat(value, this.value.slice(index + 1))
+      : this.value.slice(0, index).concat(value, this.value.slice(index + 1));
+
+    this.value = newValue.filter(e => e);
 
     const myEvent = new CustomEvent("change");
     this.dispatchEvent(myEvent);
@@ -116,6 +115,21 @@ export class AlarmoMultiSelect extends LitElement {
     div.container {
       display: flex;
       flex-direction: column;
+    }
+
+    div.container-item {
+      display: grid;
+      grid-template-columns: 1fr max-content;
+      grid-template-rows: min-content;
+      grid-template-areas: "dropdown icon";
+      align-items: flex-end;
+    }
+
+    div.dropdown-holder {
+      grid-area: dropdown;
+    }
+    div.icon-holder {
+      grid-area: icon;
     }
     `;
 }

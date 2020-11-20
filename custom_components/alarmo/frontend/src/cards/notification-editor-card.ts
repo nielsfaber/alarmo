@@ -5,7 +5,7 @@ import { localize } from '../../localize/localize';
 
 import '../components/alarmo-multi-select';
 
-import { triggerOptions, targetOptions, defaultNotificationData, messagePlaceHolder } from '../data/notifications';
+import { triggerOptions, targetOptions, defaultNotificationData, messagePlaceHolder } from '../data/actions';
 import { AlarmoNotification } from '../types';
 import { fetchAutomations, deleteAutomation, saveAutomation } from '../data/websockets';
 import { handleError, omit } from '../helpers';

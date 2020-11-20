@@ -26,17 +26,18 @@ export class SettingsRow extends LitElement {
         align-items: center;
         min-height: 72px;
       }
-      :host([narrow]) {
-        align-items: normal;
-        flex-direction: column;
-        border-top: 1px solid var(--divider-color);
-        padding: 16px 16px;
-      }
       :host([large]) {
         align-items: normal;
         flex-direction: column;
         border-top: 1px solid var(--divider-color);
         border-bottom: 1px solid var(--divider-color);
+        padding: 16px 16px;
+      }
+      :host([narrow]) {
+        align-items: normal;
+        flex-direction: column;
+        border-bottom: none;
+        border-top: 1px solid var(--divider-color);
         padding: 16px 16px;
       }
       ::slotted(ha-switch) {

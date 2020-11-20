@@ -72,8 +72,7 @@ export type Trigger = {
 
 export type Action = {
   service: string,
-  entity_id?: string,
-  service_data?: Dictionary<any>
+  service_data?: Dictionary<any> & { entity_id?: string }
 }
 
 export type NotificationAction = {
