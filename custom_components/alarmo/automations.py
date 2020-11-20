@@ -1,5 +1,5 @@
 import logging
-
+import copy
 
 from homeassistant.core import (
     HomeAssistant,
@@ -104,10 +104,10 @@ class AutomationHandler:
                 and self._config[automation_id][ATTR_IS_NOTIFICATION]
                 and ATTR_MESSAGE in action[ATTR_SERVICE_DATA]
             ):
-                changed_by = self.alarm_entity.changed_by
+                changed_by = self.alarm_entity._changed_by
                 changed_by_string = self.async_format_sensor_info(changed_by)
 
-                service_data = action[ATTR_SERVICE_DATA]
+                service_data = copy.copy(action[ATTR_SERVICE_DATA])
                 service_data[ATTR_MESSAGE] = service_data[ATTR_MESSAGE].replace("{{open_sensors}}", changed_by_string)
                 service_call["data"] = service_data
 

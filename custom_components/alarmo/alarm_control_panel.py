@@ -416,6 +416,7 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
 
             if not res:
                 # there where errors -> abort the arm
+                _LOGGER.info("Cannot arm right now, there are open sensors")
                 await self.automations.async_handle_event(event=EVENT_ARM_FAILURE)
                 await self.async_update_state(STATE_ALARM_DISARMED)
             else:
@@ -435,6 +436,8 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
                     await self.async_update_state(STATE_ALARM_ARMING)
                     self.async_set_timer(leave_delay, self.async_leave_timer_finished)
                 else:
+                    _LOGGER.info("Cannot arm right now, there are open sensors")
+                    await self.automations.async_handle_event(event=EVENT_ARM_FAILURE)
                     await self.async_update_state(STATE_ALARM_DISARMED)
 
     async def async_trigger(self, skip_delay=False):
