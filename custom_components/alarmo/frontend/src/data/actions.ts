@@ -72,7 +72,6 @@ export const defaultNotificationData: AlarmoNotification = {
     {
       service: "",
       service_data: {
-        title: "",
         message: "",
       }
     }
@@ -129,7 +128,7 @@ export const ActionDomains = [
   "script",
 ];
 
-export function validateData(data: AlarmoAutomation, hass: HomeAssistant) {
+export function validateData(data: AlarmoAutomation | AlarmoNotification, hass: HomeAssistant) {
   if (!data.triggers.length) return localize("panels.actions.validation_errors.no_triggers", hass.language);
 
   for (let i = 0; i < data.triggers.length; i++) {
@@ -151,7 +150,11 @@ export function validateData(data: AlarmoAutomation, hass: HomeAssistant) {
     if (!Object.keys(hass.services).includes(computeDomain(action.service))) return localize("panels.actions.validation_errors.invalid_service", hass.language, "{service}", action.service);
     if (!Object.keys(hass.services[computeDomain(action.service)]).includes(computeEntity(action.service))) return localize("panels.actions.validation_errors.invalid_service", hass.language, "{service}", action.service);
     if (!action.service_data || !Object.keys(action.service_data).length) return localize("panels.actions.validation_errors.no_service_data", hass.language);
-    if (!Object.keys(action.service_data).includes('entity_id')) return localize("panels.actions.validation_errors.no_entity_in_service_data", hass.language);
+    if (data.is_notification) {
+      if (!Object.keys(action.service_data).includes('message') || !action.service_data.message.length) return localize("panels.actions.validation_errors.no_message_in_service_data", hass.language);
+    } else {
+      if (!Object.keys(action.service_data).includes('entity_id')) return localize("panels.actions.validation_errors.no_entity_in_service_data", hass.language);
+    }
   };
 
   return;

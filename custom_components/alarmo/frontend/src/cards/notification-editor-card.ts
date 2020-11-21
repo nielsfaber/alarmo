@@ -5,10 +5,10 @@ import { localize } from '../../localize/localize';
 
 import '../components/alarmo-multi-select';
 
-import { triggerOptions, targetOptions, defaultNotificationData, messagePlaceHolder } from '../data/actions';
-import { AlarmoNotification } from '../types';
-import { fetchAutomations, deleteAutomation, saveAutomation } from '../data/websockets';
-import { handleError, omit } from '../helpers';
+import { triggerOptions, targetOptions, defaultNotificationData, messagePlaceHolder, validateData } from '../data/actions';
+import { AlarmoNotification, AlarmoConfig, EArmModes, EAlarmStates } from '../types';
+import { fetchAutomations, deleteAutomation, saveAutomation, fetchConfig } from '../data/websockets';
+import { handleError, omit, showErrorDialog } from '../helpers';
 
 @customElement('notification-editor-card')
 export class NotificationEditorCard extends LitElement {
@@ -19,15 +19,28 @@ export class NotificationEditorCard extends LitElement {
   @property() data?: AlarmoNotification;
 
   @property() yamlMode = false;
+  @property() namePlaceholder = "";
 
   yamlCode?: Object;
+  config?: AlarmoConfig;
 
   async firstUpdated() {
-    this.data = { ...defaultNotificationData };
+    this.config = await fetchConfig(this.hass);
+    const automations = await fetchAutomations(this.hass);
+
     if (this.item) {
+      if (automations[this.item] && automations[this.item].is_notification) this.data = omit(automations[this.item], ['automation_id', 'is_notification', 'enabled']) as AlarmoNotification;
+      else this.data = { ...defaultNotificationData };
+    } else {
+      this.data = { ...defaultNotificationData };
+      let name = `My notification`;
       const automations = await fetchAutomations(this.hass);
-      const data = omit(automations[this.item], ['automation_id']);
-      this.data = data as unknown as AlarmoNotification;
+      if (Object.values(automations).find(e => e.name == name)) {
+        let i = 2;
+        while (Object.values(automations).find(e => e.name == `${name} ${i}`)) i++;
+        name = `${name} ${i}`;
+      }
+      this.namePlaceholder = name;
     }
   }
 
@@ -52,8 +65,8 @@ export class NotificationEditorCard extends LitElement {
   <div style="text-align: right; padding: 0px 16px 16px 16px">
     <mwc-button @click=${this.toggleYaml}>
       ${this.yamlMode
-        ? localize("panels.actions.cards.new_notification.actions.ui_mode", this.hass.language)
-        : localize("panels.actions.cards.new_notification.actions.yaml_mode", this.hass.language)
+        ? localize("components.editor.ui_mode", this.hass.language)
+        : localize("components.editor.yaml_mode", this.hass.language)
       }
     </mwc-button>
   </div>
@@ -74,29 +87,33 @@ export class NotificationEditorCard extends LitElement {
         html`
 
   <settings-row .narrow=${this.narrow}>
-    <span slot="heading">${localize("panels.actions.cards.new_notification.fields.name.heading", this.hass.language)}</span>
-    <span slot="description">${localize("panels.actions.cards.new_notification.fields.name.description", this.hass.language)}</span>
-
-    <paper-input
-      label="${localize("panels.actions.cards.new_notification.fields.name.heading", this.hass.language)}"
-      placeholder=""
-      value=${this.data.name}
-      @change=${(ev: Event) => this.data = { ...this.data!, name: (ev.target as HTMLInputElement).value }}
-    >
-    </paper-input>
-  </settings-row>
-
-  <settings-row .narrow=${this.narrow}>
     <span slot="heading">${localize("panels.actions.cards.new_notification.fields.event.heading", this.hass.language)}</span>
     <span slot="description">${localize("panels.actions.cards.new_notification.fields.event.description", this.hass.language)}</span>
 
     <alarmo-multi-select
+      label=${localize("panels.actions.cards.new_action.fields.event.heading", this.hass.language)}
       .options=${Object.values(triggerOptions(this.hass))}
       .value=${this.data.triggers.map(trigger => triggerOptions(this.hass).find(e => JSON.stringify(e.trigger) == JSON.stringify(trigger))!.value)}
       @change=${(ev: Event) => this.updateTriggers((ev.target as HTMLInputElement).value as unknown as string[])}
     </alarmo-multi-select>
   </settings-row>
 
+  <div class="separator"></div>
+
+  <settings-row .narrow=${this.narrow}>
+    <span slot="heading">${localize("panels.actions.cards.new_notification.fields.mode.heading", this.hass.language)}</span>
+    <span slot="description">${localize("panels.actions.cards.new_notification.fields.mode.description", this.hass.language)}</span>
+
+    <alarmo-multi-select
+      label=${localize("panels.actions.cards.new_notification.fields.mode.heading", this.hass.language)}
+      ?disabled=${!this.data.triggers.length || this.data.triggers.some(e => e.state && e.state == EAlarmStates.Disarmed)}
+      .options=${this.getModeList()}
+      .value=${this.data.modes || []}
+      @change=${(ev: Event) => this.updateModes((ev.target as HTMLInputElement).value as unknown as EArmModes[])}
+    </alarmo-multi-select>
+
+  </settings-row>
+  
   <settings-row .narrow=${this.narrow}>
     <span slot="heading">${localize("panels.actions.cards.new_notification.fields.title.heading", this.hass.language)}</span>
     <span slot="description">${localize("panels.actions.cards.new_notification.fields.title.description", this.hass.language)}</span>
@@ -128,10 +145,24 @@ export class NotificationEditorCard extends LitElement {
     <span slot="description">${localize("panels.actions.cards.new_notification.fields.target.description", this.hass.language)}</span>
 
     <alarmo-multi-select
+      label=${localize("panels.actions.cards.new_notification.fields.target.heading", this.hass.language)}
       .options=${this.getTargetList()}
       .value=${this.data.actions.map(action => action.service)}
       @change=${(ev: Event) => this.updateTargets((ev.target as HTMLInputElement).value as unknown as string[])}
     </alarmo-multi-select>
+  </settings-row>
+
+  <settings-row .narrow=${this.narrow}>
+    <span slot="heading">${localize("panels.actions.cards.new_notification.fields.name.heading", this.hass.language)}</span>
+    <span slot="description">${localize("panels.actions.cards.new_notification.fields.name.description", this.hass.language)}</span>
+
+    <paper-input
+      label="${localize("panels.actions.cards.new_notification.fields.name.heading", this.hass.language)}"
+      placeholder=${this.namePlaceholder}
+      value=${this.data.name}
+      @change=${(ev: Event) => this.data = { ...this.data!, name: (ev.target as HTMLInputElement).value }}
+    >
+    </paper-input>
   </settings-row>
   `}
         
@@ -165,11 +196,20 @@ export class NotificationEditorCard extends LitElement {
     ];
   }
 
+  private getModeList() {
+    return Object.keys(this.config!.modes)
+      .map(e => Object({ name: localize(`common.modes_long.${e}`, this.hass.language), value: e }));
+  }
+
   private updateTriggers(value: string[]) {
     this.data = {
       ...this.data!,
       triggers: value.map(val => triggerOptions(this.hass).find(e => e.value == val)!.trigger)
     };
+  }
+
+  private updateModes(value: EArmModes[]) {
+    this.data = { ...this.data!, modes: value };
   }
 
   private updateTitle(value: string) {
@@ -222,8 +262,30 @@ export class NotificationEditorCard extends LitElement {
   }
 
 
-  private saveClick(ev: Event) {
-    let data = { ...this.data, is_notification: true };
+  private async saveClick(ev: Event) {
+    let data = {
+      ...this.data!,
+      is_notification: true,
+      actions: this.data!.actions.map(action => {
+        if (action.service_data && (!action.service_data.message || !action.service_data.message.length)) {
+          return {
+            ...action,
+            service_data: {
+              ...action.service_data,
+              message: messagePlaceHolder(this.data!)
+            }
+          }
+        }
+        else return action;
+      }),
+      name: this.data!.name || this.namePlaceholder
+    };
+
+    const error = validateData(data, this.hass);
+    if (error) {
+      showErrorDialog(ev, error);
+      return;
+    }
     if (this.item) data = { ...data, automation_id: this.item };
     saveAutomation(this.hass, data)
       .catch(e => handleError(e, ev))

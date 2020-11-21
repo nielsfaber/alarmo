@@ -20,20 +20,28 @@ export class AutomationEditorCard extends LitElement {
   @property() data?: AlarmoAutomation;
 
   @property() yamlMode = false;
+  @property() namePlaceholder = "";
 
   yamlCode?: Object;
   config?: AlarmoConfig;
 
   async firstUpdated() {
     this.config = await fetchConfig(this.hass);
+    const automations = await fetchAutomations(this.hass);
 
     if (this.item) {
-      const automations = await fetchAutomations(this.hass);
-      const data = omit(automations[this.item], ['automation_id', 'is_notification', 'enabled']);
-      if (!data.is_notification) this.data = data as unknown as AlarmoAutomation;
+      if (automations[this.item] && !automations[this.item].is_notification) this.data = omit(automations[this.item], ['automation_id', 'is_notification', 'enabled']) as AlarmoNotification;
       else this.data = { ...defaultAutomationData };
     } else {
-      this.data = { ...defaultAutomationData }
+      this.data = { ...defaultAutomationData };
+      let name = `My notification`;
+      const automations = await fetchAutomations(this.hass);
+      if (Object.values(automations).find(e => e.name == name)) {
+        let i = 2;
+        while (Object.values(automations).find(e => e.name == `${name} ${i}`)) i++;
+        name = `${name} ${i}`;
+      }
+      this.namePlaceholder = name;
     }
   }
 
@@ -242,17 +250,19 @@ export class AutomationEditorCard extends LitElement {
     deleteAutomation(this.hass, this.item)
       .catch(e => handleError(e, ev))
       .then(() => { this.cancelClick() });
-  }
-
+  } z
 
   private saveClick(ev: Event) {
-    const error = validateData(this.data!, this.hass);
+    let data = {
+      ...this.data!,
+      name: this.data!.name || this.namePlaceholder
+    };
+    const error = validateData(data, this.hass);
     if (error) {
       showErrorDialog(ev, error);
       return;
     }
 
-    let data = { ...this.data };
     if (this.item) data = { ...data, automation_id: this.item };
 
     saveAutomation(this.hass, data)
