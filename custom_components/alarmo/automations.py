@@ -104,11 +104,11 @@ class AutomationHandler:
                 and self._config[automation_id][ATTR_IS_NOTIFICATION]
                 and ATTR_MESSAGE in action[ATTR_SERVICE_DATA]
             ):
-                changed_by = self.alarm_entity._changed_by
-                changed_by_string = self.async_format_sensor_info(changed_by)
+                open_sensors = self.alarm_entity._open_sensors
+                open_sensors_string = self.async_format_sensor_info(open_sensors)
 
                 service_data = copy.copy(action[ATTR_SERVICE_DATA])
-                service_data[ATTR_MESSAGE] = service_data[ATTR_MESSAGE].replace("{{open_sensors}}", changed_by_string)
+                service_data[ATTR_MESSAGE] = service_data[ATTR_MESSAGE].replace("{{open_sensors}}", open_sensors_string)
                 service_call["data"] = service_data
 
             elif ATTR_SERVICE_DATA in action:

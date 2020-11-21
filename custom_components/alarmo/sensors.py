@@ -87,8 +87,8 @@ class SensorHandler:
                     open_sensors[entity] = state.state
 
         # store the entities that are in violation
-        if open_sensors and not self.alarm_entity._changed_by:
-            self.alarm_entity._changed_by = open_sensors
+        if open_sensors and not self.alarm_entity._open_sensors:
+            self.alarm_entity._open_sensors = open_sensors
 
         return not open_sensors  # empty dict = false
 

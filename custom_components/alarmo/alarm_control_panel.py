@@ -34,6 +34,7 @@ from homeassistant.const import (
     STATE_ALARM_PENDING,
     STATE_ALARM_ARMING,
     ATTR_MODE,
+    ATTR_NAME,
 )
 from .const import (
     DOMAIN,
@@ -127,6 +128,7 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
         self._push_target = None
         self._siren_entity = None
         self._changed_by = None
+        self._open_sensors = None
         self._subscribed_topics = []
 
     @property
@@ -178,6 +180,11 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
         return self._changed_by
 
     @property
+    def open_sensors(self):
+        """Open sensors."""
+        return self._open_sensors
+
+    @property
     def state(self):
         """Return the state of the device."""
         return self._state
@@ -209,6 +216,7 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
         return {
             "changed_by": self._changed_by,
             "arm_mode": self._arm_mode,
+            "open_sensors": self._open_sensors,
         }
 
     @callback
@@ -228,8 +236,10 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
         """Validate given code."""
 
         if state == STATE_ALARM_DISARMED and not self._config[ATTR_CODE_DISARM_REQUIRED]:
+            self._changed_by = None
             return True
         elif state != STATE_ALARM_DISARMED and not self._config[ATTR_CODE_ARM_REQUIRED]:
+            self._changed_by = None
             return True
         elif not code or not len(code):
             return False
@@ -237,6 +247,8 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
         res = self.coordinator.async_authenticate_user(code)
         if not res:
             return False
+        else:
+            self._changed_by = res[ATTR_NAME]
 
         return True
 
@@ -251,7 +263,7 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
             _LOGGER.warning("Wrong code provided.")
             return
         else:
-            self._changed_by = None
+            self._open_sensors = None
             await self.async_update_state(STATE_ALARM_DISARMED)
 
     async def async_alarm_arm_away(self, code=None, skip_code=False):
@@ -268,7 +280,9 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
             _LOGGER.warning("Wrong code provided.")
             return
         else:
-            self._changed_by = None
+            self._open_sensors = None
+            if skip_code:
+                self._changed_by = None
             await self.async_arm(STATE_ALARM_ARMED_AWAY)
 
     async def async_alarm_arm_home(self, code=None, skip_code=False):
@@ -285,7 +299,9 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
             _LOGGER.warning("Wrong code provided.")
             return
         else:
-            self._changed_by = None
+            self._open_sensors = None
+            if skip_code:
+                self._changed_by = None
             await self.async_arm(STATE_ALARM_ARMED_HOME)
 
     async def async_alarm_arm_night(self, code=None, skip_code=False):
@@ -302,7 +318,9 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
             _LOGGER.warning("Wrong code provided.")
             return
         else:
-            self._changed_by = None
+            self._open_sensors = None
+            if skip_code:
+                self._changed_by = None
             await self.async_arm(STATE_ALARM_ARMED_NIGHT)
 
     async def async_alarm_arm_custom_bypass(self, code=None, skip_code=False):
@@ -319,7 +337,9 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
             _LOGGER.warning("Wrong code provided.")
             return
         else:
-            self._changed_by = None
+            self._open_sensors = None
+            if skip_code:
+                self._changed_by = None
             await self.async_arm(STATE_ALARM_ARMED_CUSTOM_BYPASS)
 
     async def async_added_to_hass(self):
@@ -346,6 +366,9 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
             if "changed_by" in state.attributes:
                 self._changed_by = state.attributes["changed_by"]
 
+            if "open_sensors" in state.attributes:
+                self._open_sensors = state.attributes["open_sensors"]
+
             # restore previous state
             if state.state in ARM_MODES:
 
@@ -362,6 +385,7 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
 
         else:
             await self.async_update_state(STATE_ALARM_DISARMED)
+            self._changed_by = None
 
         self.async_write_ha_state()
 
@@ -474,6 +498,7 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
         """Update state at a scheduled point in time."""
 
         # _LOGGER.debug("async_trigger_timer_finished")
+        self._changed_by = None
         if self._config[ATTR_DISARM_AFTER_TRIGGER]:
             await self.async_update_state(STATE_ALARM_DISARMED)
         else:
