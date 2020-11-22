@@ -56,6 +56,7 @@ from .const import (
     PUSH_EVENTS,
     EVENT_CATEGORIES,
     EVENT_ACTION_FORCE_ARM,
+    EVENT_ACTION_RETRY_ARM,
 )
 from homeassistant.components.mqtt import (
     DOMAIN as ATTR_MQTT,
@@ -559,6 +560,9 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
             if action == EVENT_ACTION_FORCE_ARM and self._arm_mode and self._state == STATE_ALARM_DISARMED:
                 _LOGGER.info("Received request for force arming")
                 await self.async_arm(self._arm_mode, bypass_open_sensors=True)
+            elif action == EVENT_ACTION_RETRY_ARM and self._arm_mode and self._state == STATE_ALARM_DISARMED:
+                _LOGGER.info("Received request for retry arming")
+                await self.async_arm(self._arm_mode)
 
         for event in PUSH_EVENTS:
             handle = self._hass.bus.async_listen(event, async_handle_event)

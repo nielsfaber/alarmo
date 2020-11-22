@@ -61,13 +61,13 @@ class SensorHandler:
 
     @property
     def open_sensors(self):
-        """Get bypassed sensors."""
-        return self._bypassed_sensors
+        """Get open sensors."""
+        return self._open_sensors
 
     @open_sensors.setter
     def open_sensors(self, value):
-        """Set bypassed sensors."""
-        if not self._open_sensors:
+        """Set open sensors."""
+        if not self._open_sensors and type(value) is dict:
             self._open_sensors = value
         elif not value:
             self._open_sensors = None
@@ -80,7 +80,7 @@ class SensorHandler:
     @bypassed_sensors.setter
     def bypassed_sensors(self, value):
         """Set bypassed sensors."""
-        if not self._bypassed_sensors:
+        if not self._bypassed_sensors and type(value) is list:
             self._bypassed_sensors = value
         elif not value:
             self._bypassed_sensors = None

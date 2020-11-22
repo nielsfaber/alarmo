@@ -104,7 +104,7 @@ class AutomationHandler:
                 and self._config[automation_id][ATTR_IS_NOTIFICATION]
                 and ATTR_MESSAGE in action[ATTR_SERVICE_DATA]
             ):
-                open_sensors = self.alarm_entity._open_sensors
+                open_sensors = self.alarm_entity.sensors.open_sensors
                 open_sensors_string = self.async_format_sensor_info(open_sensors)
 
                 service_data = copy.copy(action[ATTR_SERVICE_DATA])
