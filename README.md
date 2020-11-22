@@ -100,14 +100,14 @@ In the <code>custom_components</code> directory, remove the 'alarmo' folder.
 </details>
   
 ## Planned improvements
-* Add support for skipping the arming delay.
-* Implement lock-out time when too many incorrect pincodes are entered.
-* Add security to the configuration panel.
-* ~~Add the project to HACS.~~
-* ~~Add support for bypassing failed sensors.~~
-* ~~MQTT support for control + status reporting of the system from 3rd party applications.~~
-* ~~Extend support for action configuration.~~
-* ~~Adding translations for push notifications and the frontend.~~
+- [ ] Add support for skipping the arming delay.
+- [ ] Implement lock-out time when too many incorrect pincodes are entered.
+- [ ] Add security to the configuration panel.
+- [x] Add the project to HACS.
+- [x] Add support for bypassing failed sensors.
+- [x] MQTT support for control + status reporting of the system from 3rd party applications.
+- [x] Extend support for action configuration.
+- [x] Adding translations for push notifications and the frontend.
 
 ## Usage
 
@@ -148,18 +148,18 @@ The Alarmo entity follows the state definitions as defined by HA:
 | `armed_custom_bypass`      | The alarm is armed in custom mode.                                                       |
 | `pending`                  | The alarm is pending.<br>After the entry delay has expired, the alarm will be triggered. |
 | `triggered`                | The alarm is triggered.                                                                  |
-| `unavailable`<br>`unknown` | Something is wrong. Check the logs for more information.                                 |
+| `unavailable`<br>`unknown` | Something is wrong.<br>Check the logs for more information.                              |
 
 #### Attributes
 
 The Alarmo entity defines the following attributes:
 
-| Attribute          | Default value | Type (when set) | Example value                    | Description                                                                                                                                                                                                                                   |
-| ------------------ | ------------- | --------------- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `arm_mode`         | `null`        | string          | `armed_away`                     | The current active arm mode.<br> Defined in all states except `disarmed`.                                                                                                                                                                     |
-| `changed_by`       | `null`        | string          | `Niels`                          | User who last armed or disarmed the alarm.<br> Detected from the entered code.<br> Cleared when alarm is armed or disarmed without a code.                                                                                                    |
-| `open_sensors`     | `null`        | dict            | `{ binary_sensor.backdoor: on }` | List of sensors with their entity-ID + state, that caused the alarm to change state.<br>Set when arming attempt failed (due to one or more sensors).<br>Set when alarm is triggered (only first sensor that caused the triggering is stored). |
-| `bypassed_sensors` | `null`        | list            | `[ binary_sensor.backdoor ]`     | List of sensors that are temporarily excluded from the alarm, due to arming in force.                                                                                                                                                         |
+| Attribute          | Default value | Example value when set         | Description                                                                                                                                                                                                                                         |
+| ------------------ | ------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `arm_mode`         | `null`        | `armed_away`                   | The current active arm mode.<br> Defined in all states except `disarmed`.                                                                                                                                                                           |
+| `changed_by`       | `null`        | `Niels`                        | User who last armed or disarmed the alarm.<br> Detected from the entered code.<br> Cleared when alarm is armed or disarmed without a code.                                                                                                          |
+| `open_sensors`     | `null`        | `{binary_sensor.backdoor: on}` | Dictionary of sensors with their entity-ID + state, that caused the alarm to change state.<br>Set when arming attempt failed (due to one or more sensors).<br>Set when alarm is triggered (only first sensor that caused the triggering is stored). |
+| `bypassed_sensors` | `null`        | `[binary_sensor.backdoor]`     | List of sensors that are temporarily excluded from the alarm, due to arming in force.                                                                                                                                                               |
 
 
 ### Sensor configuration
