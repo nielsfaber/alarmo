@@ -7,7 +7,7 @@ import '../components/alarmo-multi-select';
 import '../components/alarmo-multi-entity-select';
 
 import { triggerOptions, defaultAutomationData, ActionDomains, validateData } from '../data/actions';
-import { AlarmoNotification, AlarmoAutomation, AlarmoConfig, EAlarmStates, EArmModes, Action } from '../types';
+import { AlarmoAutomation, AlarmoConfig, EAlarmStates, EArmModes, Action } from '../types';
 import { fetchAutomations, deleteAutomation, saveAutomation, fetchConfig } from '../data/websockets';
 import { handleError, omit, Unique, showErrorDialog } from '../helpers';
 
@@ -30,7 +30,7 @@ export class AutomationEditorCard extends LitElement {
     const automations = await fetchAutomations(this.hass);
 
     if (this.item) {
-      if (automations[this.item] && !automations[this.item].is_notification) this.data = omit(automations[this.item], ['automation_id', 'is_notification', 'enabled']) as AlarmoNotification;
+      if (automations[this.item] && !automations[this.item].is_notification) this.data = omit(automations[this.item], ['automation_id', 'is_notification', 'enabled']) as AlarmoAutomation;
       else this.data = { ...defaultAutomationData };
     } else {
       this.data = { ...defaultAutomationData };
@@ -188,6 +188,7 @@ export class AutomationEditorCard extends LitElement {
 
   private getModeList() {
     return Object.keys(this.config!.modes)
+      .filter(e => this.config!.modes[e].enabled)
       .map(e => Object({ name: localize(`common.modes_long.${e}`, this.hass.language), value: e }));
   }
 
@@ -253,9 +254,10 @@ export class AutomationEditorCard extends LitElement {
   } z
 
   private saveClick(ev: Event) {
-    let data = {
-      ...this.data!,
-      name: this.data!.name || this.namePlaceholder
+    let data = this.yamlMode ? { ...this.yamlCode } as AlarmoAutomation : this.data!;
+    data = {
+      ...data,
+      name: data.name || this.namePlaceholder
     };
     const error = validateData(data, this.hass);
     if (error) {
@@ -274,7 +276,9 @@ export class AutomationEditorCard extends LitElement {
     if (!this.data) return;
     this.yamlMode = !this.yamlMode;
     if (!this.yamlMode && this.yamlCode) {
-      this.data = { ...this.yamlCode } as AlarmoNotification;
+      this.data = { ...this.yamlCode } as AlarmoAutomation;
+    } else {
+      this.yamlCode = { ...this.data };
     }
   }
 

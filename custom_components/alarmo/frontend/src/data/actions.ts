@@ -49,11 +49,21 @@ export const triggerOptions = (_hass: HomeAssistant) => [
   }
 ];
 
-export const targetOptions = (hass: HomeAssistant) => Object.keys(hass.services.notify)
-  .map(e => Object({
-    value: `notify.${e}`,
-    name: e
-  }));
+export function targetOptions(hass: HomeAssistant) {
+  let list = Object.keys(hass.services.notify)
+    .map(e => {
+      let data = {
+        value: `notify.${e}`,
+        name: e
+      };
+      const stateObj = hass.states[`device_tracker.${e.replace('mobile_app_', '')}`];
+      if (stateObj) data = { ...data, name: stateObj.attributes.friendly_name || computeEntity(stateObj.entity_id) };
+      return data;
+    });
+
+  list.sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1));
+  return list;
+}
 
 
 export type notificationFormData = {

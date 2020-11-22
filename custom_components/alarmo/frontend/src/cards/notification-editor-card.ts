@@ -198,6 +198,7 @@ export class NotificationEditorCard extends LitElement {
 
   private getModeList() {
     return Object.keys(this.config!.modes)
+      .filter(e => this.config!.modes[e].enabled)
       .map(e => Object({ name: localize(`common.modes_long.${e}`, this.hass.language), value: e }));
   }
 
@@ -263,22 +264,23 @@ export class NotificationEditorCard extends LitElement {
 
 
   private async saveClick(ev: Event) {
-    let data = {
-      ...this.data!,
+    let data = this.yamlMode ? { ...this.yamlCode } as AlarmoNotification : this.data!;
+    data = {
+      ...data,
       is_notification: true,
-      actions: this.data!.actions.map(action => {
+      actions: data.actions.map(action => {
         if (action.service_data && (!action.service_data.message || !action.service_data.message.length)) {
           return {
             ...action,
             service_data: {
               ...action.service_data,
-              message: messagePlaceHolder(this.data!)
+              message: messagePlaceHolder(data)
             }
           }
         }
         else return action;
       }),
-      name: this.data!.name || this.namePlaceholder
+      name: data.name || this.namePlaceholder
     };
 
     const error = validateData(data, this.hass);
@@ -297,6 +299,9 @@ export class NotificationEditorCard extends LitElement {
     this.yamlMode = !this.yamlMode;
     if (!this.yamlMode && this.yamlCode) {
       this.data = { ...this.yamlCode } as AlarmoNotification;
+    }
+    else {
+      this.yamlCode = { ...this.data };
     }
   }
 

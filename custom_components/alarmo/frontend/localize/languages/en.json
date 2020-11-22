@@ -4,13 +4,13 @@
       "armed_away": "Armed Away",
       "armed_home": "Armed Home",
       "armed_night": "Armed Night",
-      "armed_custom": "Armed Custom"
+      "armed_custom_bypass": "Armed Custom"
     },
     "modes_short": {
       "armed_away": "Away",
       "armed_home": "Home",
       "armed_night": "Night",
-      "armed_custom": "Custom"
+      "armed_custom_bypass": "Custom"
     }
   },
   "components": {
@@ -19,6 +19,10 @@
       "minutes": "min",
       "infinite": "infinite",
       "none": "none"
+    },
+    "editor": {
+      "ui_mode": "Switch to UI",
+      "yaml_mode": "Switch to YAML"
     }
   },
   "panels": {
@@ -134,22 +138,6 @@
             }
           }
         }
-      },
-      "dialogs": {
-        "sensor": {
-          "title": "Configuration for '{entity}'",
-          "actions": {
-            "remove": "remove"
-          },
-          "fields": {
-            "enabled_modes": {
-              "heading": "Alarm modes in which this sensor is active"
-            },
-            "immediate": {
-              "heading": "This sensor should trigger the alarm immediately"
-            }
-          }
-        }
       }
     },
     "codes": {
@@ -229,8 +217,7 @@
               "heading": "Current code",
               "description": "Current code, leave empty to leave unchanged."
             }
-          },
-          "errors": {}
+          }
         }
       }
     },
@@ -269,6 +256,10 @@
               "heading": "Event",
               "description": "When should the notification be sent"
             },
+            "mode": {
+              "heading": "Mode",
+              "description": "Limit the action to specific arm modes (optional)"
+            },
             "title": {
               "heading": "Title",
               "description": "Title for the notification message"
@@ -281,12 +272,48 @@
               "heading": "Target",
               "description": "Device to send the push message to"
             }
-          },
-          "actions": {
-            "ui_mode": "Edit as YAML",
-            "yaml_mode": "Edit in UI"
+          }
+        },
+        "new_action": {
+          "title": "Create action",
+          "description": "This panel can be used to switch a device when the alarm state changes.",
+          "fields": {
+            "name": {
+              "heading": "Name",
+              "description": "Description for this action"
+            },
+            "event": {
+              "heading": "Event",
+              "description": "When should the action be executed"
+            },
+            "mode": {
+              "heading": "Mode",
+              "description": "Limit the action to specific arm modes (optional)"
+            },
+            "entity": {
+              "heading": "Entity",
+              "description": "Entity to perform action on"
+            },
+            "action": {
+              "heading": "Action",
+              "description": "Action to perform on the entity",
+              "turn_on": "Turn on",
+              "turn_off": "Turn off"
+            }
           }
         }
+      },
+      "validation_errors": {
+        "no_triggers": "No state or event provided for the triggering of this automation.",
+        "empty_trigger": "One of the triggers has no state or event provided.",
+        "invalid_trigger": "One of the triggers has an invalid value: {trigger}",
+        "invalid_mode": "Invalid input provided for 'mode': {mode}",
+        "no_actions": "No actions are provided to be performed by this automation.",
+        "no_service": "One of the actions is missing a service.",
+        "invalid_service": "An invalid service name was provided for one of the actions: {service}",
+        "no_service_data": "No service data was provided for one of the actions.",
+        "no_entity_in_service_data": "No entity_id was provided in the service_data of one of the actions.",
+        "no_message_in_service_data": "No message was provided in the service_data of one of the actions."
       }
     }
   }
