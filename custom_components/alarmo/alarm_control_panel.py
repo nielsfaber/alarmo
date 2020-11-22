@@ -33,7 +33,6 @@ from homeassistant.const import (
     STATE_ALARM_TRIGGERED,
     STATE_ALARM_PENDING,
     STATE_ALARM_ARMING,
-    ATTR_MODE,
     ATTR_NAME,
 )
 from .const import (
@@ -292,18 +291,18 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
         await self._async_handle_arm_request(STATE_ALARM_ARMED_AWAY, code, skip_code)
 
     async def async_alarm_arm_home(self, code=None, skip_code=False):
-        """Send arm away command."""
-        _LOGGER.debug("alarm_arm_away")
+        """Send arm home command."""
+        _LOGGER.debug("alarm_arm_home")
         await self._async_handle_arm_request(STATE_ALARM_ARMED_HOME, code, skip_code)
 
     async def async_alarm_arm_night(self, code=None, skip_code=False):
-        """Send arm away command."""
-        _LOGGER.debug("alarm_arm_away")
+        """Send arm night command."""
+        _LOGGER.debug("alarm_arm_night")
         await self._async_handle_arm_request(STATE_ALARM_ARMED_NIGHT, code, skip_code)
 
     async def async_alarm_arm_custom_bypass(self, code=None, skip_code=False):
-        """Send arm away command."""
-        _LOGGER.debug("alarm_arm_away")
+        """Send arm custom_bypass command."""
+        _LOGGER.debug("alarm_arm_custom_bypass")
         await self._async_handle_arm_request(STATE_ALARM_ARMED_CUSTOM_BYPASS, code, skip_code)
 
     async def async_added_to_hass(self):
@@ -321,40 +320,40 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
         self._subscribe_events()
 
         state = await self.async_get_last_state()
+        initial_state = STATE_ALARM_DISARMED
 
         # restore previous state
         if state:
-
             # restore attributes
-            if ATTR_MODE in state.attributes:
-                self._arm_mode = state.attributes[ATTR_MODE]
-
+            if "arm_mode" in state.attributes:
+                self._arm_mode = state.attributes["arm_mode"]
             if "changed_by" in state.attributes:
                 self._changed_by = state.attributes["changed_by"]
-
             if "open_sensors" in state.attributes:
                 self.sensors.open_sensors = state.attributes["open_sensors"]
-
             if "bypassed_sensors" in state.attributes:
                 self.sensors.bypassed_sensors = state.attributes["bypassed_sensors"]
 
-            # restore previous state
-            if state.state in ARM_MODES:
-
-                self.async_set_timer(INITIALIZATION_TIME, self.async_initialization_timer_finished)
-
-            elif state.state == STATE_ALARM_ARMING:
-                await self.async_arm(self.arm_mode)
-            elif state.state == STATE_ALARM_PENDING:
-                await self.async_trigger(skip_delay=True)
-            elif state.state == STATE_ALARM_TRIGGERED:
-                await self.async_trigger()
+            # determine the state to start in
+            if (state.state in ARM_MODES or state.state == STATE_ALARM_ARMING) and self._arm_mode:
+                _LOGGER.debug(self._arm_mode)
+                initial_state = self._arm_mode
+            elif state.state in [STATE_ALARM_PENDING, STATE_ALARM_TRIGGERED]:
+                initial_state = STATE_ALARM_TRIGGERED
             else:
-                await self.async_update_state(STATE_ALARM_DISARMED)
+                initial_state = STATE_ALARM_DISARMED
 
+        _LOGGER.debug("Initial state is {}".format(initial_state))
+        if initial_state == STATE_ALARM_TRIGGERED:
+            await self.async_trigger(skip_delay=True)
+        elif not self.sensors.all_sensors_available_for_state(initial_state):
+            # some sensors need to start up still, so lets wait for them before restoring state
+            await self.sensors.async_update_listener(initial_state)
+            self.async_set_timer(INITIALIZATION_TIME, self.async_initialization_timer_finished)
+        elif initial_state in ARM_MODES:
+            await self.async_arm(self._arm_mode)
         else:
             await self.async_update_state(STATE_ALARM_DISARMED)
-            self._changed_by = None
 
         self.async_write_ha_state()
 
@@ -455,19 +454,23 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
     @callback
     async def async_initialization_timer_finished(self, now):
         """Update state at a scheduled point in time."""
-        await self.async_arm(self.arm_mode)
+        _LOGGER.debug("async_initialization_timer_finished")
+        if self.arm_mode:
+            await self.async_arm(self.arm_mode)
+        else:
+            await self.async_update_state(STATE_ALARM_DISARMED)
 
     @callback
     async def async_leave_timer_finished(self, now):
         """Update state at a scheduled point in time."""
-        # _LOGGER.debug("async_leave_timer_finished")
+        _LOGGER.debug("async_leave_timer_finished")
         await self.async_arm(self.arm_mode)
 
     @callback
     async def async_trigger_timer_finished(self, now):
         """Update state at a scheduled point in time."""
 
-        # _LOGGER.debug("async_trigger_timer_finished")
+        _LOGGER.debug("async_trigger_timer_finished")
         self._changed_by = None
         if self._config[ATTR_DISARM_AFTER_TRIGGER]:
             await self.async_update_state(STATE_ALARM_DISARMED)
@@ -479,7 +482,7 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
     async def async_entry_timer_finished(self, now):
         """Update state at a scheduled point in time."""
 
-        # _LOGGER.debug("async_entry_timer_finished")
+        _LOGGER.debug("async_entry_timer_finished")
         await self.async_trigger()
 
     def async_cancel_timer(self):
@@ -538,7 +541,7 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
         )
         self._subscribed_topics.append(subscription)
 
-    async def _unsubscribe_topics(self):
+    def _unsubscribe_topics(self):
         while self._subscribed_topics:
             self._subscribed_topics.pop()()
 
@@ -568,6 +571,6 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
             handle = self._hass.bus.async_listen(event, async_handle_event)
             self._event_listeners.append(handle)
 
-    async def _unsubscribe_events(self):
+    def _unsubscribe_events(self):
         while self._event_listeners:
             self._event_listeners.pop()()

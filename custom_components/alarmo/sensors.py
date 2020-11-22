@@ -85,6 +85,23 @@ class SensorHandler:
         elif not value:
             self._bypassed_sensors = None
 
+    def get_sensors_by_state(self, state):
+        """Compose a list of sensors that are active for the state"""
+        entities = []
+        for entity, config in self._config.items():
+            if self.bypassed_sensors and entity in self.bypassed_sensors:
+                # bypassed sensors shall not be considered
+                continue
+
+            if state == STATE_ALARM_DISARMED:
+                # in disarmed state only always-on sensors are included
+                if config[ATTR_ALWAYS_ON]:
+                    entities.append(entity)
+            elif self.alarm_entity.arm_mode in config[ATTR_MODES] or config[ATTR_ALWAYS_ON]:
+                # in other states, we check if the sensor is linked to the arm mode
+                entities.append(entity)
+        return entities
+
     @callback
     def async_load_config(self):
         self._config = self.coordinator.store.async_get_sensors()
@@ -95,17 +112,13 @@ class SensorHandler:
 
         # store internally so we can take into account during leave time
         self._bypass_mode = bypass_open_sensors
+        sensors_list = self.get_sensors_by_state(self.alarm_entity.arm_mode)
 
-        for entity, config in self._config.items():
-            if not config[ATTR_ALWAYS_ON]:
-                if self.alarm_entity.arm_mode not in config[ATTR_MODES]:
-                    continue
-                elif event == EVENT_LEAVE and not config[ATTR_IMMEDIATE]:
-                    continue
-                elif event == EVENT_ARM and config[ATTR_ALLOW_OPEN]:
-                    continue
-
-            if self.bypassed_sensors and entity in self.bypassed_sensors:
+        for entity in sensors_list:
+            sensor_config = self._config[entity]
+            if event == EVENT_LEAVE and not sensor_config[ATTR_IMMEDIATE]:
+                continue
+            elif event == EVENT_ARM and sensor_config[ATTR_ALLOW_OPEN]:
                 continue
 
             state = self.hass.states.get(entity)
@@ -139,11 +152,16 @@ class SensorHandler:
 
         # immediate trigger due to always on sensor
         if sensor_config[ATTR_ALWAYS_ON] and not self.validate_event(event=None, state_filter=STATE_OPEN):
+            _LOGGER.debug("Alarm is triggered due to an always-on sensor")
             await self.alarm_entity.async_trigger(skip_delay=True)
 
         # initializing -> check if all sensors have a known state
-        elif not self.alarm_entity.state and self.validate_event(event=EVENT_ARM, state_filter=STATE_UNKNOWN):
-            await self.alarm_entity.async_arm(self.alarm_entity.arm_mode)
+        elif not self.alarm_entity.state and self.all_sensors_available_for_state(self.alarm_entity.arm_mode):
+            _LOGGER.debug("All sensors are initialized, restoring state")
+            if self.alarm_entity.arm_mode:
+                await self.alarm_entity.async_arm(self.alarm_entity.arm_mode)
+            else:
+                await self.alarm_entity.async_update_state(STATE_ALARM_DISARMED)
 
         # arming while immediate sensor is triggered -> cancel arm
         elif self.alarm_entity.state == STATE_ALARM_ARMING and not self.validate_event(event=EVENT_LEAVE):
@@ -166,18 +184,28 @@ class SensorHandler:
 
     async def async_update_listener(self, state):
 
-        entities = []
-        for entity, config in self._config.items():
-            if config[ATTR_ALWAYS_ON]:
-                entities.append(entity)
-            elif state != STATE_ALARM_DISARMED and self.alarm_entity.arm_mode in config[ATTR_MODES]:
-                entities.append(entity)
+        sensors_list = self.get_sensors_by_state(state)
 
         if self._listener:
             self._listener()
             self._listener = None
 
-        if len(entities):
+        if len(sensors_list):
             self._listener = async_track_state_change(
-                self.hass, entities, self.async_sensor_state_changed
+                self.hass, sensors_list, self.async_sensor_state_changed
             )
+
+    def all_sensors_available_for_state(self, state):
+        sensors_list = self.get_sensors_by_state(state)
+        passed = True
+
+        for entity in sensors_list:
+            state = self.hass.states.get(entity)
+            if (
+                not state
+                or not state.state
+                or (state.state not in SENSOR_STATES_CLOSED and state.state not in SENSOR_STATES_OPEN)
+            ):
+                passed = False
+
+        return passed

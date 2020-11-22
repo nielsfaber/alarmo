@@ -22,7 +22,10 @@ from .const import (
     ATTR_OLD_CODE,
 )
 from .store import async_get_registry
-from .panel import async_register_panel
+from .panel import (
+    async_register_panel,
+    async_unregister_panel,
+)
 from .websockets import async_register_websockets
 
 _LOGGER = logging.getLogger(__name__)
@@ -77,6 +80,7 @@ async def async_unload_entry(hass, entry):
         )
     )
     if unload_ok:
+        async_unregister_panel(hass)
         coordinator = hass.data[DOMAIN]
         await coordinator.async_delete()
         del hass.data[DOMAIN]

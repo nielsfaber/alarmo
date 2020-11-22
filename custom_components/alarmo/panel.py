@@ -3,6 +3,8 @@ import logging
 from aiohttp import web
 
 from homeassistant.components.http import HomeAssistantView
+from homeassistant.components import frontend
+from homeassistant.components import panel_custom
 
 from .const import (
     CUSTOM_COMPONENTS,
@@ -28,7 +30,8 @@ async def async_register_panel(hass):
     hass.http.register_view(AlarmView(str(panel_dir)))
     hass.http.register_static_path(PANEL_URL, view_url)
 
-    await hass.components.panel_custom.async_register_panel(
+    await panel_custom.async_register_panel(
+        hass,
         webcomponent_name=PANEL_NAME,
         frontend_url_path=DOMAIN,
         module_url=PANEL_URL,
@@ -36,6 +39,11 @@ async def async_register_panel(hass):
         sidebar_icon=PANEL_ICON,
         config={"entity_id": ALARM_ENTITY},
     )
+
+
+def async_unregister_panel(hass):
+    frontend.async_remove_panel(hass, DOMAIN)
+    _LOGGER.debug("Removing panel")
 
 
 class AlarmView(HomeAssistantView):
