@@ -53,6 +53,9 @@ from .const import (
     ATTR_ENABLED,
     ATTR_REQUIRE_CODE,
     ATTR_DISARM_AFTER_TRIGGER,
+    PUSH_EVENTS,
+    EVENT_CATEGORIES,
+    EVENT_ACTION_FORCE_ARM,
 )
 from homeassistant.components.mqtt import (
     DOMAIN as ATTR_MQTT,
@@ -128,8 +131,8 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
         self._push_target = None
         self._siren_entity = None
         self._changed_by = None
-        self._open_sensors = None
         self._subscribed_topics = []
+        self._event_listeners = []
 
     @property
     def device_info(self) -> dict:
@@ -180,11 +183,6 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
         return self._changed_by
 
     @property
-    def open_sensors(self):
-        """Open sensors."""
-        return self._open_sensors
-
-    @property
     def state(self):
         """Return the state of the device."""
         return self._state
@@ -216,7 +214,8 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
         return {
             "changed_by": self._changed_by,
             "arm_mode": self._arm_mode,
-            "open_sensors": self._open_sensors,
+            "open_sensors": self.sensors.open_sensors,
+            "bypassed_sensors": self.sensors.bypassed_sensors,
         }
 
     @callback
@@ -263,84 +262,48 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
             _LOGGER.warning("Wrong code provided.")
             return
         else:
-            self._open_sensors = None
+            self._arm_mode = None
+            self.sensors.open_sensors = None
+            self.sensors.bypassed_sensors = None
             await self.async_update_state(STATE_ALARM_DISARMED)
+
+    async def _async_handle_arm_request(self, arm_mode, code, skip_code):
+        """check if conditions are met for starting arm procedure"""
+        if arm_mode not in supported_modes(self._config):
+            _LOGGER.warning("Mode {} is not enabled, ignoring.".format(arm_mode))
+            return
+        elif self._state != STATE_ALARM_DISARMED:
+            _LOGGER.warning("Cannot go to state {} from state {}.".format(arm_mode, self._state))
+            return
+        elif not self._validate_code(code, arm_mode) and not skip_code:
+            _LOGGER.warning("Wrong code provided.")
+            return
+        else:
+            self.sensors.open_sensors = None
+            self.sensors.bypassed_sensors = None
+            if skip_code:
+                self._changed_by = None
+            await self.async_arm(arm_mode)
 
     async def async_alarm_arm_away(self, code=None, skip_code=False):
         """Send arm away command."""
         _LOGGER.debug("alarm_arm_away")
-
-        if STATE_ALARM_ARMED_AWAY not in supported_modes(self._config):
-            _LOGGER.warning("Mode ARMED_AWAY is not enabled, ignoring.")
-            return
-        elif self._state != STATE_ALARM_DISARMED:
-            _LOGGER.warning("Cannot go to state {} from state {}.".format(STATE_ALARM_ARMED_AWAY, self._state))
-            return
-        elif not self._validate_code(code, STATE_ALARM_ARMED_AWAY) and not skip_code:
-            _LOGGER.warning("Wrong code provided.")
-            return
-        else:
-            self._open_sensors = None
-            if skip_code:
-                self._changed_by = None
-            await self.async_arm(STATE_ALARM_ARMED_AWAY)
+        await self._async_handle_arm_request(STATE_ALARM_ARMED_AWAY, code, skip_code)
 
     async def async_alarm_arm_home(self, code=None, skip_code=False):
-        """Send arm home command."""
-        _LOGGER.debug("alarm_arm_home")
-
-        if STATE_ALARM_ARMED_HOME not in supported_modes(self._config):
-            _LOGGER.warning("Mode ARMED_HOME is not enabled, ignoring.")
-            return
-        elif self._state != STATE_ALARM_DISARMED:
-            _LOGGER.warning("Cannot go to state {} from state {}.".format(STATE_ALARM_ARMED_HOME, self._state))
-            return
-        elif not self._validate_code(code, STATE_ALARM_ARMED_HOME) and not skip_code:
-            _LOGGER.warning("Wrong code provided.")
-            return
-        else:
-            self._open_sensors = None
-            if skip_code:
-                self._changed_by = None
-            await self.async_arm(STATE_ALARM_ARMED_HOME)
+        """Send arm away command."""
+        _LOGGER.debug("alarm_arm_away")
+        await self._async_handle_arm_request(STATE_ALARM_ARMED_HOME, code, skip_code)
 
     async def async_alarm_arm_night(self, code=None, skip_code=False):
-        """Send arm night command."""
-        _LOGGER.debug("alarm_arm_night")
-
-        if STATE_ALARM_ARMED_NIGHT not in supported_modes(self._config):
-            _LOGGER.warning("Mode ARMED_NIGHT is not enabled, ignoring.")
-            return
-        elif self._state != STATE_ALARM_DISARMED:
-            _LOGGER.warning("Cannot go to state {} from state {}.".format(STATE_ALARM_ARMED_NIGHT, self._state))
-            return
-        elif not self._validate_code(code, STATE_ALARM_ARMED_NIGHT) and not skip_code:
-            _LOGGER.warning("Wrong code provided.")
-            return
-        else:
-            self._open_sensors = None
-            if skip_code:
-                self._changed_by = None
-            await self.async_arm(STATE_ALARM_ARMED_NIGHT)
+        """Send arm away command."""
+        _LOGGER.debug("alarm_arm_away")
+        await self._async_handle_arm_request(STATE_ALARM_ARMED_NIGHT, code, skip_code)
 
     async def async_alarm_arm_custom_bypass(self, code=None, skip_code=False):
-        """Send arm custom bypass command."""
-        _LOGGER.debug("alarm_arm_custom_bypass")
-
-        if STATE_ALARM_ARMED_CUSTOM_BYPASS not in supported_modes(self._config):
-            _LOGGER.warning("Mode ARMED_CUSTOM_BYPASS is not enabled, ignoring.")
-            return
-        elif self._state != STATE_ALARM_DISARMED:
-            _LOGGER.warning("Cannot go to state {} from state {}.".format(STATE_ALARM_ARMED_CUSTOM_BYPASS, self._state))
-            return
-        elif not self._validate_code(code, STATE_ALARM_ARMED_CUSTOM_BYPASS) and not skip_code:
-            _LOGGER.warning("Wrong code provided.")
-            return
-        else:
-            self._open_sensors = None
-            if skip_code:
-                self._changed_by = None
-            await self.async_arm(STATE_ALARM_ARMED_CUSTOM_BYPASS)
+        """Send arm away command."""
+        _LOGGER.debug("alarm_arm_away")
+        await self._async_handle_arm_request(STATE_ALARM_ARMED_CUSTOM_BYPASS, code, skip_code)
 
     async def async_added_to_hass(self):
         """Connect to dispatcher listening for entity data notifications."""
@@ -354,12 +317,14 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
         if self._config[ATTR_MQTT][ATTR_ENABLED]:
             await self._subscribe_topics()
 
+        self._subscribe_events()
+
         state = await self.async_get_last_state()
 
         # restore previous state
         if state:
 
-            # get arm mode
+            # restore attributes
             if ATTR_MODE in state.attributes:
                 self._arm_mode = state.attributes[ATTR_MODE]
 
@@ -367,7 +332,10 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
                 self._changed_by = state.attributes["changed_by"]
 
             if "open_sensors" in state.attributes:
-                self._open_sensors = state.attributes["open_sensors"]
+                self.sensors.open_sensors = state.attributes["open_sensors"]
+
+            if "bypassed_sensors" in state.attributes:
+                self.sensors.bypassed_sensors = state.attributes["bypassed_sensors"]
 
             # restore previous state
             if state.state in ARM_MODES:
@@ -392,6 +360,7 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
     async def async_will_remove_from_hass(self):
         _LOGGER.debug("async_will_remove_from_hass")
         self._unsubscribe_topics()
+        self._unsubscribe_events()
 
     def get_delay_config(self, event):
         """Get datetime object for delay time."""
@@ -427,16 +396,16 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
 
         self.async_write_ha_state()
 
-    async def async_arm(self, arm_mode, skip_delay=False):
+    async def async_arm(self, arm_mode, skip_delay=False, bypass_open_sensors=False):
         """Update the state."""
-
         self._arm_mode = arm_mode
         leave_delay = self.get_delay_config(EVENT_LEAVE)
 
         # ARM request
 
         if self._state != STATE_ALARM_DISARMED or skip_delay:  # immediate arm event
-            res = self.sensors.validate_event(event=EVENT_ARM)
+
+            res = self.sensors.validate_event(event=EVENT_ARM, bypass_open_sensors=bypass_open_sensors)
 
             if not res:
                 # there where errors -> abort the arm
@@ -451,11 +420,11 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
 
             if not leave_delay:
                 # no delay configured -> run function again but skip the delay
-                await self.async_arm(arm_mode, skip_delay=True)
+                await self.async_arm(arm_mode, skip_delay=True, bypass_open_sensors=bypass_open_sensors)
 
             else:
                 # proceed to arming
-                res = self.sensors.validate_event(event=EVENT_LEAVE)
+                res = self.sensors.validate_event(event=EVENT_LEAVE, bypass_open_sensors=bypass_open_sensors)
                 if res:
                     await self.async_update_state(STATE_ALARM_ARMING)
                     self.async_set_timer(leave_delay, self.async_leave_timer_finished)
@@ -501,6 +470,7 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
         self._changed_by = None
         if self._config[ATTR_DISARM_AFTER_TRIGGER]:
             await self.async_update_state(STATE_ALARM_DISARMED)
+            self.sensors.bypassed_sensors = None
         else:
             await self.async_arm(self.arm_mode)
 
@@ -570,3 +540,30 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
     async def _unsubscribe_topics(self):
         while self._subscribed_topics:
             self._subscribed_topics.pop()()
+
+    def _subscribe_events(self):
+        @callback
+        async def async_handle_event(event):
+            action = None
+            if (
+                event.data and "categoryName" in event.data
+                and "actionName" in event.data
+                and event.data["categoryName"] in EVENT_CATEGORIES
+            ):
+                # IOS push notification format
+                action = event.data["actionName"]
+            elif event.data["action"]:
+                # Android push notification format
+                action = event.data["action"]
+
+            if action == EVENT_ACTION_FORCE_ARM and self._arm_mode and self._state == STATE_ALARM_DISARMED:
+                _LOGGER.info("Received request for force arming")
+                await self.async_arm(self._arm_mode, bypass_open_sensors=True)
+
+        for event in PUSH_EVENTS:
+            handle = self._hass.bus.async_listen(event, async_handle_event)
+            self._event_listeners.append(handle)
+
+    async def _unsubscribe_events(self):
+        while self._event_listeners:
+            self._event_listeners.pop()()

@@ -89,3 +89,12 @@ ATTR_REQUIRE_CODE = "require_code"
 
 ATTR_IS_NOTIFICATION = "is_notification"
 ATTR_VERSION = "version"
+
+PUSH_EVENTS = [
+    "ios.notification_action_fired",
+    "mobile_app_notification_action",
+]
+EVENT_CATEGORIES = [
+    "ALARMO_ARM_FAILURE",
+]
+EVENT_ACTION_FORCE_ARM = "ALARMO_FORCE_ARM"

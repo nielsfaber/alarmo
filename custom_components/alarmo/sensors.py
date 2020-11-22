@@ -55,15 +55,46 @@ class SensorHandler:
         self._listener = None
         self._config = self.coordinator.store.async_get_sensors()
         self.coordinator.register_sensor_callback(self.async_load_config)
-        self.changed_by = None
+        self._bypass_mode = False
+        self._open_sensors = None
+        self._bypassed_sensors = None
+
+    @property
+    def open_sensors(self):
+        """Get bypassed sensors."""
+        return self._bypassed_sensors
+
+    @open_sensors.setter
+    def open_sensors(self, value):
+        """Set bypassed sensors."""
+        if not self._open_sensors:
+            self._open_sensors = value
+        elif not value:
+            self._open_sensors = None
+
+    @property
+    def bypassed_sensors(self):
+        """Get bypassed sensors."""
+        return self._bypassed_sensors
+
+    @bypassed_sensors.setter
+    def bypassed_sensors(self, value):
+        """Set bypassed sensors."""
+        if not self._bypassed_sensors:
+            self._bypassed_sensors = value
+        elif not value:
+            self._bypassed_sensors = None
 
     @callback
     def async_load_config(self):
         self._config = self.coordinator.store.async_get_sensors()
 
-    def validate_event(self, event=None, state_filter=None) -> bool:
+    def validate_event(self, event=None, state_filter=None, bypass_open_sensors=False) -> bool:
         """"check if sensors have correct state"""
         open_sensors = {}
+
+        # store internally so we can take into account during leave time
+        self._bypass_mode = bypass_open_sensors
 
         for entity, config in self._config.items():
             if not config[ATTR_ALWAYS_ON]:
@@ -73,6 +104,9 @@ class SensorHandler:
                     continue
                 elif event == EVENT_ARM and config[ATTR_ALLOW_OPEN]:
                     continue
+
+            if self.bypassed_sensors and entity in self.bypassed_sensors:
+                continue
 
             state = self.hass.states.get(entity)
 
@@ -86,11 +120,16 @@ class SensorHandler:
                 if not state_filter or state_filter == STATE_UNKNOWN:
                     open_sensors[entity] = state.state
 
-        # store the entities that are in violation
-        if open_sensors and not self.alarm_entity._open_sensors:
-            self.alarm_entity._open_sensors = open_sensors
-
-        return not open_sensors  # empty dict = false
+        if self._bypass_mode and event in [EVENT_LEAVE, EVENT_ARM]:
+            if event == EVENT_ARM:
+                # store failed sensors
+                self.bypassed_sensors = list(open_sensors.keys())
+            return True
+        elif open_sensors:
+            self.open_sensors = open_sensors
+            return False
+        else:
+            return True
 
     @callback
     async def async_sensor_state_changed(self, entity, old_state, new_state):
