@@ -128,7 +128,7 @@ export class sensorEditorCard extends LitElement {
 
         
         ${
-      this.data.immediate || this.data.always_on
+      this.data.always_on
         ? ''
         : html`
         <settings-row .narrow=${this.narrow}>
