@@ -7,6 +7,7 @@ import { localize } from '../../localize/localize';
 import { Unique, Without, handleError } from '../helpers';
 
 import '../dialogs/error-dialog';
+import { HassEntity } from 'home-assistant-js-websocket';
 
 @customElement('sensor-editor-card')
 export class sensorEditorCard extends LitElement {
@@ -28,7 +29,7 @@ export class sensorEditorCard extends LitElement {
 
   render() {
     if (!this.data) return html``;
-    const stateObj = this.hass.states[this.data.entity_id];
+    const stateObj = this.hass.states[this.data.entity_id] as HassEntity | undefined;
     return html`
         <ha-card
         >
@@ -43,7 +44,7 @@ export class sensorEditorCard extends LitElement {
             </ha-icon-button>
           </div>
           <div class="card-content">
-              ${localize("panels.sensors.cards.editor.description", this.hass.language, "{entity}", stateObj.entity_id)}
+              ${localize("panels.sensors.cards.editor.description", this.hass.language, "{entity}", this.item)}
           </div>
 
         <settings-row .narrow=${this.narrow}>
@@ -52,7 +53,7 @@ export class sensorEditorCard extends LitElement {
 
           <paper-input
             label="${localize("panels.sensors.cards.editor.fields.name.heading", this.hass.language)}"
-            placeholder=${stateObj.attributes.friendly_name || ""}
+            placeholder=${stateObj?.attributes.friendly_name || ""}
             value=${this.data.name}
             @change=${(ev: Event) => this.data = { ...this.data, name: (ev.target as HTMLInputElement).value }}
           >

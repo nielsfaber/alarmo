@@ -125,7 +125,7 @@ class SensorHandler:
 
             if not state or not state.state:
                 if not state_filter or state_filter == STATE_UNKNOWN:
-                    open_sensors[entity] = state.state
+                    open_sensors[entity] = STATE_UNKNOWN
             elif state.state in SENSOR_STATES_OPEN:
                 if not state_filter or state_filter == STATE_OPEN:
                     open_sensors[entity] = state.state
@@ -179,7 +179,7 @@ class SensorHandler:
 
         # alarm is in pending -> check if pending time needs to be aborted
         elif self.alarm_entity.state == STATE_ALARM_PENDING:
-            if not res and sensor_config[ATTR_IMMEDIATE]:
+            if new_state not in SENSOR_STATES_CLOSED and sensor_config[ATTR_IMMEDIATE]:
                 await self.alarm_entity.async_trigger(skip_delay=True)
 
     async def async_update_listener(self, state):

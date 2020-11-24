@@ -77,13 +77,15 @@ export class AlarmViewSensors extends SubscribeMixin(LitElement) {
   sensorsPanel() {
     if (!this.hass) return html``;
 
-    let sensorsList = Object.values(this.hass.states)
-      .filter(e => Object.keys(this.sensors).includes(e.entity_id))
-      .map(e => Object({
-        id: e.entity_id,
-        name: computeName(e),
-        icon: computeIcon(e),
-      }));
+    let sensorsList = Object.keys(this.sensors)
+      .map(e => {
+        const stateObj = this.hass!.states[e];
+        return {
+          id: e,
+          name: computeName(stateObj),
+          icon: computeIcon(stateObj),
+        }
+      });
 
     sensorsList.sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1));
 
