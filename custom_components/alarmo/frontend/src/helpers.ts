@@ -1,7 +1,7 @@
 import { HomeAssistant, stateIcon, fireEvent } from 'custom-card-helpers';
 import { HassEntity } from 'home-assistant-js-websocket';
-import { platform } from './const';
-import { Dictionary } from './types';
+import { platform, AlarmStates, AlarmCommands } from './const';
+import { Dictionary, AlarmoConfig, EArmModes } from './types';
 import { html, TemplateResult } from 'lit-element';
 
 export function getDomain(entity: string | HassEntity) {
@@ -70,4 +70,45 @@ export function handleError(err: any, ev: Event) {
     Please <a href="https://github.com/nielsfaber/alarmo/issues">report</a> the bug.
   `;
   showErrorDialog(ev, errorMessage);
+}
+
+export const commandToState = (command: string) => {
+  switch (command) {
+    case AlarmCommands.COMMAND_ALARM_DISARM:
+      return AlarmStates.STATE_ALARM_DISARMED;
+    case AlarmCommands.COMMAND_ALARM_ARM_HOME:
+      return AlarmStates.STATE_ALARM_ARMED_HOME;
+    case AlarmCommands.COMMAND_ALARM_ARM_AWAY:
+      return AlarmStates.STATE_ALARM_ARMED_AWAY;
+    case AlarmCommands.COMMAND_ALARM_ARM_NIGHT:
+      return AlarmStates.STATE_ALARM_ARMED_NIGHT;
+    case AlarmCommands.COMMAND_ALARM_ARM_CUSTOM_BYPASS:
+      return AlarmStates.STATE_ALARM_ARMED_CUSTOM_BYPASS;
+    default:
+      return undefined;
+  }
+}
+
+export const filterState = (state: string, config: AlarmoConfig) => {
+  if (!state) return false;
+  switch (state) {
+    case AlarmStates.STATE_ALARM_ARMED_AWAY:
+      return config.modes[EArmModes.ArmedAway].enabled;
+    case AlarmStates.STATE_ALARM_ARMED_HOME:
+      return config.modes[EArmModes.ArmedHome].enabled;
+    case AlarmStates.STATE_ALARM_ARMED_NIGHT:
+      return config.modes[EArmModes.ArmedNight].enabled;
+    case AlarmStates.STATE_ALARM_ARMED_CUSTOM_BYPASS:
+      return config.modes[EArmModes.ArmedCustom].enabled;
+    default:
+      return true;
+  }
+}
+
+export function Assign<Type>(obj: Type, changes: Partial<Type>): Type {
+  Object.entries(changes).forEach(([key, val]) => {
+    if (key in obj && typeof obj[key] == "object" && obj[key] !== null) obj = { ...obj, [key]: Assign(obj[key], val) };
+    else obj = { ...obj, [key]: val };
+  });
+  return obj;
 }

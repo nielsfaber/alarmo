@@ -88,6 +88,14 @@
             "require_code": {
               "heading": "Require code",
               "description": "Require the code to be sent with the command."
+            },
+            "state_payload": {
+              "heading": "Configure payload per state",
+              "item": "Define a payload for state '{state}'"
+            },
+            "command_payload": {
+              "heading": "Configure payload per command",
+              "item": "Define a payload for command '{command}'"
             }
           }
         }
@@ -109,7 +117,8 @@
           "description": "Add more sensors. Make sure that your sensors have a friendly_name, so you can identify them.",
           "no_items": "There are no available HA entities that can be configured for the alarm. Make sure to include entities of the type binary_sensor.",
           "actions": {
-            "add_to_alarm": "add to alarm"
+            "add_to_alarm": "add to alarm",
+            "show_all": "Show all"
           }
         },
         "editor": {

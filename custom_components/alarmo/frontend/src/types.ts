@@ -118,6 +118,8 @@ export interface AlarmoNotification extends AlarmoAutomation {
 export type MqttConfig = {
   enabled: boolean,
   state_topic: string,
+  state_payload: Dictionary<string>,
   command_topic: string,
+  command_payload: Dictionary<string>,
   require_code: boolean,
 }

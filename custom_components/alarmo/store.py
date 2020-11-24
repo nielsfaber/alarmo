@@ -47,7 +47,9 @@ class MqttConfig:
 
     enabled = attr.ib(type=bool, default=False)
     state_topic = attr.ib(type=str, default="alarmo/state")
+    state_payload = attr.ib(type=dict, default={})
     command_topic = attr.ib(type=str, default="alarmo/command")
+    command_payload = attr.ib(type=dict, default={})
     require_code = attr.ib(type=bool, default=False)
 
 
@@ -149,7 +151,8 @@ class AlarmoStorage:
         automations: "OrderedDict[str, AutomationEntry]" = OrderedDict()
 
         if data is not None:
-            config = attr.evolve(config, **data["config"])
+            config = Config(**data["config"])
+            config = attr.evolve(config, **{"mqtt": MqttConfig(**data["config"]["mqtt"])})
 
             if "sensors" in data:
                 for sensor in data["sensors"]:

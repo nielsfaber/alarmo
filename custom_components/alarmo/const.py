@@ -54,6 +54,20 @@ ARM_MODES = [
     STATE_ALARM_ARMED_CUSTOM_BYPASS,
 ]
 
+COMMAND_ARM_NIGHT = "arm_night"
+COMMAND_ARM_AWAY = "arm_away"
+COMMAND_ARM_HOME = "arm_home"
+COMMAND_ARM_CUSTOM_BYPASS = "arm_custom_bypass"
+COMMAND_DISARM = "disarm"
+
+COMMANDS = [
+    COMMAND_DISARM,
+    COMMAND_ARM_AWAY,
+    COMMAND_ARM_NIGHT,
+    COMMAND_ARM_HOME,
+    COMMAND_ARM_CUSTOM_BYPASS,
+]
+
 EVENT_LEAVE = "leave"
 EVENT_ARM = "arm"
 EVENT_ENTRY = "entry"
@@ -89,6 +103,8 @@ ATTR_REQUIRE_CODE = "require_code"
 
 ATTR_IS_NOTIFICATION = "is_notification"
 ATTR_VERSION = "version"
+ATTR_STATE_PAYLOAD = "state_payload"
+ATTR_COMMAND_PAYLOAD = "command_payload"
 
 PUSH_EVENTS = [
     "ios.notification_action_fired",

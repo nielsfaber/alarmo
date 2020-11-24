@@ -14,7 +14,16 @@ from homeassistant.const import (
     ATTR_CODE,
     ATTR_SERVICE,
     ATTR_SERVICE_DATA,
-    ATTR_STATE
+    ATTR_STATE,
+    STATE_ALARM_ARMED_AWAY,
+    STATE_ALARM_ARMED_HOME,
+    STATE_ALARM_ARMED_NIGHT,
+    STATE_ALARM_ARMED_CUSTOM_BYPASS,
+    STATE_ALARM_DISARMED,
+    STATE_ALARM_TRIGGERED,
+    STATE_ALARM_PENDING,
+    STATE_ALARM_DISARMING,
+    STATE_ALARM_ARMING,
 )
 
 from homeassistant.components.alarm_control_panel import (
@@ -47,6 +56,13 @@ from .const import (
     ATTR_REQUIRE_CODE,
     ATTR_IS_NOTIFICATION,
     ATTR_VERSION,
+    ATTR_STATE_PAYLOAD,
+    ATTR_COMMAND_PAYLOAD,
+    COMMAND_ARM_NIGHT,
+    COMMAND_ARM_AWAY,
+    COMMAND_ARM_HOME,
+    COMMAND_ARM_CUSTOM_BYPASS,
+    COMMAND_DISARM,
 )
 
 from homeassistant.components.mqtt import (
@@ -85,7 +101,25 @@ class AlarmoConfigView(HomeAssistantView):
                 vol.Optional(ATTR_MQTT): vol.Schema({
                     vol.Required(ATTR_ENABLED): cv.boolean,
                     vol.Required(CONF_STATE_TOPIC): cv.string,
+                    vol.Optional(ATTR_STATE_PAYLOAD): vol.Schema({
+                        vol.Optional(STATE_ALARM_DISARMED): cv.string,
+                        vol.Optional(STATE_ALARM_ARMED_HOME): cv.string,
+                        vol.Optional(STATE_ALARM_ARMED_AWAY): cv.string,
+                        vol.Optional(STATE_ALARM_ARMED_NIGHT): cv.string,
+                        vol.Optional(STATE_ALARM_ARMED_CUSTOM_BYPASS): cv.string,
+                        vol.Optional(STATE_ALARM_PENDING): cv.string,
+                        vol.Optional(STATE_ALARM_ARMING): cv.string,
+                        vol.Optional(STATE_ALARM_DISARMING): cv.string,
+                        vol.Optional(STATE_ALARM_TRIGGERED): cv.string
+                    }),
                     vol.Required(CONF_COMMAND_TOPIC): cv.string,
+                    vol.Optional(ATTR_COMMAND_PAYLOAD): vol.Schema({
+                        vol.Optional(COMMAND_ARM_AWAY): cv.string,
+                        vol.Optional(COMMAND_ARM_HOME): cv.string,
+                        vol.Optional(COMMAND_ARM_NIGHT): cv.string,
+                        vol.Optional(COMMAND_ARM_CUSTOM_BYPASS): cv.string,
+                        vol.Optional(COMMAND_DISARM): cv.string,
+                    }),
                     vol.Required(ATTR_REQUIRE_CODE): cv.boolean,
                 })
             }

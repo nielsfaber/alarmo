@@ -9,3 +9,24 @@ export const IconArmedAway = 'car-traction-control';
 export const IconArmedHome = 'home';
 export const IconArmedNight = 'weather-night';
 export const IconArmedCustom = 'palette-outline';
+
+export enum AlarmStates {
+  STATE_ALARM_DISARMED = "disarmed",
+  STATE_ALARM_ARMED_HOME = "armed_home",
+  STATE_ALARM_ARMED_AWAY = "armed_away",
+  STATE_ALARM_ARMED_NIGHT = "armed_night",
+  STATE_ALARM_ARMED_CUSTOM_BYPASS = "armed_custom_bypass",
+  STATE_ALARM_PENDING = "pending",
+  STATE_ALARM_ARMING = "arming",
+  STATE_ALARM_DISARMING = "disarming",
+  STATE_ALARM_TRIGGERED = "triggered",
+}
+
+export enum AlarmCommands {
+  COMMAND_ALARM_DISARM = "disarm",
+  COMMAND_ALARM_ARM_HOME = "arm_home",
+  COMMAND_ALARM_ARM_AWAY = "arm_away",
+  COMMAND_ALARM_ARM_NIGHT = "arm_night",
+  COMMAND_ALARM_ARM_CUSTOM_BYPASS = "arm_custom_bypass",
+}
+
