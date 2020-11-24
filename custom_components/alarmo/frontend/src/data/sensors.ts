@@ -5,9 +5,10 @@ import { getDomain } from "../helpers";
 
 
 
-export const isValidSensor = (entity: HassEntity) => {
+export const isValidSensor = (entity: HassEntity, showAllDeviceClasses: boolean) => {
   const domain = getDomain(entity.entity_id);
   if (domain == 'binary_sensor') {
+    if (showAllDeviceClasses) return true;
     const type = entity.attributes.device_class;
     if (!type) return false;
     if (

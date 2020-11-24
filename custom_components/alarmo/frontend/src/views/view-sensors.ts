@@ -15,7 +15,6 @@ import { SubscribeMixin } from '../subscribe-mixin';
 import { localize } from '../../localize/localize';
 import { TableColumn, TableData } from '../components/alarmo-table';
 import { defaultSensorConfig, isValidSensor } from '../data/sensors';
-import { IconArmedAway, IconArmedHome } from '../const';
 
 @customElement('alarm-view-sensors')
 export class AlarmViewSensors extends SubscribeMixin(LitElement) {
@@ -27,6 +26,8 @@ export class AlarmViewSensors extends SubscribeMixin(LitElement) {
   @property() sensors: Dictionary<AlarmoSensor> = {};
 
   @property() addSelection: string[] = [];
+
+  @property() showAllSensorEntities = false;
 
   public hassSubscribe(): Promise<UnsubscribeFunc>[] {
     this._fetchData();
@@ -149,7 +150,7 @@ export class AlarmViewSensors extends SubscribeMixin(LitElement) {
     if (!this.hass) return html``;
 
     let addSensorsList = Object.values(this.hass.states)
-      .filter(e => isValidSensor(e))
+      .filter(e => isValidSensor(e, this.showAllSensorEntities))
       .filter(e => !Object.keys(this.sensors).includes(e.entity_id))
       .map(e => Object({
         id: e.entity_id,
@@ -201,6 +202,15 @@ export class AlarmViewSensors extends SubscribeMixin(LitElement) {
     <ha-card header="${localize("panels.sensors.cards.add_sensors.title", this.hass.language)}">
       <div class="card-content">
         ${localize("panels.sensors.cards.add_sensors.description", this.hass.language)}
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; padding: 8px 16px">
+        <ha-switch
+          @change=${(ev: Event) => { this.showAllSensorEntities = (ev.target as HTMLInputElement).checked }}
+          style="padding: 0px 8px"
+        >
+        </ha-switch>
+        ${localize("panels.sensors.cards.add_sensors.actions.show_all", this.hass!.language)}
       </div>
 
       <alarmo-table
