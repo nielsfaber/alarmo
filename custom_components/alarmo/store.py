@@ -98,6 +98,7 @@ class UserEntry:
     is_admin = attr.ib(type=bool, default=False)
     can_arm = attr.ib(type=bool, default=False)
     can_disarm = attr.ib(type=bool, default=False)
+    is_override_code = attr.ib(type=bool, default=False)
 
 
 @attr.s(slots=True, frozen=True)

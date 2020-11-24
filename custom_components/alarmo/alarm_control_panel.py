@@ -51,6 +51,7 @@ from .const import (
     ATTR_CODE_DISARM_REQUIRED,
     ATTR_ENABLED,
     ATTR_REQUIRE_CODE,
+    ATTR_IS_OVERRIDE_CODE,
     ATTR_DISARM_AFTER_TRIGGER,
     PUSH_EVENTS,
     EVENT_CATEGORIES,
@@ -252,7 +253,7 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
         else:
             self._changed_by = res[ATTR_NAME]
 
-        return True
+        return res
 
     async def async_alarm_disarm(self, code=None, skip_code=False):
         """Send disarm command."""
@@ -278,15 +279,20 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
         elif self._state != STATE_ALARM_DISARMED:
             _LOGGER.warning("Cannot go to state {} from state {}.".format(arm_mode, self._state))
             return
-        elif not self._validate_code(code, arm_mode) and not skip_code:
-            _LOGGER.warning("Wrong code provided.")
-            return
         else:
-            self.sensors.open_sensors = None
-            self.sensors.bypassed_sensors = None
-            if skip_code:
+            bypass_open_sensors = False
+            if not skip_code:
+                res = self._validate_code(code, arm_mode)
+                if not res:
+                    _LOGGER.warning("Wrong code provided.")
+                    return
+                elif res[ATTR_IS_OVERRIDE_CODE]:
+                    bypass_open_sensors = True
+                self.sensors.open_sensors = None
+                self.sensors.bypassed_sensors = None
+                await self.async_arm(arm_mode, bypass_open_sensors=bypass_open_sensors)
+            else:
                 self._changed_by = None
-            await self.async_arm(arm_mode)
 
     async def async_alarm_arm_away(self, code=None, skip_code=False):
         """Send arm away command."""

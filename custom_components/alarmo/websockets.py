@@ -50,6 +50,7 @@ from .const import (
     ATTR_CAN_ARM,
     ATTR_CAN_DISARM,
     ATTR_OLD_CODE,
+    ATTR_IS_OVERRIDE_CODE,
     ATTR_TRIGGERS,
     ATTR_ACTIONS,
     ATTR_EVENT,
@@ -212,6 +213,7 @@ class AlarmoUserView(HomeAssistantView):
                 vol.Optional(ATTR_IS_ADMIN): cv.boolean,
                 vol.Optional(ATTR_CAN_ARM): cv.boolean,
                 vol.Optional(ATTR_CAN_DISARM): cv.boolean,
+                vol.Optional(ATTR_IS_OVERRIDE_CODE): cv.boolean,
             }
         )
     )

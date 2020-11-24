@@ -20,7 +20,8 @@ export class UserEditorCard extends LitElement {
     confirm_code: string,
     is_admin: boolean,
     can_arm: boolean,
-    can_disarm: boolean
+    can_disarm: boolean,
+    is_override_code: boolean
   };
 
   users?: Dictionary<AlarmoUser>;
@@ -36,14 +37,15 @@ export class UserEditorCard extends LitElement {
       confirm_code: "",
       is_admin: false,
       can_arm: true,
-      can_disarm: true
+      can_disarm: true,
+      is_override_code: false
     };
 
     if (this.item) {
       const user = this.users[this.item];
       this.data = {
         ...this.data,
-        ...pick(user, ['name', 'is_admin', 'can_arm', 'can_disarm'])
+        ...pick(user, ['name', 'is_admin', 'can_arm', 'can_disarm', 'is_override_code'])
       };
     }
   }
@@ -171,6 +173,17 @@ export class UserEditorCard extends LitElement {
       ?checked=${this.data.can_disarm || this.data.is_admin}
       ?disabled=${this.data.is_admin}
       @change=${(ev: Event) => this.data = { ...this.data!, can_disarm: (ev.target as HTMLInputElement).checked }}
+    >
+    </ha-switch>
+  </settings-row>
+
+  <settings-row .narrow=${this.narrow}>
+    <span slot="heading">${localize("panels.codes.cards.new_user.fields.is_override_code.heading", this.hass.language)}</span>
+    <span slot="description">${localize("panels.codes.cards.new_user.fields.is_override_code.description", this.hass.language)}</span>
+
+    <ha-switch
+      ?checked=${this.data.is_override_code}
+      @change=${(ev: Event) => this.data = { ...this.data!, is_override_code: (ev.target as HTMLInputElement).checked }}
     >
     </ha-switch>
   </settings-row>

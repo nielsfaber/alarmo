@@ -62,7 +62,8 @@ export type AlarmoUser = {
   old_code?: string,
   is_admin: boolean,
   can_arm: boolean,
-  can_disarm: boolean
+  can_disarm: boolean,
+  is_override_code: boolean
 }
 
 export type Trigger = {

@@ -91,6 +91,7 @@ ATTR_DISARM_AFTER_TRIGGER = "disarm_after_trigger"
 
 ATTR_REMOVE = "remove"
 ATTR_IS_ADMIN = "is_admin"
+ATTR_IS_OVERRIDE_CODE = "is_override_code"
 
 ATTR_AUTOMATION_ID = "automation_id"
 
