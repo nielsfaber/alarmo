@@ -286,7 +286,7 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
                 if not res:
                     _LOGGER.warning("Wrong code provided.")
                     return
-                elif res[ATTR_IS_OVERRIDE_CODE]:
+                elif type(res) is dict and res[ATTR_IS_OVERRIDE_CODE]:
                     bypass_open_sensors = True
                 self.sensors.open_sensors = None
                 self.sensors.bypassed_sensors = None
