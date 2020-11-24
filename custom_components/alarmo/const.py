@@ -15,7 +15,7 @@ from homeassistant.const import (
 
 from homeassistant.components.alarm_control_panel import DOMAIN as PLATFORM
 
-VERSION = "1.2.0"
+VERSION = "1.3.0"
 NAME = "Alarmo"
 MANUFACTURER = "@nielsfaber"
 
