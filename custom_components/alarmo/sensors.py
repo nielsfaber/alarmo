@@ -118,7 +118,7 @@ class SensorHandler:
             sensor_config = self._config[entity]
             if event == EVENT_LEAVE and not sensor_config[ATTR_IMMEDIATE]:
                 continue
-            elif event == EVENT_ARM and sensor_config[ATTR_ALLOW_OPEN]:
+            if event in [EVENT_LEAVE, EVENT_ARM] and sensor_config[ATTR_ALLOW_OPEN]:
                 continue
 
             state = self.hass.states.get(entity)
