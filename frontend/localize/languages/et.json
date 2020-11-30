@@ -1,0 +1,333 @@
+{
+  "common": {
+    "modes_long": {
+      "armed_away": "Valvestatud eemal",
+      "armed_home": "Valvestatud kodus",
+      "armed_night": "Valvestatud ööseks",
+      "armed_custom_bypass": "Valikuline valvestus"
+    },
+    "modes_short": {
+      "armed_away": "Eemal",
+      "armed_home": "Kodus",
+      "armed_night": "Ööseks",
+      "armed_custom_bypass": "Valikuline"
+    }
+  },
+  "components": {
+    "time_slider": {
+      "seconds": "sek",
+      "minutes": "min",
+      "infinite": "piiranguta",
+      "none": "puudub"
+    },
+    "editor": {
+      "ui_mode": "Kasutajaliides",
+      "yaml_mode": "Koodiredaktor"
+    }
+  },
+  "panels": {
+    "general": {
+      "cards": {
+        "general": {
+          "title": "Üldsätted",
+          "description": "Need seaded kehtivad kõikides valve olekutes.",
+          "fields": {
+            "trigger_time": {
+              "heading": "Häire kestus",
+              "description": "Sireeni jne. aktiveerimise kestus."
+            },
+            "disarm_after_trigger": {
+              "heading": "Häire summutamine",
+              "description": "Peale häire lõppu võta valvest maha miite ära valvesta uuesti."
+            },
+            "enable_mqtt": {
+              "heading": "Luba MQTT juhtimine",
+              "description": "Luba nupustiku juhtimist MQTT abil."
+            }
+          },
+          "actions": {
+            "setup_mqtt": "MQTT seadistamine"
+          }
+        },
+        "common": {
+          "fields": {
+            "leave_time": {
+              "heading": "Ooteaeg valvestamisel",
+              "description": "Viivitus enne valvestamise rakendumist."
+            },
+            "entry_time": {
+              "heading": "Sisenemise viivitus",
+              "description": "Viivitus sisenemisel enne häire rakendumist."
+            }
+          }
+        },
+        "armed_away": {
+          "description": "Täielik valvestamine kui kedagi pole kodus. Kasutusel on kõik andurid."
+        },
+        "armed_home": {
+          "description": "Valvestatud kodus ei kasuta liikumisandureid kuid väisuksed ja aknad on valve all."
+        },
+        "armed_night": {
+          "description": "Valvestatud ööseks ei kasuta määratud liikumisandureid, välisperimeeter on valve all."
+        },
+        "armed_custom": {
+          "description": "Valikulise valvestuse puhul saab määrata kasutatavad andurid."
+        },
+        "mqtt": {
+          "title": "MQTT sätted",
+          "description": "MQTT parameetrite seadistamine.",
+          "fields": {
+            "state_topic": {
+              "heading": "Oleku teema (topic)",
+              "description": "Teema milles avaldatakse oleku muutused."
+            },
+            "command_topic": {
+              "heading": "Käskude teema (topic)",
+              "description": "Teema milles avaldatakse valvestamise käsud."
+            },
+            "require_code": {
+              "heading": "Nõua PIN koodi",
+              "description": "Käskude edastamiseks on vajalik PIN kood."
+            },
+            "state_payload": {
+              "heading": "Määra olekute toimeandmed",
+              "item": "Määra oleku '{state}' toimeandmed"
+            },
+            "command_payload": {
+              "heading": "Määra käskude toimeandmed",
+              "item": "Määra käsu '{command}' toimeandmed"
+            }
+          }
+        }
+      }
+    },
+    "sensors": {
+      "cards": {
+        "sensors": {
+          "title": "Andurid",
+          "description": "Kasutusel olevad andurid. Klõpsa olemil, et seadistada.",
+          "no_items": "Andureid pole lisatud. Alustuseks lisa mõni andur.",
+          "table": {
+            "arm_modes": "Valvestamise olek",
+            "always_on": "(alati)"
+          }
+        },
+        "add_sensors": {
+          "title": "Andurite lisamine",
+          "description": "Lisa veel andureid. Mõistlik on panna neile arusaadav nimi (friendly_name).",
+          "no_items": "Puuduvad valvestamiseks sobivad Home Assistanti olemid. Lisatavad olemid peavad olema olekuandurid (binary_sensor).",
+          "actions": {
+            "add_to_alarm": "Lisa valvesüsteemile",
+            "show_all": "Kuva kõik andurid"
+          }
+        },
+        "editor": {
+          "title": "Andurite sätted",
+          "description": "Muuda olemi '{entity}' sätteid.",
+          "fields": {
+            "name": {
+              "heading": "Nimi",
+              "description": "Muuda kuvatavat nime."
+            },
+            "always_on": {
+              "heading": "Alati kasutusel",
+              "description": "Andur käivitab häire igas valve olekus."
+            },
+            "modes": {
+              "heading": "Valve olekute valik",
+              "description": "Valve olekud kus seda andurit kasutatakse."
+            },
+            "immediate": {
+              "heading": "Viivituseta",
+              "description": "Andur annab häire ilma viiteta."
+            },
+            "allow_open": {
+              "heading": "Lahkumisviivitus",
+              "description": "See andur ei aktiveeru enne lahkumisviivituse lõppu."
+            }
+          }
+        }
+      }
+    },
+    "codes": {
+      "cards": {
+        "codes": {
+          "title": "Koodid",
+          "description": "Valvestuskoodide muutmine.",
+          "fields": {
+            "code_arm_required": {
+              "heading": "Valvestamine koodiga",
+              "description": "Valvestamiseks tuleb sisestada kood"
+            },
+            "code_disarm_required": {
+              "heading": "Valvest vabastamise kood",
+              "description": "Valvest vabastamiseks tulem sisestada kood"
+            },
+            "code_format": {
+              "heading": "Koodi vorming",
+              "description": "Kasutajaliidese koodi tüübid.",
+              "code_format_number": "PIN kood",
+              "code_format_text": "Salasõna"
+            }
+          }
+        },
+        "user_management": {
+          "title": "Kasutajate haldus",
+          "description": "Igal kasutajal on oma juhtkood.",
+          "no_items": "Kasutajaid pole määratud",
+          "table": {
+            "remarks": "Märkused",
+            "administrator": "Haldaja"
+          },
+          "actions": {
+            "new_user": "Uus kasutaja"
+          }
+        },
+        "new_user": {
+          "title": "Lisa uus kasutaja",
+          "description": "Valvesüsteemi kasutaja lisamine.",
+          "fields": {
+            "name": {
+              "heading": "Nimi",
+              "description": "Kasutaja nimi."
+            },
+            "code": {
+              "heading": "Valvestuskood",
+              "description": "Selle kasutaja kood."
+            },
+            "confirm_code": {
+              "heading": "Koodi kinnitamine",
+              "description": "Sisesta sama kood uuesti."
+            },
+            "is_admin": {
+              "heading": "Kasutajal on haldusõigused",
+              "description": "Kasutaja saab teha muudatusi."
+            },
+            "can_arm": {
+              "heading": "Tohib valvestada",
+              "description": "Koodi sisestamine valvestab."
+            },
+            "can_disarm": {
+              "heading": "Tohib valvest maha võtta",
+              "description": "Koodi sisestamine võtab valvest maha."
+            },
+            "is_override_code": {
+              "heading": "Alistuskood",
+              "description": "Koodi sisestamine käivitab kohese häire"
+            }
+          },
+          "errors": {
+            "no_name": "Nimi puudub.",
+            "no_code": "Kood peab olema vhemalt 4 tärki.",
+            "code_mismatch": "Sisestatud koodid ei klapi."
+          }
+        },
+        "edit_user": {
+          "title": "Muuda kasutaja sätteid",
+          "description": "Muuda kasutaja '{name}' sätteid.",
+          "fields": {
+            "old_code": {
+              "heading": "Kehtiv kood",
+              "description": "Kehtiv kood, jäta tühjaks kui ei taha muuta."
+            }
+          }
+        }
+      }
+    },
+    "actions": {
+      "cards": {
+        "notifications": {
+          "title": "Teavitused",
+          "description": "Halda saadetavaid teavitusi",
+          "table": {
+            "enabled": "Lubatud",
+            "no_items": "Teavitusi pole veel loodud."
+          },
+          "actions": {
+            "new_notification": "uus teavitus"
+          }
+        },
+        "actions": {
+          "title": "Toimingud",
+          "description": "Arenduses, mõeldud seadmete lülitamiseks.",
+          "table": {
+            "no_items": "Toiminguid pole veel määratud."
+          },
+          "actions": {
+            "new_action": "uus toiming"
+          }
+        },
+        "new_notification": {
+          "title": "Loo teavitus",
+          "description": "Uue teavituse loomine.",
+          "fields": {
+            "name": {
+              "heading": "Nimi",
+              "description": "Teavituse kirjeldus"
+            },
+            "event": {
+              "heading": "Sündmus",
+              "description": "Mille puhul teavitada"
+            },
+            "mode": {
+              "heading": "Olek",
+              "description": "Millises valve olekus teavitada (valikuline)"
+            },
+            "title": {
+              "heading": "Päis",
+              "description": "Teavitussõnumi päis"
+            },
+            "message": {
+              "heading": "Sisu",
+              "description": "Teavitussõnumi tekst"
+            },
+            "target": {
+              "heading": "Saaja",
+              "description": "Seade millele edastada teavitus"
+            }
+          }
+        },
+        "new_action": {
+          "title": "Loo toiming",
+          "description": "Seadme oleku muutmine valve oleku muutmisel.",
+          "fields": {
+            "name": {
+              "heading": "Nimi",
+              "description": "Toimingu kirjeldus"
+            },
+            "event": {
+              "heading": "Sündmus",
+              "description": "Millisel juhul käivitada toiming"
+            },
+            "mode": {
+              "heading": "Olek",
+              "description": "Millises valve olekus toiming käivitada (valikuline)"
+            },
+            "entity": {
+              "heading": "Olem",
+              "description": "Toimingu olem"
+            },
+            "action": {
+              "heading": "Toiming",
+              "description": "Olemi toiming",
+              "turn_on": "Lülita sisse",
+              "turn_off": "Lülita välja"
+            }
+          }
+        }
+      },
+      "validation_errors": {
+        "no_triggers": "Selle tegevuse käivitamiseks puudub vajalik olek või sündmus.",
+        "empty_trigger": "Ühel päästikul puudub oleku või sündmuse tingimus.",
+        "invalid_trigger": "Ühel päästikul: {trigger} on vigane väärtus",
+        "invalid_mode": "Valve olekule: {mode} on sisestatud vigane väärtus",
+        "no_actions": "Sellele toingule pole määratud tegevust.",
+        "no_service": "Ühel toimingutest puudub nõutav teenus.",
+        "invalid_service": "Ühele toimingule on omistatud sobimatu teenus: {service}",
+        "no_service_data": "Ühel toimingul puuduvad teenuse andmed.",
+        "no_entity_in_service_data": "Ühel toimingul puudub teenuse andmetes olemi ID.",
+        "no_message_in_service_data": "Ühe toimingu teenuse andmetes puuduvad teenuse andmed."
+      }
+    }
+  }
+}
