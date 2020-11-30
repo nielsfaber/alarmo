@@ -54,6 +54,10 @@ class AutomationHandler:
     async def async_handle_state_update(self, state=None, last_state=None):
         _LOGGER.debug("state is updated from {} to {}".format(last_state, state))
 
+        if not last_state:
+            # prevent execution of automations when HA is restarted
+            return
+
         if state in ARM_MODES:
             state = "armed"
 
