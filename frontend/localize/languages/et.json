@@ -144,8 +144,12 @@
             "allow_open": {
               "heading": "Lahkumisviivitus",
               "description": "See andur ei aktiveeru enne lahkumisviivituse lõppu."
-            }
-          }
+            },
+            "trigger_unavailable": {
+              "heading": "Andurite saadavus",
+              "description": "Käivita häire kui andur muutub kättesaamatuks."
+            }  
+          } 
         }
       }
     },
