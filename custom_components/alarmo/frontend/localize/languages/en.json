@@ -144,6 +144,10 @@
             "allow_open": {
               "heading": "Allow open",
               "description": "Allow this sensor to remain active shortly after leaving."
+            },
+            "trigger_unavailable": {
+              "heading": "Trigger when unavailable",
+              "description": "Trigger the alarm when the sensor state becomes 'unavailable'."
             }
           }
         }

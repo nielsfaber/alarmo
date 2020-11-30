@@ -144,6 +144,18 @@ export class sensorEditorCard extends LitElement {
         </settings-row>
         `}
 
+          <settings-row .narrow=${this.narrow}>
+            <span slot="heading">${localize("panels.sensors.cards.editor.fields.trigger_unavailable.heading", this.hass.language)}</span>
+            <span slot="description">${localize("panels.sensors.cards.editor.fields.trigger_unavailable.description", this.hass.language)}</span>
+
+            <ha-switch
+              ?checked=${this.data.trigger_unavailable}
+              @change=${(ev: Event) => this.data = { ...this.data, trigger_unavailable: (ev.target as HTMLInputElement).checked }}
+            >
+            </ha-switch>
+
+          </settings-row>
+  
           <div class="card-actions">
             <mwc-button
               @click=${this.saveClick}

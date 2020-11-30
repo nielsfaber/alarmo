@@ -77,6 +77,7 @@ from .sensors import (
     ATTR_ALWAYS_ON,
     ATTR_ARM_ON_CLOSE,
     ATTR_ALLOW_OPEN,
+    ATTR_TRIGGER_UNAVAILABLE,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -182,6 +183,7 @@ class AlarmoSensorView(HomeAssistantView):
                 vol.Optional(ATTR_ARM_ON_CLOSE): cv.boolean,
                 vol.Optional(ATTR_ALLOW_OPEN): cv.boolean,
                 vol.Optional(ATTR_ALWAYS_ON): cv.boolean,
+                vol.Optional(ATTR_TRIGGER_UNAVAILABLE): cv.boolean,
             }
         )
     )

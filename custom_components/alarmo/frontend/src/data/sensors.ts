@@ -94,7 +94,8 @@ export function defaultSensorConfig(stateObj: HassEntity | undefined, alarmoConf
     immediate: false,
     arm_on_close: false,
     allow_open: false,
-    always_on: false
+    always_on: false,
+    trigger_unavailable: false
   };
 
   config = {

@@ -53,6 +53,7 @@ export type AlarmoSensor = {
   arm_on_close: boolean,
   allow_open: boolean,
   always_on: boolean,
+  trigger_unavailable: boolean,
 }
 
 export type AlarmoUser = {

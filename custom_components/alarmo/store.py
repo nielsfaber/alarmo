@@ -86,6 +86,7 @@ class SensorEntry:
     always_on = attr.ib(type=bool, default=False)
     arm_on_close = attr.ib(type=bool, default=False)
     allow_open = attr.ib(type=bool, default=False)
+    trigger_unavailable = attr.ib(type=bool, default=False)
 
 
 @attr.s(slots=True, frozen=True)
