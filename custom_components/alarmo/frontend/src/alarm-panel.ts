@@ -6,16 +6,18 @@ import './views/view-general.ts';
 import './views/view-sensors.ts';
 import './views/view-codes.ts';
 import './views/view-actions.ts';
+
 import { commonStyle } from './styles';
 import { VERSION } from './const';
-import { AlarmoConfig } from './types';
+import { fetchUsers } from './data/websockets';
+import { AlarmoUser, Dictionary } from './types';
 
 @customElement('alarm-panel')
 export class MyAlarmPanel extends LitElement {
   @property() public hass!: HomeAssistant;
   @property({ type: Boolean, reflect: true }) public narrow!: boolean;
 
-  config?: AlarmoConfig;
+  @property() userConfig?: Dictionary<AlarmoUser>;
 
   async firstUpdated() {
     window.addEventListener("location-changed", () => {
@@ -23,12 +25,56 @@ export class MyAlarmPanel extends LitElement {
     });
 
     await loadHaForm();
+    this.userConfig = await fetchUsers(this.hass);
     this.requestUpdate();
   }
 
   render() {
-    if (!customElements.get('ha-app-layout')) return html`loading...`;
-    return html`
+    if (!customElements.get('ha-app-layout') || !this.userConfig) return html`loading...`;
+    const matchingUser = Object.values(this.userConfig!).find(e => e.name.toLowerCase() == this.hass!.user.name.toLowerCase());
+
+    if (this.hass.user.is_admin && (!matchingUser || !matchingUser.is_admin)) {
+      return html`
+      <ha-app-layout>
+        <app-header fixed slot="header">
+          <app-toolbar>
+            <ha-menu-button
+              .hass=${this.hass}
+              .narrow=${this.narrow}
+            >
+            </ha-menu-button>
+            <div main-title>
+              Alarm panel
+            </div>
+          </app-toolbar>
+        </app-header>
+      </ha-app-layout>
+      <div class="view">
+        <div>
+          <ha-card header="Access is blocked">
+            <div class="card-content">
+              You have no access to view this page.
+              Please check the following:
+              <ul>
+                <li>
+                  You are logged in using HA user account <b>${this.hass!.user.name}</b>.
+                  This account <b>${this.hass!.user.is_admin ? 'does' : 'does NOT'}</b> have administrator permission.
+                </li>
+              </ul>
+              <ul>
+                <li>
+                  There is <b>${matchingUser ? 'a' : 'NO'}</b> user configured in Alarmo with name <b>${this.hass!.user.name}</b>.
+                  ${matchingUser ? `This user ${matchingUser.is_admin ? 'does' : 'does NOT'}</b> have administrator permission. ` : ''}
+                </li>
+              </ul>
+            </div>
+          </ha-card>
+        </div>
+      </div>
+      `
+    }
+    else {
+      return html`
       <ha-app-layout>
         <app-header fixed slot="header">
           <app-toolbar>
@@ -69,6 +115,7 @@ export class MyAlarmPanel extends LitElement {
         ${this.getView()}
       </div>
     `;
+    }
   }
 
   getPath() {
