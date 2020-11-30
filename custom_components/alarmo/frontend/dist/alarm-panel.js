@@ -1693,7 +1693,7 @@ const K=window.ShadowRoot&&(void 0===window.ShadyCSS||window.ShadyCSS.nativeShad
 
       
 
-    `}};t([Q()],Vt.prototype,"hass",void 0),t([Q()],Vt.prototype,"narrow",void 0),t([Q()],Vt.prototype,"path",void 0),t([Q()],Vt.prototype,"alarmEntity",void 0),t([Q()],Vt.prototype,"automations",void 0),Vt=t([G("alarm-view-actions")],Vt),e.MyAlarmPanel=class extends ae{async firstUpdated(){window.addEventListener("location-changed",()=>{this.requestUpdate()}),await Ne(),this.userConfig=await We(this.hass),this.requestUpdate()}render(){if(!customElements.get("ha-app-layout")||!this.userConfig)return L`loading...`;const e=Object.values(this.userConfig).find(e=>e.name.toLowerCase()==this.hass.user.name.toLowerCase());return!this.hass.user.is_admin||e&&e.is_admin?L`
+    `}};t([Q()],Vt.prototype,"hass",void 0),t([Q()],Vt.prototype,"narrow",void 0),t([Q()],Vt.prototype,"path",void 0),t([Q()],Vt.prototype,"alarmEntity",void 0),t([Q()],Vt.prototype,"automations",void 0),Vt=t([G("alarm-view-actions")],Vt),e.MyAlarmPanel=class extends ae{async firstUpdated(){window.addEventListener("location-changed",()=>{this.requestUpdate()}),await Ne(),this.userConfig=await We(this.hass),this.requestUpdate()}render(){if(!customElements.get("ha-app-layout")||!this.userConfig)return L`loading...`;const e=Object.values(this.userConfig).find(e=>e.name.toLowerCase()==this.hass.user.name.toLowerCase());return this.hass.user.is_admin||e&&e.is_admin?L`
       <ha-app-layout>
         <app-header fixed slot="header">
           <app-toolbar>

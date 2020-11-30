@@ -33,7 +33,7 @@ export class MyAlarmPanel extends LitElement {
     if (!customElements.get('ha-app-layout') || !this.userConfig) return html`loading...`;
     const matchingUser = Object.values(this.userConfig!).find(e => e.name.toLowerCase() == this.hass!.user.name.toLowerCase());
 
-    if (this.hass.user.is_admin && (!matchingUser || !matchingUser.is_admin)) {
+    if (!this.hass.user.is_admin && (!matchingUser || !matchingUser.is_admin)) {
       return html`
       <ha-app-layout>
         <app-header fixed slot="header">
