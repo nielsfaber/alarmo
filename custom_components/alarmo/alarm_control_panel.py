@@ -288,11 +288,11 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
                     return
                 elif type(res) is dict and res[ATTR_IS_OVERRIDE_CODE]:
                     bypass_open_sensors = True
-                self.sensors.open_sensors = None
-                self.sensors.bypassed_sensors = None
-                await self.async_arm(arm_mode, bypass_open_sensors=bypass_open_sensors)
             else:
                 self._changed_by = None
+            self.sensors.open_sensors = None
+            self.sensors.bypassed_sensors = None
+            await self.async_arm(arm_mode, bypass_open_sensors=bypass_open_sensors)
 
     async def async_alarm_arm_away(self, code=None, skip_code=False):
         """Send arm away command."""
