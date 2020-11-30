@@ -53,11 +53,11 @@
           "fields": {
             "leave_time": {
               "heading": "Leave time",
-              "description": "After trigger time has expired, disarm the alarm instead of returning to armed state."
+              "description": "When arming the alarm, within this time period the sensors will not trigger the alarm yet."
             },
             "entry_time": {
               "heading": "Entry time",
-              "description": "After trigger time has expired, disarm the alarm instead of returning to armed state."
+              "description": "Delay time until the alarm is triggered after one of the sensors is activated."
             }
           }
         },
