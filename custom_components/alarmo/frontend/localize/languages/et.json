@@ -248,7 +248,7 @@
             "no_items": "Teavitusi pole veel loodud."
           },
           "actions": {
-            "new_notification": "uus teavitus"
+            "new_notification": "Uus teavitus"
           }
         },
         "actions": {
@@ -258,7 +258,7 @@
             "no_items": "Toiminguid pole veel määratud."
           },
           "actions": {
-            "new_action": "uus toiming"
+            "new_action": "Uus toiming"
           }
         },
         "new_notification": {
@@ -325,7 +325,7 @@
         "empty_trigger": "Ühel päästikul puudub oleku või sündmuse tingimus.",
         "invalid_trigger": "Ühel päästikul: {trigger} on vigane väärtus",
         "invalid_mode": "Valve olekule: {mode} on sisestatud vigane väärtus",
-        "no_actions": "Sellele toingule pole määratud tegevust.",
+        "no_actions": "Sellele toimingule pole määratud tegevust.",
         "no_service": "Ühel toimingutest puudub nõutav teenus.",
         "invalid_service": "Ühele toimingule on omistatud sobimatu teenus: {service}",
         "no_service_data": "Ühel toimingul puuduvad teenuse andmed.",
