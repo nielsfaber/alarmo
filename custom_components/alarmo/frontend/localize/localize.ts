@@ -2,6 +2,7 @@ import * as en from './languages/en.json';
 
 var languages: any = {
   en: en,
+  et: et,
 };
 
 export function localize(string: string, language: string, search: string = '', replace: string = '') {
