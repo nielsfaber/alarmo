@@ -399,9 +399,9 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
         if self._config[ATTR_MQTT][ATTR_ENABLED]:
             payload_config = self._config[ATTR_MQTT][ATTR_STATE_PAYLOAD]
             if state in payload_config and payload_config[state]:
-                mqtt.async_publish(self._hass, self._config[ATTR_MQTT][CONF_STATE_TOPIC], payload_config[state])
+                mqtt.async_publish(self._hass, self._config[ATTR_MQTT][CONF_STATE_TOPIC], payload_config[state], retain=True)
             elif state not in payload_config:
-                mqtt.async_publish(self._hass, self._config[ATTR_MQTT][CONF_STATE_TOPIC], state)
+                mqtt.async_publish(self._hass, self._config[ATTR_MQTT][CONF_STATE_TOPIC], state, retain=True)
 
         await self.automations.async_handle_state_update(state=state, last_state=last_state)
 
