@@ -277,8 +277,12 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
             _LOGGER.warning("Mode {} is not enabled, ignoring.".format(arm_mode))
             return
         elif self._state != STATE_ALARM_DISARMED:
-            _LOGGER.warning("Cannot go to state {} from state {}.".format(arm_mode, self._state))
-            return
+            """Transition from armed_XXX to armed_XXX:
+               - no code check (not needed)
+               - can be immediate
+               - but sensors must be checked again 
+               - if Fail to arm, keep same state"""
+            await self.async_arm(arm_mode, skip_delay=True, bypass_open_sensors=False, keep_state_on_fail=True)
         else:
             bypass_open_sensors = False
             if not skip_code:
@@ -409,7 +413,7 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
 
         self.async_write_ha_state()
 
-    async def async_arm(self, arm_mode, skip_delay=False, bypass_open_sensors=False):
+    async def async_arm(self, arm_mode, skip_delay=False, bypass_open_sensors=False, keep_state_on_fail=False):
         """Update the state."""
         self._arm_mode = arm_mode
         leave_delay = self.get_delay_config(EVENT_LEAVE)
@@ -424,7 +428,12 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
                 # there where errors -> abort the arm
                 _LOGGER.info("Cannot arm right now, there are open sensors")
                 await self.automations.async_handle_event(event=EVENT_ARM_FAILURE)
-                await self.async_update_state(STATE_ALARM_DISARMED)
+                # should we keep same state, or go to disarm?
+                if not keep_state_on_fail:
+                    _LOGGER.info("Go to Disarmed state")
+                    await self.async_update_state(STATE_ALARM_DISARMED)
+                else:
+                    _LOGGER.info("Kept same state")
             else:
                 # proceed the arm
                 await self.async_update_state(arm_mode)
