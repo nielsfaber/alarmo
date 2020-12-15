@@ -1,4 +1,5 @@
 import * as en from './languages/en.json';
+import * as et from './languages/et.json';
 
 var languages: any = {
   en: en,

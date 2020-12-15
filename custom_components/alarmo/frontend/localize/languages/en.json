@@ -52,11 +52,11 @@
         "common": {
           "fields": {
             "leave_time": {
-              "heading": "Leave time",
+              "heading": "Exit delay",
               "description": "When arming the alarm, within this time period the sensors will not trigger the alarm yet."
             },
             "entry_time": {
-              "heading": "Entry time",
+              "heading": "Entry delay",
               "description": "Delay time until the alarm is triggered after one of the sensors is activated."
             }
           }

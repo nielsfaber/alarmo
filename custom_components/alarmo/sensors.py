@@ -160,18 +160,18 @@ class SensorHandler:
             if state == STATE_OPEN:
                 # sensor is open
                 if not state_filter or state_filter == STATE_OPEN:
-                    open_sensors[entity] = state.state
+                    open_sensors[entity] = state
             elif state == STATE_UNAVAILABLE:
                 # sensor is unavailable
                 if (
                     (not state_filter and event != EVENT_ENTRY) or
                     (not state_filter and event == EVENT_ENTRY and sensor_config[ATTR_TRIGGER_UNAVAILABLE])
                 ):
-                    open_sensors[entity] = state.state
+                    open_sensors[entity] = state
             elif state == STATE_UNKNOWN:
                 # sensor state is unrecognized (other)
                 if not state_filter or state_filter == STATE_UNKNOWN:
-                    open_sensors[entity] = state.state
+                    open_sensors[entity] = state
 
         if self._bypass_mode and event in [EVENT_LEAVE, EVENT_ARM]:
             if event == EVENT_ARM:
@@ -260,7 +260,7 @@ class SensorHandler:
         return passed
 
     def start_arm_timer(self, entity):
-        _LOGGER.debug("start_arm_timer")
+        """start timer for automatical arming"""
 
         @callback
         async def timer_finished(now):
@@ -276,7 +276,7 @@ class SensorHandler:
         )
 
     def stop_arm_timer(self, entity=None):
-        _LOGGER.debug("stop_arm_timer")
+        """cancel timer(s) for automatical arming"""
 
         if entity and entity in self._arm_timers:
             self._arm_timers[entity]()

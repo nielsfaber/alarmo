@@ -309,6 +309,8 @@ Step 2: Go to YAML mode. Look for the part that has `service_data`, and extend i
             title: Retry Arm # feel free to change this text
           - action: ALARMO_FORCE_ARM
             title: Force Arm # feel free to change this text
+        ttl: 0
+        priority: high
 ```
 
 #### Device actions
