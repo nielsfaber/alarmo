@@ -46,6 +46,9 @@ export const commonStyle = css`
   mwc-button.warning {
     --mdc-theme-primary: var(--error-color);
   }
+  mwc-button.success {
+    --mdc-theme-primary: var(--success-color);
+  }
 
   mwc-button.disabled.active {
     opacity: 0.5;
@@ -85,5 +88,8 @@ export const commonStyle = css`
 
   a { 
     color: var(--primary-color);
+  }
+  mwc-button ha-icon {
+    padding-right: 11px;
   }
 `;

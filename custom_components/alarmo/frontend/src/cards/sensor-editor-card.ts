@@ -1,13 +1,15 @@
 import { LitElement, html, customElement, property } from 'lit-element';
 import { HomeAssistant, navigate } from 'custom-card-helpers';
 import { commonStyle } from '../styles';
-import { AlarmoSensor, AlarmoConfig, EArmModes } from '../types';
+import { AlarmoSensor, AlarmoConfig, EArmModes, ESensorType } from '../types';
 import { fetchConfig, fetchSensors, saveSensor, deleteSensor } from '../data/websockets';
 import { localize } from '../../localize/localize';
 import { Unique, Without, handleError } from '../helpers';
 
 import '../dialogs/error-dialog';
+import '../components/alarmo-select';
 import { HassEntity } from 'home-assistant-js-websocket';
+import { sensorConfigByType } from '../data/sensors';
 
 @customElement('sensor-editor-card')
 export class sensorEditorCard extends LitElement {
@@ -60,89 +62,152 @@ export class sensorEditorCard extends LitElement {
           </paper-input>
 
         </settings-row>
+
         
-        <settings-row .narrow=${this.narrow}>
-          <span slot="heading">${localize("panels.sensors.cards.editor.fields.always_on.heading", this.hass.language)}</span>
-          <span slot="description">${localize("panels.sensors.cards.editor.fields.always_on.description", this.hass.language)}</span>
+        <settings-row .narrow=${this.narrow}  .large=${true}>
+          <span slot="heading">${localize("panels.sensors.cards.editor.fields.device_type.heading", this.hass.language)}</span>
+          <span slot="description">${localize("panels.sensors.cards.editor.fields.device_type.description", this.hass.language)}</span>
 
-          <ha-switch
-            ?checked=${this.data.always_on}
-            @change=${(ev: Event) => this.data = { ...this.data, always_on: (ev.target as HTMLInputElement).checked }}
+          <alarmo-select
+            .hass=${this.hass}
+            .items=${[
+        {
+          value: "door",
+          name: localize("panels.sensors.cards.editor.fields.device_type.choose.door.name", this.hass.language),
+          description: localize("panels.sensors.cards.editor.fields.device_type.choose.door.description", this.hass.language),
+          icon: "hass:door-closed"
+        },
+        {
+          value: "window",
+          name: localize("panels.sensors.cards.editor.fields.device_type.choose.window.name", this.hass.language),
+          description: localize("panels.sensors.cards.editor.fields.device_type.choose.window.description", this.hass.language),
+          icon: "hass:window-closed"
+        },
+        {
+          value: "motion",
+          name: localize("panels.sensors.cards.editor.fields.device_type.choose.motion.name", this.hass.language),
+          description: localize("panels.sensors.cards.editor.fields.device_type.choose.motion.description", this.hass.language),
+          icon: "hass:motion-sensor"
+        },
+        {
+          value: "tamper",
+          name: localize("panels.sensors.cards.editor.fields.device_type.choose.tamper.name", this.hass.language),
+          description: localize("panels.sensors.cards.editor.fields.device_type.choose.tamper.description", this.hass.language),
+          icon: "hass:vibrate"
+        },
+        {
+          value: "environmental",
+          name: localize("panels.sensors.cards.editor.fields.device_type.choose.environmental.name", this.hass.language),
+          description: localize("panels.sensors.cards.editor.fields.device_type.choose.environmental.description", this.hass.language),
+          icon: "hass:fire"
+        }
+      ]}
+            label=${localize("panels.sensors.cards.editor.fields.device_type.heading", this.hass.language)}
+            value=${this.data["type"]}
+            @value-changed=${(ev: Event) => this.setType(((ev.target as HTMLInputElement).value || ESensorType.Other) as ESensorType)}
           >
-          </ha-switch>
-
+          </alarmo-select>
         </settings-row>
-
-        ${
-      this.data.always_on
-        ? ''
-        : html`
+        
         <settings-row .narrow=${this.narrow}>
           <span slot="heading">${localize("panels.sensors.cards.editor.fields.modes.heading", this.hass.language)}</span>
           <span slot="description">${localize("panels.sensors.cards.editor.fields.modes.description", this.hass.language)}</span>
-
-          <div style="display: flex; flex-direction: column">
+          
+          <div style="display: flex; flex-direction: column; padding: 10px 0px">
           ${Object.values(EArmModes).filter(e => Object.keys(this.config!.modes).includes(e) && this.config!.modes[e].enabled).map(e =>
-          html`
-            <div
-              style="display: flex; align-items: center; cursor: pointer"
-              @click=${(ev: Event) => { try { ((ev.target as HTMLElement).querySelector("ha-checkbox")! as HTMLElement).click(); } catch (e) { } }}
+        html`
+            <mwc-button
+              class="${this.data.modes.includes(e) ? "success" : "warning"}"
+              @click=${() => {
+            this.data = {
+              ...this.data,
+              modes: this.data.modes.includes(e)
+                ? Without(this.data.modes, e)
+                : Unique(this.data.modes.concat([e]))
+            };
+          }}
             >
-              <ha-checkbox
-                ?checked=${this.data.modes.includes(e)}
-                @change=${
-            (ev: Event) => {
-              this.data = {
-                ...this.data,
-                modes: (ev.target as HTMLInputElement).checked
-                  ? Unique(this.data.modes.concat([e]))
-                  : Without(this.data.modes, e)
-              };
-            }}
-            >
-            </ha-checkbox>
-            ${localize(`common.modes_long.${e}`, this.hass.language)}
-            </div>
-              `)}
+              <ha-icon icon="${this.data.modes.includes(e) ? "hass:check" : "hass:close"}"></ha-icon>
+              ${localize(`common.modes_long.${e}`, this.hass.language)}
+            </mwc-button>
+          `)}
           </div>
-
         </settings-row>
-      `}
 
-        ${
-      this.data.always_on
-        ? ''
-        : html`
-        <settings-row .narrow=${this.narrow}>
-          <span slot="heading">${localize("panels.sensors.cards.editor.fields.immediate.heading", this.hass.language)}</span>
-          <span slot="description">${localize("panels.sensors.cards.editor.fields.immediate.description", this.hass.language)}</span>
+        <collapsible-section
+           .narrow=${this.narrow}
+          header=${localize("panels.sensors.cards.editor.actions.toggle_advanced", this.hass.language)}
+        >
+      ${!this.data.type || [ESensorType.Environmental, ESensorType.Other].includes(this.data.type)
+        ? html`
+          <settings-row .narrow=${this.narrow}>
+            <span slot="heading">${localize("panels.sensors.cards.editor.fields.always_on.heading", this.hass.language)}</span>
+            <span slot="description">${localize("panels.sensors.cards.editor.fields.always_on.description", this.hass.language)}</span>
 
-          <ha-switch
-            ?checked=${this.data.immediate}
-            @change=${(ev: Event) => this.data = { ...this.data, immediate: (ev.target as HTMLInputElement).checked }}
-          >
-          </ha-switch>
+            <ha-switch
+              ?checked=${this.data.always_on}
+              @change=${(ev: Event) => this.data = (ev.target as HTMLInputElement).checked
+            ? { ...this.data, always_on: true, arm_on_close: false, immediate: true, allow_open: false }
+            : { ...this.data, always_on: false }
+          }
+            >
+            </ha-switch>
+          </settings-row>
+          ` : ''}
+  
+      ${!this.data.type || [ESensorType.Door, ESensorType.Other].includes(this.data.type)
+        ? html`
+          <settings-row .narrow=${this.narrow}>
+            <span slot="heading">${localize("panels.sensors.cards.editor.fields.arm_on_close.heading", this.hass.language)}</span>
+            <span slot="description">${localize("panels.sensors.cards.editor.fields.arm_on_close.description", this.hass.language)}</span>
 
-        </settings-row>
-        `}
+            <ha-switch
+              ?checked=${this.data.arm_on_close}
+              ?disabled=${this.data.always_on}
+              @change=${(ev: Event) => this.data = (ev.target as HTMLInputElement).checked
+            ? { ...this.data, arm_on_close: true, allow_open: false, immediate: false, always_on: false }
+            : { ...this.data, arm_on_close: false }
+          }
+            >
+            </ha-switch>
+          </settings-row>
+          ` : ''}
 
+      ${!this.data.type || [ESensorType.Window, ESensorType.Door, ESensorType.Motion, ESensorType.Tamper, ESensorType.Other].includes(this.data.type)
+        ? html`
+          <settings-row .narrow=${this.narrow}>
+            <span slot="heading">${localize("panels.sensors.cards.editor.fields.immediate.heading", this.hass.language)}</span>
+            <span slot="description">${localize("panels.sensors.cards.editor.fields.immediate.description", this.hass.language)}</span>
+
+            <ha-switch
+              ?checked=${this.data.immediate}
+              ?disabled=${this.data.always_on || this.data.arm_on_close}
+              @change=${(ev: Event) => this.data = (ev.target as HTMLInputElement).checked
+            ? { ...this.data, immediate: true, arm_on_close: false, always_on: false, allow_open: false }
+            : { ...this.data, immediate: false }
+          }
+            >
+            </ha-switch>
+          </settings-row>
+          ` : ''}
         
-        ${
-      this.data.always_on
-        ? ''
-        : html`
-        <settings-row .narrow=${this.narrow}>
-          <span slot="heading">${localize("panels.sensors.cards.editor.fields.allow_open.heading", this.hass.language)}</span>
-          <span slot="description">${localize("panels.sensors.cards.editor.fields.allow_open.description", this.hass.language)}</span>
+      ${!this.data.type || [ESensorType.Motion, ESensorType.Other].includes(this.data.type)
+        ? html`
+          <settings-row .narrow=${this.narrow}>
+            <span slot="heading">${localize("panels.sensors.cards.editor.fields.allow_open.heading", this.hass.language)}</span>
+            <span slot="description">${localize("panels.sensors.cards.editor.fields.allow_open.description", this.hass.language)}</span>
 
-          <ha-switch
-            ?checked=${this.data.allow_open}
-            @change=${(ev: Event) => this.data = { ...this.data, allow_open: (ev.target as HTMLInputElement).checked }}
-          >
-          </ha-switch>
-
-        </settings-row>
-        `}
+            <ha-switch
+              ?checked=${this.data.allow_open}
+              ?disabled=${this.data.always_on || this.data.immediate || this.data.arm_on_close}
+              @change=${(ev: Event) => this.data = (ev.target as HTMLInputElement).checked
+            ? { ...this.data, allow_open: true, arm_on_close: false, always_on: false, immediate: false }
+            : { ...this.data, allow_open: false }
+          }
+            >
+            </ha-switch>
+          </settings-row>
+          ` : ''}
 
           <settings-row .narrow=${this.narrow}>
             <span slot="heading">${localize("panels.sensors.cards.editor.fields.trigger_unavailable.heading", this.hass.language)}</span>
@@ -153,8 +218,10 @@ export class sensorEditorCard extends LitElement {
               @change=${(ev: Event) => this.data = { ...this.data, trigger_unavailable: (ev.target as HTMLInputElement).checked }}
             >
             </ha-switch>
-
           </settings-row>
+
+          
+        </collapsible-section>
   
           <div class="card-actions">
             <mwc-button
@@ -172,6 +239,15 @@ export class sensorEditorCard extends LitElement {
           </div>
         </ha-card>
     `;
+  }
+
+  private setType(type: ESensorType) {
+    const settings = type != ESensorType.Other ? sensorConfigByType(this.config!)[type] : {};
+    this.data = {
+      ...this.data,
+      type: type,
+      ...settings
+    };
   }
 
   private deleteClick(ev: Event) {

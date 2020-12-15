@@ -59,6 +59,7 @@ from .const import (
     ATTR_VERSION,
     ATTR_STATE_PAYLOAD,
     ATTR_COMMAND_PAYLOAD,
+    ATTR_TYPE,
     COMMAND_ARM_NIGHT,
     COMMAND_ARM_AWAY,
     COMMAND_ARM_HOME,
@@ -78,6 +79,7 @@ from .sensors import (
     ATTR_ARM_ON_CLOSE,
     ATTR_ALLOW_OPEN,
     ATTR_TRIGGER_UNAVAILABLE,
+    SENSOR_TYPES,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -175,6 +177,7 @@ class AlarmoSensorView(HomeAssistantView):
                 vol.Required(ATTR_ENTITY_ID): cv.entity_id,
                 vol.Optional(ATTR_NAME): cv.string,
                 vol.Optional(ATTR_REMOVE): cv.boolean,
+                vol.Optional(ATTR_TYPE): vol.In(SENSOR_TYPES),
                 vol.Optional(ATTR_MODES): vol.All(
                     cv.ensure_list,
                     [vol.In(ARM_MODES)]

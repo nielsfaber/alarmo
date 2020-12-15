@@ -48,6 +48,7 @@ export type AlarmoConfig = {
 export type AlarmoSensor = {
   entity_id: string,
   name?: string,
+  type: ESensorType,
   modes: EArmModes[]
   immediate: boolean,
   arm_on_close: boolean,
@@ -124,4 +125,13 @@ export type MqttConfig = {
   command_topic: string,
   command_payload: Dictionary<string>,
   require_code: boolean,
+}
+
+export enum ESensorType {
+  Door = "door",
+  Window = "window",
+  Motion = "motion",
+  Tamper = "tamper",
+  Environmental = "environmental",
+  Other = "other"
 }

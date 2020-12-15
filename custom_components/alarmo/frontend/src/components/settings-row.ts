@@ -46,6 +46,9 @@ export class SettingsRow extends LitElement {
       .info {
         flex: 1 0 60px;
       }
+      :host([large]) .info, :host([narrow]) .info {
+        flex: 1 0 40px;
+      }
       .secondary {
         color: var(--secondary-text-color);
       }

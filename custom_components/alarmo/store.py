@@ -24,6 +24,10 @@ from .const import (
     DOMAIN,
 )
 
+from .sensors import (
+    SENSOR_TYPE_OTHER,
+)
+
 _LOGGER = logging.getLogger(__name__)
 
 DATA_REGISTRY = f"{DOMAIN}_storage"
@@ -81,6 +85,7 @@ class SensorEntry:
 
     entity_id = attr.ib(type=str, default=None)
     name = attr.ib(type=str, default="")
+    type = attr.ib(type=str, default=SENSOR_TYPE_OTHER)
     modes = attr.ib(type=list, default=[])
     immediate = attr.ib(type=bool, default=False)
     always_on = attr.ib(type=bool, default=False)

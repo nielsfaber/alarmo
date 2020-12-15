@@ -35,6 +35,7 @@ PANEL_NAME = "alarm-panel"
 
 
 INITIALIZATION_TIME = datetime.timedelta(seconds=30)
+SENSOR_ARM_TIME = datetime.timedelta(seconds=5)
 
 STATES = [
     STATE_ALARM_ARMED_AWAY,

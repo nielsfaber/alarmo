@@ -129,6 +129,32 @@
               "heading": "Name",
               "description": "Overwrite friendly name."
             },
+            "device_type": {
+              "heading": "Device Type",
+              "description": "Choose a device type to automatically apply appropriate settings.",
+              "choose": {
+                "door": {
+                  "name": "Door",
+                  "description": "A door, gate or other entrance that is used for entering/leaving the home."
+                },
+                "window": {
+                  "name": "Window",
+                  "description": "A window, or a door not used for entering the house such as balcony."
+                },
+                "motion": {
+                  "name": "Motion",
+                  "description": "Presence sensor or similar device having a delay between activations."
+                },
+                "tamper": {
+                  "name": "Tamper",
+                  "description": "Detector of sensor cover removal, glass break sensor, etc."
+                },
+                "environmental": {
+                  "name": "Environmental",
+                  "description": "Smoke/gas sensor, leak detector, etc. (not related to burglar protection)."
+                }
+              }
+            },
             "always_on": {
               "heading": "Always on",
               "description": "Sensor should always trigger the alarm."
@@ -137,18 +163,25 @@
               "heading": "Enabled modes",
               "description": "Alarm modes in which this sensor is active."
             },
+            "arm_on_close": {
+              "heading": "Arm after closing",
+              "description": "After deactivation of this sensor, the remaining exit delay will automatically be skipped."
+            },
             "immediate": {
               "heading": "Immediate",
-              "description": "Sensor should skip the delay."
+              "description": "Activating this sensor will trigger the alarm directly instead of after entry delay."
             },
             "allow_open": {
-              "heading": "Allow open",
-              "description": "Allow this sensor to remain active shortly after leaving."
+              "heading": "Allow open while arming",
+              "description": "Allow this sensor to be active shortly after leaving such that it will not block arming."
             },
             "trigger_unavailable": {
               "heading": "Trigger when unavailable",
-              "description": "Trigger the alarm when the sensor state becomes 'unavailable'."
+              "description": "When the sensor state becomes 'unavailable', this will activate the sensor."
             }
+          },
+          "actions": {
+            "toggle_advanced": "Advanced settings"
           }
         }
       }
