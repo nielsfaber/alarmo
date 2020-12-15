@@ -495,7 +495,9 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
             await self.async_update_state(STATE_ALARM_DISARMED)
             self.sensors.bypassed_sensors = None
         else:
-            await self.async_arm(self.arm_mode)
+            self.sensors.open_sensors = None
+            self.sensors.bypassed_sensors = None
+            await self.async_arm(self.arm_mode, bypass_open_sensors=True)
 
     @callback
     async def async_entry_timer_finished(self, now):
