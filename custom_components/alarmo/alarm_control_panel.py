@@ -491,7 +491,7 @@ class AlarmoEntity(AlarmControlPanelEntity, RestoreEntity):
 
         _LOGGER.debug("async_trigger_timer_finished")
         self._changed_by = None
-        if self._config[ATTR_DISARM_AFTER_TRIGGER]:
+        if self._config[ATTR_DISARM_AFTER_TRIGGER] or not self.arm_mode:
             await self.async_update_state(STATE_ALARM_DISARMED)
             self.sensors.bypassed_sensors = None
         else:
