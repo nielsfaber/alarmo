@@ -136,7 +136,7 @@ export function defaultSensorConfig(stateObj: HassEntity | undefined, alarmoConf
       config = {
         ...config,
         type: type,
-        ...sensorConfigByType[type]
+        ...sensorConfigByType(alarmoConfig)[type]
       };
     }
   }
