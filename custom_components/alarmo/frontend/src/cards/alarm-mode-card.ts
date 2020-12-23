@@ -112,7 +112,8 @@ export class AlarmModeCard extends LitElement {
     saveModeConfig(this.hass, {
       mode: this.mode,
       leave_time: this.leave_time,
-      entry_time: this.entry_time
+      entry_time: this.entry_time,
+      enabled: true
     })
       .catch(() => {
       })
