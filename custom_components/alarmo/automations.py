@@ -108,12 +108,38 @@ class AutomationHandler:
                 and self._config[automation_id][ATTR_IS_NOTIFICATION]
                 and ATTR_MESSAGE in action[ATTR_SERVICE_DATA]
             ):
-                open_sensors = self.alarm_entity.sensors.open_sensors
-                open_sensors_string = self.async_format_sensor_info(open_sensors)
+                data = copy.copy(action[ATTR_SERVICE_DATA])
+                if "{{open_sensors}}" in data[ATTR_MESSAGE]:
+                    open_sensors = ""
+                    if self.alarm_entity.sensors.open_sensors:
+                        parts = []
+                        for (entity_id, status) in self.alarm_entity.sensors.open_sensors.items():
+                            name = self.get_friendly_name_for_sensor(entity_id)
+                            parts.append("{} is {}".format(name, status))
+                        open_sensors = ", ".join(parts)
 
-                service_data = copy.copy(action[ATTR_SERVICE_DATA])
-                service_data[ATTR_MESSAGE] = service_data[ATTR_MESSAGE].replace("{{open_sensors}}", open_sensors_string)
-                service_call["data"] = service_data
+                    data[ATTR_MESSAGE] = data[ATTR_MESSAGE].replace("{{open_sensors}}", open_sensors)
+
+                if "{{bypassed_sensors}}" in data[ATTR_MESSAGE]:
+                    bypassed_sensors = ""
+                    if self.alarm_entity.sensors.bypassed_sensors and len(self.alarm_entity.sensors.bypassed_sensors):
+                        parts = []
+                        for entity_id in self.alarm_entity.sensors.bypassed_sensors:
+                            name = self.get_friendly_name_for_sensor(entity_id)
+                            parts.append(name)
+                        bypassed_sensors = ", ".join(parts)
+
+                    data[ATTR_MESSAGE] = data[ATTR_MESSAGE].replace("{{bypassed_sensors}}", bypassed_sensors)
+
+                if "{{arm_mode}}" in data[ATTR_MESSAGE]:
+                    arm_mode = self.alarm_entity.arm_mode if self.alarm_entity.arm_mode else ""
+                    data[ATTR_MESSAGE] = data[ATTR_MESSAGE].replace("{{arm_mode}}", arm_mode)
+
+                if "{{changed_by}}" in data[ATTR_MESSAGE]:
+                    changed_by = self.alarm_entity.changed_by if self.alarm_entity.changed_by else ""
+                    data[ATTR_MESSAGE] = data[ATTR_MESSAGE].replace("{{changed_by}}", changed_by)
+
+                service_call["data"] = data
 
             elif ATTR_SERVICE_DATA in action:
                 service_call["data"] = action[ATTR_SERVICE_DATA]
@@ -123,27 +149,14 @@ class AutomationHandler:
                 service_call
             )
 
-    def async_format_sensor_info(self, open_sensors: dict):
-        if not open_sensors:
-            return ""
-
+    def get_friendly_name_for_sensor(self, entity_id):
+        state = self.hass.states.get(entity_id)
         sensor_config = self.coordinator.store.async_get_sensors()
 
-        output = []
-
-        for (entity_id, status) in open_sensors.items():
-            state = self.hass.states.get(entity_id)
-
-            if entity_id in sensor_config and sensor_config[entity_id][ATTR_NAME]:
-                name = sensor_config[entity_id][ATTR_NAME]
-            elif state and state.attributes["friendly_name"]:
-                name = state.attributes["friendly_name"]
-            else:
-                name = entity_id
-
-            output.append("{} is {}".format(name, status))
-
-        if not len(output):
-            return ""
+        if entity_id in sensor_config and sensor_config[entity_id][ATTR_NAME]:
+            name = sensor_config[entity_id][ATTR_NAME]
+        elif state and state.attributes["friendly_name"]:
+            name = state.attributes["friendly_name"]
         else:
-            return ", ".join(output)
+            name = entity_id
+        return name
