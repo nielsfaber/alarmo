@@ -167,7 +167,7 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
         .config=${this.config.modes[EArmModes.ArmedCustom]}
         .narrow=${this.narrow}
       >
-        <span slot="heading">${localize("common.modes_long.armed_custom", this.hass.language)}</span>
+        <span slot="heading">${localize("common.modes_long.armed_custom_bypass", this.hass.language)}</span>
         <span slot="description">${localize("panels.general.cards.armed_custom.description", this.hass.language)}</slot>
       </alarm-mode-card>
     `;

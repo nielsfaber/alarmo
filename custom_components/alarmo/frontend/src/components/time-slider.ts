@@ -31,6 +31,7 @@ export class TimeSlider extends LitElement {
   zeroValue?: string;
 
   firstUpdated() {
+    if (this.value > 0 && this.value < 60) this.unit = "sec";
     if (this.unit == "min") this.scaleFactor = 1 / 60;
     if (this.unit == "min") this.step = 1;
   }
