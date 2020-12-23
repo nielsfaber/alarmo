@@ -99,16 +99,6 @@ In the <code>custom_components</code> directory, remove the 'alarmo' folder.
 </ol>
 </details>
   
-## Planned improvements
-- [ ] Add support for skipping the arming delay.
-- [ ] Implement lock-out time when too many incorrect pincodes are entered.
-- [ ] Add security to the configuration panel.
-- [x] Add the project to HACS.
-- [x] Add support for bypassing failed sensors.
-- [x] MQTT support for control + status reporting of the system from 3rd party applications.
-- [x] Extend support for action configuration.
-- [x] Adding translations for push notifications and the frontend.
-
 ## Usage
 
 ### Alarm functionality
@@ -170,13 +160,32 @@ Available sensors should show up automatically in the *sensors* tab in the *Add 
 Simply check the sensors that you wish to include in the alarm, and click 'add to alarm'. 
 Review the configuration for each sensor in the *sensors* card.
 
+#### Sensor types
+
+The sensor configuration in the Alarmo panel allows defining a type for each sensor entity.
+
+Setting a type for a sensor has the benefit that the appropriate configuration is automatically set.
+HA defines [device classes](https://www.home-assistant.io/integrations/binary_sensor/#device-class) for binary sensors.
+When assigning sensors to Alarmo, the type of the sensor is automatically determined based on this property (if it is defined).
+
+Note that assigning a sensor type is not mandatory, and all configuration settings can also be set manually. It is also possible to deviate from the predefined configuration after setting a type.
+
+The following table defines the sensor types and the predefined configuration:
+| Type          | Device classes                      | Arm modes                           | Always on | Immediate | Arm on close | Allow open |
+| ------------- | ----------------------------------- | ----------------------------------- | --------- | --------- | ------------ | ---------- |
+| Door          | door, garage_door, lock. opening    | Armed Away, Armed Home, Armed Night | No        | No        | Yes          | No         |
+| Window        | window                              | Armed Away, Armed Home, Armed Night | No        | Yes       | No           | No         |
+| Motion        | motion, moving, occupancy, presence | Armed Away                          | No        | No        | No           | Yes        |
+| Tamper        | sound, opening, vibration           | Armed Away, Armed Home, Armed Night | No        | Yes       | No           | No         |
+| Environmental | gas, heat, moisture, smoke, safety  | N/A                                 | Yes       | Yes       | No           | No         |
+
 #### Immediate
 When the alarm is armed with an immediate sensor, this sensor will trigger the alarm directly instead of waiting for the (optional) entry delay.
 
+An immediate sensor must be closed before you can enable the alarm. It is not allowed to be open while you are leaving the house. In other words, the exit delay is not applicable to immediate sensors.
+
 Example of use cases: in mode *armed away* you would normally leave and enter the house via a door. 
 If a window is opened when the alarm is armed, this means bad news. The siren should be enabled ASAP.
-
-Note: an immediate sensor must be *off* before you can enable the alarm. It is not allowed to be *on* while you are leaving the house.
 
 #### Always-on
 When marking a sensor as always-on, it will **always** be able to trigger the alarm, even when the alarm is disarmed. The triggering occurs as soon as the sensor is activated and entry delays will be ignored.
@@ -188,6 +197,24 @@ The allow-open property allows a sensor to be in the active state, while (and af
 
 This property is intended for motion sensors, which have a relatively long period before they return to inactive state, after the zone is clear.
 By setting this property, it is possible to set a leave delay that is lower than the reset period of this sensor.
+
+#### Arm on close
+The alarm on close feature is intended for entrances only. 
+When setting this property to a door/contact sensor, Alarmo will watch this sensor while the alarm is in state *arming*, and determine if the user left the house.
+
+Once the sensor state changes from open to closed, this is interpreted as the user closing the (front) door. 
+Alarmo will skip the remaining of the exit delay, and proceed directly to the *armed* state.
+If any sensor (without the *allow-open* setting) is still open, the alarm will return to *disarmed* state.
+
+Note: Alarmo uses a built-in 5 seconds delay to allow for contact bounce (the chattering of a door when pulling it shut).
+
+#### Trigger when unavailable
+
+HA defines the *unavailable* state for sensors for which the state is undeterminate (can be either open or closed). The *unavailable* state usually occurs when a battery-powered sensor loses connection to the gateway. This might be a harmless scenario (such as an empty battery) but it could also be the result of tampering of the sensor.
+
+Since Alarmo cannot guarantee the security of your house when this occurs, it might be desirable to have the alarm trigger if this occurs. 
+Setting the *trigger when unavailable* setting has the effect that the *unavailable* state is treated the same as the sensor being *open*.
+
 
 ### Codes and users
 
@@ -209,9 +236,13 @@ So it is impossible to recover your pin code.
 This also means that if you lose your pincode, you cannot unlock the alarm (there is no backup code!)
 
 #### Administrator
-Currently, the administrator has no additional rights to a normal user.
+The administrator setting grants access to the Alarmo configuration panel.
 
-This property is reserved for future use.
+For using this feature, the user names in Alarmo should be matched to the account names in HA.
+
+When a user is trying to access the Alarmo configuration panel, access is only allowed if any of the following requirements are met:
+1. The user is administrator in HA (i.e. this user can access the HA configuration)
+2. The user is not a HA administrator, but a matching user exists in Alarmo, which has the *administator* setting activated.
 
 
 ### MQTT
