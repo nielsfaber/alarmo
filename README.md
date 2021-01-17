@@ -3,6 +3,40 @@
 
 This is an alarm system integration for Home Assistant. It provides a user interface for setting your own alarm system completely from the browser.
 
+- [Alarmo](#alarmo)
+  - [Introduction](#introduction)
+    - [Features](#features)
+    - [Preview](#preview)
+  - [Installation](#installation)
+  - [Updating](#updating)
+  - [Uninstalling](#uninstalling)
+  - [Usage](#usage)
+    - [Alarm functionality](#alarm-functionality)
+    - [Arm modes](#arm-modes)
+    - [Alarmo entity](#alarmo-entity)
+      - [States](#states)
+      - [Attributes](#attributes)
+      - [Areas](#areas)
+      - [Alarm Master](#alarm-master)
+    - [Sensor configuration](#sensor-configuration)
+      - [Sensor types](#sensor-types)
+      - [Immediate](#immediate)
+      - [Always-on](#always-on)
+      - [Allow-open](#allow-open)
+      - [Arm on close](#arm-on-close)
+      - [Trigger when unavailable](#trigger-when-unavailable)
+    - [Codes and users](#codes-and-users)
+      - [Codes](#codes)
+      - [Administrator](#administrator)
+    - [MQTT](#mqtt)
+      - [State topic](#state-topic)
+      - [Command topic](#command-topic)
+    - [Actions](#actions)
+      - [Push notifications](#push-notifications)
+        - [Actionable notifications](#actionable-notifications)
+      - [Device actions](#device-actions)
+    - [Lovelace alarm panel card](#lovelace-alarm-panel-card)
+
 ## Introduction
 This is an integration for the `alarm_control_panel` domain in HA.
 It allows to combine existing sensors for creating a security system for your house. 
@@ -151,6 +185,34 @@ The Alarmo entity defines the following attributes:
 | `open_sensors`     | `null`        | `{binary_sensor.backdoor: on}` | Dictionary of sensors with their entity-ID + state, that caused the alarm to change state.<br>Set when arming attempt failed (due to one or more sensors).<br>Set when alarm is triggered (only first sensor that caused the triggering is stored). |
 | `bypassed_sensors` | `null`        | `[binary_sensor.backdoor]`     | List of sensors that are temporarily excluded from the alarm, due to arming in force.                                                                                                                                                               |
 
+#### Areas
+An area is a physical compartment of your house, such as a garage, 1st floor of the house, garden, etc.
+Alarmo will create an `alarm_control_panel` entity for each area which can be armed and disarmed independently. An area has its own set of sensors and can have dedicated configuration for arm modes, exit/entry times and automations.
+
+In the *general* tab of the Alarmo configuration UI, there is a card showing the areas in your setup. 
+You can add additional areas, as well as rename or remove existing areas.
+Alarmo requires at least 1 area to be set up to be functional. 
+
+The name of an area defines the entity ID as well. 
+The entity will be instantly renamed after saving.
+After renaming an area, the old entity ID may appear again in your entities list after a restart of HA. This entity shows up as `unavailable` and has to be deleted manually. 
+
+**Warning**: renaming an area changes the entity ID, which might break your Lovelace cards and automations outside of Alarmo, so treat it with care.
+
+
+#### Alarm Master
+Alarmo has the option for enabling an alarm master.
+The option appears in the *general* tab in *general settings* if you have multiple areas defined.
+
+The alarm master is meant for operating your areas synchronously. 
+An extra `alarm_control_panel` entity is created for the master, which watches the state of the areas for and mirrors its own state with that.
+
+Arming / disarming the master will cause the action to be propagated to all areas.
+If the arming of one area fails, the arming is aborted and all areas are disarmed.
+
+The triggering of one area causes the triggering of the alarm master.
+
+**Warning**: the state of the master can only be determined if the areas are in sync. If one area is being armed while another is disarmed, the master will not change the state (i.e. it stays in `disarmed`). The only allowed exceptions are the `pending` and `arming` states.
 
 ### Sensor configuration
 
