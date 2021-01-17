@@ -1,5 +1,5 @@
 {
-  "name": "Alarmo",
+  "name": "alarmo",
   "version": "1.0.0",
   "description": "Alarmo frontend",
   "main": "dist/alarm-panel.js",
