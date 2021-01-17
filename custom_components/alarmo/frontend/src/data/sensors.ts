@@ -1,7 +1,8 @@
 import { HassEntity } from "home-assistant-js-websocket";
-import { AlarmoConfig, AlarmoSensor, EArmModes, ESensorType, Dictionary } from "../types";
+import { AlarmoSensor, EArmModes, Dictionary } from "../types";
 import { getDomain } from "../helpers";
 import { computeDomain } from "custom-card-helpers";
+import { ESensorTypes } from "../const";
 
 
 
@@ -84,37 +85,37 @@ export const binarySensorConfig = (stateObj: HassEntity): Partial<AlarmoSensor> 
   }
 }
 
-export const sensorClassToType = (stateObj: HassEntity): ESensorType | undefined => {
+export const sensorClassToType = (stateObj: HassEntity): ESensorTypes | undefined => {
 
   switch (stateObj.attributes.device_class) {
     case 'door':
     case 'garage_door':
     case 'lock':
     case 'opening':
-      return ESensorType.Door;
+      return ESensorTypes.Door;
     case 'window':
-      return ESensorType.Window;
+      return ESensorTypes.Window;
     case 'gas':
     case 'heat':
     case 'moisture':
     case 'smoke':
     case 'safety':
-      return ESensorType.Environmental
+      return ESensorTypes.Environmental
     case 'motion':
     case 'moving':
     case 'occupancy':
     case 'presence':
-      return ESensorType.Motion
+      return ESensorTypes.Motion
     case 'sound':
     case 'opening':
     case 'vibration':
-      return ESensorType.Tamper
+      return ESensorTypes.Tamper
     default:
       return;
   }
 }
 
-export function defaultSensorConfig(stateObj: HassEntity | undefined, alarmoConfig: AlarmoConfig) {
+export function defaultSensorConfig(stateObj: HassEntity | undefined, modeList: EArmModes[]) {
   if (!stateObj) return null;
   const domain = computeDomain(stateObj.entity_id);
 
@@ -127,7 +128,8 @@ export function defaultSensorConfig(stateObj: HassEntity | undefined, alarmoConf
     allow_open: false,
     always_on: false,
     trigger_unavailable: false,
-    type: ESensorType.Other,
+    type: ESensorTypes.Other,
+    enabled: true
   };
 
   if (domain == 'binary_sensor') {
@@ -136,57 +138,47 @@ export function defaultSensorConfig(stateObj: HassEntity | undefined, alarmoConf
       config = {
         ...config,
         type: type,
-        ...sensorConfigByType(alarmoConfig)[type]
+        ...sensorConfigByType(modeList)[type]
       };
     }
   }
-
-  config = {
-    ...config,
-    modes: config.modes.filter(e =>
-      alarmoConfig.modes[e].enabled
-    )
-  };
-
   return config;
 }
 
-export const sensorConfigByType = (alarmoConfig: AlarmoConfig): Dictionary<Partial<AlarmoSensor>> => {
+export const sensorConfigByType = (modeList: EArmModes[]): Dictionary<Partial<AlarmoSensor>> => {
 
-  const filterModes = (modes: EArmModes[]) => modes.filter(e =>
-    alarmoConfig.modes[e].enabled
-  )
+  const filterModes = (modes: EArmModes[]) => modes.filter(e => modeList.includes(e));
 
   return {
-    [ESensorType.Door]: {
+    [ESensorTypes.Door]: {
       modes: filterModes([EArmModes.ArmedAway, EArmModes.ArmedHome, EArmModes.ArmedNight]),
       always_on: false,
       allow_open: false,
       arm_on_close: true,
       immediate: false,
     },
-    [ESensorType.Window]: {
+    [ESensorTypes.Window]: {
       modes: filterModes([EArmModes.ArmedAway, EArmModes.ArmedHome, EArmModes.ArmedNight]),
       always_on: false,
       allow_open: false,
       arm_on_close: false,
       immediate: true,
     },
-    [ESensorType.Motion]: {
+    [ESensorTypes.Motion]: {
       modes: filterModes([EArmModes.ArmedAway]),
       always_on: false,
       allow_open: true,
       arm_on_close: false,
       immediate: false,
     },
-    [ESensorType.Tamper]: {
+    [ESensorTypes.Tamper]: {
       modes: filterModes([EArmModes.ArmedAway, EArmModes.ArmedHome, EArmModes.ArmedNight, EArmModes.ArmedCustom]),
       always_on: false,
       allow_open: false,
       arm_on_close: false,
       immediate: true,
     },
-    [ESensorType.Environmental]: {
+    [ESensorTypes.Environmental]: {
       modes: filterModes([EArmModes.ArmedAway, EArmModes.ArmedHome, EArmModes.ArmedNight, EArmModes.ArmedCustom]),
       always_on: true,
       allow_open: false,

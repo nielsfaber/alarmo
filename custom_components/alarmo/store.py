@@ -41,13 +41,14 @@ class ModeEntry:
     """Mode storage Entry."""
 
     enabled = attr.ib(type=bool, default=False)
-    leave_time = attr.ib(type=int, default=0)
+    exit_time = attr.ib(type=int, default=0)
     entry_time = attr.ib(type=int, default=0)
+    trigger_time = attr.ib(type=int, default=0)
 
 
 @attr.s(slots=True, frozen=True)
 class MqttConfig:
-    """Mode storage Entry."""
+    """MQTT storage Entry."""
 
     enabled = attr.ib(type=bool, default=False)
     state_topic = attr.ib(type=str, default="alarmo/state")
@@ -58,24 +59,36 @@ class MqttConfig:
 
 
 @attr.s(slots=True, frozen=True)
+class MasterConfig:
+    """Master storage Entry."""
+
+    enabled = attr.ib(type=bool, default=True)
+    name = attr.ib(type=str, default="master")
+
+
+@attr.s(slots=True, frozen=True)
+class AreaEntry:
+    """Area storage Entry."""
+
+    area_id = attr.ib(type=str, default=None)
+    name = attr.ib(type=str, default=None)
+    modes = attr.ib(type=[str, ModeEntry], default={
+        STATE_ALARM_ARMED_AWAY: ModeEntry(),
+        STATE_ALARM_ARMED_HOME: ModeEntry(),
+        STATE_ALARM_ARMED_NIGHT: ModeEntry(),
+        STATE_ALARM_ARMED_CUSTOM_BYPASS: ModeEntry()
+    })
+
+
+@attr.s(slots=True, frozen=True)
 class Config:
     """(General) Config storage Entry."""
 
     code_arm_required = attr.ib(type=bool, default=False)
     code_disarm_required = attr.ib(type=bool, default=False)
     code_format = attr.ib(type=str, default=CODE_FORMAT_NUMBER)
-    trigger_time = attr.ib(type=int, default=1800)
     disarm_after_trigger = attr.ib(type=bool, default=False)
-
-    modes = attr.ib(
-        type=[str, ModeEntry],
-        default={
-            STATE_ALARM_ARMED_AWAY: ModeEntry(enabled=True),
-            STATE_ALARM_ARMED_HOME: ModeEntry(enabled=True),
-            STATE_ALARM_ARMED_NIGHT: ModeEntry(enabled=False),
-            STATE_ALARM_ARMED_CUSTOM_BYPASS: ModeEntry(enabled=False),
-        },
-    )
+    master = attr.ib(type=MasterConfig, default=MasterConfig())
     mqtt = attr.ib(type=MqttConfig, default=MqttConfig())
 
 
@@ -92,6 +105,8 @@ class SensorEntry:
     arm_on_close = attr.ib(type=bool, default=False)
     allow_open = attr.ib(type=bool, default=False)
     trigger_unavailable = attr.ib(type=bool, default=False)
+    area = attr.ib(type=str, default=None)
+    enabled = attr.ib(type=bool, default=True)
 
 
 @attr.s(slots=True, frozen=True)
@@ -135,6 +150,7 @@ class AutomationEntry:
     actions = attr.ib(type=[ActionEntry], default=[])
     enabled = attr.ib(type=bool, default=True)
     is_notification = attr.ib(type=bool, default=False)
+    area = attr.ib(type=str, default=None)
 
 
 class AlarmoStorage:
@@ -144,6 +160,7 @@ class AlarmoStorage:
         """Initialize the storage."""
         self.hass = hass
         self.config: Config = Config()
+        self.areas: MutableMapping[str, AreaEntry] = {}
         self.sensors: MutableMapping[str, SensorEntry] = {}
         self.users: MutableMapping[str, UserEntry] = {}
         self.automations: MutableMapping[str, AutomationEntry] = {}
@@ -153,18 +170,45 @@ class AlarmoStorage:
         """Load the registry of schedule entries."""
         data = await self._store.async_load()
         config: Config = Config()
+        areas: "OrderedDict[str, AreaEntry]" = OrderedDict()
         sensors: "OrderedDict[str, SensorEntry]" = OrderedDict()
         users: "OrderedDict[str, UserEntry]" = OrderedDict()
         automations: "OrderedDict[str, AutomationEntry]" = OrderedDict()
 
         if data is not None:
-            config = Config(**data["config"])
-            modes = {}
-            for mode, mode_config in data["config"]["modes"].items():
-                modes[mode] = ModeEntry(**mode_config)
+            config = Config(
+                code_arm_required=data["config"]["code_arm_required"],
+                code_disarm_required=data["config"]["code_disarm_required"],
+                code_format=data["config"]["code_format"],
+                disarm_after_trigger=data["config"]["disarm_after_trigger"]
+            )
 
-            config = attr.evolve(config, **{"modes": modes})
-            config = attr.evolve(config, **{"mqtt": MqttConfig(**data["config"]["mqtt"])})
+            if "mqtt" in data["config"]:
+                config = attr.evolve(config, **{
+                    "mqtt": MqttConfig(**data["config"]["mqtt"]),
+                })
+
+            if "master" in data["config"]:
+                config = attr.evolve(config, **{
+                    "master": MasterConfig(**data["config"]["master"]),
+                })
+
+            if "areas" in data:
+                for area in data["areas"]:
+                    modes = {
+                        mode: ModeEntry(
+                            enabled=config["enabled"],
+                            exit_time=config["exit_time"],
+                            entry_time=config["entry_time"],
+                            trigger_time=config["trigger_time"]
+                        )
+                        for (mode, config) in area["modes"].items()
+                    }
+                    areas[area["area_id"]] = AreaEntry(
+                        area_id=area["area_id"],
+                        name=area["name"],
+                        modes=modes
+                    )
 
             if "sensors" in data:
                 for sensor in data["sensors"]:
@@ -179,6 +223,7 @@ class AlarmoStorage:
                     automations[automation["automation_id"]] = AutomationEntry(**automation)
 
         self.config = config
+        self.areas = areas
         self.sensors = sensors
         self.automations = automations
         self.users = users
@@ -199,11 +244,18 @@ class AlarmoStorage:
             "config": attr.asdict(self.config),
         }
 
-        store_data["sensors"] = [attr.asdict(entry) for entry in self.sensors.values()]
-
-        store_data["users"] = [attr.asdict(entry) for entry in self.users.values()]
-
-        store_data["automations"] = [attr.asdict(entry) for entry in self.automations.values()]
+        store_data["areas"] = [
+            attr.asdict(entry) for entry in self.areas.values()
+        ]
+        store_data["sensors"] = [
+            attr.asdict(entry) for entry in self.sensors.values()
+        ]
+        store_data["users"] = [
+            attr.asdict(entry) for entry in self.users.values()
+        ]
+        store_data["automations"] = [
+            attr.asdict(entry) for entry in self.automations.values()
+        ]
 
         return store_data
 
@@ -223,7 +275,7 @@ class AlarmoStorage:
         old = self.config
         new = self.config = attr.evolve(old, **changes)
         self.async_schedule_save()
-        return new
+        return attr.asdict(new)
 
     @callback
     def async_update_mode_config(self, mode: str, changes: dict):
@@ -240,6 +292,46 @@ class AlarmoStorage:
         self.config = attr.evolve(self.config, **{"modes": modes})
         self.async_schedule_save()
         return new
+
+    @callback
+    def async_get_area(self, area_id) -> AreaEntry:
+        """Get an existing AreaEntry by id."""
+        res = self.areas.get(area_id)
+        return attr.asdict(res) if res else None
+
+    @callback
+    def async_get_areas(self):
+        """Get an existing AreaEntry by id."""
+        res = {}
+        for (key, val) in self.areas.items():
+            res[key] = attr.asdict(val)
+        return res
+
+    @callback
+    def async_create_area(self, data: dict) -> AreaEntry:
+        """Create a new AreaEntry."""
+        area_id = str(int(time.time()))
+        new_area = AreaEntry(**data, area_id=area_id)
+        self.areas[area_id] = new_area
+        self.async_schedule_save()
+        return attr.asdict(new_area)
+
+    @callback
+    def async_delete_area(self, area_id: str) -> None:
+        """Delete AreaEntry."""
+        if area_id in self.areas:
+            del self.areas[area_id]
+            self.async_schedule_save()
+            return True
+        return False
+
+    @callback
+    def async_update_area(self, area_id: str, changes: dict) -> AreaEntry:
+        """Update existing self."""
+        old = self.areas[area_id]
+        new = self.areas[area_id] = attr.evolve(old, **changes)
+        self.async_schedule_save()
+        return attr.asdict(new)
 
     @callback
     def async_get_sensor(self, entity_id) -> SensorEntry:
@@ -334,11 +426,9 @@ class AlarmoStorage:
     def async_create_automation(self, data: dict) -> AutomationEntry:
         """Create a new AutomationEntry."""
         automation_id = str(int(time.time()))
-        new_automation = AutomationEntry(
-            **data,
-            automation_id=automation_id
-        )
-        _LOGGER.debug(new_automation)
+        if "area" in data and not data["area"]:
+            data["area"] = None
+        new_automation = AutomationEntry(**data, automation_id=automation_id)
         self.automations[automation_id] = new_automation
         self.async_schedule_save()
         return new_automation
@@ -355,6 +445,8 @@ class AlarmoStorage:
     @callback
     def async_update_automation(self, automation_id: str, changes: dict) -> AutomationEntry:
         """Update existing AutomationEntry."""
+        if "area" in changes and not changes["area"]:
+            changes["area"] = None
         old = self.automations[automation_id]
         new = self.automations[automation_id] = attr.evolve(old, **changes)
         self.async_schedule_save()

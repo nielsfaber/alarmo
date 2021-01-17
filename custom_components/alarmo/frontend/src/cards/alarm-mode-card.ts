@@ -1,125 +1,181 @@
 import { LitElement, html, customElement, property } from 'lit-element';
 import { HomeAssistant } from 'custom-card-helpers';
-import { EArmModes, AlarmoModeConfig } from '../types';
 
 import '../components/time-slider';
+import '../components/alarmo-select';
 import { commonStyle } from '../styles';
 import { localize } from '../../localize/localize';
-import { saveModeConfig } from '../data/websockets';
+import { AlarmoModeConfig, AlarmoConfig, EArmModes, Dictionary, AlarmoArea } from '../types';
+import { fetchAreas, saveArea } from '../data/websockets';
+import { handleError } from '../helpers';
+import { SubscribeMixin } from '../subscribe-mixin';
+import { UnsubscribeFunc } from 'home-assistant-js-websocket';
+import { EArmModeIcons } from '../const';
 
 @customElement('alarm-mode-card')
-export class AlarmModeCard extends LitElement {
-  @property() hass?: HomeAssistant;
+export class AlarmModeCard extends SubscribeMixin(LitElement) {
+
+  @property() hass!: HomeAssistant;
   @property() narrow!: boolean;
+  @property() currentTab: number = 0;
 
-  @property({ type: String }) mode?: EArmModes;
-  @property({ type: Object }) config?: AlarmoModeConfig;
+  @property() config!: AlarmoConfig;
+  @property() areas!: Dictionary<AlarmoArea>;
+  @property() data!: Record<EArmModes, AlarmoModeConfig>;
 
-  @property() enabled = false;
-  @property() leave_time: number = 0;
-  @property() entry_time: number = 0;
+  @property() selectedArea!: string;
 
-  firstUpdated() {
-    if (!this.config) return;
-    this.enabled = this.config.enabled;
-    this.leave_time = this.config.leave_time;
-    this.entry_time = this.config.entry_time;
+  public hassSubscribe(): Promise<UnsubscribeFunc>[] {
+    this._fetchData();
+    return [
+      this.hass!.connection.subscribeEvents(
+        () => this._fetchData(),
+        "alarmo_updated"
+      ),
+    ];
+  }
+
+  private async _fetchData(): Promise<void> {
+    if (!this.hass) {
+      return;
+    }
+    this.areas = await fetchAreas(this.hass);
+  }
+
+  async firstUpdated() {
+    this.areas = await fetchAreas(this.hass);
+    this.selectedArea = Object.keys(this.areas)[0];
+    this.data = { ...this.areas[this.selectedArea].modes };
   }
 
   render() {
-    if (!this.hass) return html``;
+    if (!this.data) return html``;
+    const mode = Object.values(EArmModes)[this.currentTab];
     return html`
-        <ha-card
-        >
-          <div class="card-header">
-            <div class="name">
-              <slot name="heading"></slot>
-            </div>
-            <ha-switch
-              ?disabled=${this.mode == EArmModes.ArmedAway}
-              ?checked=${this.enabled}
-              @change=${this.toggleEnable}
-            >
-            </ha-switch>
-          </div>
-          <div class="card-content">
-              <slot name="description"></slot>
+      <ha-card>
+        <div class="card-header">
+          <div class="name">
+            ${localize("panels.general.cards.modes.title", this.hass.language)}
           </div>
 
-          ${
-      this.enabled
+          ${Object.keys(this.areas).length > 1
         ? html`
-          <settings-row .narrow=${this.narrow}>
-            <span slot="heading">${localize("panels.general.cards.common.fields.leave_time.heading", this.hass.language)}</span>
-            <span slot="description">${localize("panels.general.cards.common.fields.leave_time.description", this.hass.language)}</span>
-            <time-slider
-              .hass=${this.hass}
-              ?disabled=${!this.enabled}
-              unit="sec"
-              max="180"
-              zeroValue=${localize("components.time_slider.none", this.hass.language)}
-              value=${this.leave_time}
-              @change=${ev => { this.leave_time = Number(ev.target.value); }}
-            >
-            </time-slider>
-          </settings-row>
+              <alarmo-select
+            .items=${Object.values(this.areas).map(e => Object({ value: e.area_id, name: e.name }))}
+            value=${this.selectedArea}
+            label=${this.hass.localize("ui.components.area-picker.area")}
+            @value-changed=${(ev: Event) => this.selectArea((ev.target as HTMLInputElement).value)}
 
-          <settings-row .narrow=${this.narrow}>
-            <span slot="heading">${localize("panels.general.cards.common.fields.entry_time.heading", this.hass.language)}</span>
-            <span slot="description">${localize("panels.general.cards.common.fields.entry_time.description", this.hass.language)}</span>
-            <time-slider
-              .hass=${this.hass}
-              ?disabled=${!this.enabled}
-              unit="sec"
-              max="180"
-              zeroValue=${localize("components.time_slider.none", this.hass.language)}
-              value=${this.entry_time}
-              @change=${ev => { this.entry_time = Number(ev.target.value); }}
-            >
-            </time-slider>
-          </settings-row>
-          ` : ''
+              </alarmo-select>
+              ` : ''}
+
+        </div>
+        <div class="card-content">
+          ${localize("panels.general.cards.modes.description", this.hass.language)}
+        </div>
+
+        <mwc-tab-bar
+          .activeIndex=${this.currentTab}
+          @MDCTabBar:activated=${(ev: CustomEvent) => this.currentTab = Number(ev.detail.index)}
+        >
+          ${Object.entries(EArmModes)
+        .map(([k, v]) => html`
+          <mwc-tab
+            label="${localize(`common.modes_short.${v}`, this.hass.language)}"
+            hasImageIcon
+            stacked
+            class="${this.data[v].enabled ? "" : "disabled"}"
+          >
+            <ha-icon icon="${EArmModeIcons[k]}" slot="icon"></ha-icon>
+          </mwc-tab>
+          `)
       }
-          <div class="card-actions">
-            <mwc-button ?disabled=${!this.enabled} @click=${this.saveClick}>
-              ${this.hass.localize("ui.common.save")}
+        </mwc-tab-bar>
+
+        <settings-row .narrow=${this.narrow} .large=${true}>
+          <span slot="heading">${localize(`common.modes_long.${mode}`, this.hass.language)}</span>
+          <span slot="description">${localize(`panels.general.cards.modes.fields.mode.${mode}`, this.hass.language)}</span>
+
+          <div style="display: flex; margin: 10px 0px; justify-content: center; width: 100%">
+            <mwc-button
+              class="${this.data[mode].enabled ? "active" : ""}"
+              @click=${() => this.data = { ...this.data, [mode]: { ...this.data[mode], enabled: true } }}
+            >
+              ${localize("panels.general.cards.modes.fields.mode.enabled", this.hass.language)}
+            </mwc-button>
+            <mwc-button
+              class="${this.data[mode].enabled ? "" : "active"}"
+              @click=${() => this.data = { ...this.data, [mode]: { ...this.data[mode], enabled: false } }}
+            >
+              ${localize("panels.general.cards.modes.fields.mode.disabled", this.hass.language)}
             </mwc-button>
           </div>
-        </ha-card>
-    `;
+        </settings-row>
+
+        ${this.data[mode].enabled ? html`
+
+        <settings-row .narrow=${this.narrow}>
+          <span slot="heading">${localize("panels.general.cards.modes.fields.exit_delay.heading", this.hass.language)}</span>
+          <span slot="description">${localize("panels.general.cards.modes.fields.exit_delay.description", this.hass.language)}</span>
+          <time-slider
+            .hass=${this.hass}
+            unit="sec"
+            max="180"
+            zeroValue=${localize("components.time_slider.none", this.hass.language)}
+            value=${this.data[mode].exit_time || 0}
+            @change=${(ev: Event) => this.data = { ...this.data, [mode]: { ...this.data[mode], exit_time: Number((ev.target as HTMLInputElement).value) } }}
+          >
+          </time-slider>
+        </settings-row>
+
+        <settings-row .narrow=${this.narrow}>
+          <span slot="heading">${localize("panels.general.cards.modes.fields.entry_delay.heading", this.hass.language)}</span>
+          <span slot="description">${localize("panels.general.cards.modes.fields.entry_delay.description", this.hass.language)}</span>
+          <time-slider
+            .hass=${this.hass}
+            unit="sec"
+            max="180"
+            zeroValue=${localize("components.time_slider.none", this.hass.language)}
+            value=${this.data[mode].entry_time || 0}
+            @change=${(ev: Event) => this.data = { ...this.data, [mode]: { ...this.data[mode], entry_time: Number((ev.target as HTMLInputElement).value) } }}
+          >
+          </time-slider>
+        </settings-row>
+
+        <settings-row .narrow=${this.narrow}>
+          <span slot="heading">${localize("panels.general.cards.modes.fields.trigger_time.heading", this.hass.language)}</span>
+          <span slot="description">${localize("panels.general.cards.modes.fields.trigger_time.description", this.hass.language)}</span>
+          <time-slider
+            .hass=${this.hass}
+            unit="min"
+            max="3600"
+            zeroValue=${localize("components.time_slider.infinite", this.hass.language)}
+            value=${this.data[mode].trigger_time || 0}
+            @change=${(ev: Event) => this.data = { ...this.data, [mode]: { ...this.data[mode], trigger_time: Number((ev.target as HTMLInputElement).value) } }}          >
+          </time-slider>
+        </settings-row>
+
+        ` : ''}
+
+        <div class="card-actions">
+          <mwc-button @click=${this.saveClick}>
+            ${this.hass.localize("ui.common.save")}
+          </mwc-button>
+        </div>
+      </ha-card>
+    `
   }
 
-  toggleEnable(ev: Event) {
-    if (!this.hass || !this.mode) return;
-    this.enabled = (ev.target as HTMLInputElement).checked;
-
-    saveModeConfig(this.hass, {
-      mode: this.mode,
-      enabled: this.enabled,
-    })
-      .catch(() => {
-
-      })
-      .then(() => {
-
-      });
-
+  selectArea(area_id: string) {
+    if (area_id == this.selectedArea) return;
+    this.selectedArea = area_id;
+    this.data = { ...this.areas[area_id].modes };
   }
 
-  saveClick() {
-    if (!this.hass || !this.mode) return;
-
-    saveModeConfig(this.hass, {
-      mode: this.mode,
-      leave_time: this.leave_time,
-      entry_time: this.entry_time,
-      enabled: true
-    })
-      .catch(() => {
-      })
-      .then(() => {
-
-      });
+  saveClick(ev: Event) {
+    saveArea(this.hass, { area_id: this.selectedArea, modes: this.data })
+      .catch(e => handleError(e, ev))
+      .then(() => { });
   }
 
   static styles = commonStyle;

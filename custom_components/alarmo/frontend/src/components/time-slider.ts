@@ -39,6 +39,9 @@ export class TimeSlider extends LitElement {
   render() {
     return html`
       <div class="container">
+        <div class="prefix">
+          <slot name="prefix"></slot>
+        </div>
         <div class="slider">
           ${this.getSlider()}
         </div>
@@ -105,9 +108,15 @@ export class TimeSlider extends LitElement {
 
     div.container {
       display: grid;
-      grid-template-columns: 1fr 60px;
+      grid-template-columns: max-content 1fr 60px;
       grid-template-rows: min-content;
-      grid-template-areas: 'slider value';
+      grid-template-areas: 'prefix slider value';
+    }
+
+    div.prefix {
+      grid-area: prefix;
+      display: flex;
+      align-items: center;
     }
 
     div.slider {

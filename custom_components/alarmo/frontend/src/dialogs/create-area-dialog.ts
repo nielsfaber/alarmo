@@ -1,0 +1,168 @@
+import { LitElement, html, customElement, property, CSSResult, css, internalProperty } from 'lit-element';
+import { HomeAssistant, fireEvent } from 'custom-card-helpers';
+import { saveArea, deleteArea, fetchAreas, fetchSensors, fetchAutomations } from '../data/websockets';
+import { AlarmoArea, Dictionary, AlarmoSensor, AlarmoAutomation } from '../types';
+import { commonStyle } from '../styles';
+import { localize } from '../../localize/localize';
+import { UnsubscribeFunc } from 'home-assistant-js-websocket';
+import { SubscribeMixin } from '../subscribe-mixin';
+
+import './confirm-delete-dialog';
+
+@customElement('create-area-dialog')
+export class CreateAreaDialog extends SubscribeMixin(LitElement) {
+  @property({ attribute: false }) public hass!: HomeAssistant;
+
+  @internalProperty() private _params?: any;
+  @property() areas: Dictionary<AlarmoArea> = {};
+  @property() sensors: Dictionary<AlarmoSensor> = {};
+  @property() automations: Dictionary<AlarmoAutomation> = {};
+
+  @property() name: string = "";
+  @property() area_id?: string;
+
+
+  public hassSubscribe(): Promise<UnsubscribeFunc>[] {
+    this._fetchData();
+    return [
+      this.hass!.connection.subscribeEvents(
+        () => this._fetchData(),
+        "alarmo_updated"
+      ),
+    ];
+  }
+
+  private async _fetchData(): Promise<void> {
+    if (!this.hass) return;
+    this.areas = await fetchAreas(this.hass);
+    this.sensors = await fetchSensors(this.hass);
+    this.automations = await fetchAutomations(this.hass);
+  }
+
+  public async showDialog(params: any): Promise<void> {
+    await this._fetchData();
+    this._params = params;
+    if (params.area_id) {
+      this.area_id = params.area_id;
+      this.name = this.areas![this.area_id!].name;
+    }
+    await this.updateComplete;
+  }
+
+  public async closeDialog() {
+    this._params = undefined;
+    this.area_id = undefined;
+    this.name = "";
+  }
+
+  render() {
+    if (!this._params) return html``;
+    return html`
+      <ha-dialog
+        open
+        .heading=${true}
+        @closed=${this.closeDialog}
+        @close-dialog=${this.closeDialog}
+      >
+        <div slot="heading">
+          <ha-header-bar>
+            <ha-icon-button
+              slot="navigationIcon"
+              dialogAction="cancel"
+              icon="mdi:close"
+            >
+            </ha-icon-button>
+            <span slot="title">
+      ${this.area_id
+        ? localize("panels.general.dialogs.edit_area.title", this.hass.language, "{area}", this.areas[this.area_id!].name)
+        : localize("panels.general.dialogs.create_area.title", this.hass.language)
+      }
+            </span>
+          </ha-header-bar>
+        </div>
+        <div class="wrapper">
+          <paper-input
+            label=${this.hass.localize("ui.components.area-picker.add_dialog.name")}
+            @value-changed=${(ev: Event) => this.name = (ev.target as HTMLInputElement).value}
+            value="${this.name}"
+          >
+          </paper-input>
+      ${this.area_id
+        ? html`<span class="note">${localize("panels.general.dialogs.edit_area.name_warning", this.hass.language)}</span>`
+        : ''
+      }
+        </div>
+        <mwc-button
+          slot="primaryAction"
+          @click=${this.saveClick}
+        >
+          ${this.hass.localize("ui.common.save")}
+        </mwc-button>
+        ${this.area_id ?
+        html`
+        <mwc-button
+          slot="secondaryAction"
+          @click=${this.deleteClick}
+          class="warning"
+          ?disabled=${Object.keys(this.areas!).length == 1}
+        >
+          ${this.hass.localize("ui.common.delete")}
+        </mwc-button>
+        ` : ''}
+      </ha-dialog>
+    `;
+  }
+
+  private saveClick() {
+    const name = this.name.trim();
+    if (!name.length) return;
+
+    let data: Partial<AlarmoArea> = {
+      name: name
+    }
+    if (this.area_id) data = { ...data, area_id: this.area_id };
+
+    saveArea(this.hass, data)
+      .catch(() => { })
+      .then(() => { this.closeDialog() });
+  }
+
+  private async deleteClick(ev: Event) {
+    if (!this.area_id) return;
+    const sensors = Object.values(this.sensors).filter(e => e.area == this.area_id).length;
+    const automations = Object.values(this.automations).filter(e => e.area == this.area_id).length;
+    let result = false;
+    if (sensors || automations) {
+      result = await new Promise((resolve) => {
+        fireEvent(ev.target as HTMLElement, 'show-dialog', {
+          dialogTag: 'confirm-delete-dialog',
+          dialogImport: () => import('./confirm-delete-dialog'),
+          dialogParams: {
+            title: localize("panels.general.dialogs.remove_area.title", this.hass.language),
+            description: localize("panels.general.dialogs.remove_area.description", this.hass.language, ["{sensors}", "{automations}"], [String(sensors), String(automations)]),
+            cancel: () => resolve(false),
+            confirm: () => resolve(true)
+          }
+        });
+      });
+    } else result = true;
+
+    if (result) {
+      deleteArea(this.hass, this.area_id)
+        .catch(() => { })
+        .then(() => { this.closeDialog() });
+    }
+  }
+
+  static get styles(): CSSResult {
+    return css`
+      ${commonStyle}
+      div.wrapper {
+        color: var(--primary-text-color);
+      }
+      span.note {
+        color: var(--secondary-text-color);
+      }
+    `;
+  }
+}

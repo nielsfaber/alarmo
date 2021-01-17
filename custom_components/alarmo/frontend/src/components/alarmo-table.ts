@@ -109,8 +109,7 @@ export class AlarmoTable extends LitElement {
         box-sizing: border-box;
       }
       div.table-cell.text {
-        padding-right: 16px;
-        padding-left: 16px;
+        padding: 4px 16px;
       }
       div.table-cell.grow {
         flex-grow: 1;
@@ -151,6 +150,12 @@ export class AlarmoTable extends LitElement {
       ha-icon {
         color: var(--paper-item-icon-color);
         padding: 8px;
+      }
+
+      .secondary {
+        color: var(--secondary-text-color);
+        display: flex;
+        padding-top: 4px;
       }
   `;
 }

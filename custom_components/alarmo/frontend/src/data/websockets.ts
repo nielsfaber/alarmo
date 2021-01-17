@@ -1,5 +1,5 @@
 import { HomeAssistant } from "custom-card-helpers";
-import { AlarmoConfig, AlarmoModeConfig, AlarmoSensor, Dictionary, AlarmoUser, EArmModes, AlarmoAutomation } from "../types";
+import { AlarmoConfig, AlarmoModeConfig, AlarmoSensor, Dictionary, AlarmoUser, EArmModes, AlarmoAutomation, AlarmoArea } from "../types";
 
 
 export const fetchConfig = (hass: HomeAssistant): Promise<AlarmoConfig> =>
@@ -68,6 +68,26 @@ export const deleteAutomation = (hass: HomeAssistant, automation_id: string): Pr
   return hass
     .callApi("POST", "alarmo/automations", {
       automation_id: automation_id,
+      remove: true
+    })
+};
+
+
+export const fetchAreas = (hass: HomeAssistant): Promise<Dictionary<AlarmoArea>> =>
+  hass.callWS({
+    type: "alarmo/areas",
+  });
+
+
+export const saveArea = (hass: HomeAssistant, config: Partial<AlarmoArea>): Promise<boolean> => {
+  return hass
+    .callApi("POST", "alarmo/area", config)
+};
+
+export const deleteArea = (hass: HomeAssistant, area_id: string): Promise<boolean> => {
+  return hass
+    .callApi("POST", "alarmo/area", {
+      area_id: area_id,
       remove: true
     })
 };

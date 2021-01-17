@@ -92,4 +92,37 @@ export const commonStyle = css`
   mwc-button ha-icon {
     padding-right: 11px;
   }
+  mwc-button.vertical {
+    height: 60px;
+    --mdc-button-height: 60px;
+    background: var(--primary-color);
+    --mdc-theme-primary: var(--text-primary-color);
+  }
+  mwc-button.vertical div {
+    display: flex;
+    flex-direction: column; 
+  }
+  mwc-button.vertical span {
+    display: flex;
+  }
+  mwc-button.vertical ha-icon {
+    display: flex;
+    margin-left: 50%;
+  }
+  mwc-tab ha-icon {
+    --mdc-icon-size: 20px;
+  }
+  mwc-tab.disabled {
+      --mdc-theme-primary: var(--disabled-text-color);
+      --mdc-tab-color-default: var(--disabled-text-color);
+      --mdc-tab-text-label-color-default: var(--disabled-text-color);
+  }
+
+  ha-card settings-row:first-child, ha-card settings-row:first-of-type {
+    border-top: 0px;
+  }
+
+  ha-card > ha-card {
+    margin: 10px;
+  }
 `;

@@ -18,18 +18,11 @@ from homeassistant.const import (
 )
 
 from homeassistant.components.notify import ATTR_MESSAGE
-
 from homeassistant.helpers.service import async_call_from_config
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
-from .const import (
-    ATTR_ENABLED,
-    ATTR_TRIGGERS,
-    ATTR_ACTIONS,
-    ATTR_EVENT,
-    ARM_MODES,
-    ATTR_MODES,
-    ATTR_IS_NOTIFICATION,
-)
+from . import const
+from .alarm_control_panel import AlarmoBaseEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -37,64 +30,82 @@ EVENT_ARM_FAILURE = "arm_failure"
 
 
 class AutomationHandler:
-    def __init__(self, hass: HomeAssistant, coordinator, alarmEntity):
-        self._config = None
+    def __init__(self, hass: HomeAssistant):
         self.hass = hass
-        self.coordinator = coordinator
-        self.alarm_entity = alarmEntity
+        self._config = None
         self._listener = None
-        self._config = self.coordinator.store.async_get_automations()
-        self.coordinator.register_automation_callback(self.async_load_config)
 
-    @callback
-    def async_load_config(self):
-        self._config = self.coordinator.store.async_get_automations()
+        def async_update_config():
+            """automation config updated, reload the configuration."""
+            self._config = self.hass.data[const.DOMAIN]["coordinator"].store.async_get_automations()
 
-    @callback
-    async def async_handle_state_update(self, state=None, last_state=None):
-        _LOGGER.debug("state is updated from {} to {}".format(last_state, state))
+        async_dispatcher_connect(hass, "alarmo_automations_updated", async_update_config)
+        async_update_config()
 
-        if not last_state:
-            # prevent execution of automations when HA is restarted
-            return
+        @callback
+        async def async_alarm_state_changed(area_id: str, old_state: str, new_state: str):
+            if not old_state:
+                # ignore automations at startup/restoring
+                return
 
-        if state in ARM_MODES:
-            state = "armed"
-
-        for automation_id, config in self._config.items():
-            if not config[ATTR_ENABLED]:
-                continue
-            elif (
-                len(config[ATTR_MODES]) and self.alarm_entity._arm_mode
-                and self.alarm_entity._arm_mode not in config[ATTR_MODES]
-            ):
-                continue
+            if area_id:
+                alarm_entity = self.hass.data[const.DOMAIN]["areas"][area_id]
             else:
-                for trigger in config[ATTR_TRIGGERS]:
-                    if ATTR_STATE in trigger and trigger[ATTR_STATE] == state:
-                        await self.async_execute_automation(automation_id)
+                alarm_entity = self.hass.data[const.DOMAIN]["master"]
 
-    @callback
-    async def async_handle_event(self, event=None):
-        _LOGGER.debug("event {} has occured".format(event))
+            _LOGGER.debug("state of {} is updated from {} to {}".format(alarm_entity.entity_id, old_state, new_state))
 
-        for automation_id, config in self._config.items():
-            if not config[ATTR_ENABLED]:
-                continue
-            elif (
-                len(config[ATTR_MODES]) and self.alarm_entity._arm_mode
-                and self.alarm_entity._arm_mode not in config[ATTR_MODES]
-            ):
-                continue
+            if new_state in const.ARM_MODES:
+                # we don't distinguish between armed modes for automations, they are handled separately
+                new_state = "armed"
+
+            for automation_id, config in self._config.items():
+                if (
+                    not config[const.ATTR_ENABLED]
+                    or config[const.ATTR_AREA] != area_id
+                ):
+                    continue
+                elif (
+                    len(config[const.ATTR_MODES]) and alarm_entity.arm_mode
+                    and alarm_entity.arm_mode not in config[const.ATTR_MODES]
+                ):
+                    continue
+                else:
+                    for trigger in config[const.ATTR_TRIGGERS]:
+                        if ATTR_STATE in trigger and trigger[ATTR_STATE] == new_state:
+                            await self.async_execute_automation(automation_id, alarm_entity)
+
+        async_dispatcher_connect(self.hass, "alarmo_state_updated", async_alarm_state_changed)
+
+        @callback
+        async def async_failed_to_arm(area_id: str):
+            if area_id:
+                alarm_entity = self.hass.data[const.DOMAIN]["areas"][area_id]
             else:
-                for trigger in config[ATTR_TRIGGERS]:
-                    if ATTR_EVENT in trigger and trigger[ATTR_EVENT] == event:
-                        await self.async_execute_automation(automation_id)
+                alarm_entity = self.hass.data[const.DOMAIN]["master"]
 
-    async def async_execute_automation(self, automation_id):
+            _LOGGER.debug("{} has failed to arm".format(alarm_entity.entity_id))
+
+            for automation_id, config in self._config.items():
+                if not config[const.ATTR_ENABLED]:
+                    continue
+                elif (
+                    len(config[const.ATTR_MODES]) and alarm_entity.arm_mode
+                    and alarm_entity.arm_mode not in config[const.ATTR_MODES]
+                ):
+                    continue
+                else:
+                    for trigger in config[const.ATTR_TRIGGERS]:
+                        if const.ATTR_EVENT in trigger and trigger[const.ATTR_EVENT] == EVENT_ARM_FAILURE:
+                            await self.async_execute_automation(automation_id, alarm_entity)
+
+        async_dispatcher_connect(self.hass, "alarmo_failed_to_arm", async_failed_to_arm)
+
+    async def async_execute_automation(self, automation_id: str, alarm_entity: AlarmoBaseEntity):
+        # automation is a dict of AutomationEntry
         _LOGGER.debug("executing automation {}".format(automation_id))
 
-        actions = self._config[automation_id][ATTR_ACTIONS]
+        actions = self._config[automation_id][const.ATTR_ACTIONS]
         for action in actions:
 
             service_call = {
@@ -104,16 +115,16 @@ class AutomationHandler:
                 service_call["entity_id"] = action[ATTR_ENTITY_ID]
 
             if (
-                ATTR_IS_NOTIFICATION in self._config[automation_id]
-                and self._config[automation_id][ATTR_IS_NOTIFICATION]
+                const.ATTR_IS_NOTIFICATION in self._config[automation_id]
+                and self._config[automation_id][const.ATTR_IS_NOTIFICATION]
                 and ATTR_MESSAGE in action[ATTR_SERVICE_DATA]
             ):
                 data = copy.copy(action[ATTR_SERVICE_DATA])
                 if "{{open_sensors}}" in data[ATTR_MESSAGE]:
                     open_sensors = ""
-                    if self.alarm_entity.sensors.open_sensors:
+                    if alarm_entity.open_sensors:
                         parts = []
-                        for (entity_id, status) in self.alarm_entity.sensors.open_sensors.items():
+                        for (entity_id, status) in alarm_entity.open_sensors.items():
                             name = self.get_friendly_name_for_sensor(entity_id)
                             parts.append("{} is {}".format(name, status))
                         open_sensors = ", ".join(parts)
@@ -122,9 +133,9 @@ class AutomationHandler:
 
                 if "{{bypassed_sensors}}" in data[ATTR_MESSAGE]:
                     bypassed_sensors = ""
-                    if self.alarm_entity.sensors.bypassed_sensors and len(self.alarm_entity.sensors.bypassed_sensors):
+                    if alarm_entity.bypassed_sensors and len(alarm_entity.bypassed_sensors):
                         parts = []
-                        for entity_id in self.alarm_entity.sensors.bypassed_sensors:
+                        for entity_id in alarm_entity.sensors.bypassed_sensors:
                             name = self.get_friendly_name_for_sensor(entity_id)
                             parts.append(name)
                         bypassed_sensors = ", ".join(parts)
@@ -132,11 +143,12 @@ class AutomationHandler:
                     data[ATTR_MESSAGE] = data[ATTR_MESSAGE].replace("{{bypassed_sensors}}", bypassed_sensors)
 
                 if "{{arm_mode}}" in data[ATTR_MESSAGE]:
-                    arm_mode = self.alarm_entity.arm_mode if self.alarm_entity.arm_mode else ""
+                    _LOGGER.debug(alarm_entity.arm_mode)
+                    arm_mode = alarm_entity.arm_mode if alarm_entity.arm_mode else ""
                     data[ATTR_MESSAGE] = data[ATTR_MESSAGE].replace("{{arm_mode}}", arm_mode)
 
                 if "{{changed_by}}" in data[ATTR_MESSAGE]:
-                    changed_by = self.alarm_entity.changed_by if self.alarm_entity.changed_by else ""
+                    changed_by = alarm_entity.changed_by if alarm_entity.changed_by else ""
                     data[ATTR_MESSAGE] = data[ATTR_MESSAGE].replace("{{changed_by}}", changed_by)
 
                 service_call["data"] = data
@@ -151,7 +163,7 @@ class AutomationHandler:
 
     def get_friendly_name_for_sensor(self, entity_id):
         state = self.hass.states.get(entity_id)
-        sensor_config = self.coordinator.store.async_get_sensors()
+        sensor_config = self.hass.data[const.DOMAIN]["coordinator"].store.async_get_sensors()
 
         if entity_id in sensor_config and sensor_config[entity_id][ATTR_NAME]:
             name = sensor_config[entity_id][ATTR_NAME]

@@ -1,4 +1,5 @@
 import { HassEntity, HassEntityAttributeBase } from 'home-assistant-js-websocket';
+import { ESensorTypes } from './const';
 
 export interface Dictionary<TValue> {
   [id: string]: TValue;
@@ -29,8 +30,9 @@ export enum EArmModes {
 
 export type AlarmoModeConfig = {
   enabled: boolean,
-  leave_time: number,
+  exit_time: number,
   entry_time: number,
+  trigger_time: number,
 }
 
 
@@ -38,23 +40,23 @@ export type AlarmoConfig = {
   code_arm_required: boolean,
   code_disarm_required: boolean,
   code_format: 'number' | 'text',
-  trigger_time: number,
   disarm_after_trigger: boolean,
-  modes: Record<EArmModes, AlarmoModeConfig>,
   mqtt: MqttConfig,
-  version: string
+  master: MasterConfig,
 }
 
 export type AlarmoSensor = {
   entity_id: string,
   name?: string,
-  type: ESensorType,
+  type: ESensorTypes,
   modes: EArmModes[]
   immediate: boolean,
   arm_on_close: boolean,
   allow_open: boolean,
   always_on: boolean,
   trigger_unavailable: boolean,
+  area?: string,
+  enabled: boolean,
 }
 
 export type AlarmoUser = {
@@ -106,6 +108,7 @@ export interface AlarmoAutomation {
   enabled?: boolean,
   modes?: EArmModes[],
   is_notification?: boolean,
+  area?: string,
 }
 
 
@@ -115,7 +118,8 @@ export interface AlarmoNotification extends AlarmoAutomation {
   triggers: Trigger[],
   actions: NotificationAction[],
   enabled?: boolean,
-  modes?: EArmModes[]
+  modes?: EArmModes[],
+  area?: string,
 }
 
 export type MqttConfig = {
@@ -127,11 +131,14 @@ export type MqttConfig = {
   require_code: boolean,
 }
 
-export enum ESensorType {
-  Door = "door",
-  Window = "window",
-  Motion = "motion",
-  Tamper = "tamper",
-  Environmental = "environmental",
-  Other = "other"
+export type MasterConfig = {
+  enabled: boolean,
+  name: string,
+}
+
+export type AlarmoArea = {
+  area_id: string,
+  name: string,
+  enabled: boolean,
+  modes: Record<EArmModes, AlarmoModeConfig>,
 }

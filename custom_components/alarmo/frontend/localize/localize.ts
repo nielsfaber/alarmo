@@ -8,7 +8,7 @@ var languages: any = {
   nl: nl,
 };
 
-export function localize(string: string, language: string, search: string = '', replace: string = '') {
+export function localize(string: string, language: string, search: string | string[] = '', replace: string | string[] = '') {
 
   const lang = language.replace(/['"]+/g, '').replace('-', '_');
 
@@ -22,8 +22,13 @@ export function localize(string: string, language: string, search: string = '', 
 
   if (translated === undefined) translated = string.split('.').reduce((o, i) => o[i], languages['en']);
 
+
   if (search !== '' && replace !== '') {
-    translated = translated.replace(search, replace);
+    if (!Array.isArray(search)) search = [search];
+    if (!Array.isArray(replace)) replace = [replace];
+    for (let i = 0; i < search.length; i++) {
+      translated = translated.replace(search[i], replace[i]);
+    }
   }
   return translated;
 }

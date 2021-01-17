@@ -5,10 +5,11 @@ import { localize } from '../../localize/localize';
 
 import '../components/alarmo-multi-select';
 import '../components/alarmo-multi-entity-select';
+import '../components/alarmo-select';
 
 import { triggerOptions, defaultAutomationData, ActionDomains, validateData } from '../data/actions';
-import { AlarmoAutomation, AlarmoConfig, EAlarmStates, EArmModes, Action } from '../types';
-import { fetchAutomations, deleteAutomation, saveAutomation, fetchConfig } from '../data/websockets';
+import { AlarmoAutomation, EAlarmStates, EArmModes, Action, AlarmoArea, Dictionary } from '../types';
+import { fetchAutomations, deleteAutomation, saveAutomation, fetchAreas } from '../data/websockets';
 import { handleError, omit, Unique, showErrorDialog } from '../helpers';
 
 @customElement('automation-editor-card')
@@ -23,10 +24,12 @@ export class AutomationEditorCard extends LitElement {
   @property() namePlaceholder = "";
 
   yamlCode?: Object;
-  config?: AlarmoConfig;
+  @property() areas: Dictionary<AlarmoArea> = {};
 
   async firstUpdated() {
-    this.config = await fetchConfig(this.hass);
+    const areas = await fetchAreas(this.hass);
+    this.areas = areas;
+
     const automations = await fetchAutomations(this.hass);
 
     if (this.item) {
@@ -42,6 +45,7 @@ export class AutomationEditorCard extends LitElement {
         name = `${name} ${i}`;
       }
       this.namePlaceholder = name;
+      if (!this.data.area && Object.keys(areas).length == 1) this.data = { ...this.data, area: Object.keys(this.areas)[0] };
     }
   }
 
@@ -91,13 +95,34 @@ export class AutomationEditorCard extends LitElement {
     <span slot="heading">${localize("panels.actions.cards.new_action.fields.event.heading", this.hass.language)}</span>
     <span slot="description">${localize("panels.actions.cards.new_action.fields.event.description", this.hass.language)}</span>
 
-    <alarmo-multi-select
+    <alarmo-select
+      .hass=${this.hass}
+      .items=${triggerOptions(this.hass)}
       label=${localize("panels.actions.cards.new_action.fields.event.heading", this.hass.language)}
-      .options=${Object.values(triggerOptions(this.hass))}
-      .value=${this.data.triggers.map(trigger => triggerOptions(this.hass).find(e => JSON.stringify(e.trigger) == JSON.stringify(trigger))!.value)}
-      @change=${(ev: Event) => this.updateTriggers((ev.target as HTMLInputElement).value as unknown as string[])}
-    </alarmo-multi-select>
+      icons=${true}
+      .value=${this.data.triggers.map(trigger => triggerOptions(this.hass).find(e => JSON.stringify(e.trigger) == JSON.stringify(trigger))!.value)[0]}
+      @value-changed=${(ev: Event) => this.updateTriggers((ev.target as HTMLInputElement).value)}
+    >
+    </alarmo-select>
+
   </settings-row>
+
+  ${this.areas && Object.keys(this.areas).length > 1
+            ? html`
+  <settings-row .narrow=${this.narrow}>
+    <span slot="heading">${localize("panels.actions.cards.new_action.fields.area.heading", this.hass.language)}</span>
+    <span slot="description">${localize("panels.actions.cards.new_action.fields.area.description", this.hass.language)}</span>
+
+    <alarmo-select
+      .items=${Object.values(this.areas).map(e => Object({ value: e.area_id, name: e.name }))}
+      value=${this.data.area || ""}
+      clearable=${true}
+      label=${localize("panels.sensors.cards.editor.fields.area.heading", this.hass.language)}
+      @value-changed=${(ev: Event) => this.data = { ...this.data!, area: (ev.target as HTMLInputElement).value }}
+    </alarmo-select>
+  </settings-row>`
+            : ''
+          }
 
   <div class="separator"></div>
 
@@ -146,7 +171,7 @@ export class AutomationEditorCard extends LitElement {
     </div>
   </settings-row>
 
-  <settings-row .narrow=${this.narrow}>
+  <settings-row .narrow=${this.narrow} .large=${true}>
     <span slot="heading">${localize("panels.actions.cards.new_action.fields.name.heading", this.hass.language)}</span>
     <span slot="description">${localize("panels.actions.cards.new_action.fields.name.description", this.hass.language)}</span>
 
@@ -187,15 +212,26 @@ export class AutomationEditorCard extends LitElement {
   }
 
   private getModeList() {
-    return Object.keys(this.config!.modes)
-      .filter(e => this.config!.modes[e].enabled)
-      .map(e => Object({ name: localize(`common.modes_long.${e}`, this.hass.language), value: e }));
+    const modes = this.data?.area
+      ? Object.entries(this.areas[this.data.area].modes)
+        .filter(([, v]) => v.enabled)
+        .map(([k]) => k as EArmModes)
+      : Object.values(this.areas)
+        .map(e => Object.entries(e.modes)
+          .filter(([, v]) => v.enabled)
+          .map(([k]) => k as EArmModes)
+        )
+        .reduce((a, b) => a.filter(i => b.includes(i)));
+
+    return modes.map(e => Object({ name: localize(`common.modes_long.${e}`, this.hass.language), value: e }));
   }
 
-  private updateTriggers(value: string[]) {
+  private updateTriggers(value: string) {
     this.data = {
       ...this.data!,
-      triggers: value.map(val => triggerOptions(this.hass).find(e => e.value == val)!.trigger)
+      triggers: [
+        triggerOptions(this.hass).find(e => e.value == value)!.trigger
+      ]
     };
   }
 

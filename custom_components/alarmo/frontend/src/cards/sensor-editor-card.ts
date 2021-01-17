@@ -1,15 +1,16 @@
 import { LitElement, html, customElement, property } from 'lit-element';
 import { HomeAssistant, navigate } from 'custom-card-helpers';
 import { commonStyle } from '../styles';
-import { AlarmoSensor, AlarmoConfig, EArmModes, ESensorType } from '../types';
-import { fetchConfig, fetchSensors, saveSensor, deleteSensor } from '../data/websockets';
+import { AlarmoSensor, EArmModes, Dictionary, AlarmoArea } from '../types';
+import { fetchSensors, saveSensor, deleteSensor, fetchAreas } from '../data/websockets';
 import { localize } from '../../localize/localize';
-import { Unique, Without, handleError } from '../helpers';
+import { Unique, Without, handleError, showErrorDialog } from '../helpers';
 
 import '../dialogs/error-dialog';
 import '../components/alarmo-select';
 import { HassEntity } from 'home-assistant-js-websocket';
 import { sensorConfigByType } from '../data/sensors';
+import { EArmModeIcons, ESensorTypes, ESensorIcons } from '../const';
 
 @customElement('sensor-editor-card')
 export class sensorEditorCard extends LitElement {
@@ -19,14 +20,15 @@ export class sensorEditorCard extends LitElement {
   @property() item!: string;
   @property() data!: AlarmoSensor;
 
-  config?: AlarmoConfig;
+  areas!: Dictionary<AlarmoArea>;
 
   async firstUpdated() {
 
-    const config = await fetchConfig(this.hass);
-    this.config = config;
+    const areas = await fetchAreas(this.hass);
+    this.areas = areas;
     const sensors = await fetchSensors(this.hass);
     this.data = sensors[this.item];
+    if (!this.data.area && Object.keys(areas).length == 1) this.data = { ...this.data, area: Object.keys(this.areas)[0] };
   }
 
   render() {
@@ -63,6 +65,21 @@ export class sensorEditorCard extends LitElement {
 
         </settings-row>
 
+        ${Object.keys(this.areas).length > 1
+        ? html`
+        <settings-row .narrow=${this.narrow}>
+          <span slot="heading">${localize("panels.sensors.cards.editor.fields.area.heading", this.hass.language)}</span>
+          <span slot="description">${localize("panels.sensors.cards.editor.fields.area.description", this.hass.language)}</span>
+
+          <alarmo-select
+            .items=${Object.values(this.areas).map(e => Object({ value: e.area_id, name: e.name }))}
+            value=${this.data.area}
+            label=${localize("panels.sensors.cards.editor.fields.area.heading", this.hass.language)}
+            @value-changed=${(ev: Event) => this.data = { ...this.data, area: (ev.target as HTMLInputElement).value }}
+          </alarmo-select>
+        </settings-row>`
+        : ''
+      }
         
         <settings-row .narrow=${this.narrow}  .large=${true}>
           <span slot="heading">${localize("panels.sensors.cards.editor.fields.device_type.heading", this.hass.language)}</span>
@@ -70,41 +87,19 @@ export class sensorEditorCard extends LitElement {
 
           <alarmo-select
             .hass=${this.hass}
-            .items=${[
-        {
-          value: "door",
-          name: localize("panels.sensors.cards.editor.fields.device_type.choose.door.name", this.hass.language),
-          description: localize("panels.sensors.cards.editor.fields.device_type.choose.door.description", this.hass.language),
-          icon: "hass:door-closed"
-        },
-        {
-          value: "window",
-          name: localize("panels.sensors.cards.editor.fields.device_type.choose.window.name", this.hass.language),
-          description: localize("panels.sensors.cards.editor.fields.device_type.choose.window.description", this.hass.language),
-          icon: "hass:window-closed"
-        },
-        {
-          value: "motion",
-          name: localize("panels.sensors.cards.editor.fields.device_type.choose.motion.name", this.hass.language),
-          description: localize("panels.sensors.cards.editor.fields.device_type.choose.motion.description", this.hass.language),
-          icon: "hass:motion-sensor"
-        },
-        {
-          value: "tamper",
-          name: localize("panels.sensors.cards.editor.fields.device_type.choose.tamper.name", this.hass.language),
-          description: localize("panels.sensors.cards.editor.fields.device_type.choose.tamper.description", this.hass.language),
-          icon: "hass:vibrate"
-        },
-        {
-          value: "environmental",
-          name: localize("panels.sensors.cards.editor.fields.device_type.choose.environmental.name", this.hass.language),
-          description: localize("panels.sensors.cards.editor.fields.device_type.choose.environmental.description", this.hass.language),
-          icon: "hass:fire"
-        }
-      ]}
+            .items=${Object.entries(ESensorTypes)
+        .filter(([, e]) => e != ESensorTypes.Other)
+        .map(([k, v]) => Object({
+          value: v,
+          name: localize(`panels.sensors.cards.editor.fields.device_type.choose.${v}.name`, this.hass.language),
+          description: localize(`panels.sensors.cards.editor.fields.device_type.choose.${v}.description`, this.hass.language),
+          icon: ESensorIcons[k]
+        }))}
             label=${localize("panels.sensors.cards.editor.fields.device_type.heading", this.hass.language)}
+            clearable=${true}
+            icons=${true}
             value=${this.data["type"]}
-            @value-changed=${(ev: Event) => this.setType(((ev.target as HTMLInputElement).value || ESensorType.Other) as ESensorType)}
+            @value-changed=${(ev: Event) => this.setType(((ev.target as HTMLInputElement).value || ESensorTypes.Other) as ESensorTypes)}
           >
           </alarmo-select>
         </settings-row>
@@ -113,32 +108,33 @@ export class sensorEditorCard extends LitElement {
           <span slot="heading">${localize("panels.sensors.cards.editor.fields.modes.heading", this.hass.language)}</span>
           <span slot="description">${localize("panels.sensors.cards.editor.fields.modes.description", this.hass.language)}</span>
           
-          <div style="display: flex; flex-direction: column; padding: 10px 0px">
-          ${Object.values(EArmModes).filter(e => Object.keys(this.config!.modes).includes(e) && this.config!.modes[e].enabled).map(e =>
-        html`
-            <mwc-button
-              class="${this.data.modes.includes(e) ? "success" : "warning"}"
-              @click=${() => {
+          <div>
+            ${this.modesByArea(this.data.area)
+        .map(el => html`
+              <mwc-button
+                class="${this.data.modes.includes(el) ? "active" : ""}"
+                @click=${() => {
             this.data = {
               ...this.data,
-              modes: this.data.modes.includes(e)
-                ? Without(this.data.modes, e)
-                : Unique(this.data.modes.concat([e]))
+              modes: this.data.modes.includes(el)
+                ? Without(this.data.modes, el)
+                : Unique(this.data.modes.concat([el]))
             };
           }}
-            >
-              <ha-icon icon="${this.data.modes.includes(e) ? "hass:check" : "hass:close"}"></ha-icon>
-              ${localize(`common.modes_long.${e}`, this.hass.language)}
-            </mwc-button>
-          `)}
+              >
+                <ha-icon icon="${EArmModeIcons[Object.entries(EArmModes).find(([, v]) => v == el)![0]]}"></ha-icon>
+                ${localize(`common.modes_short.${el}`, this.hass.language)}
+              </mwc-button>
+              `)}
           </div>
+
         </settings-row>
 
         <collapsible-section
            .narrow=${this.narrow}
           header=${localize("panels.sensors.cards.editor.actions.toggle_advanced", this.hass.language)}
         >
-      ${!this.data.type || [ESensorType.Environmental, ESensorType.Other].includes(this.data.type)
+      ${!this.data.type || [ESensorTypes.Environmental, ESensorTypes.Other].includes(this.data.type)
         ? html`
           <settings-row .narrow=${this.narrow}>
             <span slot="heading">${localize("panels.sensors.cards.editor.fields.always_on.heading", this.hass.language)}</span>
@@ -155,7 +151,7 @@ export class sensorEditorCard extends LitElement {
           </settings-row>
           ` : ''}
   
-      ${!this.data.type || [ESensorType.Door, ESensorType.Other].includes(this.data.type)
+      ${!this.data.type || [ESensorTypes.Door, ESensorTypes.Other].includes(this.data.type)
         ? html`
           <settings-row .narrow=${this.narrow}>
             <span slot="heading">${localize("panels.sensors.cards.editor.fields.arm_on_close.heading", this.hass.language)}</span>
@@ -173,7 +169,7 @@ export class sensorEditorCard extends LitElement {
           </settings-row>
           ` : ''}
 
-      ${!this.data.type || [ESensorType.Window, ESensorType.Door, ESensorType.Motion, ESensorType.Tamper, ESensorType.Other].includes(this.data.type)
+      ${!this.data.type || [ESensorTypes.Window, ESensorTypes.Door, ESensorTypes.Motion, ESensorTypes.Tamper, ESensorTypes.Other].includes(this.data.type)
         ? html`
           <settings-row .narrow=${this.narrow}>
             <span slot="heading">${localize("panels.sensors.cards.editor.fields.immediate.heading", this.hass.language)}</span>
@@ -191,7 +187,7 @@ export class sensorEditorCard extends LitElement {
           </settings-row>
           ` : ''}
         
-      ${!this.data.type || [ESensorType.Motion, ESensorType.Other].includes(this.data.type)
+      ${!this.data.type || [ESensorTypes.Motion, ESensorTypes.Other].includes(this.data.type)
         ? html`
           <settings-row .narrow=${this.narrow}>
             <span slot="heading">${localize("panels.sensors.cards.editor.fields.allow_open.heading", this.hass.language)}</span>
@@ -234,15 +230,33 @@ export class sensorEditorCard extends LitElement {
               class="warning"
               @click=${this.deleteClick}
             >
-              ${this.hass.localize("ui.common.delete")}
+              ${localize("panels.sensors.cards.editor.actions.remove", this.hass.language)}
             </mwc-button>
           </div>
         </ha-card>
     `;
   }
 
-  private setType(type: ESensorType) {
-    const settings = type != ESensorType.Other ? sensorConfigByType(this.config!)[type] : {};
+  private modesByArea(area_id?: string): EArmModes[] {
+    const modesPerArea: Dictionary<EArmModes[]> = Object.keys(this.areas)
+      .reduce((obj, e) => Object.assign(obj, {
+        [e]:
+          Object.entries(this.areas[e].modes)
+            .filter(([, v]) => v.enabled)
+            .map(([k]) => k)
+      }), {});
+
+    return area_id
+      ? modesPerArea[area_id]
+      : Object.values(modesPerArea).reduce((a, b) => a.filter(i => b.includes(i)));
+  }
+
+  private setType(type: ESensorTypes) {
+    const config = this.data.area
+      ? this.areas[this.data.area].modes
+      : Object.values(this.areas).map(e => e.modes)[0];
+
+    const settings = type != ESensorTypes.Other ? sensorConfigByType(this.modesByArea(this.data.area)) : {};
     this.data = {
       ...this.data,
       type: type,
@@ -258,9 +272,22 @@ export class sensorEditorCard extends LitElement {
 
 
   private saveClick(ev: Event) {
-    saveSensor(this.hass, { ...this.data })
-      .catch(e => handleError(e, ev))
-      .then(() => { this.cancelClick(); });
+    let errors: string[] = [];
+    if (!this.data.area) errors.push(localize("panels.sensors.cards.editor.errors.no_area", this.hass.language));
+    if (!this.data.modes.length && !this.data.always_on) errors.push(localize("panels.sensors.cards.editor.errors.no_modes", this.hass.language));
+    if (errors.length) {
+      showErrorDialog(ev, html`
+        ${localize("panels.sensors.cards.editor.errors.description", this.hass.language)}
+        <ul>
+          ${errors.map(e => html`<li>${e}</li>`)}
+        </ul>
+      `);
+    }
+    else {
+      saveSensor(this.hass, { ...this.data })
+        .catch(e => handleError(e, ev))
+        .then(() => { this.cancelClick(); });
+    }
   }
 
 

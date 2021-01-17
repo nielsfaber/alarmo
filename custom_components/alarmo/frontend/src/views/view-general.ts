@@ -1,16 +1,19 @@
 import { LitElement, html, customElement, property } from 'lit-element';
-import { HomeAssistant, navigate } from 'custom-card-helpers';
+import { HomeAssistant, navigate, fireEvent } from 'custom-card-helpers';
 import { loadHaForm } from '../load-ha-form';
-import { AlarmoConfig, EArmModes } from '../types';
+import { AlarmoConfig, Dictionary, AlarmoArea, AlarmoAutomation } from '../types';
 import { commonStyle } from '../styles';
 
 import '../components/time-slider';
 import '../cards/alarm-mode-card';
 import '../components/settings-row.ts';
 import '../cards/mqtt-config-card.ts';
+import '../cards/area-config-card.ts';
+import '../dialogs/edit-master-dialog.ts';
+import '../dialogs/confirm-delete-dialog.ts';
 
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
-import { fetchConfig, saveConfig } from '../data/websockets';
+import { fetchConfig, saveConfig, fetchAreas, fetchAutomations } from '../data/websockets';
 import { SubscribeMixin } from '../subscribe-mixin';
 import { localize } from '../../localize/localize';
 import { pick, handleError } from '../helpers';
@@ -24,8 +27,8 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
   @property() data?: Partial<AlarmoConfig>;
 
   @property() config?: AlarmoConfig;
-  @property() trigger_time = 0;
-  @property() disarm_after_trigger = false;
+  @property() areas: Dictionary<AlarmoArea> = {};
+  @property() automations: Dictionary<AlarmoAutomation> = {};
 
   public hassSubscribe(): Promise<UnsubscribeFunc>[] {
     this._fetchData();
@@ -41,11 +44,10 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
     if (!this.hass) {
       return;
     }
-    const config = await fetchConfig(this.hass);
-    this.config = config;
-    this.data = pick(this.config, ['trigger_time', 'disarm_after_trigger', 'mqtt']);
-    this.trigger_time = config.trigger_time;
-    this.disarm_after_trigger = config.disarm_after_trigger;
+    this.config = await fetchConfig(this.hass);
+    this.areas = await fetchAreas(this.hass);
+    this.automations = await fetchAutomations(this.hass);
+    this.data = pick(this.config, ['trigger_time', 'disarm_after_trigger', 'mqtt', 'master']);
   }
 
   firstUpdated() {
@@ -64,28 +66,24 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
       </mqtt-config-card>
     `;
     }
+    if (this.path && this.path[0] == "edit_area" && this.path.length == 2) {
+      return html`
+      <area-editor-card
+        .hass=${this.hass}
+        .narrow=${this.narrow}
+        item=${this.path[1]}
+      >
+      </area-editor-card>
+      `;
+    }
     else {
-
       return html`
       <ha-card header="${localize("panels.general.cards.general.title", this.hass.language)}">
+
+
         <div class="card-content">
           ${localize("panels.general.cards.general.description", this.hass.language)}
         </div>
-
-        <settings-row .narrow=${this.narrow}>
-          <span slot="heading">${localize("panels.general.cards.general.fields.trigger_time.heading", this.hass.language)}</span>
-          <span slot="description">${localize("panels.general.cards.general.fields.trigger_time.description", this.hass.language)}</span>
-          <time-slider
-            .hass=${this.hass}
-            unit="min"
-            max="3600"
-            zeroValue=${localize("components.time_slider.infinite", this.hass.language)}
-            value=${Math.round(this.data!.trigger_time!)}
-            @change=${(ev: Event) => this.data = { ...this.data, trigger_time: Number((ev.target as HTMLInputElement).value) }}
-        }}
-          >
-          </time-slider>
-        </settings-row>
 
         <settings-row .narrow=${this.narrow}>
           <span slot="heading">${localize("panels.general.cards.general.fields.disarm_after_trigger.heading", this.hass.language)}</span>
@@ -124,6 +122,33 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
           ''
         }
 
+        <settings-row .narrow=${this.narrow}>
+          <span slot="heading">${localize("panels.general.cards.general.fields.enable_master.heading", this.hass.language)}</span>
+          <span slot="description">${localize("panels.general.cards.general.fields.enable_master.description", this.hass.language)}</span>
+          <ha-switch
+            ?checked=${this.data?.master?.enabled && Object.keys(this.areas).length >= 2}
+            ?disabled=${Object.keys(this.areas).length < 2}
+            @change=${this.toggleEnableMaster}
+          >
+          </ha-switch>
+        </settings-row>
+
+        ${this.data?.master?.enabled && Object.keys(this.areas).length >= 2
+          ?
+          html`
+        <div style="padding: 0px 0px 16px 16px">
+          <mwc-button
+            outlined
+            @click=${this.setupMasterClick}
+          >
+            ${localize("panels.general.cards.general.actions.setup_master", this.hass.language)}
+          </mwc-button>
+        </div>
+        `
+          :
+          ''
+        }
+
         <div class="card-actions">
           <mwc-button @click=${this.saveClick}>
             ${this.hass.localize("ui.common.save")}
@@ -133,45 +158,61 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
 
       <alarm-mode-card
         .hass=${this.hass}
-        mode=${EArmModes.ArmedAway}
-        .config=${this.config.modes[EArmModes.ArmedAway]}
         .narrow=${this.narrow}
       >
-        <span slot="heading">${localize("common.modes_long.armed_away", this.hass.language)}</span>
-        <span slot="description">${localize("panels.general.cards.armed_away.description", this.hass.language)}</slot>
       </alarm-mode-card>
 
-      <alarm-mode-card
+      <area-config-card
         .hass=${this.hass}
-        mode=${EArmModes.ArmedNight}
-        .config=${this.config.modes[EArmModes.ArmedNight]}
         .narrow=${this.narrow}
       >
-        <span slot="heading">${localize("common.modes_long.armed_night", this.hass.language)}</span>
-        <span slot="description">${localize("panels.general.cards.armed_night.description", this.hass.language)}</slot>
-      </alarm-mode-card>
-
-      <alarm-mode-card
-        .hass=${this.hass}
-        mode=${EArmModes.ArmedHome}
-        .config=${this.config.modes[EArmModes.ArmedHome]}
-        .narrow=${this.narrow}
-      >
-        <span slot="heading">${localize("common.modes_long.armed_home", this.hass.language)}</span>
-        <span slot="description">${localize("panels.general.cards.armed_home.description", this.hass.language)}</slot>
-      </alarm-mode-card>
-
-      <alarm-mode-card
-        .hass=${this.hass}
-        mode=${EArmModes.ArmedCustom}
-        .config=${this.config.modes[EArmModes.ArmedCustom]}
-        .narrow=${this.narrow}
-      >
-        <span slot="heading">${localize("common.modes_long.armed_custom_bypass", this.hass.language)}</span>
-        <span slot="description">${localize("panels.general.cards.armed_custom.description", this.hass.language)}</slot>
-      </alarm-mode-card>
+      </area-config-card>
     `;
     }
+  }
+
+  setupMasterClick(ev: Event) {
+    const element = ev.target as HTMLElement;
+    fireEvent(element, 'show-dialog', {
+      dialogTag: 'edit-master-dialog',
+      dialogImport: () => import('../dialogs/edit-master-dialog'),
+      dialogParams: {},
+    });
+  }
+
+
+  private async toggleEnableMaster(ev: Event) {
+    const target = (ev.target as HTMLInputElement);
+    let enabled = target.checked;
+    if(!enabled) {
+      const automations = Object.values(this.automations).filter(e => !e.area).length;
+      if (automations) {
+        const result = await new Promise((resolve) => {
+          fireEvent(target, 'show-dialog', {
+            dialogTag: 'confirm-delete-dialog',
+            dialogImport: () => import('../dialogs/confirm-delete-dialog'),
+            dialogParams: {
+              title: localize("panels.general.dialogs.disable_master.title", this.hass!.language),
+              description: localize("panels.general.dialogs.disable_master.description", this.hass!.language, ["{automations}"], [String(automations)]),
+              cancel: () => resolve(false),
+              confirm: () => resolve(true)
+            }
+          });
+        });
+        if(!result) {
+          enabled = true;
+          target.checked = true;
+        }
+      }
+    }
+ 
+    this.data = {
+      ...this.data!,
+      master: {
+        ...this.data!.master!,
+        enabled: enabled
+      }
+    };
   }
 
   saveClick(ev: Event) {
