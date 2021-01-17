@@ -4,6 +4,7 @@ import { commonStyle } from '../styles';
 import { localize } from '../../localize/localize';
 
 import '../components/alarmo-multi-select';
+import '../components/alarmo-select';
 
 
 import { triggerOptions, targetOptions, defaultNotificationData, messagePlaceHolder, validateData } from '../data/actions';

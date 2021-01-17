@@ -256,7 +256,8 @@ export class sensorEditorCard extends LitElement {
       ? this.areas[this.data.area].modes
       : Object.values(this.areas).map(e => e.modes)[0];
 
-    const settings = type != ESensorTypes.Other ? sensorConfigByType(this.modesByArea(this.data.area)) : {};
+    const settings = type != ESensorTypes.Other ? sensorConfigByType(this.modesByArea(this.data.area))[type] : {};
+
     this.data = {
       ...this.data,
       type: type,

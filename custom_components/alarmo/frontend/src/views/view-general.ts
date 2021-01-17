@@ -122,6 +122,8 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
           ''
         }
 
+        ${Object.keys(this.areas).length >= 2
+          ? html`
         <settings-row .narrow=${this.narrow}>
           <span slot="heading">${localize("panels.general.cards.general.fields.enable_master.heading", this.hass.language)}</span>
           <span slot="description">${localize("panels.general.cards.general.fields.enable_master.description", this.hass.language)}</span>
@@ -132,6 +134,8 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
           >
           </ha-switch>
         </settings-row>
+        ` : ''
+        }
 
         ${this.data?.master?.enabled && Object.keys(this.areas).length >= 2
           ?
@@ -144,9 +148,7 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
             ${localize("panels.general.cards.general.actions.setup_master", this.hass.language)}
           </mwc-button>
         </div>
-        `
-          :
-          ''
+        ` : ''
         }
 
         <div class="card-actions">
@@ -184,7 +186,7 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
   private async toggleEnableMaster(ev: Event) {
     const target = (ev.target as HTMLInputElement);
     let enabled = target.checked;
-    if(!enabled) {
+    if (!enabled) {
       const automations = Object.values(this.automations).filter(e => !e.area).length;
       if (automations) {
         const result = await new Promise((resolve) => {
@@ -199,13 +201,13 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
             }
           });
         });
-        if(!result) {
+        if (!result) {
           enabled = true;
           target.checked = true;
         }
       }
     }
- 
+
     this.data = {
       ...this.data!,
       master: {

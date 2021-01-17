@@ -97,13 +97,14 @@ export class AlarmViewSensors extends SubscribeMixin(LitElement) {
       },
       name: {
         title: this.hass.localize("ui.components.entity.entity-picker.entity"),
-        width: "80%",
+        width: "60%",
         grow: true,
         text: true
       },
       modes: {
         title: localize("panels.sensors.cards.sensors.table.arm_modes", this.hass.language),
         width: "25%",
+        hide: this.narrow,
         text: true
       },
       enabled: {
@@ -283,7 +284,11 @@ export class AlarmViewSensors extends SubscribeMixin(LitElement) {
 
     const data = this.addSelection
       .map(e => defaultSensorConfig(this.hass!.states[e], modeList))
-      .map(e => Object.keys(this.areas).length == 1 ? Object.assign(e, Object.keys(this.areas)[0]) : e)
+      .map(e => Object.keys(this.areas).length == 1
+        ? Object.assign(e, {
+          "area": Object.keys(this.areas)[0]
+        })
+        : e)
       .filter(e => e) as AlarmoSensor[];
 
     data.forEach(el => {
