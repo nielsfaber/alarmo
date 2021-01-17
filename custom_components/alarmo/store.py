@@ -6,7 +6,7 @@ from typing import MutableMapping, cast
 from homeassistant.loader import bind_hass
 from homeassistant.core import callback
 from homeassistant.helpers.typing import HomeAssistantType
-
+from homeassistant.helpers.storage import Store
 
 from homeassistant.const import (
     STATE_ALARM_ARMED_AWAY,
@@ -14,7 +14,6 @@ from homeassistant.const import (
     STATE_ALARM_ARMED_NIGHT,
     STATE_ALARM_ARMED_CUSTOM_BYPASS,
 )
-
 
 from homeassistant.components.alarm_control_panel import (
     FORMAT_NUMBER as CODE_FORMAT_NUMBER,
@@ -32,7 +31,7 @@ _LOGGER = logging.getLogger(__name__)
 
 DATA_REGISTRY = f"{DOMAIN}_storage"
 STORAGE_KEY = f"{DOMAIN}.storage"
-STORAGE_VERSION = 1
+STORAGE_VERSION = 2
 SAVE_DELAY = 10
 
 
@@ -153,6 +152,35 @@ class AutomationEntry:
     area = attr.ib(type=str, default=None)
 
 
+class MigratableStore(Store):
+    async def _async_migrate_func(self, old_version, data: dict):
+        _LOGGER.debug(data["config"])
+        if old_version == 1:
+            area_id = str(int(time.time()))
+            data["areas"] = [
+                attr.asdict(AreaEntry(**{
+                    "name": "Alarmo",
+                    "modes": {
+                        mode: attr.asdict(ModeEntry(
+                            enabled=bool(config["enabled"]),
+                            exit_time=int(config["leave_time"]),
+                            entry_time=int(config["entry_time"]),
+                            trigger_time=int(data["config"]["trigger_time"])
+                        ))
+                        for (mode, config) in data["config"]["modes"].items()
+                    }
+                }, area_id=area_id))
+            ]
+            if "sensors" in data:
+                for sensor in data["sensors"]:
+                    sensor["area"] = area_id
+            if "automations" in data:
+                for automation in data["automations"]:
+                    automation["area"] = area_id
+            _LOGGER.debug(data)
+        return data
+
+
 class AlarmoStorage:
     """Class to hold alarmo configuration data."""
 
@@ -164,7 +192,7 @@ class AlarmoStorage:
         self.sensors: MutableMapping[str, SensorEntry] = {}
         self.users: MutableMapping[str, UserEntry] = {}
         self.automations: MutableMapping[str, AutomationEntry] = {}
-        self._store = hass.helpers.storage.Store(STORAGE_VERSION, STORAGE_KEY)
+        self._store = MigratableStore(hass, STORAGE_VERSION, STORAGE_KEY)
 
     async def async_load(self) -> None:
         """Load the registry of schedule entries."""
@@ -227,6 +255,33 @@ class AlarmoStorage:
         self.sensors = sensors
         self.automations = automations
         self.users = users
+
+        if not areas:
+            self.async_create_area({
+                "name": "Alarmo",
+                "modes": {
+                    STATE_ALARM_ARMED_AWAY: attr.asdict(
+                        ModeEntry(
+                            enabled=True,
+                            exit_time=60,
+                            entry_time=60,
+                            trigger_time=1800
+                        )
+                    ),
+                    STATE_ALARM_ARMED_HOME: attr.asdict(
+                        ModeEntry(
+                            enabled=True,
+                            trigger_time=1800
+                        )
+                    ),
+                    STATE_ALARM_ARMED_NIGHT: attr.asdict(
+                        ModeEntry()
+                    ),
+                    STATE_ALARM_ARMED_CUSTOM_BYPASS: attr.asdict(
+                        ModeEntry()
+                    )
+                }
+            })
 
     @callback
     def async_schedule_save(self) -> None:
