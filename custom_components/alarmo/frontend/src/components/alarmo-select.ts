@@ -5,39 +5,7 @@ type Option = {
   name: string,
   description: string,
   value: string,
-  icon: string
-}
-
-const rowRenderer = (
-  root: HTMLElement,
-  _owner,
-  entry: { item: Option }
-) => {
-  if (!root.firstElementChild) {
-    root.innerHTML = `
-      <style>
-        paper-icon-item {
-            margin: -10px;
-            padding: 0;
-        }
-        ha-icon {
-            display: flex;
-            flex: 0 0 40px;
-            color: var(--state-icon-color);
-        }
-      </style>
-      <paper-icon-item>
-        <ha-icon icon="" slot="item-icon"></ha-icon>
-        <paper-item-body two-line>
-          <div class="name"></div>
-          <div secondary></div>
-        </paper-item-body>
-      </paper-icon-item>
-      `;
-  }
-  root.querySelector(".name")!.textContent = entry.item.name;
-  root.querySelector("[secondary]")!.textContent = entry.item.description;
-  (root.querySelector("ha-icon")! as any).icon = entry.item.icon;
+  icon?: string
 }
 
 @customElement("alarmo-select")
@@ -47,7 +15,8 @@ export class AlarmoSelect extends LitElement {
   @property() public label: string = "";
   @property() public value?: string;
   @property() items: Option[] = [];
-
+  @property() clearable: boolean = false;
+  @property() icons: boolean = false;
   @internalProperty() private _opened?: boolean;
 
   @query("vaadin-combo-box-light", true) private _comboBox!: HTMLElement;
@@ -74,7 +43,7 @@ export class AlarmoSelect extends LitElement {
         item-id-path="value"
         item-label-path="name"
         .value=${this._value}
-        .renderer=${rowRenderer}
+        .renderer=${this.rowRenderer}
         @opened-changed=${this._openedChanged}
         @value-changed=${this._valueChanged}
       >
@@ -88,11 +57,18 @@ export class AlarmoSelect extends LitElement {
         >
           ${this._value && this.items.find(e => e.value == this._value)
         ? html`
+                ${this.icons
+                ? html`
                 <ha-icon 
                   slot="prefix"
                   icon="${this.items.find(e => e.value == this._value)!.icon}"
                 >
                 </ha-icon>
+                ` : 
+                ''
+                }
+                ${this.clearable
+                  ? html`
                 <ha-icon-button
                   slot="suffix"
                   class="clear-button"
@@ -100,6 +76,9 @@ export class AlarmoSelect extends LitElement {
                   icon="hass:close"
                 >
                 </ha-icon-button>
+                ` :
+                ''
+                }
               `
         : ""}
           <ha-icon-button
@@ -113,6 +92,53 @@ export class AlarmoSelect extends LitElement {
     `;
   }
 
+  rowRenderer = (
+    root: HTMLElement,
+    _owner,
+    entry: { item: Option }
+  ) => {
+    if (!root.firstElementChild && this.icons) {
+      root.innerHTML = `
+        <style>
+          paper-icon-item {
+              margin: -10px;
+              padding: 0;
+          }
+          ha-icon {
+              display: flex;
+              flex: 0 0 40px;
+              color: var(--state-icon-color);
+          }
+        </style>
+        <paper-icon-item>
+          <ha-icon icon="" slot="item-icon"></ha-icon>
+          <paper-item-body two-line>
+            <div class="name"></div>
+            <div secondary></div>
+          </paper-item-body>
+        </paper-icon-item>
+        `;
+    } else if(!root.firstElementChild) {
+      root.innerHTML = `
+        <style>
+          paper-item {
+              margin: -10px;
+              padding: 0;
+          }
+        </style>
+        <paper-item>
+          <paper-item-body two-line>
+            <div class="name"></div>
+            <div secondary></div>
+          </paper-item-body>
+        </paper-item>
+        `;
+      
+    }
+    root.querySelector(".name")!.textContent = entry.item.name;
+    root.querySelector("[secondary]")!.textContent = entry.item.description;
+    if(this.icons) (root.querySelector("ha-icon")! as any).icon = entry.item.icon;
+  }
 
   private _clearValue(ev: Event) {
     ev.stopPropagation();
@@ -144,6 +170,9 @@ export class AlarmoSelect extends LitElement {
 
   static get styles(): CSSResult {
     return css`
+      :host {
+        line-height: 1em;
+      }
       paper-input > ha-icon-button {
         --mdc-icon-button-size: 24px;
         padding: 2px;

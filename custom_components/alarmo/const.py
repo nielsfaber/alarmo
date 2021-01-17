@@ -13,9 +13,15 @@ from homeassistant.const import (
     STATE_ALARM_ARMING,
 )
 
-from homeassistant.components.alarm_control_panel import DOMAIN as PLATFORM
+from homeassistant.components.alarm_control_panel import (
+    DOMAIN as PLATFORM,
+    SUPPORT_ALARM_ARM_AWAY,
+    SUPPORT_ALARM_ARM_HOME,
+    SUPPORT_ALARM_ARM_NIGHT,
+    SUPPORT_ALARM_ARM_CUSTOM_BYPASS,
+)
 
-VERSION = "1.4.1"
+VERSION = "1.5.0b"
 NAME = "Alarmo"
 MANUFACTURER = "@nielsfaber"
 
@@ -80,7 +86,7 @@ ATTR_REMOVE = "remove"
 ATTR_OLD_CODE = "old_code"
 
 ATTR_TRIGGER_TIME = "trigger_time"
-ATTR_LEAVE_TIME = "leave_time"
+ATTR_EXIT_TIME = "exit_time"
 ATTR_ENTRY_TIME = "entry_time"
 
 ATTR_ENABLED = "enabled"
@@ -97,6 +103,8 @@ ATTR_IS_OVERRIDE_CODE = "is_override_code"
 ATTR_AUTOMATION_ID = "automation_id"
 
 ATTR_TYPE = "type"
+ATTR_AREA = "area"
+ATTR_MASTER = "master"
 
 ATTR_TRIGGERS = "triggers"
 ATTR_ACTIONS = "actions"
@@ -117,3 +125,10 @@ EVENT_CATEGORIES = [
 ]
 EVENT_ACTION_FORCE_ARM = "ALARMO_FORCE_ARM"
 EVENT_ACTION_RETRY_ARM = "ALARMO_RETRY_ARM"
+
+MODES_TO_SUPPORTED_FEATURES = {
+    STATE_ALARM_ARMED_AWAY: SUPPORT_ALARM_ARM_AWAY,
+    STATE_ALARM_ARMED_HOME: SUPPORT_ALARM_ARM_HOME,
+    STATE_ALARM_ARMED_NIGHT: SUPPORT_ALARM_ARM_NIGHT,
+    STATE_ALARM_ARMED_CUSTOM_BYPASS: SUPPORT_ALARM_ARM_CUSTOM_BYPASS,
+}

@@ -1,14 +1,17 @@
 
 
-export const VERSION = "1.4.1"
+export const VERSION = "1.5.0b"
 
 export const platform = 'alarmo';
 export const editConfigService = 'edit_config';
 
-export const IconArmedAway = 'car-traction-control';
-export const IconArmedHome = 'home';
-export const IconArmedNight = 'weather-night';
-export const IconArmedCustom = 'palette-outline';
+
+export enum EArmModeIcons {
+  ArmedAway = 'hass:car-traction-control',
+  ArmedHome = 'hass:home-outline',
+  ArmedNight = 'hass:weather-night',
+  ArmedCustom = 'hass:star-outline',
+}
 
 export enum AlarmStates {
   STATE_ALARM_DISARMED = "disarmed",
@@ -30,3 +33,20 @@ export enum AlarmCommands {
   COMMAND_ALARM_ARM_CUSTOM_BYPASS = "arm_custom_bypass",
 }
 
+export enum ESensorTypes {
+  Door = "door",
+  Window = "window",
+  Motion = "motion",
+  Tamper = "tamper",
+  Environmental = "environmental",
+  Other = "other"
+}
+
+export enum ESensorIcons {
+  Door = "hass:door-closed",
+  Window = "hass:window-closed",
+  Motion = "hass:motion-sensor",
+  Tamper = "hass:vibrate",
+  Environmental = "hass:fire",
+  Other = "hass:contactless-payment-circle-outline"
+}

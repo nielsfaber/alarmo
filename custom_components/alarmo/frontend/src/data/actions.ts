@@ -5,47 +5,60 @@ import { localize } from "../../localize/localize";
 
 
 export const triggerOptions = (_hass: HomeAssistant) => [
+
   {
     value: EAlarmStates.Armed,
+    name: "Alarm is armed",
+    description: "The alarm is succesfully armed",
+    icon: "hass:shield-check-outline",
     trigger: {
       state: EAlarmStates.Armed
-    },
-    name: "Alarm is armed",
+    }
   },
   {
     value: EAlarmStates.Disarmed,
+    name: "Alarm is disarmed",
+    description: "The alarm is disarmed",
+    icon: "hass:shield-off-outline",
     trigger: {
       state: EAlarmStates.Disarmed
-    },
-    name: "Alarm is disarmed",
+    }
   },
   {
     value: EAlarmStates.Triggered,
+    name: "Alarm is triggered",
+    description: "The alarm is triggered",
+    icon: "hass:bell-alert-outline",
     trigger: {
       state: EAlarmStates.Triggered
-    },
-    name: "Alarm is triggered",
+    }
   },
   {
     value: EAlarmEvents.ArmFailure,
+    name: "Failed to arm",
+    description: "The arming of the alarm failed due to one or more open sensors",
+    icon: "hass:alert-outline",
     trigger: {
       event: EAlarmEvents.ArmFailure
-    },
-    name: "Failed to arm",
+    }
   },
   {
     value: EAlarmStates.Arming,
+    name: "Exit delay started",
+    description: "Exit delay started, ready to leave the house.",
+    icon: "hass:home-export-outline",
     trigger: {
       state: EAlarmStates.Arming
-    },
-    name: "Leave delay started",
+    }
   },
   {
     value: EAlarmStates.Pending,
+    name: "Entry delay started",
+    description: "Entry delay started, the alarm will trigger soon.",
+    icon: "hass:home-import-outline",
     trigger: {
       state: EAlarmStates.Pending
-    },
-    name: "Entry delay started",
+    }
   }
 ];
 

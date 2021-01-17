@@ -1,7 +1,7 @@
 import { HomeAssistant, stateIcon, fireEvent } from 'custom-card-helpers';
 import { HassEntity } from 'home-assistant-js-websocket';
 import { platform, AlarmStates, AlarmCommands } from './const';
-import { Dictionary, AlarmoConfig, EArmModes } from './types';
+import { Dictionary, AlarmoConfig, EArmModes, AlarmoArea } from './types';
 import { html, TemplateResult } from 'lit-element';
 
 export function getDomain(entity: string | HassEntity) {
@@ -89,17 +89,17 @@ export const commandToState = (command: string) => {
   }
 }
 
-export const filterState = (state: string, config: AlarmoConfig) => {
+export const filterState = (state: string, _config: AlarmoConfig) => {
   if (!state) return false;
   switch (state) {
     case AlarmStates.STATE_ALARM_ARMED_AWAY:
-      return config.modes[EArmModes.ArmedAway].enabled;
+      return true;//config.modes[EArmModes.ArmedAway].enabled;
     case AlarmStates.STATE_ALARM_ARMED_HOME:
-      return config.modes[EArmModes.ArmedHome].enabled;
+      return true;//config.modes[EArmModes.ArmedHome].enabled;
     case AlarmStates.STATE_ALARM_ARMED_NIGHT:
-      return config.modes[EArmModes.ArmedNight].enabled;
+      return true;//config.modes[EArmModes.ArmedNight].enabled;
     case AlarmStates.STATE_ALARM_ARMED_CUSTOM_BYPASS:
-      return config.modes[EArmModes.ArmedCustom].enabled;
+      return true;//config.modes[EArmModes.ArmedCustom].enabled;
     default:
       return true;
   }
