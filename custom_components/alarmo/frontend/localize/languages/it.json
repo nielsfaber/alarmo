@@ -1,0 +1,337 @@
+{
+  "common": {
+    "modes_long": {
+      "armed_away": "Modalità 'fuori casa' attiva",
+      "armed_home": "Modalità 'in casa' attiva",
+      "armed_night": "Modalità 'notte' attiva",
+      "armed_custom_bypass": "Modalità 'personalizzato' attiva"
+    },
+    "modes_short": {
+      "armed_away": "Fuori casa",
+      "armed_home": "In casa",
+      "armed_night": "Notte",
+      "armed_custom_bypass": "Personalizzato"
+    }
+  },
+  "components": {
+    "time_slider": {
+      "seconds": "sec",
+      "minutes": "min",
+      "infinite": "infinito",
+      "none": "niente"
+    },
+    "editor": {
+      "ui_mode": "Passa a UI",
+      "yaml_mode": "Passa a YAML"
+    }
+  },
+  "panels": {
+    "general": {
+      "cards": {
+        "general": {
+          "title": "Impostazioni Generali",
+          "description": "Questo pannello definisce alcune impostazioni da applicare alle modalità di allarme.",
+          "fields": {
+            "trigger_time": {
+              "heading": "Tempo di attivazione",
+              "description": "Tempo durante il quale suonerà la sirena"
+            },
+            "disarm_after_trigger": {
+              "heading": "Disattiva allarme dopo l'attivazione",
+              "description": "Dopo che il tempo di attivazione è scaduto, disattivare l'allarme invece di tornare allo stato inserito."
+            },
+            "enable_mqtt": {
+              "heading": "Abilita MQTT",
+              "description": "Permetti al pannello allarme di essere controllato attraverso MQTT."
+            }
+          },
+          "actions": {
+            "setup_mqtt": "Configurazione MQTT"
+          }
+        },
+        "common": {
+          "fields": {
+            "leave_time": {
+              "heading": "Tempo di preattivazione",
+              "description": "Quando si attiva l'allarme, entro questo periodo di tempo i sensori non attiveranno ancora l'allarme."
+            },
+            "entry_time": {
+              "heading": "Ritardo di attivazione",
+              "description": "Tempo di ritardo fino allo scatto dell'allarme dopo l'attivazione di uno dei sensori."
+            }
+          }
+        },
+        "armed_away": {
+          "description": "Modalità 'fuori casa': da utilizzare quando tutte le persone lasciano la casa. Tutti i sensori di porte e finestre che consentono l'accesso alla casa saranno attivi, così come i sensori di movimento all'interno della casa."
+        },
+        "armed_home": {
+          "description": "Modalità 'in casa': da utilizzare quando si attiva l'allarme mentre le persone sono in casa. Tutti i sensori di porte e finestre che consentono l'accesso alla casa saranno attivi, ma non i sensori di movimento all'interno della casa."
+        },
+        "armed_night": {
+          "description": "Modalità 'notte': da utilizzare quando si imposta la sveglia prima di andare a dormire. Tutti i sensori di porte e finestre che consentono l'accesso alla casa saranno attivi e sensori di movimento selezionati (ad esempio al piano di sotto) nella casa."
+        },
+        "armed_custom": {
+          "description": "Modalità 'personalizzato': da utilizzare per definire una modalità di allarme specifica per le esigenze dell'utilizzatore."
+        },
+        "mqtt": {
+          "title": "Configurazione MQTT",
+          "description": "Questo pannello può essere usato per le impostazioni MQTT.",
+          "fields": {
+            "state_topic": {
+              "heading": "Topic di stato",
+              "description": "Topic su cui vengono pubblicati gli aggiornamenti di stato"
+            },
+            "command_topic": {
+              "heading": "Topic di comando",
+              "description": "Topic su cui vengono inviati i comandi di inserimento / disinserimento."
+            },
+            "require_code": {
+              "heading": "Richiedi Codice",
+              "description": "Richiedi il codice da inviare con il comando."
+            },
+            "state_payload": {
+              "heading": "Configura payload per stato",
+              "item": "Definisci un payload per lo stato '{state}'"
+            },
+            "command_payload": {
+              "heading": "Configura payload per comando",
+              "item": "Definisci un payload per il comando '{command}'"
+            }
+          }
+        }
+      }
+    },
+    "sensors": {
+      "cards": {
+        "sensors": {
+          "title": "Sensori",
+          "description": "Sensori attualmente configurati. Clicca sull'entità per modificare.",
+          "no_items": "Non ci sono ancora sensori aggiunti a questo allarme. Assicurati di aggiungerli prima.",
+          "table": {
+            "arm_modes": "Modalità di attivazione",
+            "always_on": "(Sempre)"
+          }
+        },
+        "add_sensors": {
+          "title": "Aggiungi Sensori",
+          "description": "Aggiungi più sensori. Assicurati che i sensori abbiano un friendly_name (nome amichevole), in modo da identificarli più facilmente.",
+          "no_items": "Non ci sono entità disponibili che possono essere configurate con l'allarme. Assicurati di includere entità del tipo binary_sensor (sensore binario).",
+          "actions": {
+            "add_to_alarm": "aggiungi all'allarme",
+            "show_all": "Mostra tutti"
+          }
+        },
+        "editor": {
+          "title": "Modifica Sensore",
+          "description": "Configura le impostazioni del sensore '{entity}'.",
+          "fields": {
+            "name": {
+              "heading": "Nome",
+              "description": "Sovrascrivi friendly name."
+            },
+            "always_on": {
+              "heading": "Sempre attivo",
+              "description": "Il sensore attiverà sempre l'allarme."
+            },
+            "modes": {
+              "heading": "Modalità attive",
+              "description": "Modalità di allarme in cui il sensore risulta collegato."
+            },
+            "immediate": {
+              "heading": "Immediato",
+              "description": "Il sensore si attiva saltando il ritardo."
+            },
+            "allow_open": {
+              "heading": "Permetti apertura",
+              "description": "Consentire a questo sensore di rimanere attivo poco dopo essere usciti."
+            },
+            "trigger_unavailable": {
+              "heading": "Fai scattare l'allarme quando non disponibile",
+              "description": "L'allarme scatterà quando lo stato del sensore diverrà 'non disponibile'."
+            }
+          }
+        }
+      }
+    },
+    "codes": {
+      "cards": {
+        "codes": {
+          "title": "Codici",
+          "description": "Modifica le impostazioni dei codici.",
+          "fields": {
+            "code_arm_required": {
+              "heading": "Usa codice d'attivazione",
+              "description": "Richiedi un codice per attivare l'allarme"
+            },
+            "code_disarm_required": {
+              "heading": "Usa codice di disattivazione",
+              "description": "Richiedi un codice per disattivare l'allarme"
+            },
+            "code_format": {
+              "heading": "Formato del codice",
+              "description": "Imposta il tipo di codice da digitare nella card di Lovelace.",
+              "code_format_number": "codice numerico",
+              "code_format_text": "password"
+            }
+          }
+        },
+        "user_management": {
+          "title": "Gestione utente",
+          "description": "Ogni utente ha il suo codice per attivare/disattivare l'allarme.",
+          "no_items": "Non è stato creato nessun utente per ora",
+          "table": {
+            "remarks": "Ruolo",
+            "administrator": "Amministratore"
+          },
+          "actions": {
+            "new_user": "nuovo utente"
+          }
+        },
+        "new_user": {
+          "title": "Crea nuovo utente",
+          "description": "Gli utenti potranno operare con l'allarme.",
+          "fields": {
+            "name": {
+              "heading": "Nome",
+              "description": "Nome dell'utente."
+            },
+            "code": {
+              "heading": "Codice operativo",
+              "description": "Codice che utilizzerà quest'utente."
+            },
+            "confirm_code": {
+              "heading": "Ripeti codice operativo",
+              "description": "Ripeti il codice operativo scelto."
+            },
+            "is_admin": {
+              "heading": "L'utente è un amministratore",
+              "description": "Ciò consente al utente di effettuare modifiche al sistema di allarme"
+            },
+            "can_arm": {
+              "heading": "Utilizza codice per attivare l'allarme",
+              "description": "Utilizza codice per attivare l'allarme"
+            },
+            "can_disarm": {
+              "heading": "Utilizza codice per disattivare l'allarme",
+              "description": "Utilizza codice per disattivare l'allarme"
+            },
+            "is_override_code": {
+              "heading": "E' un codice di forzatura",
+              "description": "Inserendo questo codice forzerai lo stato di attivazione dell'allarme"
+            }
+          },
+          "errors": {
+            "no_name": "Non hai inserito il nome.",
+            "no_code": "Il codice deve avere almeno 4 numeri o caratteri.",
+            "code_mismatch": "Il codice scelto non combacia, verifica il codice inserito."
+          }
+        },
+        "edit_user": {
+          "title": "Modifica Utente",
+          "description": "Cambia impostazioni per l'utente '{name}'.",
+          "fields": {
+            "old_code": {
+              "heading": "Modifica Codice",
+              "description": "Codice attuale, lascia vuoto per non modificare."
+            }
+          }
+        }
+      }
+    },
+    "actions": {
+      "cards": {
+        "notifications": {
+          "title": "Notifiche",
+          "description": "Con questo pannello puoi gestire le notifiche da inviare quanto accade un determinato evento",
+          "table": {
+            "enabled": "Abilitato",
+            "no_items": "Non è stata creata nessuna notifica per ora."
+          },
+          "actions": {
+            "new_notification": "nuova notifica"
+          }
+        },
+        "actions": {
+          "title": "Azioni",
+          "description": "Questo pannello è in fase di sviluppo. Sarà usato per cambiare lo stato di una o più entità.",
+          "table": {
+            "no_items": "Non è stata creata nessuna azione per ora."
+          },
+          "actions": {
+            "new_action": "nuova azione"
+          }
+        },
+        "new_notification": {
+          "title": "Crea notifica",
+          "description": "Crea una nuova notifica.",
+          "fields": {
+            "name": {
+              "heading": "Nome",
+              "description": "Descrizione della notifica"
+            },
+            "event": {
+              "heading": "Evento",
+              "description": "Quando questa notifica deve essere inviata"
+            },
+            "mode": {
+              "heading": "Modalità",
+              "description": "Limita ad una specifica modalità di allarme (opzionale)"
+            },
+            "title": {
+              "heading": "Titolo",
+              "description": "Titolo per il messaggio di notifica"
+            },
+            "message": {
+              "heading": "Messaggio",
+              "description": "Contenuto del messaggio di notifica"
+            },
+            "target": {
+              "heading": "Destinatario",
+              "description": "Dispositivo a cui inviare il messaggio di notifica"
+            }
+          }
+        },
+        "new_action": {
+          "title": "Crea azione",
+          "description": "Questo pannello può essere usato per cambiare lo stato di un entità quando lo stato dell'allarme cambia.",
+          "fields": {
+            "name": {
+              "heading": "Nome",
+              "description": "Descrizione dell'azione"
+            },
+            "event": {
+              "heading": "Evento",
+              "description": "Quando questa azione deve essere eseguita"
+            },
+            "mode": {
+              "heading": "Modalità",
+              "description": "Limita ad una specifica modalità di allarme (opzionale)"
+            },
+            "entity": {
+              "heading": "Entità",
+              "description": "Entità su cui eseguire l'azione"
+            },
+            "action": {
+              "heading": "Azione",
+              "description": "Azione che deve eseguire l'entità",
+              "turn_on": "Accendi",
+              "turn_off": "Spegni"
+            }
+          }
+        }
+      },
+      "validation_errors": {
+        "no_triggers": "Nessuno evento o modalità scelto per l'attivazione di questa azione.",
+        "empty_trigger": "Evento o modalità mancante per questa azione.",
+        "invalid_trigger": "Uno degli eventi selezionati ha un valore non valido: {trigger}",
+        "invalid_mode": "Input selezionato non valido per la modalità: {mode}",
+        "no_actions": "Nessuna azione è stata scelta per questa azione.",
+        "no_service": "Una di queste azioni ha un servizio mancante.",
+        "invalid_service": "Il nome del servizio non è valido per una delle azioni: {service}",
+        "no_service_data": "Dati del servizio non inseriti per una delle azioni.",
+        "no_entity_in_service_data": "Nessun entity_id è stata inserita in service_data di una delle azioni.",
+        "no_message_in_service_data": "Nessun messaggio è stato inserito nel service_data di una delle azioni."
+      }
+    }
+  }
+}
