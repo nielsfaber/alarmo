@@ -108,7 +108,9 @@
           "no_items": "There are no areas defined yet.",
           "table": {
             "remarks": "Remarks",
-            "summary": "This area contains {sensors} sensors and {automations} automations."
+            "summary": "This area contains {summary_sensors} and {summary_automations}.",
+            "summary_sensors": "{number} sensors",
+            "summary_automations": "{number} automations"
           },
           "actions": {
             "add": "Add"
@@ -141,10 +143,14 @@
         "sensors": {
           "title": "Sensors",
           "description": "Currently configured sensors. Click on an entity to make changes.",
-          "no_items": "There are no sensors added to the alarm yet. Make sure to add them first.",
+          "no_items": "There are no sensors to be displayed here.",
           "table": {
             "arm_modes": "Arm Modes",
             "always_on": "(Always)"
+          },
+          "filter": {
+            "label": "Filter by area",
+            "no_area": "(No area)"
           }
         },
         "add_sensors": {
@@ -323,18 +329,22 @@
       "cards": {
         "notifications": {
           "title": "Notifications",
-          "description": "Using this panel, you can manage notifications to be sent when during a certain alarm event",
+          "description": "Using this panel, you can manage notifications to be sent when during a certain alarm event.",
           "table": {
             "enabled": "Enabled",
             "no_items": "There are no notifications created yet."
           },
           "actions": {
             "new_notification": "new notification"
+          },
+          "filter": {
+            "label": "Filter by area",
+            "no_area": "Alarm master"
           }
         },
         "actions": {
           "title": "Actions",
-          "description": "This panel is still in development. It will be used for switching devices.",
+          "description": "This panel can be used to switch a device when the alarm state changes.",
           "table": {
             "no_items": "There are no actions created yet."
           },

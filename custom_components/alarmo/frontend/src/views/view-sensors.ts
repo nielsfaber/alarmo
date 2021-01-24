@@ -7,6 +7,8 @@ import { Dictionary, AlarmoConfig, AlarmoSensor, EArmModes, AlarmoArea } from '.
 
 import '../cards/sensor-editor-card.ts';
 import '../components/alarmo-table.ts';
+import '../components/alarmo-chips.ts';
+
 
 import { commonStyle } from '../styles';
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
@@ -16,6 +18,7 @@ import { localize } from '../../localize/localize';
 import { TableColumn, TableData } from '../components/alarmo-table';
 import { defaultSensorConfig, isValidSensor } from '../data/sensors';
 import { EArmModeIcons, ESensorIcons, ESensorTypes } from '../const';
+import { Option } from '../components/alarmo-chips';
 
 @customElement('alarm-view-sensors')
 export class AlarmViewSensors extends SubscribeMixin(LitElement) {
@@ -29,6 +32,9 @@ export class AlarmViewSensors extends SubscribeMixin(LitElement) {
   @property() addSelection: string[] = [];
 
   @property() showAllSensorEntities = false;
+  @property() selectedArea?: string;
+
+  @property() areaFilterOptions: Option[] = [];
 
   public hassSubscribe(): Promise<UnsubscribeFunc>[] {
     this._fetchData();
@@ -44,14 +50,32 @@ export class AlarmViewSensors extends SubscribeMixin(LitElement) {
     if (!this.hass) {
       return;
     }
-    const areas = await fetchAreas(this.hass);
-    this.areas = areas;
-    const sensors = await fetchSensors(this.hass);
-    this.sensors = sensors;
+    this.areas = await fetchAreas(this.hass);
+    this.sensors = await fetchSensors(this.hass);
+
+    this.areaFilterOptions = [
+      {
+        value: "no_area",
+        name: localize("panels.sensors.cards.sensors.filter.no_area", this.hass.language),
+        count: Object.values(this.sensors).filter(e => !e.area).length
+      }]
+      .concat(
+        Object.values(this.areas)
+          .map(e => Object({
+            value: e.area_id,
+            name: e.name,
+            count: Object.values(this.sensors).filter(el => el.area == e.area_id).length
+          }))
+          .sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1))
+      )
+      .filter(e => e.count);
   }
 
   firstUpdated() {
     (async () => await loadHaForm())();
+
+    if (this.path && this.path.length == 2 && this.path[0] == "filter")
+      this.selectedArea = this.path[1];
   }
 
   render() {
@@ -114,7 +138,14 @@ export class AlarmViewSensors extends SubscribeMixin(LitElement) {
       }
 
     };
-    const data = sensorsList.map(item => {
+    const data = sensorsList
+      .filter(e => 
+        !this.selectedArea ||
+        !this.areaFilterOptions.find(e => e.value == this.selectedArea) ||
+        this.sensors[e.id].area == this.selectedArea ||
+        (this.selectedArea === "no_area" && !this.sensors[e.id].area)
+      )
+      .map(item => {
       const type = Object.entries(ESensorTypes).find(([, v]) => v == this.sensors[item.id].type)![0];
       let output: TableData = {
         icon: html`
@@ -153,11 +184,23 @@ export class AlarmViewSensors extends SubscribeMixin(LitElement) {
     });
 
     return html`
-      <ha-card header="${localize("panels.sensors.cards.sensors.title", this.hass.language)}">
-        <div class="card-content">
-          ${localize("panels.sensors.cards.sensors.description", this.hass.language)}
-        </div>
+    <ha-card header="${localize("panels.sensors.cards.sensors.title", this.hass.language)}">
+      <div class="card-content">
+        ${localize("panels.sensors.cards.sensors.description", this.hass.language)}
+      </div>
 
+      ${this.areaFilterOptions.length > 1
+        ? html`
+      <div class="table-filter" ?narrow=${this.narrow}>
+       <span class="header">${localize("panels.sensors.cards.sensors.filter.label", this.hass.language)}:</span>
+        <alarmo-chips
+          .items=${this.areaFilterOptions}
+          value=${this.selectedArea}
+          @value-changed=${(ev: Event) => this.selectedArea = (ev.target as HTMLInputElement).value}
+        >
+        </alarmo-chips>
+      </div>
+      ` : ''}
       <alarmo-table
         ?selectable=${true}
         .columns=${columns}
