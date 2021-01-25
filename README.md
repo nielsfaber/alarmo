@@ -1,7 +1,7 @@
 # Alarmo
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
 
-This is an alarm system integration for Home Assistant. It provides a user interface for setting your own alarm system completely from the browser.
+This is an alarm system integration for Home Assistant. It provides a user interface for setting up your own alarm system completely from the browser.
 
 - [Alarmo](#alarmo)
   - [Introduction](#introduction)
@@ -39,6 +39,8 @@ This is an alarm system integration for Home Assistant. It provides a user inter
         - [Actionable notifications](#actionable-notifications)
       - [Device actions](#device-actions)
     - [Lovelace alarm panel card](#lovelace-alarm-panel-card)
+- [Say thank you](#say-thank-you)
+
 
 ## Introduction
 This is an integration for the `alarm_control_panel` domain in HA.
@@ -367,26 +369,29 @@ alarmo/command
 
 If Alarmo is configured to require a pincode or password for the (arm/disarm) command, the payload must be formatted as JSON according to the following format:
 ```
-{command: "<my command>", code: "<my pin or password>"}
+{
+  "command": "<my command>",
+  "code": "<my pin or password>"
+}
 ```
 If Alarmo does not require any code for the command, the command can be sent directly as text/string value.
 
 
-Alarmo supports the following command values (these can be customized as desired):
-* DISARM
-* ARM_AWAY
-* ARM_HOME
-* ARM_NIGHT
-* ARM_CUSTOM_BYPASS
+Alarmo supports the following command values by default (these can be customized as desired):
+* disarm
+* arm_away
+* arm_home
+* arm_night
+* arm_custom_bypass
 
 
 If the provided payload does not have the correct format, lacks a code when it is required or contains a wrong code, the command shall be ignored. 
 In other cases, you should see a change in the state topic.
 
-
 **Notes**:
 * The pin or password value should always be sent as a text/string value. A numeric value is not supported. This is due to the fact that a pincode could contain leading zeros (e.g. 0012), which would be lost if sent as a number.
 * Alarmo provides the option to accept MQTT commands without requiring a code. By disabling the "*Require code*" setting in the MQTT configuration, the internal code check is skipped. This setting should be used with care as it may compromise the security of the alarm.
+* The command is treated as case-insensitive.
 
 #### Multiple area usage
 The MQTT functionality can be used in combination with a multiple area configuration.
@@ -395,13 +400,19 @@ Alarmo shall publish the state updates for the Master Alarm and the areas in ded
 * Master Alarm: `alarmo/state`
 * Area: `alarmo/<area_name>/state`
 
-Likewise, for sending a command, the dedicated topics become:
-* Master Alarm: `alarmo/command`
-* Area: `alarmo/<area_name>/command`
+For targeting an arm/disarm command to a specific area, the JSON payload can be extended with the *area* property:
+```
+{
+  "command": "<my command>",
+  "code": "<my pin or password>",
+  "area": "<area_name>"
+}
+```
 
 **Notes**: 
-* The MQTT configuration allows customizing the state and command topics for the Master Alarm only. The topics for the areas are automatically derived by inserting the area name. Example: setting state topic to `my/custom/topic` gives `my/custom/<area_name>/topic` as state topic for an area.
+* The MQTT configuration allows customizing the state topic for the Master Alarm only. The topics for the areas are automatically derived by inserting the area name. Example: setting state topic to `my/custom/topic` gives `my/custom/<area_name>/topic` as state topic for an area.
 * `<area_name>` is a *slug* of the name that is given to an area. This means that the name shall be in lowercase and all non-alphanumerical characters are replaced by underscores (similar to the entity_IDs in HA).
+* If no area is provided, the command is addressed to the Master Alarm. If the Master Alarm is disabled, the command is ignored.
 
 ### Actions
 
@@ -492,6 +503,14 @@ This card will show you the current state of the alarm, and will allow you to en
 Make sure that the card is configured with the same modes (they are referred to as `states` in the card), as you have set up in Alarmo.
 There is currently no functionality in place to detect this setting automatically.
 
+---
+
+
+## Say thank you
+If you want to make donation as appreciation of my work, you can buy me a coffee. Thank you!
+
+<a href="https://www.buymeacoffee.com/vrdx7mi" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png"></a>
+
 
 <!-- ### Alarm modes
  -->
@@ -519,3 +538,5 @@ disarmed => "evaluate leave delay configuration": received command;
 "^sensors?" => armed: sensors OK;
 "^sensors?" => disarmed: sensors NOK;
 -->
+
+
