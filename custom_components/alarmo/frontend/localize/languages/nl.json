@@ -32,10 +32,6 @@
           "title": "Algemene instellingen",
           "description": "Dit paneel definieert enkele instellingen die van toepassing zijn op alle inschakelmodi.",
           "fields": {
-            "trigger_time": {
-              "heading": "Activeer tijd",
-              "description": "Tijd waarin de sirene af gaat."
-            },
             "disarm_after_trigger": {
               "heading": "Uitschakelen na activatie",
               "description": "Nadat de triggertijd is verstreken, schakelt u het alarm uit in plaats van terug te keren naar de ingeschakelde toestand."
@@ -43,35 +39,42 @@
             "enable_mqtt": {
               "heading": "MQTT inschakelen",
               "description": "Allow the alarm panel to be controlled through MQTT."
+            },
+            "enable_master": {
+              "heading": "Master alarm inschakelen",
+              "description": "Creëert een entiteit om alle gebieden tegelijkertijd te besturen."
             }
           },
           "actions": {
-            "setup_mqtt": "MQTT Configuratie"
+            "setup_mqtt": "MQTT Configuratie",
+            "setup_master": "Master configuratie"
           }
         },
-        "common": {
+        "modes": {
+          "title": "Modi",
+          "description": "Dit paneel kan worden gebruikt om de inschakelmodi van het alarm in te stellen.",
           "fields": {
-            "leave_time": {
+            "mode": {
+              "armed_away": "Ingeschakeld weg wordt gebruikt als alle mensen het huis hebben verlaten. Alle deuren en ramen die toegang geven tot het huis worden bewaakt, evenals bewegingssensoren in het huis.",
+              "armed_home": "Ingeschakeld thuis (ook wel ingeschakeld thuisblijven genoemd) wordt gebruikt bij het instellen van het alarm terwijl er mensen in huis zijn. Alle deuren en ramen die toegang geven tot het huis worden bewaakt, maar bewegingssensoren in het huis worden niet gebruikt.",
+              "armed_night": "Ingeschakeld nacht wordt gebruikt bij het instellen van het alarm voordat u gaat slapen. Alle deuren en ramen die toegang geven tot het huis worden bewaakt, en geselecteerde bewegingssensoren (beneden) in het huis.",
+              "armed_custom_bypass": "Een extra modus om uw eigen beveiligingsperimeter te definiëren.",
+              "enabled": "Enabled",
+              "disabled": "Disabled"
+            },
+            "exit_delay": {
               "heading": "Vertrek vertraging",
               "description": "Bij het inschakelen van het alarm zullen de sensoren binnen deze tijdsperiode het alarm nog niet activeren."
             },
-            "entry_time": {
+            "entry_delay": {
               "heading": "Binnenkomst vertraging",
               "description": "Vertragingstijd totdat het alarm afgaat nadat een van de sensoren is geactiveerd."
+            },
+            "trigger_time": {
+              "heading": "Activeer tijd",
+              "description": "Tijd waarin de sirene af gaat."
             }
           }
-        },
-        "armed_away": {
-          "description": "Ingeschakeld weg wordt gebruikt als alle mensen het huis hebben verlaten. Alle deuren en ramen die toegang geven tot het huis worden bewaakt, evenals bewegingssensoren in het huis."
-        },
-        "armed_home": {
-          "description": "Ingeschakeld thuis (ook wel ingeschakeld thuisblijven genoemd) wordt gebruikt bij het instellen van het alarm terwijl er mensen in huis zijn. Alle deuren en ramen die toegang geven tot het huis worden bewaakt, maar bewegingssensoren in het huis worden niet gebruikt."
-        },
-        "armed_night": {
-          "description": "Ingeschakeld nacht wordt gebruikt bij het instellen van het alarm voordat u gaat slapen. Alle deuren en ramen die toegang geven tot het huis worden bewaakt, en geselecteerde bewegingssensoren (beneden) in het huis."
-        },
-        "armed_custom": {
-          "description": "Een extra modus om uw eigen beveiligingsperimeter te definiëren."
         },
         "mqtt": {
           "title": "MQTT configuratie",
@@ -98,6 +101,43 @@
               "item": "Definieer een payload voor commando '{command}'"
             }
           }
+        },
+        "areas": {
+          "title": "Gebieden",
+          "description": "Gebieden kunnen worden gebruikt om uw alarmsysteem in meerdere compartimenten op te delen.",
+          "no_items": "Er zijn nog geen gebieden gedefinieerd.",
+          "table": {
+            "remarks": "Opmerkingen",
+            "summary": "Dit gebied bevat {summary_sensors} en {summary_automations}.",
+            "summary_sensors": "{number} sensoren",
+            "summary_automations": "{number} automatiseringen"
+          },
+          "actions": {
+            "add": "Toevoegen"
+          }
+        }
+      },
+      "dialogs": {
+        "create_area": {
+          "title": "Nieuw gebied",
+          "fields": {
+            "copy_from": "Kopieer instellingen van"
+          }
+        },
+        "edit_area": {
+          "title": "Bewerken van gebied '{area}'",
+          "name_warning": "Opmerking: als u de naam wijzigt, wordt de entiteits-ID gewijzigd"
+        },
+        "remove_area": {
+          "title": "Gebied verwijderen?",
+          "description": "Weet u zeker dat u dit gebied wilt verwijderen? Dit gebied bevat {sensors} sensoren en {automations} automatiseringen, die ook zullen worden verwijderd."
+        },
+        "edit_master": {
+          "title": "Master configuratie"
+        },
+        "disable_master": {
+          "title": "Master uitschakelen?",
+          "description": "Weet u zeker dat u het master alarm wilt verwijderen? Dit gebied bevat {automations} automatiseringen, die met deze actie worden verwijderd."
         }
       }
     },
@@ -110,6 +150,10 @@
           "table": {
             "arm_modes": "Inschakelmodi",
             "always_on": "(Altijd)"
+          },
+          "filter": {
+            "label": "Filter op gebied",
+            "no_area": "(Geen gebied)"
           }
         },
         "add_sensors": {
@@ -128,6 +172,10 @@
             "name": {
               "heading": "Naam",
               "description": "Overschrijf vriendelijke naam."
+            },
+            "area": {
+              "heading": "Gebied",
+              "description": "Selecteer een gebied dat deze sensor bevat."
             },
             "device_type": {
               "heading": "Apparaat Type",
@@ -152,6 +200,9 @@
                 "environmental": {
                   "name": "Omgeving",
                   "description": "Rook/gassensor, lekdetector, etc. (niet gerelateerd aan inbraakbeveiliging)."
+                },
+                "other": {
+                  "name": "Algemeen"
                 }
               }
             },
@@ -181,7 +232,13 @@
             }
           },
           "actions": {
-            "toggle_advanced": "Geavanceerde instellingen"
+            "toggle_advanced": "Geavanceerde instellingen",
+            "remove": "Verwijder"
+          },
+          "errors": {
+            "description": "Corrigeer de volgende fouten:",
+            "no_area": "Er is geen gebied geselecteerd",
+            "no_modes": "Er zijn geen modi geselecteerd waarvoor de sensor actief zou moeten zijn"
           }
         }
       }
@@ -282,6 +339,10 @@
           },
           "actions": {
             "new_notification": "nieuwe melding"
+          },
+          "filter": {
+            "label": "Filter op gebied",
+            "no_area": "Alarm master"
           }
         },
         "actions": {
@@ -335,6 +396,10 @@
             "event": {
               "heading": "Gebeurtenis",
               "description": "Wanneer moet de actie worden uitgevoerd"
+            },
+            "area": {
+              "heading": "Gebied",
+              "description": "Het gebied waarop de gebeurtenis van toepassing is, laat leeg om het algemene alarm te selecteren."
             },
             "mode": {
               "heading": "Mode",
