@@ -340,7 +340,6 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
         self.area_id = area_id
         self._timer = None
         self._bypass_mode = False
-        self._config_listener = None
 
     @property
     def supported_features(self) -> int:
@@ -367,7 +366,9 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
             self._config.update(coordinator.store.async_get_area(self.area_id))
             self.async_write_ha_state()
 
-        self._config_listener = async_dispatcher_connect(self.hass, "alarmo_config_updated", async_update_config)
+        self.async_on_remove(
+            async_dispatcher_connect(self.hass, "alarmo_config_updated", async_update_config)
+        )
         await async_update_config()
 
         state = await self.async_get_last_state()
@@ -413,8 +414,6 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
     async def async_will_remove_from_hass(self):
         await super().async_will_remove_from_hass()
 
-        if self._config_listener:
-            self._config_listener()
         self.hass.data[const.DOMAIN]["areas"].pop(self.area_id, None)
 
     async def async_update_state(self, state: str = None):
@@ -573,8 +572,6 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
     def __init__(self, hass: HomeAssistant, name: str, entity_id: str) -> None:
         """Initialize the alarm_control_panel entity."""
         super().__init__(hass, name, entity_id)
-        self._config_listener = None
-        self._entity_listener = None
 
     @property
     def supported_features(self) -> int:
@@ -592,25 +589,21 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
 
         # load the configuration and make sure that it is reloaded on changes
         @callback
-        async def async_update_config(_config=None):
-            @callback
-            async def async_alarm_state_changed(entity, old_state, new_state):
-                _LOGGER.debug("async_alarm_state_changed")
-                await self.async_update_state()
+        async def async_update_config(area_id=None):
+            if area_id:
+                # wait for update of the area entity, to refresh the supported_features
+                async_call_later(self.hass, 1, async_update_config)
+                return
 
-            @callback
-            async def async_reload_config(now=None):
-                _LOGGER.debug("async_update_subscribers")
+            coordinator = self.hass.data[const.DOMAIN]["coordinator"]
+            self._config = coordinator.store.async_get_config()
 
-                coordinator = self.hass.data[const.DOMAIN]["coordinator"]
-                self._config = coordinator.store.async_get_config()
+            await self.async_update_state()
+            self.async_write_ha_state()
 
-                await self.async_update_state()
-
-            async_call_later(self.hass, 1, async_reload_config)
-
-        self._entity_listener = async_dispatcher_connect(self.hass, "alarmo_register_entity", async_update_config)
-        self._config_listener = async_dispatcher_connect(self.hass, "alarmo_config_updated", async_update_config)
+        self.async_on_remove(
+            async_dispatcher_connect(self.hass, "alarmo_config_updated", async_update_config)
+        )
         await async_update_config()
 
         @callback
@@ -639,10 +632,6 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
     async def async_will_remove_from_hass(self):
         await super().async_will_remove_from_hass()
 
-        if self._config_listener:
-            self._config_listener()
-        if self._entity_listener:
-            self._entity_listener()
         self.hass.data[const.DOMAIN]["master"] = None
 
     async def async_update_state(self, state: str = None):
@@ -698,7 +687,6 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
                     open_sensors.update(item.open_sensors)
             self.open_sensors = open_sensors
 
-            _LOGGER.debug("checking bypassed sensors")
             bypassed_sensors = []
             for item in self.hass.data[const.DOMAIN]["areas"].values():
                 if item.bypassed_sensors:

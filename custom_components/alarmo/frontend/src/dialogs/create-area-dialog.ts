@@ -20,7 +20,7 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
 
   @property() name: string = "";
   @property() area_id?: string;
-
+  @property() selectedArea?: string;
 
   public hassSubscribe(): Promise<UnsubscribeFunc>[] {
     this._fetchData();
@@ -91,6 +91,19 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
         ? html`<span class="note">${localize("panels.general.dialogs.edit_area.name_warning", this.hass.language)}</span>`
         : ''
       }
+      ${!this.area_id
+        ? html`
+        <alarmo-select
+          .items=${Object.values(this.areas).map(e => Object({ value: e.area_id, name: e.name }))}
+          value=${this.selectedArea}
+          label="${localize("panels.general.dialogs.create_area.fields.copy_from", this.hass.language)}"
+          clearable=${true}
+          @value-changed=${(ev: Event) => this.selectedArea = (ev.target as HTMLInputElement).value}
+        >
+        </alarmo-select>
+        `
+        : ''
+      }
         </div>
         <mwc-button
           slot="primaryAction"
@@ -121,7 +134,8 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
       name: name
     }
     if (this.area_id) data = { ...data, area_id: this.area_id };
-
+    else if(this.selectedArea) data = { ...data, modes: { ...this.areas[this.selectedArea].modes } };
+    
     saveArea(this.hass, data)
       .catch(() => { })
       .then(() => { this.closeDialog() });

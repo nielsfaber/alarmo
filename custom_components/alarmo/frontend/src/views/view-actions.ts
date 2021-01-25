@@ -68,8 +68,7 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
             count: Object.values(this.automations).filter(el => el.is_notification && el.area == e.area_id).length
           }))
           .sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1))
-      )
-      .filter(e => e.count);
+      );
 
       this.automationFilterOptions = [
         {
@@ -85,8 +84,7 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
               count: Object.values(this.automations).filter(el => !el.is_notification && el.area == e.area_id).length
             }))
             .sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1))
-        )
-        .filter(e => e.count);
+        );
   }
 
   firstUpdated() {

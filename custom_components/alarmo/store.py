@@ -154,7 +154,7 @@ class AutomationEntry:
 
 class MigratableStore(Store):
     async def _async_migrate_func(self, old_version, data: dict):
-        _LOGGER.debug(data["config"])
+
         if old_version == 1:
             area_id = str(int(time.time()))
             data["areas"] = [
@@ -171,13 +171,11 @@ class MigratableStore(Store):
                     }
                 }, area_id=area_id))
             ]
+
             if "sensors" in data:
                 for sensor in data["sensors"]:
                     sensor["area"] = area_id
-            if "automations" in data:
-                for automation in data["automations"]:
-                    automation["area"] = area_id
-            _LOGGER.debug(data)
+
         return data
 
 

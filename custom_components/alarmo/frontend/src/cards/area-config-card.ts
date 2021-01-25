@@ -71,7 +71,9 @@ export class AreaConfigCard extends SubscribeMixin(LitElement) {
 
     const data = Object.values(areas).map(item => {
       const sensors = Object.values(this.sensors).filter(e => e.area == item.area_id).length;
-      const automations = Object.values(this.automations).filter(e => e.area == item.area_id).length;
+      const automations = Object.values(areas).length == 1
+        ? Object.values(this.automations).filter(e => !e.area || e.area == item.area_id).length
+        : Object.values(this.automations).filter(e => e.area == item.area_id).length;
       const summary_sensors = `<a href="/alarmo/sensors/filter/${item.area_id}">${localize("panels.general.cards.areas.table.summary_sensors", this.hass!.language, "{number}", String(sensors))}</a>`;
       const summary_automations = `<a href="/alarmo/actions/filter/${item.area_id}">${localize("panels.general.cards.areas.table.summary_automations", this.hass!.language, "{number}", String(automations))}</a>`;
       let output: TableData = {

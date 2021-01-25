@@ -67,8 +67,7 @@ export class AlarmViewSensors extends SubscribeMixin(LitElement) {
             count: Object.values(this.sensors).filter(el => el.area == e.area_id).length
           }))
           .sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1))
-      )
-      .filter(e => e.count);
+      );
   }
 
   firstUpdated() {

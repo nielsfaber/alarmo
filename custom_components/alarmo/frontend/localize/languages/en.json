@@ -119,7 +119,10 @@
       },
       "dialogs": {
         "create_area": {
-          "title": "New area"
+          "title": "New area",
+          "fields": {
+            "copy_from": "Copy settings from"
+          }
         },
         "edit_area": {
           "title": "Editing area '{area}'",
