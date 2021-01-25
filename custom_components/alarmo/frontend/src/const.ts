@@ -1,6 +1,6 @@
 
 
-export const VERSION = "1.5.0b"
+export const VERSION = "1.5.0"
 
 export const platform = 'alarmo';
 export const editConfigService = 'edit_config';

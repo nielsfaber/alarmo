@@ -21,7 +21,7 @@ from homeassistant.components.alarm_control_panel import (
     SUPPORT_ALARM_ARM_CUSTOM_BYPASS,
 )
 
-VERSION = "1.5.0b"
+VERSION = "1.5.0"
 NAME = "Alarmo"
 MANUFACTURER = "@nielsfaber"
 
