@@ -590,7 +590,7 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
         # load the configuration and make sure that it is reloaded on changes
         @callback
         async def async_update_config(area_id=None):
-            if area_id:
+            if area_id and area_id in self.hass.data[const.DOMAIN]["areas"]:
                 # wait for update of the area entity, to refresh the supported_features
                 async_call_later(self.hass, 1, async_update_config)
                 return
