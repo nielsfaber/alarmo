@@ -91,7 +91,7 @@ export class AutomationEditorCard extends LitElement {
         :
         html`
 
-  <settings-row .narrow=${this.narrow}>
+  <settings-row .narrow=${this.narrow} .large=${true}>
     <span slot="heading">${localize("panels.actions.cards.new_action.fields.event.heading", this.hass.language)}</span>
     <span slot="description">${localize("panels.actions.cards.new_action.fields.event.description", this.hass.language)}</span>
 

@@ -1,4 +1,5 @@
 import { LitElement, html, customElement, property } from 'lit-element';
+import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
 import { HomeAssistant, navigate, fireEvent } from 'custom-card-helpers';
 
 import { prettyPrint } from '../helpers';
@@ -70,12 +71,16 @@ export class AreaConfigCard extends SubscribeMixin(LitElement) {
 
     const data = Object.values(areas).map(item => {
       const sensors = Object.values(this.sensors).filter(e => e.area == item.area_id).length;
-      const automations = Object.values(this.automations).filter(e => e.area == item.area_id).length;
+      const automations = Object.values(areas).length == 1
+        ? Object.values(this.automations).filter(e => !e.area || e.area == item.area_id).length
+        : Object.values(this.automations).filter(e => e.area == item.area_id).length;
+      const summary_sensors = `<a href="/alarmo/sensors/filter/${item.area_id}">${localize("panels.general.cards.areas.table.summary_sensors", this.hass!.language, "{number}", String(sensors))}</a>`;
+      const summary_automations = `<a href="/alarmo/actions/filter/${item.area_id}">${localize("panels.general.cards.areas.table.summary_automations", this.hass!.language, "{number}", String(automations))}</a>`;
       let output: TableData = {
         id: item.area_id,
         actions: html`<ha-icon-button @click=${(ev: Event) => this.editClick(ev, item.area_id)} icon="hass:pencil"></ha-icon-button>`,
         name: prettyPrint(item.name),
-        remarks: localize("panels.general.cards.areas.table.summary", this.hass!.language, ["{sensors}", "{automations}"], [String(sensors), String(automations)])
+        remarks: unsafeHTML(localize("panels.general.cards.areas.table.summary", this.hass!.language, ["{summary_sensors}", "{summary_automations}"], [summary_sensors, summary_automations])) as unknown as string
       };
       return output;
     });

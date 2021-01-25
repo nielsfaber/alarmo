@@ -86,7 +86,7 @@ export const commonStyle = css`
     width: 100%;
   }
 
-  a { 
+  a, a:visited { 
     color: var(--primary-color);
   }
   mwc-button ha-icon {
@@ -124,5 +124,25 @@ export const commonStyle = css`
 
   ha-card > ha-card {
     margin: 10px;
+  }
+
+  div.table-filter {
+    display: flex;
+    width: 100%;
+    min-height: 52px;
+    border-top: 1px solid var(--divider-color);
+    box-sizing: border-box;
+    padding: 2px 8px;
+    flex-direction: row;
+    align-items: center;
+  }
+  div.table-filter .header {
+    display: flex;
+    white-space: nowrap;
+    padding: 8px 8px;
+  }
+  div.table-filter[narrow] {
+    flex-direction: column;
+    align-items: flex-start;
   }
 `;

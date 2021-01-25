@@ -132,7 +132,7 @@ class AlarmoCoordinator(DataUpdateCoordinator):
             old_config = self.store.async_get_config()
             if old_config[const.ATTR_MASTER] != data["master"]:
                 if self.hass.data[const.DOMAIN]["master"]:
-                    await self.hass.data[const.DOMAIN]["master"].async_remove()
+                    await self.async_remove_entity(self.hass.data[const.DOMAIN]["master"])
                 if data["master"]["enabled"]:
                     async_dispatcher_send(self.hass, "alarmo_register_master", data["master"])
                 else:
@@ -167,10 +167,10 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                 async_dispatcher_send(self.hass, "alarmo_automations_updated")
 
             self.store.async_delete_area(area_id)
-            await self.hass.data[const.DOMAIN]["areas"][area_id].async_remove()
+            await self.async_remove_entity(self.hass.data[const.DOMAIN]["areas"][area_id])
 
-            if len(self.hass.data[const.DOMAIN]["areas"]) == 1 and self.hass.data[const.DOMAIN]["master"]:
-                await self.hass.data[const.DOMAIN]["master"].async_remove()
+            if len(self.store.async_get_areas()) == 1 and self.hass.data[const.DOMAIN]["master"]:
+                await self.async_remove_entity(self.hass.data[const.DOMAIN]["master"])
 
         elif self.store.async_get_area(area_id):
             # modify an area
@@ -178,7 +178,7 @@ class AlarmoCoordinator(DataUpdateCoordinator):
             if "name" not in data:
                 async_dispatcher_send(self.hass, "alarmo_config_updated", area_id)
             else:
-                await self.hass.data[const.DOMAIN]["areas"][area_id].async_remove()
+                await self.async_remove_entity(self.hass.data[const.DOMAIN]["areas"][area_id])
                 async_dispatcher_send(self.hass, "alarmo_register_entity", entry)
         else:
             # create an area
@@ -187,7 +187,7 @@ class AlarmoCoordinator(DataUpdateCoordinator):
 
             config = self.store.async_get_config()
 
-            if len(self.hass.data[const.DOMAIN]["areas"]) == 2 and config["master"]["enabled"]:
+            if len(self.store.async_get_areas()) == 2 and config["master"]["enabled"]:
                 async_dispatcher_send(self.hass, "alarmo_register_master", config["master"])
 
     def async_update_sensor_config(self, entity_id: str, data: dict):
@@ -261,7 +261,6 @@ class AlarmoCoordinator(DataUpdateCoordinator):
     def listen_push_events(self):
         @callback
         async def async_handle_event(event):
-            _LOGGER.debug(event)
             action = None
             if (
                 event.data and "categoryName" in event.data
@@ -300,3 +299,7 @@ class AlarmoCoordinator(DataUpdateCoordinator):
         for event in const.PUSH_EVENTS:
             handle = self.hass.bus.async_listen(event, async_handle_event)
             self._push_listeners.append(handle)
+
+    async def async_remove_entity(self, entity):
+        entity_registry = await self.hass.helpers.entity_registry.async_get_registry()
+        entity_registry.async_remove(entity.entity_id)

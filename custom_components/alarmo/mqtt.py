@@ -134,7 +134,6 @@ class MqttHandler:
             command = msg.payload
             code = None
 
-        _LOGGER.debug(command)
         if type(command) is str:
             command = command.lower()
         else:
@@ -147,19 +146,20 @@ class MqttHandler:
         command_payloads = {}
         for item in const.COMMANDS:
             if item in payload_config and payload_config[item]:
-                command_payloads[item] = payload_config[item]
+                command_payloads[item] = payload_config[item].lower()
             elif item not in payload_config:
-                command_payloads[item] = item
+                command_payloads[item] = item.lower()
 
         if command not in list(command_payloads.values()):
             _LOGGER.warning("Received unexpected command: %s", command)
             return
 
         if area:
-            entity = filter(lambda el: slugify(el["name"]) == area, self.hass.data[const.DOMAIN]["areas"].values())
-            if not entity:
+            res = list(filter(lambda el: slugify(el.name) == area, self.hass.data[const.DOMAIN]["areas"].values()))
+            if not res:
                 _LOGGER.warning("Area {} does not exist".format(area))
                 return
+            entity = res[0]
         else:
             if self._config[const.ATTR_MASTER][const.ATTR_ENABLED] and len(self.hass.data[const.DOMAIN]["areas"]) > 1:
                 entity = self.hass.data[const.DOMAIN]["master"]

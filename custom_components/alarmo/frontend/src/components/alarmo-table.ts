@@ -157,5 +157,9 @@ export class AlarmoTable extends LitElement {
         display: flex;
         padding-top: 4px;
       }
+
+      a, a:visited {
+        color: var(--primary-color);
+      }
   `;
 }
