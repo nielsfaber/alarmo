@@ -18,6 +18,8 @@ This is an alarm system integration for Home Assistant. It provides a user inter
       - [Attributes](#attributes)
       - [Areas](#areas)
       - [Alarm Master](#alarm-master)
+        - [States](#states-1)
+        - [Commands](#commands)
     - [Sensor configuration](#sensor-configuration)
       - [Sensor types](#sensor-types)
       - [Immediate](#immediate)
@@ -31,6 +33,7 @@ This is an alarm system integration for Home Assistant. It provides a user inter
     - [MQTT](#mqtt)
       - [State topic](#state-topic)
       - [Command topic](#command-topic)
+      - [Multiple area usage](#multiple-area-usage)
     - [Actions](#actions)
       - [Push notifications](#push-notifications)
         - [Actionable notifications](#actionable-notifications)
@@ -195,7 +198,6 @@ Alarmo requires at least 1 area to be set up to be functional.
 
 The name of an area defines the entity ID as well. 
 The entity will be instantly renamed after saving.
-After renaming an area, the old entity ID may appear again in your entities list after a restart of HA. This entity shows up as `unavailable` and has to be deleted manually. 
 
 **Warning**: renaming an area changes the entity ID, which might break your Lovelace cards and automations outside of Alarmo, so treat it with care.
 
@@ -207,12 +209,35 @@ The option appears in the *general* tab in *general settings* if you have multip
 The alarm master is meant for operating your areas synchronously. 
 An extra `alarm_control_panel` entity is created for the master, which watches the state of the areas for and mirrors its own state with that.
 
+ ##### States
+ The Alarm Master will watch the states of the area entities and updates its own state accordingly.
+ 
+ The following table shows the rules which are implemented to determine the the master alarm state (in order of priority):
+
+ | Condition                                                                                                                   | Master Alarm state       |
+ | --------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
+ | One or more areas have state `triggered`                                                                                    | `triggered`              |
+ | One or more areas have state `pending`                                                                                      | `pending`                |
+ | One or more areas have state `arming`, others have state `armed_away`, `armed_home`, `armed_night` or `armed_custom_bypass` | `arming`                 |
+ | All areas have state `armed_away`                                                                                           | `armed_away`             |
+ | All areas have state `armed_home`                                                                                           | `armed_home`             |
+ | All areas have state `armed_night`                                                                                          | `armed_night`            |
+ | All areas have state `armed_custom_bypass`                                                                                  | `armed_custom_bypass`    |
+ | All areas have state `disarmed`                                                                                             | `disarmed`               |
+ | Otherwise                                                                                                                   | (previous state is kept) |
+
+
+**Notes**:
+* The Alarm Master cannot determine its state if some are disarmed while others are armed. If the Alarm Master is used for arming/disarming the alarm, this condition should not occur.
+* If the areas are independently operated, the user is reponsible to maintain synchronism between the areas. If independent operation is desired, usage of the Master Alarm is not recommended.
+
+##### Commands
 Arming / disarming the master will cause the action to be propagated to all areas.
-If the arming of one area fails, the arming is aborted and all areas are disarmed.
 
-The triggering of one area causes the triggering of the alarm master.
+If the arming of an area fails (due to blocking sensors), the arming procedure will be aborted and all areas are disarmed.
 
-**Warning**: the state of the master can only be determined if the areas are in sync. If one area is being armed while another is disarmed, the master will not change the state (i.e. it stays in `disarmed`). The only allowed exceptions are the `pending` and `arming` states.
+The available [arm modes](#arm-modes) for the Master Alarm are determined from the areas. 
+Only arm modes which are in common for all areas are available for the Master Alarm.
 
 ### Sensor configuration
 
@@ -310,33 +335,73 @@ When a user is trying to access the Alarmo configuration panel, access is only a
 ### MQTT
 Alarmo supports MQTT for external control of the alarm. This function is intended for third-party alarm panels (such as a touch screen in the hallway).
 
-The MQTT support needs to be enabled before it can be used.
+The MQTT support needs to be enabled before it can be used. This setting is available in tab "*General*".
 
 #### State topic
+The state topic shall be used to publish state changes of the `alarm_control_panel` entities.
 
-The state topic shall be used to publish state changes.
+The state topic is an output topic, i.e. the data is sent by Alarmo and should be received by another application (such as a wall panel).
+
+Default state topic (can be configured):
+```
+alarmo/state
+```
 
 Alarmo will send the current state of the Alarmo entity as payload (string).
 See [here](#states) for the complete list of payloads.
+ The payload which is sent per state can be configured if desired.
+
+The data published on the state topic shall be sent with a *retain* flag. This means that the last sent payload shall be stored in the broker, and as soon as an application subscribed to the topic, the most recent data shall be available for it.
+
 
 #### Command topic
 
-The command topic can be used to control Alarmo through MQTT.
+The command topic can be used for external control of Alarmo through MQTT.
 
-The following commands/payloads are supported:
+The command topic is an input topic, i.e. the topic is watched by Alarmo and data should be sent by another application (such as a wall panel). The data should never be sent with *retain* flag, as this might give undesired behaviour when HA is restarted.
+
+Default command topic (can be configured):
+```
+alarmo/command
+```
+
+If Alarmo is configured to require a pincode or password for the (arm/disarm) command, the payload must be formatted as JSON according to the following format:
+```
+{command: "<my command>", code: "<my pin or password>"}
+```
+If Alarmo does not require any code for the command, the command can be sent directly as text/string value.
+
+
+Alarmo supports the following command values (these can be customized as desired):
 * DISARM
 * ARM_AWAY
 * ARM_HOME
 * ARM_NIGHT
 * ARM_CUSTOM_BYPASS
 
-If Alarmo is configured to require a pincode or password for the command, the payload must be formatted as JSON with the following format:
-```
-{command: "<my command>", code: "<my pin or password>"}
-```
 
-If the provided payload does not have the correct format, lacks a code when it is required or contains a wrong code, the command is ignored. 
+If the provided payload does not have the correct format, lacks a code when it is required or contains a wrong code, the command shall be ignored. 
 In other cases, you should see a change in the state topic.
+
+
+**Notes**:
+* The pin or password value should always be sent as a text/string value. A numeric value is not supported. This is due to the fact that a pincode could contain leading zeros (e.g. 0012), which would be lost if sent as a number.
+* Alarmo provides the option to accept MQTT commands without requiring a code. By disabling the "*Require code*" setting in the MQTT configuration, the internal code check is skipped. This setting should be used with care as it may compromise the security of the alarm.
+
+#### Multiple area usage
+The MQTT functionality can be used in combination with a multiple area configuration.
+
+Alarmo shall publish the state updates for the Master Alarm and the areas in dedicated state topics:
+* Master Alarm: `alarmo/state`
+* Area: `alarmo/<area_name>/state`
+
+Likewise, for sending a command, the dedicated topics become:
+* Master Alarm: `alarmo/command`
+* Area: `alarmo/<area_name>/command`
+
+**Notes**: 
+* The MQTT configuration allows customizing the state and command topics for the Master Alarm only. The topics for the areas are automatically derived by inserting the area name. Example: setting state topic to `my/custom/topic` gives `my/custom/<area_name>/topic` as state topic for an area.
+* `<area_name>` is a *slug* of the name that is given to an area. This means that the name shall be in lowercase and all non-alphanumerical characters are replaced by underscores (similar to the entity_IDs in HA).
 
 ### Actions
 
