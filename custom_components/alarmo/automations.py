@@ -62,7 +62,7 @@ class AutomationHandler:
             for automation_id, config in self._config.items():
                 if (
                     not config[const.ATTR_ENABLED]
-                    or config[const.ATTR_AREA] != area_id
+                    or (config[const.ATTR_AREA] != area_id and len(self.hass.data[const.DOMAIN]["areas"]) > 1)
                 ):
                     continue
                 elif (
@@ -87,7 +87,10 @@ class AutomationHandler:
             _LOGGER.debug("{} has failed to arm".format(alarm_entity.entity_id))
 
             for automation_id, config in self._config.items():
-                if not config[const.ATTR_ENABLED]:
+                if (
+                    not config[const.ATTR_ENABLED]
+                    or (config[const.ATTR_AREA] != area_id and len(self.hass.data[const.DOMAIN]["areas"]) > 1)
+                ):
                     continue
                 elif (
                     len(config[const.ATTR_MODES]) and alarm_entity.arm_mode
