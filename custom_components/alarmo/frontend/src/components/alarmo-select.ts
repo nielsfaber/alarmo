@@ -1,5 +1,6 @@
 import { fireEvent, HomeAssistant } from "custom-card-helpers";
-import { css, CSSResult, customElement, html, internalProperty, LitElement, property, query, TemplateResult } from "lit-element";
+import { css, CSSResult, customElement, html, internalProperty, LitElement, property, query, TemplateResult, PropertyValues } from "lit-element";
+import { IsEqual } from "../helpers";
 
 type Option = {
   name: string,
@@ -32,6 +33,14 @@ export class AlarmoSelect extends LitElement {
     });
   }
 
+  shouldUpdate(changedProps: PropertyValues) {
+    if (changedProps.get("items")) {
+      if (!IsEqual(this.items, changedProps.get("items") as Option[])) this.firstUpdated();
+      else return false;
+    }
+    return true;
+  }
+
   protected firstUpdated() {
     (this._comboBox as any).items = this.items;
   }
@@ -58,17 +67,17 @@ export class AlarmoSelect extends LitElement {
           ${this._value && this.items.find(e => e.value == this._value)
         ? html`
                 ${this.icons
-                ? html`
+            ? html`
                 <ha-icon 
                   slot="prefix"
                   icon="${this.items.find(e => e.value == this._value)!.icon}"
                 >
                 </ha-icon>
-                ` : 
-                ''
-                }
+                ` :
+            ''
+          }
                 ${this.clearable
-                  ? html`
+            ? html`
                 <ha-icon-button
                   slot="suffix"
                   class="clear-button"
@@ -77,8 +86,8 @@ export class AlarmoSelect extends LitElement {
                 >
                 </ha-icon-button>
                 ` :
-                ''
-                }
+            ''
+          }
               `
         : ""}
           <ha-icon-button
@@ -118,7 +127,7 @@ export class AlarmoSelect extends LitElement {
           </paper-item-body>
         </paper-icon-item>
         `;
-    } else if(!root.firstElementChild) {
+    } else if (!root.firstElementChild) {
       root.innerHTML = `
         <style>
           paper-item {
@@ -133,11 +142,11 @@ export class AlarmoSelect extends LitElement {
           </paper-item-body>
         </paper-item>
         `;
-      
+
     }
     root.querySelector(".name")!.textContent = entry.item.name;
     root.querySelector("[secondary]")!.textContent = entry.item.description;
-    if(this.icons) (root.querySelector("ha-icon")! as any).icon = entry.item.icon;
+    if (this.icons) (root.querySelector("ha-icon")! as any).icon = entry.item.icon;
   }
 
   private _clearValue(ev: Event) {
