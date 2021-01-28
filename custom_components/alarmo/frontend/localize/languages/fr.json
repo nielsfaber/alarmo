@@ -22,7 +22,7 @@
     },
     "editor": {
       "ui_mode": "Afficher l'éditeur visuel",
-      "yaml_mode": Afficher l'éditeur de code"
+      "yaml_mode": "Afficher l'éditeur de code"
     }
   },
   "panels": {
