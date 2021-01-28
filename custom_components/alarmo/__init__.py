@@ -132,7 +132,7 @@ class AlarmoCoordinator(DataUpdateCoordinator):
             old_config = self.store.async_get_config()
             if old_config[const.ATTR_MASTER] != data["master"]:
                 if self.hass.data[const.DOMAIN]["master"]:
-                    await self.async_remove_entity(self.hass.data[const.DOMAIN]["master"])
+                    await self.async_remove_entity("master")
                 if data["master"]["enabled"]:
                     async_dispatcher_send(self.hass, "alarmo_register_master", data["master"])
                 else:
@@ -167,10 +167,10 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                 async_dispatcher_send(self.hass, "alarmo_automations_updated")
 
             self.store.async_delete_area(area_id)
-            await self.async_remove_entity(self.hass.data[const.DOMAIN]["areas"][area_id])
+            await self.async_remove_entity(area_id)
 
             if len(self.store.async_get_areas()) == 1 and self.hass.data[const.DOMAIN]["master"]:
-                await self.async_remove_entity(self.hass.data[const.DOMAIN]["master"])
+                await self.async_remove_entity("master")
 
         elif self.store.async_get_area(area_id):
             # modify an area
@@ -178,7 +178,7 @@ class AlarmoCoordinator(DataUpdateCoordinator):
             if "name" not in data:
                 async_dispatcher_send(self.hass, "alarmo_config_updated", area_id)
             else:
-                await self.async_remove_entity(self.hass.data[const.DOMAIN]["areas"][area_id])
+                await self.async_remove_entity(area_id)
                 async_dispatcher_send(self.hass, "alarmo_register_entity", entry)
         else:
             # create an area
@@ -300,6 +300,13 @@ class AlarmoCoordinator(DataUpdateCoordinator):
             handle = self.hass.bus.async_listen(event, async_handle_event)
             self._push_listeners.append(handle)
 
-    async def async_remove_entity(self, entity):
+    async def async_remove_entity(self, area_id: str):
         entity_registry = await self.hass.helpers.entity_registry.async_get_registry()
-        entity_registry.async_remove(entity.entity_id)
+        if area_id == "master":
+            entity = self.hass.data[const.DOMAIN]["master"]
+            entity_registry.async_remove(entity.entity_id)
+            self.hass.data[const.DOMAIN]["master"] = None
+        else:
+            entity = self.hass.data[const.DOMAIN]["areas"][area_id]
+            entity_registry.async_remove(entity.entity_id)
+            self.hass.data[const.DOMAIN]["areas"].pop(area_id, None)

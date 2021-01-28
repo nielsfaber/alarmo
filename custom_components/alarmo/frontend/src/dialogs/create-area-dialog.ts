@@ -6,6 +6,8 @@ import { commonStyle } from '../styles';
 import { localize } from '../../localize/localize';
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
 import { SubscribeMixin } from '../subscribe-mixin';
+import { handleError } from '../helpers';
+
 
 import './confirm-delete-dialog';
 
@@ -126,7 +128,7 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
     `;
   }
 
-  private saveClick() {
+  private saveClick(ev: Event) {
     const name = this.name.trim();
     if (!name.length) return;
 
@@ -137,7 +139,7 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
     else if(this.selectedArea) data = { ...data, modes: { ...this.areas[this.selectedArea].modes } };
     
     saveArea(this.hass, data)
-      .catch(() => { })
+    .catch(e => handleError(e, ev))
       .then(() => { this.closeDialog() });
   }
 
@@ -163,7 +165,7 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
 
     if (result) {
       deleteArea(this.hass, this.area_id)
-        .catch(() => { })
+        .catch(e => handleError(e, ev))
         .then(() => { this.closeDialog() });
     }
   }

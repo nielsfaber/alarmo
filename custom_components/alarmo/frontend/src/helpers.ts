@@ -80,7 +80,7 @@ export function showErrorDialog(ev: Event, error: string | TemplateResult) {
 export function handleError(err: any, ev: Event) {
   let errorMessage = html`
     <b>Something went wrong!</b><br>
-    ${err.body.message}<br><br>
+    ${err.body.message ? html`${err.body.message}<br><br>` : ''}
     ${err.error}<br><br>
     Please <a href="https://github.com/nielsfaber/alarmo/issues">report</a> the bug.
   `;
