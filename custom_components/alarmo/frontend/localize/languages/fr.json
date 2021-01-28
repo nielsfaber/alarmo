@@ -1,0 +1,422 @@
+{
+  "common": {
+    "modes_long": {
+      "armed_away": "Activée en mode absence",
+      "armed_home": "Activée en mode présence",
+      "armed_night": "Activée en mode nuit",
+      "armed_custom_bypass": "Activée en mode personnalisé"
+    },
+    "modes_short": {
+      "armed_away": "Absence",
+      "armed_home": "Présence",
+      "armed_night": "Nuit",
+      "armed_custom_bypass": "Personnalisé"
+    }
+  },
+  "components": {
+    "time_slider": {
+      "seconds": "sec",
+      "minutes": "min",
+      "infinite": "infini",
+      "none": "Aucune"
+    },
+    "editor": {
+      "ui_mode": "Afficher l'éditeur visuel",
+      "yaml_mode": "Afficher l'éditeur de code"
+    }
+  },
+  "panels": {
+    "general": {
+      "cards": {
+        "general": {
+          "title": "Paramètres généraux",
+          "description": "Ce panneau définit les paramètres globaux de l'alarme.",
+          "fields": {
+            "disarm_after_trigger": {
+              "heading": "Désactivation après déclenchement",
+              "description": "Lors que le temps de fonctionnement de la sirène est écoulé, désactive l'alarme au lieu de la réactiver."
+            },
+            "enable_mqtt": {
+              "heading": "Utilisation avec MQTT",
+              "description": "Permet au panneau d'alarme d'être contrôlé via MQTT."
+            },
+            "enable_master": {
+              "heading": "Activation de commande centralisée",
+              "description": "Créer une entité pour piloter toutes les zone en même temps."
+            }
+          },
+          "actions": {
+            "setup_mqtt": "Configuration MQTT",
+            "setup_master": "Configuration pricipale"
+          }
+        },
+        "modes": {
+          "title": "Modes",
+          "description": "Ce panneau définit le mode de gestion pour chaque type d'activation.",
+          "fields": {
+            "mode": {
+              "armed_away": "Ce mode sera utilisé lorsque toutes les personnes auront quitté la maison. Toutes les portes et fenêtres permettant l'accès à la maison seront surveillées, les détecteurs de mouvement à l'intérieur de la maison seront opérationnels.",
+              "armed_home": "Ce mode sera utilisée lorsque des personnes sont dans la maison. Toutes les portes et fenêtres permettant l'accès à la maison seront surveillées (périmétrie), les détecteurs de mouvement à l'intérieur de la maison seront inopérants.",
+              "armed_night": "Ce mode sera utilisée lors du réglage de l'alarme avant de s'endormir. Toutes les portes et fenêtres permettant l'accès à la maison seront surveillées, et les capteurs de mouvement sélectionnés (ex : rez de chaussée) dans la maison seront opérationnels.",
+              "armed_custom_bypass": "ce mode supplémentaire permet de définir votre propre périmètre de sécurité.",
+              "enabled": "Actif",
+              "disabled": "Inactif"
+            },
+            "exit_delay": {
+              "heading": "Délai pour sortir",
+              "description": "Lors de l'activation, pendant cette période, les capteurs ne déclencheront pas l'alarme."
+            },
+            "entry_delay": {
+              "heading": "Délai pour entrer",
+              "description": "Temps d'attente avant que l'alarme ne se déclenche après détection d'un des capteurs."
+            },
+            "trigger_time": {
+              "heading": "Temps de fonctionnement",
+              "description": "Temps de fonctionnement de la sirène"
+            }
+          }
+        },
+        "mqtt": {
+          "title": "Configuration MQTT",
+          "description": "Ce panneau peut être utilisé pour la configuration de l'interface MQTT.",
+          "fields": {
+            "state_topic": {
+              "heading": "Etat de données",
+              "description": "Donnée sur laquelle les mises à jour d'état sont publiées"
+            },
+            "command_topic": {
+              "heading": "Commande de donnée",
+              "description": "Donnée sur laquelle les commandes d'armement / désarmement sont envoyées."
+            },
+            "require_code": {
+              "heading": "Code requis",
+              "description": "Exige que le code soit envoyé avec la commande."
+            },
+            "state_payload": {
+              "heading": "Configurer une valeur par état",
+              "item": "Définir une valeur par état '{state}'"
+            },
+            "command_payload": {
+              "heading": "Configurer une valeur par commande",
+              "item": "Définir une valeur par commande '{command}'"
+            }
+          }
+        },
+        "areas": {
+          "title": "Zones",
+          "description": "Les zones peuvent être utilisées pour diviser votre système d'alarme en plusieurs secteurs.",
+          "no_items": "Il n'y a pas encore de zones définies.",
+          "table": {
+            "remarks": "Remarque",
+            "summary": "Cette zone contient des {sensors} capteurs et {automations} automatisations."
+          },
+          "actions": {
+            "add": "Ajouter"
+          }
+        }
+      },
+      "dialogs": {
+        "create_area": {
+          "title": "Nouvelle zone"
+        },
+        "edit_area": {
+          "title": "Editer la zone '{area}'",
+          "name_warning": "Note: Changer le nom changera l'entity ID"
+        },
+        "remove_area": {
+          "title": "Suppression de zone?",
+          "description": "Etes vous sur de vouloir supprimer cette zone? Cette zone contient {sensors} des capteurs et {automations} automatisations, qui seront également supprimés."
+        },
+        "edit_master": {
+          "title": "Configuration principale"
+        },
+        "disable_master": {
+          "title": "Désactiver la configuration principale?",
+          "description": "Etes vous sur de vouloir supprimer la configuration principale? Cette zone contient {automations} automatisations, qui seront également supprimées."
+        }
+      }
+    },
+    "capteurs": {
+      "cards": {
+        "sensors": {
+          "title": "Capteurs",
+          "description": "Capteurs actuellement configurés. Cliquez sur une entité pour apporter des modifications.",
+          "no_items": "Il n'y a pas encore de capteur ajouté à l'alarme. Assurez-vous de les ajouter d'abord.",
+          "table": {
+            "arm_modes": "Type d'activation",
+            "always_on": "(Toujours)"
+          }
+        },
+        "add_sensors": {
+          "title": "Ajouter un capteur",
+          "description": "Ajoutez plus de capteurs. Assurez-vous que vos capteurs ont un nom personnalisé afin de pouvoir les identifier.",
+          "no_items": "Aucune entité HA disponible ne peut être configurée pour l'alarme. Assurez-vous d'inclure les entités de type binary_sensor.",
+          "actions": {
+            "add_to_alarm": "Ajouter à l'alarme",
+            "show_all": "Tout montrer"
+          }
+        },
+        "editor": {
+          "title": "Editer un capteur",
+          "description": "Configurer les paramètres du capteur '{entity}'.",
+          "fields": {
+            "name": {
+              "heading": "Nom",
+              "description": "Remplacer le nom personnalisé (friendly name)."
+            },
+            "area": {
+              "heading": "Zone",
+              "description": "Selectionner une zone contenant ce capteur."
+            },
+            "device_type": {
+              "heading": "Type de détection",
+              "description": "Choisissez un type de détection pour appliquer automatiquement les paramètres appropriés.",
+              "choose": {
+                "door": {
+                  "name": "Porte",
+                  "description": "Une porte, un portail ou une autre entrée utilisée pour entrer / sortir de la maison."
+                },
+                "window": {
+                  "name": "Fenêtre",
+                  "description": "Une fenêtre, ou une porte non utilisée pour entrer dans la maison comme un balcon."
+                },
+                "motion": {
+                  "name": "Mouvement",
+                  "description": "Capteur de présence ou appareil similaire présentant un délai entre les activations."
+                },
+                "tamper": {
+                  "name": "Effraction",
+                  "description": "Détection d'arrachage du capteur, capteur de bris de verre, etc.."
+                },
+                "environmental": {
+                  "name": "Détecteur Environmental",
+                  "description": "Détecteur de fumée / gaz, détecteur de fuite, etc. (non lié à la protection anti-effraction)."
+                },
+                "other": {
+                  "name": "Générique"
+                }
+              }
+            },
+            "always_on": {
+              "heading": "Toujours en service",
+              "description": "Le capteur doit toujours déclencher l'alarme."
+            },
+            "modes": {
+              "heading": "Mode possible",
+              "description": "Modes d'alarme dans lesquels ce capteur est actif."
+            },
+            "arm_on_close": {
+              "heading": "Activer après fermeture",
+              "description": "Après la désactivation de ce capteur, le délai de sortie restant sera automatiquement ignoré."
+            },
+            "immediate": {
+              "heading": "Immédiat",
+              "description": "L'activation de ce capteur déclenchera l'alarme immédiatement plutôt qu'après le délai d'entrée."
+            },
+            "allow_open": {
+              "heading": "Autoriser l'ouverture lors de l'activation",
+              "description": "Permet à ce capteur d'être actif, peu de temps après votre départ afin qu'il ne bloque pas l'armement."
+            },
+            "trigger_unavailable": {
+              "heading": "Déclenchement lorsqu'il n'est pas disponible",
+              "description": "Lorsque l'état du capteur devient `` indisponible '', cela activera le capteur."
+            }
+          },
+          "actions": {
+            "toggle_advanced": "Paramètres avancées",
+            "remove": "Supprimer"
+          },
+          "errors": {
+            "description": "Veuillez corriger les erreurs suivantes:",
+            "no_area": "Aucune zone n'est sélectionnée",
+            "no_modes": "Aucun mode sélectionné pour lequel le capteur doit être actif"
+          }
+        }
+      }
+    },
+    "codes": {
+      "cards": {
+        "codes": {
+          "title": "Codes",
+          "description": "Gestion des paramètres des codes.",
+          "fields": {
+            "code_arm_required": {
+              "heading": "Utiliser un code pour l'activation",
+              "description": "Code requis pour l'activation de l'alarme"
+            },
+            "code_disarm_required": {
+              "heading": "Utiliser un code pour la désactivation",
+              "description": "Code requis pour la désactivation de l'alarme"
+            },
+            "code_format": {
+              "heading": "Format du code",
+              "description": "Définit le type d'entrée pour la carte d'alarme Lovelace.",
+              "code_format_number": "pincode",
+              "code_format_text": "password"
+            }
+          }
+        },
+        "user_management": {
+          "title": "Gestion des utilisateurs",
+          "description": "Chaque utilisateur a son propre code pour activer / désactiver l'alarme.",
+          "no_items": "Il n'y a aucun utilisateur de défini",
+          "table": {
+            "remarks": "Remarque",
+            "administrator": "Administrateur"
+          },
+          "actions": {
+            "new_user": "Nouvel utilisateur"
+          }
+        },
+        "new_user": {
+          "title": "Créer un nouvel utilisateur",
+          "description": "Des utilisateurs peuvent être créés pour donner accès au fonctionnement de l'alarme.",
+          "fields": {
+            "name": {
+              "heading": "Nom",
+              "description": "Nom de l'utilisateur."
+            },
+            "code": {
+              "heading": "Code",
+              "description": "Code personnel de l'utilisateur."
+            },
+            "confirm_code": {
+              "heading": "Confirmation du code",
+              "description": "Répèter le  code."
+            },
+            "is_admin": {
+              "heading": "L'utilisateur est aussi administrateur",
+              "description": "Autorise l'utilisateur à effectuer des changements."
+            },
+            "can_arm": {
+              "heading": "Demande de code pour l'activation",
+              "description": "Entrer ce code pour activer l'alarme."
+            },
+            "can_disarm": {
+              "heading": "Demande de code pour désactivation",
+              "description": "Entrer ce code pour désactiver l'alarme."
+            },
+            "is_override_code": {
+              "heading": "Code de sécurité",
+              "description": "La saisie de ce code forcera l'activation l'alarme."
+            }
+          },
+          "errors": {
+            "no_name": "Aucun nom saisi.",
+            "no_code": "Le code doit contenir 4 caractères/chiffres minimum.",
+            "code_mismatch": "Les codes sont différents."
+          }
+        },
+        "edit_user": {
+          "title": "Editer l'utilisateur",
+          "description": "Changer la  configuration pour l'utilisateur '{name}'.",
+          "fields": {
+            "old_code": {
+              "heading": "Code utilisé",
+              "description": "Code actuel, laissez vide pour ne rien changer."
+            }
+          }
+        }
+      }
+    },
+    "actions": {
+      "cards": {
+        "notifications": {
+          "title": "Notifications",
+          "description": "À l'aide de ce panneau, vous pouvez gérer les notifications à envoyer lors d'un évènement d'alarme",
+          "table": {
+            "enabled": "Active",
+            "no_items": "Il n'y a aucune notification de  créée."
+          },
+          "actions": {
+            "new_notification": "Nouvelle notification"
+          }
+        },
+        "actions": {
+          "title": "Actions",
+          "description": "Ce panneau est encore en développement. Il sera utilisé pour changer d'état les appareils de votre choix.",
+          "table": {
+            "no_items": "Il n'y a aucune action de créer."
+          },
+          "actions": {
+            "new_action": "Nouvelle action"
+          }
+        },
+        "new_notification": {
+          "title": "Créer une notification",
+          "description": "Créer une nouvelle notification.",
+          "fields": {
+            "name": {
+              "heading": "Nom",
+              "description": "Description de la notification"
+            },
+            "event": {
+              "heading": "Evènement",
+              "description": "Détermine quand la notification doit être envoyée"
+            },
+            "mode": {
+              "heading": "Mode",
+              "description": "Limite la notification à un mode spécifique (optionnel)"
+            },
+            "title": {
+              "heading": "Titre",
+              "description": "Titre du message de la notification"
+            },
+            "message": {
+              "heading": "Message",
+              "description": "Contenu du message de la notification"
+            },
+            "target": {
+              "heading": "Cible",
+              "description": "Appareil recevant le message"
+            }
+          }
+        },
+        "new_action": {
+          "title": "Créer une action",
+          "description": "Ce panneau peut être utilisé pour commuter un appareil lorsque l'état de l'alarme change.",
+          "fields": {
+            "name": {
+              "heading": "Nom",
+              "description": "Description de  l'action"
+            },
+            "event": {
+              "heading": "Evènement",
+              "description": "Détermine quand l'action doit être exécutée"
+            },
+            "area": {
+              "heading": "Zone",
+              "description": "Zone pour laquelle l'évènement s'applique, laissez vide pour sélectionner l'alarme globale."
+            },
+            "mode": {
+              "heading": "Mode",
+              "description": "Limite l'action à un mode spécifique (optionnel)"
+            },
+            "entity": {
+              "heading": "Entité",
+              "description": "Entité sur laquelle effectuer une action"
+            },
+            "action": {
+              "heading": "Action",
+              "description": "Action à exécuter sur l'entité",
+              "turn_on": "Mettre à on",
+              "turn_off": "Mettre à off"
+            }
+          }
+        }
+      },
+      "validation_errors": {
+        "no_triggers": "Aucun état ou évènement prévu pour le déclenchement de cette automatisation.",
+        "empty_trigger": "L'un des déclencheurs n'a aucun état ou évènement fourni.",
+        "invalid_trigger": "L'un des déclencheurs a une valeur non valide: {trigger}",
+        "invalid_mode": "Entrée non valide fournie par  le 'mode': {mode}",
+        "no_actions": "Aucune action n'est prévue pour être effectuée par cette automatisation.",
+        "no_service": "Il manque un service dans l’une des actions.",
+        "invalid_service": "Un nom de service non valide a été fourni pour l'une des actions: {service}",
+        "no_service_data": "Aucune donnée de service n'a été fournie pour l'une des actions.",
+        "no_entity_in_service_data": "Aucun entity_id n'a été fourni dans le service_data de l'une des actions.",
+        "no_message_in_service_data": "Aucun message n'a été fourni dans le service_data de l'une des actions."
+      }
+    }
+  }
+}
