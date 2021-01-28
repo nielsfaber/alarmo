@@ -164,7 +164,7 @@ class MqttHandler:
             if self._config[const.ATTR_MASTER][const.ATTR_ENABLED] and len(self.hass.data[const.DOMAIN]["areas"]) > 1:
                 entity = self.hass.data[const.DOMAIN]["master"]
             elif len(self.hass.data[const.DOMAIN]["areas"]) == 1:
-                entity = self.hass.data[const.DOMAIN]["areas"][0]
+                entity = self.hass.data[const.DOMAIN]["areas"].values()[0]
             else:
                 _LOGGER.warning("No area specified")
                 return
