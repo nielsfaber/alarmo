@@ -11,6 +11,7 @@ import { commonStyle } from './styles';
 import { VERSION } from './const';
 import { fetchUsers } from './data/websockets';
 import { AlarmoUser, Dictionary } from './types';
+import { localize } from '../localize/localize';
 
 @customElement('alarm-panel')
 export class MyAlarmPanel extends LitElement {
@@ -84,7 +85,7 @@ export class MyAlarmPanel extends LitElement {
             >
             </ha-menu-button>
             <div main-title>
-              Alarm panel
+              ${localize("title", this.hass.language)}
             </div>
             <div class="version">
               v${VERSION}
@@ -97,16 +98,16 @@ export class MyAlarmPanel extends LitElement {
             @iron-activate=${this.handlePageSelected}
           >
             <paper-tab page-name="general">
-              General
+              ${localize("panels.general.title", this.hass.language)}
             </paper-tab>
             <paper-tab page-name="sensors">
-              sensors
+              ${localize("panels.sensors.title", this.hass.language)}
             </paper-tab>
             <paper-tab page-name="codes">
-              Codes
+              ${localize("panels.codes.title", this.hass.language)}
             </paper-tab>
             <paper-tab page-name="actions">
-              actions
+              ${localize("panels.actions.title", this.hass.language)}
             </paper-tab>
           </paper-tabs>
         </app-header>
