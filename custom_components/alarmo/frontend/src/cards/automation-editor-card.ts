@@ -213,9 +213,11 @@ export class AutomationEditorCard extends LitElement {
 
   private getModeList() {
     const modes = this.data?.area
-      ? Object.entries(this.areas[this.data.area].modes)
-        .filter(([, v]) => v.enabled)
-        .map(([k]) => k as EArmModes)
+      ? this.areas[this.data.area]
+        ? Object.entries(this.areas[this.data.area].modes)
+          .filter(([, v]) => v.enabled)
+          .map(([k]) => k as EArmModes)
+       : []
       : Object.values(this.areas)
         .map(e => Object.entries(e.modes)
           .filter(([, v]) => v.enabled)
@@ -293,7 +295,8 @@ export class AutomationEditorCard extends LitElement {
     let data = this.yamlMode ? { ...this.yamlCode } as AlarmoAutomation : this.data!;
     data = {
       ...data,
-      name: data.name || this.namePlaceholder
+      name: data.name || this.namePlaceholder,
+      area: data.area || ""
     };
     const error = validateData(data, this.hass);
     if (error) {
