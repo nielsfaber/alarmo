@@ -259,6 +259,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             self.open_sensors = None
             self.bypassed_sensors = None
             await self.async_update_state(STATE_ALARM_DISARMED)
+            return True
 
     async def async_handle_arm_request(self, arm_mode, code, skip_code):
         """check if conditions are met for starting arm procedure"""
@@ -626,9 +627,8 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
     async def async_update_state(self, state: str = None):
         """update the state or refresh state attributes"""
 
-        if state == STATE_ALARM_DISARMED:
-            for item in self.hass.data[const.DOMAIN]["areas"].values():
-                await item.async_alarm_disarm()
+        if state:
+            # do not allow updating the state directly
             return
 
         states = [
@@ -687,6 +687,13 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
             async_dispatcher_send(self.hass, "alarmo_state_updated", None, old_state, state)
 
         self.async_write_ha_state()
+
+    async def async_alarm_disarm(self, code=None, skip_code=False):
+        """Send disarm command."""
+        res = await super().async_alarm_disarm(code, skip_code)
+        if res:
+            for item in self.hass.data[const.DOMAIN]["areas"].values():
+                await item.async_alarm_disarm(code, skip_code)
 
     async def async_arm(self, arm_mode, skip_delay=False, bypass_open_sensors=False):
         """Arm the alarm or switch between arm modes."""
