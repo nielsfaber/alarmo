@@ -4,12 +4,12 @@ import { omit } from "../helpers";
 import { localize } from "../../localize/localize";
 
 
-export const triggerOptions = (_hass: HomeAssistant) => [
+export const triggerOptions = (hass: HomeAssistant) => [
 
   {
     value: EAlarmStates.Armed,
-    name: "Alarm is armed",
-    description: "The alarm is succesfully armed",
+    name: localize("panels.actions.cards.new_notification.fields.event.choose.armed.name", hass.language),
+    description: localize("panels.actions.cards.new_notification.fields.event.choose.armed.description", hass.language),
     icon: "hass:shield-check-outline",
     trigger: {
       state: EAlarmStates.Armed
@@ -17,8 +17,8 @@ export const triggerOptions = (_hass: HomeAssistant) => [
   },
   {
     value: EAlarmStates.Disarmed,
-    name: "Alarm is disarmed",
-    description: "The alarm is disarmed",
+    name: localize("panels.actions.cards.new_notification.fields.event.choose.disarmed.name", hass.language),
+    description: localize("panels.actions.cards.new_notification.fields.event.choose.disarmed.description", hass.language),
     icon: "hass:shield-off-outline",
     trigger: {
       state: EAlarmStates.Disarmed
@@ -26,8 +26,8 @@ export const triggerOptions = (_hass: HomeAssistant) => [
   },
   {
     value: EAlarmStates.Triggered,
-    name: "Alarm is triggered",
-    description: "The alarm is triggered",
+    name: localize("panels.actions.cards.new_notification.fields.event.choose.triggered.name", hass.language),
+    description: localize("panels.actions.cards.new_notification.fields.event.choose.triggered.description", hass.language),
     icon: "hass:bell-alert-outline",
     trigger: {
       state: EAlarmStates.Triggered
@@ -35,8 +35,8 @@ export const triggerOptions = (_hass: HomeAssistant) => [
   },
   {
     value: EAlarmEvents.ArmFailure,
-    name: "Failed to arm",
-    description: "The arming of the alarm failed due to one or more open sensors",
+    name: localize("panels.actions.cards.new_notification.fields.event.choose.arm_failure.name", hass.language),
+    description: localize("panels.actions.cards.new_notification.fields.event.choose.arm_failure.description", hass.language),
     icon: "hass:alert-outline",
     trigger: {
       event: EAlarmEvents.ArmFailure
@@ -44,8 +44,8 @@ export const triggerOptions = (_hass: HomeAssistant) => [
   },
   {
     value: EAlarmStates.Arming,
-    name: "Exit delay started",
-    description: "Exit delay started, ready to leave the house.",
+    name: localize("panels.actions.cards.new_notification.fields.event.choose.arming.name", hass.language),
+    description: localize("panels.actions.cards.new_notification.fields.event.choose.arming.description", hass.language),
     icon: "hass:home-export-outline",
     trigger: {
       state: EAlarmStates.Arming
@@ -53,8 +53,8 @@ export const triggerOptions = (_hass: HomeAssistant) => [
   },
   {
     value: EAlarmStates.Pending,
-    name: "Entry delay started",
-    description: "Entry delay started, the alarm will trigger soon.",
+    name: localize("panels.actions.cards.new_notification.fields.event.choose.pending.name", hass.language),
+    description: localize("panels.actions.cards.new_notification.fields.event.choose.pending.description", hass.language),
     icon: "hass:home-import-outline",
     trigger: {
       state: EAlarmStates.Pending

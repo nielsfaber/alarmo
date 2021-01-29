@@ -25,11 +25,12 @@
       "yaml_mode": "Switch to YAML"
     }
   },
+  "title": "Alarm panel",
   "panels": {
     "general": {
+      "title": "General",
       "cards": {
         "general": {
-          "title": "General settings",
           "description": "This panel defines some global settings for the alarm.",
           "fields": {
             "disarm_after_trigger": {
@@ -142,9 +143,9 @@
       }
     },
     "sensors": {
+      "title": "Sensors",
       "cards": {
         "sensors": {
-          "title": "Sensors",
           "description": "Currently configured sensors. Click on an entity to make changes.",
           "no_items": "There are no sensors to be displayed here.",
           "table": {
@@ -244,9 +245,9 @@
       }
     },
     "codes": {
+      "title": "Codes",
       "cards": {
         "codes": {
-          "title": "Codes",
           "description": "Change settings for the code.",
           "fields": {
             "code_arm_required": {
@@ -329,6 +330,7 @@
       }
     },
     "actions": {
+      "title": "Actions",
       "cards": {
         "notifications": {
           "title": "Notifications",
@@ -346,7 +348,6 @@
           }
         },
         "actions": {
-          "title": "Actions",
           "description": "This panel can be used to switch a device when the alarm state changes.",
           "table": {
             "no_items": "There are no actions created yet."
@@ -365,7 +366,33 @@
             },
             "event": {
               "heading": "Event",
-              "description": "When should the notification be sent"
+              "description": "When should the notification be sent",
+              "choose": {
+                "armed": {
+                  "name": "Alarm is armed",
+                  "description": "The alarm is succesfully armed"
+                },
+                "disarmed": {
+                  "name": "Alarm is disarmed",
+                  "description": "The alarm is disarmed"
+                },
+                "triggered": {
+                  "name": "Alarm is triggered",
+                  "description": "The alarm is triggered"
+                },
+                "arm_failure": {
+                  "name": "Failed to arm",
+                  "description": "The arming of the alarm failed due to one or more open sensors"
+                },
+                "arming": {
+                  "name": "Exit delay started",
+                  "description": "Exit delay started, ready to leave the house."
+                },
+                "pending": {
+                  "name": "Entry delay started",
+                  "description": "Entry delay started, the alarm will trigger soon."
+                }
+              }
             },
             "mode": {
               "heading": "Mode",

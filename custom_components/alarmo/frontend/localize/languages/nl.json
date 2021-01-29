@@ -27,9 +27,9 @@
   },
   "panels": {
     "general": {
+      "title": "Algemeen",
       "cards": {
         "general": {
-          "title": "Algemene instellingen",
           "description": "Dit paneel definieert enkele instellingen die van toepassing zijn op alle inschakelmodi.",
           "fields": {
             "disarm_after_trigger": {
@@ -142,9 +142,9 @@
       }
     },
     "sensors": {
+      "title": "Sensoren",
       "cards": {
         "sensors": {
-          "title": "Sensoren",
           "description": "Momenteel geconfigureerde sensoren. Klik op een entiteit om wijzigingen aan te brengen.",
           "no_items": "Er zijn nog geen sensoren aan het alarm toegevoegd. Zorg ervoor dat u ze eerst toevoegt.",
           "table": {
@@ -244,9 +244,9 @@
       }
     },
     "codes": {
+      "title": "Codes",
       "cards": {
         "codes": {
-          "title": "Codes",
           "description": "Wijzig de instellingen voor de code.",
           "fields": {
             "code_arm_required": {
@@ -329,6 +329,7 @@
       }
     },
     "actions": {
+      "title": "Acties",
       "cards": {
         "notifications": {
           "title": "Meldingen",
@@ -346,8 +347,7 @@
           }
         },
         "actions": {
-          "title": "Acties",
-          "description": "Dit paneel is nog in ontwikkeling. Het wordt gebruikt apparaten te in/uit te schakelen.",
+          "description": "Dit paneel kan worden gebruikt om een apparaat te schakelen wanneer de status van het alarm veranderd.",
           "table": {
             "no_items": "Er zijn nog geen acties gemaakt."
           },

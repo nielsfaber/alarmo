@@ -235,7 +235,7 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
       </ha-card>
 
       
-      <ha-card header="${localize("panels.actions.cards.actions.title", this.hass.language)}">
+      <ha-card header="${localize("panels.actions.title", this.hass.language)}">
         <div class="card-content">${localize("panels.actions.cards.actions.description", this.hass.language)}</div>
       
         ${this.automationFilterOptions.length > 1

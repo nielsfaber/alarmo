@@ -183,7 +183,7 @@ export class AlarmViewSensors extends SubscribeMixin(LitElement) {
     });
 
     return html`
-    <ha-card header="${localize("panels.sensors.cards.sensors.title", this.hass.language)}">
+    <ha-card header="${localize("panels.sensors.title", this.hass.language)}">
       <div class="card-content">
         ${localize("panels.sensors.cards.sensors.description", this.hass.language)}
       </div>
