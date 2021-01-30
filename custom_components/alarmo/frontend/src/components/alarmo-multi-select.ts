@@ -1,4 +1,5 @@
 import { LitElement, html, customElement, css, property } from 'lit-element';
+import { IsEqual } from '../helpers';
 
 type OptionValue = string | Number;
 type ChangeEvent = Event & { target: { selectedItem: any } };
@@ -83,10 +84,12 @@ export class AlarmoMultiSelect extends LitElement {
     if (!ev.target.selectedItem) return;
     const value = ev.target.selectedItem.getAttribute('value');
 
-    this.value = (this.value.length == index)
+    const newValue = (this.value.length == index)
       ? [...this.value, value]
       : this.value.slice(0, index).concat(value, this.value.slice(index + 1))
 
+    if(IsEqual(newValue, this.value)) return;
+    this.value = newValue;
     const myEvent = new CustomEvent("change");
     this.dispatchEvent(myEvent);
   }
