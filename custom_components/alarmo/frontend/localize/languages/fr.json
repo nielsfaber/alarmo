@@ -25,11 +25,12 @@
       "yaml_mode": "Afficher l'éditeur de code"
     }
   },
+  "title": "Alarm panel",
   "panels": {
     "general": {
+      "title": "Généraux",
       "cards": {
         "general": {
-          "title": "Paramètres généraux",
           "description": "Ce panneau définit les paramètres globaux de l'alarme.",
           "fields": {
             "disarm_after_trigger": {
@@ -108,7 +109,9 @@
           "no_items": "Il n'y a pas encore de zones définies.",
           "table": {
             "remarks": "Remarque",
-            "summary": "Cette zone contient des {sensors} capteurs et {automations} automatisations."
+            "summary": "Cette zone contient des {summary_sensors} et {summary_automations}.",
+            "summary_sensors": "{number} capteurs",
+            "summary_automations": "{number} automations"
           },
           "actions": {
             "add": "Ajouter"
@@ -117,7 +120,10 @@
       },
       "dialogs": {
         "create_area": {
-          "title": "Nouvelle zone"
+          "title": "Nouvelle zone",
+          "fields": {
+            "copy_from": "Copy settings from"
+          }
         },
         "edit_area": {
           "title": "Editer la zone '{area}'",
@@ -137,14 +143,18 @@
       }
     },
     "capteurs": {
+      "title": "Capteurs",
       "cards": {
         "sensors": {
-          "title": "Capteurs",
           "description": "Capteurs actuellement configurés. Cliquez sur une entité pour apporter des modifications.",
           "no_items": "Il n'y a pas encore de capteur ajouté à l'alarme. Assurez-vous de les ajouter d'abord.",
           "table": {
             "arm_modes": "Type d'activation",
             "always_on": "(Toujours)"
+          },
+          "filter": {
+            "label": "Filter by area",
+            "no_area": "(No area)"
           }
         },
         "add_sensors": {
@@ -235,9 +245,9 @@
       }
     },
     "codes": {
+      "title": "Codes",
       "cards": {
         "codes": {
-          "title": "Codes",
           "description": "Gestion des paramètres des codes.",
           "fields": {
             "code_arm_required": {
@@ -320,6 +330,7 @@
       }
     },
     "actions": {
+      "title": "Actions",
       "cards": {
         "notifications": {
           "title": "Notifications",
@@ -330,10 +341,13 @@
           },
           "actions": {
             "new_notification": "Nouvelle notification"
+          },
+          "filter": {
+            "label": "Filter by area",
+            "no_area": "Alarm master"
           }
         },
         "actions": {
-          "title": "Actions",
           "description": "Ce panneau est encore en développement. Il sera utilisé pour changer d'état les appareils de votre choix.",
           "table": {
             "no_items": "Il n'y a aucune action de créer."
@@ -352,7 +366,33 @@
             },
             "event": {
               "heading": "Evènement",
-              "description": "Détermine quand la notification doit être envoyée"
+              "description": "Détermine quand la notification doit être envoyée",
+              "choose": {
+                "armed": {
+                  "name": "Alarm is armed",
+                  "description": "The alarm is succesfully armed"
+                },
+                "disarmed": {
+                  "name": "Alarm is disarmed",
+                  "description": "The alarm is disarmed"
+                },
+                "triggered": {
+                  "name": "Alarm is triggered",
+                  "description": "The alarm is triggered"
+                },
+                "arm_failure": {
+                  "name": "Failed to arm",
+                  "description": "The arming of the alarm failed due to one or more open sensors"
+                },
+                "arming": {
+                  "name": "Exit delay started",
+                  "description": "Exit delay started, ready to leave the house."
+                },
+                "pending": {
+                  "name": "Entry delay started",
+                  "description": "Entry delay started, the alarm will trigger soon."
+                }
+              }
             },
             "mode": {
               "heading": "Mode",

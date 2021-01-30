@@ -25,17 +25,14 @@
       "yaml_mode": "Passa a YAML"
     }
   },
+  "title": "Alarm panel",
   "panels": {
     "general": {
+      "title": "Generali",
       "cards": {
         "general": {
-          "title": "Impostazioni Generali",
           "description": "Questo pannello definisce alcune impostazioni da applicare alle modalità di allarme.",
           "fields": {
-            "trigger_time": {
-              "heading": "Tempo di attivazione",
-              "description": "Tempo durante il quale suonerà la sirena"
-            },
             "disarm_after_trigger": {
               "heading": "Disattiva allarme dopo l'attivazione",
               "description": "Dopo che il tempo di attivazione è scaduto, disattivare l'allarme invece di tornare allo stato inserito."
@@ -43,35 +40,42 @@
             "enable_mqtt": {
               "heading": "Abilita MQTT",
               "description": "Permetti al pannello allarme di essere controllato attraverso MQTT."
+            },
+            "enable_master": {
+              "heading": "Enable alarm master",
+              "description": "Creates an entity for controlling all areas simultaneously."
             }
           },
           "actions": {
-            "setup_mqtt": "Configurazione MQTT"
+            "setup_mqtt": "Configurazione MQTT",
+            "setup_master": "Master Configuration"
           }
         },
-        "common": {
+        "modes": {
+          "title": "Modes",
+          "description": "This panel can be used to set up the arm modes of the alarm.",
           "fields": {
-            "leave_time": {
+            "mode": {
+              "armed_away": "Modalità 'fuori casa': da utilizzare quando tutte le persone lasciano la casa. Tutti i sensori di porte e finestre che consentono l'accesso alla casa saranno attivi, così come i sensori di movimento all'interno della casa.",
+              "armed_home": "Modalità 'in casa': da utilizzare quando si attiva l'allarme mentre le persone sono in casa. Tutti i sensori di porte e finestre che consentono l'accesso alla casa saranno attivi, ma non i sensori di movimento all'interno della casa.",
+              "armed_night": "Modalità 'notte': da utilizzare quando si imposta la sveglia prima di andare a dormire. Tutti i sensori di porte e finestre che consentono l'accesso alla casa saranno attivi e sensori di movimento selezionati (ad esempio al piano di sotto) nella casa.",
+              "armed_custom_bypass": "Modalità 'personalizzato': da utilizzare per definire una modalità di allarme specifica per le esigenze dell'utilizzatore.",
+              "enabled": "Enabled",
+              "disabled": "Disabled"
+            },
+            "exit_delay": {
               "heading": "Tempo di preattivazione",
               "description": "Quando si attiva l'allarme, entro questo periodo di tempo i sensori non attiveranno ancora l'allarme."
             },
-            "entry_time": {
+            "entry_delay": {
               "heading": "Ritardo di attivazione",
               "description": "Tempo di ritardo fino allo scatto dell'allarme dopo l'attivazione di uno dei sensori."
+            },
+            "trigger_time": {
+              "heading": "Tempo di attivazione",
+              "description": "Tempo durante il quale suonerà la sirena"
             }
           }
-        },
-        "armed_away": {
-          "description": "Modalità 'fuori casa': da utilizzare quando tutte le persone lasciano la casa. Tutti i sensori di porte e finestre che consentono l'accesso alla casa saranno attivi, così come i sensori di movimento all'interno della casa."
-        },
-        "armed_home": {
-          "description": "Modalità 'in casa': da utilizzare quando si attiva l'allarme mentre le persone sono in casa. Tutti i sensori di porte e finestre che consentono l'accesso alla casa saranno attivi, ma non i sensori di movimento all'interno della casa."
-        },
-        "armed_night": {
-          "description": "Modalità 'notte': da utilizzare quando si imposta la sveglia prima di andare a dormire. Tutti i sensori di porte e finestre che consentono l'accesso alla casa saranno attivi e sensori di movimento selezionati (ad esempio al piano di sotto) nella casa."
-        },
-        "armed_custom": {
-          "description": "Modalità 'personalizzato': da utilizzare per definire una modalità di allarme specifica per le esigenze dell'utilizzatore."
         },
         "mqtt": {
           "title": "Configurazione MQTT",
@@ -98,18 +102,59 @@
               "item": "Definisci un payload per il comando '{command}'"
             }
           }
+        },
+        "areas": {
+          "title": "Areas",
+          "description": "Areas can be used for dividing your alarm system into multiple compartments.",
+          "no_items": "There are no areas defined yet.",
+          "table": {
+            "remarks": "Remarks",
+            "summary": "This area contains {summary_sensors} and {summary_automations}.",
+            "summary_sensors": "{number} sensors",
+            "summary_automations": "{number} automations"
+          },
+          "actions": {
+            "add": "Add"
+          }
+        }
+      },
+      "dialogs": {
+        "create_area": {
+          "title": "New area",
+          "fields": {
+            "copy_from": "Copy settings from"
+          }
+        },
+        "edit_area": {
+          "title": "Editing area '{area}'",
+          "name_warning": "Note: changing the name will change the entity ID"
+        },
+        "remove_area": {
+          "title": "Remove area?",
+          "description": "Are you sure you want to remove this area? This area contains {sensors} sensors and {automations} automations, which will be removed as well."
+        },
+        "edit_master": {
+          "title": "Master configuration"
+        },
+        "disable_master": {
+          "title": "Disable master?",
+          "description": "Are you sure you want to remove the alarm master? This area contains {automations} automations, which will be removed with this action."
         }
       }
     },
     "sensors": {
+      "title": "Sensori",
       "cards": {
         "sensors": {
-          "title": "Sensori",
           "description": "Sensori attualmente configurati. Clicca sull'entità per modificare.",
           "no_items": "Non ci sono ancora sensori aggiunti a questo allarme. Assicurati di aggiungerli prima.",
           "table": {
             "arm_modes": "Modalità di attivazione",
             "always_on": "(Sempre)"
+          },
+          "filter": {
+            "label": "Filter by area",
+            "no_area": "(No area)"
           }
         },
         "add_sensors": {
@@ -129,6 +174,39 @@
               "heading": "Nome",
               "description": "Sovrascrivi friendly name."
             },
+            "area": {
+              "heading": "Area",
+              "description": "Select an area which contains this sensor."
+            },
+            "device_type": {
+              "heading": "Device Type",
+              "description": "Choose a device type to automatically apply appropriate settings.",
+              "choose": {
+                "door": {
+                  "name": "Door",
+                  "description": "A door, gate or other entrance that is used for entering/leaving the home."
+                },
+                "window": {
+                  "name": "Window",
+                  "description": "A window, or a door not used for entering the house such as balcony."
+                },
+                "motion": {
+                  "name": "Motion",
+                  "description": "Presence sensor or similar device having a delay between activations."
+                },
+                "tamper": {
+                  "name": "Tamper",
+                  "description": "Detector of sensor cover removal, glass break sensor, etc."
+                },
+                "environmental": {
+                  "name": "Environmental",
+                  "description": "Smoke/gas sensor, leak detector, etc. (not related to burglar protection)."
+                },
+                "other": {
+                  "name": "Generic"
+                }
+              }
+            },
             "always_on": {
               "heading": "Sempre attivo",
               "description": "Il sensore attiverà sempre l'allarme."
@@ -136,6 +214,10 @@
             "modes": {
               "heading": "Modalità attive",
               "description": "Modalità di allarme in cui il sensore risulta collegato."
+            },
+            "arm_on_close": {
+              "heading": "Arm after closing",
+              "description": "After deactivation of this sensor, the remaining exit delay will automatically be skipped."
             },
             "immediate": {
               "heading": "Immediato",
@@ -149,14 +231,23 @@
               "heading": "Fai scattare l'allarme quando non disponibile",
               "description": "L'allarme scatterà quando lo stato del sensore diverrà 'non disponibile'."
             }
+          },
+          "actions": {
+            "toggle_advanced": "Advanced settings",
+            "remove": "Remove"
+          },
+          "errors": {
+            "description": "Please correct the following errors:",
+            "no_area": "No area is selected",
+            "no_modes": "No modes are selected for which the sensor should be active"
           }
         }
       }
     },
     "codes": {
+      "title": "Codici",
       "cards": {
         "codes": {
-          "title": "Codici",
           "description": "Modifica le impostazioni dei codici.",
           "fields": {
             "code_arm_required": {
@@ -239,6 +330,7 @@
       }
     },
     "actions": {
+      "title": "Azioni",
       "cards": {
         "notifications": {
           "title": "Notifiche",
@@ -249,10 +341,13 @@
           },
           "actions": {
             "new_notification": "nuova notifica"
+          },
+          "filter": {
+            "label": "Filter by area",
+            "no_area": "Alarm master"
           }
         },
         "actions": {
-          "title": "Azioni",
           "description": "Questo pannello è in fase di sviluppo. Sarà usato per cambiare lo stato di una o più entità.",
           "table": {
             "no_items": "Non è stata creata nessuna azione per ora."
@@ -271,7 +366,33 @@
             },
             "event": {
               "heading": "Evento",
-              "description": "Quando questa notifica deve essere inviata"
+              "description": "Quando questa notifica deve essere inviata",
+              "choose": {
+                "armed": {
+                  "name": "Alarm is armed",
+                  "description": "The alarm is succesfully armed"
+                },
+                "disarmed": {
+                  "name": "Alarm is disarmed",
+                  "description": "The alarm is disarmed"
+                },
+                "triggered": {
+                  "name": "Alarm is triggered",
+                  "description": "The alarm is triggered"
+                },
+                "arm_failure": {
+                  "name": "Failed to arm",
+                  "description": "The arming of the alarm failed due to one or more open sensors"
+                },
+                "arming": {
+                  "name": "Exit delay started",
+                  "description": "Exit delay started, ready to leave the house."
+                },
+                "pending": {
+                  "name": "Entry delay started",
+                  "description": "Entry delay started, the alarm will trigger soon."
+                }
+              }
             },
             "mode": {
               "heading": "Modalità",
@@ -302,6 +423,10 @@
             "event": {
               "heading": "Evento",
               "description": "Quando questa azione deve essere eseguita"
+            },
+            "area": {
+              "heading": "Area",
+              "description": "Area for which the event applies, leave empty to select the global alarm."
             },
             "mode": {
               "heading": "Modalità",

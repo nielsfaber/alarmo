@@ -25,6 +25,7 @@
       "yaml_mode": "Wissel naar YAML"
     }
   },
+  "title": "Alarmpaneel",
   "panels": {
     "general": {
       "title": "Algemeen",
@@ -365,7 +366,33 @@
             },
             "event": {
               "heading": "Gebeurtenis",
-              "description": "Wanneer moet de melding worden verzonden"
+              "description": "Wanneer moet de melding worden verzonden",
+              "choose": {
+                "armed": {
+                  "name": "Alarm is is ingeschakeld",
+                  "description": "Het alarm is succesvol ingeschakeld"
+                },
+                "disarmed": {
+                  "name": "Alarm is uitgeschakeld",
+                  "description": "Het alarm is uitgeschakeld"
+                },
+                "triggered": {
+                  "name": "Alarm is afgegaan",
+                  "description": "Het alarm gaat af"
+                },
+                "arm_failure": {
+                  "name": "Kan niet inschakelen",
+                  "description": "Het inschakelen van het alarm is mislukt vanwege een of meerdere blokkerende sensoren"
+                },
+                "arming": {
+                  "name": "Vertrek",
+                  "description": "Vertrekvertraging ingegaan, tijd om het huis te verlaten."
+                },
+                "pending": {
+                  "name": "Binnenkomst",
+                  "description": "Binnenkomstvertraging ingegaan, het alarm dient te worden uitgeschakeld."
+                }
+              }
             },
             "mode": {
               "heading": "Mode",
