@@ -410,6 +410,9 @@
               "heading": "Target",
               "description": "Device to send the push message to"
             }
+          },
+          "actions": {
+            "test": "Try it"
           }
         },
         "new_action": {

@@ -410,6 +410,9 @@
               "heading": "Saaja",
               "description": "Seade millele edastada teavitus"
             }
+          },
+          "actions": {
+            "test": "Try it"
           }
         },
         "new_action": {

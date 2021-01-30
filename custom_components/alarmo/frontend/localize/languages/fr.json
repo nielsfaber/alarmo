@@ -410,6 +410,9 @@
               "heading": "Cible",
               "description": "Appareil recevant le message"
             }
+          },
+          "actions": {
+            "test": "Try it"
           }
         },
         "new_action": {

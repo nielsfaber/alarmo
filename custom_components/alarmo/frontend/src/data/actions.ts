@@ -1,6 +1,5 @@
-import { EAlarmStates, EAlarmEvents, AlarmoNotification, Dictionary, Trigger, NotificationAction, AlarmoAutomation, EArmModes } from "../types";
+import { EAlarmStates, EAlarmEvents, AlarmoNotification, Dictionary, AlarmoAutomation, EArmModes } from "../types";
 import { HomeAssistant, computeDomain, computeEntity } from "custom-card-helpers";
-import { omit } from "../helpers";
 import { localize } from "../../localize/localize";
 
 

@@ -92,6 +92,9 @@ export const commonStyle = css`
   mwc-button ha-icon {
     padding-right: 11px;
   }
+  mwc-button[trailingIcon] ha-icon {
+    padding: 0px 0px 0px 6px;
+  }
   mwc-button.vertical {
     height: 60px;
     --mdc-button-height: 60px;

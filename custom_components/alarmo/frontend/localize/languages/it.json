@@ -410,6 +410,9 @@
               "heading": "Destinatario",
               "description": "Dispositivo a cui inviare il messaggio di notifica"
             }
+          },
+          "actions": {
+            "test": "Try it"
           }
         },
         "new_action": {

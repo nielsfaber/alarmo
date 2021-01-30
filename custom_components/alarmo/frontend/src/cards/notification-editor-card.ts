@@ -194,21 +194,25 @@ export class NotificationEditorCard extends LitElement {
         
   <div class="card-actions">
     <mwc-button @click=${this.saveClick}>
+    <ha-icon icon="hass:content-save-outline"></ha-icon>
       ${this.hass.localize("ui.common.save")}
     </mwc-button>
 
   ${this.item
         ? html`
-    <mwc-button
-      class="warning"
-      @click=${this.deleteClick}
-    >
+    <mwc-button class="warning" @click=${this.deleteClick}>
+      <ha-icon icon="hass:trash-can-outline"></ha-icon>
       ${this.hass.localize("ui.common.delete")}
     </mwc-button>`
         :
         ''
       }
-  </div>
+ 
+      <mwc-button @click=${this.testClick} style="float: right" trailingIcon>
+        ${localize("panels.actions.cards.new_notification.actions.test", this.hass.language)}
+        <ha-icon icon="hass:arrow-right"></ha-icon>
+      </mwc-button>
+    </div>
 </ha-card>
     `;
   }
@@ -301,8 +305,7 @@ export class NotificationEditorCard extends LitElement {
       .then(() => { this.cancelClick() });
   }
 
-
-  private async saveClick(ev: Event) {
+  private loadFormData() {
     let data = this.yamlMode ? { ...this.yamlCode } as AlarmoNotification : this.data!;
     data = {
       ...data,
@@ -322,7 +325,11 @@ export class NotificationEditorCard extends LitElement {
       name: data.name || this.namePlaceholder,
       area: data.area || ""
     };
+    return data;
+  }
 
+  private async saveClick(ev: Event) {
+    let data = this.loadFormData();
     const error = validateData(data, this.hass);
     if (error) {
       showErrorDialog(ev, error);
@@ -347,6 +354,38 @@ export class NotificationEditorCard extends LitElement {
 
   private cancelClick() {
     navigate(this, "/alarmo/actions", true);
+  }
+
+  private testClick(ev: Event) {
+    let data = this.loadFormData();
+    const error = validateData(data, this.hass);
+    if (error) {
+      showErrorDialog(ev, error);
+      return;
+    }
+
+    data.actions.forEach(action => {
+      const [domain, service] = action.service.split(".");
+      let message = action.service_data.message;
+      message = message.replace("{{open_sensors}}", "some-example-sensor is open");
+      message = message.replace("{{bypassed_sensors}}", "some-bypassed-sensor");
+      message = message.replace("{{arm_mode}}", "armed_away");
+      message = message.replace("{{changed_by}}", "some-example-user");
+
+      action = {
+        ...action,
+        service_data: {
+          ...action.service_data,
+          message: message
+        }
+      }
+      this.hass.callService(domain, service, action.service_data)
+        .then()
+        .catch(e => {
+          showErrorDialog(ev, e.message);
+          return;
+        });
+    });
   }
 
   static styles = commonStyle;

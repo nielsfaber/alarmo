@@ -188,20 +188,24 @@ export class AutomationEditorCard extends LitElement {
         
   <div class="card-actions">
     <mwc-button @click=${this.saveClick}>
+      <ha-icon icon="hass:content-save-outline"></ha-icon>
       ${this.hass.localize("ui.common.save")}
     </mwc-button>
 
   ${this.item
         ? html`
-    <mwc-button
-      class="warning"
-      @click=${this.deleteClick}
-    >
+    <mwc-button class="warning" @click=${this.deleteClick}> 
+      <ha-icon icon="hass:trash-can-outline"></ha-icon>
       ${this.hass.localize("ui.common.delete")}
     </mwc-button>`
         :
         ''
       }
+ 
+      <mwc-button @click=${this.testClick} style="float: right" trailingIcon>
+        ${localize("panels.actions.cards.new_notification.actions.test", this.hass.language)}
+        <ha-icon icon="hass:arrow-right"></ha-icon>
+      </mwc-button>
   </div>
 </ha-card>
     `;
@@ -289,15 +293,20 @@ export class AutomationEditorCard extends LitElement {
     deleteAutomation(this.hass, this.item)
       .catch(e => handleError(e, ev))
       .then(() => { this.cancelClick() });
-  } z
+  }
 
-  private saveClick(ev: Event) {
+  loadFormData() {
     let data = this.yamlMode ? { ...this.yamlCode } as AlarmoAutomation : this.data!;
     data = {
       ...data,
       name: data.name || this.namePlaceholder,
       area: data.area || ""
     };
+    return data;
+  }
+
+  private saveClick(ev: Event) {
+    let data = this.loadFormData();
     const error = validateData(data, this.hass);
     if (error) {
       showErrorDialog(ev, error);
@@ -323,6 +332,24 @@ export class AutomationEditorCard extends LitElement {
 
   private cancelClick() {
     navigate(this, "/alarmo/actions", true);
+  }
+  private testClick(ev: Event) {
+    let data = this.loadFormData();
+    const error = validateData(data, this.hass);
+    if (error) {
+      showErrorDialog(ev, error);
+      return;
+    }
+
+    data.actions.forEach(action => {
+      const [domain, service] = action.service.split(".");
+      this.hass.callService(domain, service, action.service_data)
+        .then()
+        .catch(e => {
+          showErrorDialog(ev, e.message);
+          return;
+        });
+    });
   }
 
   static styles = commonStyle;

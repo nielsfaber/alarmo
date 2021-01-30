@@ -410,6 +410,9 @@
               "heading": "Doel",
               "description": "Apparaat om het push-bericht naar te sturen"
             }
+          },
+          "actions": {
+            "test": "Uitproberen"
           }
         },
         "new_action": {
