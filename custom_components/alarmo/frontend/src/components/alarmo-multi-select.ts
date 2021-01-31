@@ -1,19 +1,18 @@
 import { LitElement, html, customElement, css, property } from 'lit-element';
 import { IsEqual } from '../helpers';
 
-type OptionValue = string | Number;
+type OptionValue = string | number;
 type ChangeEvent = Event & { target: { selectedItem: any } };
 export interface Option {
-  name?: string,
-  value: OptionValue
+  name?: string;
+  value: OptionValue;
 }
 
 export type OptionList = Option[];
 
 @customElement('alarmo-multi-select')
 export class AlarmoMultiSelect extends LitElement {
-
-  @property() label: string = "";
+  @property() label = '';
   @property() options: OptionList = [];
   @property() value: OptionValue[] = [];
   @property({ type: Boolean }) disabled?;
@@ -28,7 +27,7 @@ export class AlarmoMultiSelect extends LitElement {
   render() {
     return html`
       <div class="container">
-      ${[...Array(this.numOptions).keys()].map((i) => this.renderSelect(i))}
+        ${[...Array(this.numOptions).keys()].map(i => this.renderSelect(i))}
       </div>
     `;
   }
@@ -36,45 +35,50 @@ export class AlarmoMultiSelect extends LitElement {
   renderSelect(index: number) {
     return html`
       <div>
-      <paper-dropdown-menu
-          label=${this.label}
-          ?disabled=${this.disabled}
-      >
-        <paper-listbox
-          slot="dropdown-content"
-          selected=${this.getSelected(index)}
-          @selected-item-changed=${(ev: ChangeEvent) => this.selectedChange(ev, index)}
-        >
-          ${this.renderOptions(index)}
-        </paper-listbox>
-      </paper-dropdown-menu>
-      ${this.renderButton(index)}
-  </div>`;
+        <paper-dropdown-menu label=${this.label} ?disabled=${this.disabled}>
+          <paper-listbox
+            slot="dropdown-content"
+            selected=${this.getSelected(index)}
+            @selected-item-changed=${(ev: ChangeEvent) => this.selectedChange(ev, index)}
+          >
+            ${this.renderOptions(index)}
+          </paper-listbox>
+        </paper-dropdown-menu>
+        ${this.renderButton(index)}
+      </div>
+    `;
   }
 
   renderButton(index: number) {
     if (index != this.numOptions - 1)
-      return html`<ha-icon icon="hass:minus" @click=${() => this.removeOption(index)}></ha-icon>`;
+      return html`
+        <ha-icon icon="hass:minus" @click=${() => this.removeOption(index)}></ha-icon>
+      `;
     else if (index == this.options.length - 1)
-      return html`<ha-icon icon="hass:minus" @click=${() => this.removeOption(index)}></ha-icon>`;
+      return html`
+        <ha-icon icon="hass:minus" @click=${() => this.removeOption(index)}></ha-icon>
+      `;
     else if (this.value && (this.value as OptionValue[]).length > index)
-      return html`<ha-icon icon="hass:plus" @click=${this.addOption}></ha-icon>`;
+      return html`
+        <ha-icon icon="hass:plus" @click=${this.addOption}></ha-icon>
+      `;
     else
-      return html`<ha-icon class="disabled" icon="hass:plus"></ha-icon>`;
+      return html`
+        <ha-icon class="disabled" icon="hass:plus"></ha-icon>
+      `;
   }
 
   private renderOptions(index: number) {
-    const list = this.value.slice(0, index).concat(this.value.slice(index + 1))
+    const list = this.value.slice(0, index).concat(this.value.slice(index + 1));
     return this.options
       .filter(e => e.value)
-      .map(el => html`
-      <paper-item
-    value="${el.value}"
-    ?disabled=${list.includes(el.value)}
-      >
-      ${el.name || el.value}
-    </paper-item>
-      `);
+      .map(
+        el => html`
+          <paper-item value="${el.value}" ?disabled=${list.includes(el.value)}>
+            ${el.name || el.value}
+          </paper-item>
+        `
+      );
   }
   private getSelected(index: number) {
     return this.options.filter(e => e.value).findIndex(e => e.value == this.value[index]);
@@ -84,13 +88,14 @@ export class AlarmoMultiSelect extends LitElement {
     if (!ev.target.selectedItem) return;
     const value = ev.target.selectedItem.getAttribute('value');
 
-    const newValue = (this.value.length == index)
-      ? [...this.value, value]
-      : this.value.slice(0, index).concat(value, this.value.slice(index + 1))
+    const newValue =
+      this.value.length == index
+        ? [...this.value, value]
+        : this.value.slice(0, index).concat(value, this.value.slice(index + 1));
 
-    if(IsEqual(newValue, this.value)) return;
+    if (IsEqual(newValue, this.value)) return;
     this.value = newValue;
-    const myEvent = new CustomEvent("change");
+    const myEvent = new CustomEvent('change');
     this.dispatchEvent(myEvent);
   }
 
@@ -101,7 +106,7 @@ export class AlarmoMultiSelect extends LitElement {
   removeOption(index: number) {
     this.numOptions = this.numOptions - 1;
     if (index == this.value.length - 1) this.value = this.value.slice(0, index);
-    else this.value = this.value.slice(0, index).concat(this.value.slice(index + 1))
+    else this.value = this.value.slice(0, index).concat(this.value.slice(index + 1));
   }
 
   static styles = css`
@@ -120,5 +125,5 @@ export class AlarmoMultiSelect extends LitElement {
       display: flex;
       flex-direction: column;
     }
-    `;
+  `;
 }

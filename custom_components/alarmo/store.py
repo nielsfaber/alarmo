@@ -58,7 +58,6 @@ class MqttConfig:
     event_topic = attr.ib(type=str, default="alarmo/event")
 
 
-
 @attr.s(slots=True, frozen=True)
 class MasterConfig:
     """Master storage Entry."""

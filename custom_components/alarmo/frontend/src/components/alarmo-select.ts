@@ -1,41 +1,52 @@
-import { fireEvent, HomeAssistant } from "custom-card-helpers";
-import { css, CSSResult, customElement, html, internalProperty, LitElement, property, query, TemplateResult, PropertyValues } from "lit-element";
-import { IsEqual } from "../helpers";
+import { fireEvent, HomeAssistant } from 'custom-card-helpers';
+import {
+  css,
+  CSSResult,
+  customElement,
+  html,
+  internalProperty,
+  LitElement,
+  property,
+  query,
+  TemplateResult,
+  PropertyValues,
+} from 'lit-element';
+import { IsEqual } from '../helpers';
 
 type Option = {
-  name: string,
-  description: string,
-  value: string,
-  icon?: string
-}
+  name: string;
+  description: string;
+  value: string;
+  icon?: string;
+};
 
-@customElement("alarmo-select")
+@customElement('alarmo-select')
 export class AlarmoSelect extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
 
-  @property() public label: string = "";
+  @property() public label = '';
   @property() public value?: string;
   @property() items: Option[] = [];
-  @property() clearable: boolean = false;
-  @property() icons: boolean = false;
+  @property() clearable = false;
+  @property() icons = false;
   @internalProperty() private _opened?: boolean;
 
-  @query("vaadin-combo-box-light", true) private _comboBox!: HTMLElement;
+  @query('vaadin-combo-box-light', true) private _comboBox!: HTMLElement;
   public open() {
     this.updateComplete.then(() => {
-      (this.shadowRoot?.querySelector("vaadin-combo-box-light") as any)?.open();
+      (this.shadowRoot?.querySelector('vaadin-combo-box-light') as any)?.open();
     });
   }
 
   public focus() {
     this.updateComplete.then(() => {
-      (this.shadowRoot?.querySelector("paper-input") as HTMLInputElement).focus();
+      (this.shadowRoot?.querySelector('paper-input') as HTMLInputElement).focus();
     });
   }
 
   shouldUpdate(changedProps: PropertyValues) {
-    if (changedProps.get("items")) {
-      if (!IsEqual(this.items, changedProps.get("items") as Option[])) this.firstUpdated();
+    if (changedProps.get('items')) {
+      if (!IsEqual(this.items, changedProps.get('items') as Option[])) this.firstUpdated();
       else return false;
     }
     return true;
@@ -65,35 +76,24 @@ export class AlarmoSelect extends LitElement {
           spellcheck="false"
         >
           ${this._value && this.items.find(e => e.value == this._value)
-        ? html`
+            ? html`
                 ${this.icons
-            ? html`
-                <ha-icon 
-                  slot="prefix"
-                  icon="${this.items.find(e => e.value == this._value)!.icon}"
-                >
-                </ha-icon>
-                ` :
-            ''
-          }
+                  ? html`
+                      <ha-icon slot="prefix" icon="${this.items.find(e => e.value == this._value)!.icon}"> </ha-icon>
+                    `
+                  : ''}
                 ${this.clearable
-            ? html`
-                <ha-icon-button
-                  slot="suffix"
-                  class="clear-button"
-                  @click=${this._clearValue}
-                  icon="hass:close"
-                >
-                </ha-icon-button>
-                ` :
-            ''
-          }
+                  ? html`
+                      <ha-icon-button slot="suffix" class="clear-button" @click=${this._clearValue} icon="hass:close">
+                      </ha-icon-button>
+                    `
+                  : ''}
               `
-        : ""}
+            : ''}
           <ha-icon-button
             slot="suffix"
             class="toggle-button"
-            icon="${this._opened ? "hass:menu-up" : "hass:menu-down"}"
+            icon="${this._opened ? 'hass:menu-up' : 'hass:menu-down'}"
           >
           </ha-icon-button>
         </paper-input>
@@ -101,11 +101,7 @@ export class AlarmoSelect extends LitElement {
     `;
   }
 
-  rowRenderer = (
-    root: HTMLElement,
-    _owner,
-    entry: { item: Option }
-  ) => {
+  rowRenderer = (root: HTMLElement, _owner, entry: { item: Option }) => {
     if (!root.firstElementChild && this.icons) {
       root.innerHTML = `
         <style>
@@ -142,20 +138,19 @@ export class AlarmoSelect extends LitElement {
           </paper-item-body>
         </paper-item>
         `;
-
     }
-    root.querySelector(".name")!.textContent = entry.item.name;
-    root.querySelector("[secondary]")!.textContent = entry.item.description;
-    if (this.icons) (root.querySelector("ha-icon")! as any).icon = entry.item.icon;
-  }
+    root.querySelector('.name')!.textContent = entry.item.name;
+    root.querySelector('[secondary]')!.textContent = entry.item.description;
+    if (this.icons) (root.querySelector('ha-icon')! as any).icon = entry.item.icon;
+  };
 
   private _clearValue(ev: Event) {
     ev.stopPropagation();
-    this._setValue("");
+    this._setValue('');
   }
 
   private get _value() {
-    return this.value || "";
+    return this.value || '';
   }
 
   private _openedChanged(ev: CustomEvent) {
@@ -173,7 +168,7 @@ export class AlarmoSelect extends LitElement {
     this.value = value;
 
     setTimeout(() => {
-      fireEvent(this, "value-changed", { value });
+      fireEvent(this, 'value-changed', { value });
     }, 0);
   }
 
@@ -191,12 +186,12 @@ export class AlarmoSelect extends LitElement {
         display: none;
       }
       paper-input > ha-icon {
-          display: flex;
-          flex: 0 0 40px;
-          color: var(--state-icon-color);
-          width: 40px;
-          height: 26px;
-          align-items: center;
+        display: flex;
+        flex: 0 0 40px;
+        color: var(--state-icon-color);
+        width: 40px;
+        height: 26px;
+        align-items: center;
       }
     `;
   }

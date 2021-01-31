@@ -4,7 +4,6 @@ import { HomeAssistant } from 'custom-card-helpers';
 
 @customElement('time-slider')
 export class TimeSlider extends LitElement {
-
   hass?: HomeAssistant;
 
   @property({ type: Number })
@@ -31,9 +30,9 @@ export class TimeSlider extends LitElement {
   zeroValue?: string;
 
   firstUpdated() {
-    if (this.value > 0 && this.value < 60) this.unit = "sec";
-    if (this.unit == "min") this.scaleFactor = 1 / 60;
-    if (this.unit == "min") this.step = 1;
+    if (this.value > 0 && this.value < 60) this.unit = 'sec';
+    if (this.unit == 'min') this.scaleFactor = 1 / 60;
+    if (this.unit == 'min') this.step = 1;
   }
 
   render() {
@@ -45,10 +44,7 @@ export class TimeSlider extends LitElement {
         <div class="slider">
           ${this.getSlider()}
         </div>
-        <div
-          class="value${this.disabled ? ' disabled' : ''}"
-          @click=${this.toggleUnit}
-        >
+        <div class="value${this.disabled ? ' disabled' : ''}" @click=${this.toggleUnit}>
           ${this.getValue()}
         </div>
       </div>
@@ -56,7 +52,7 @@ export class TimeSlider extends LitElement {
   }
 
   getValue() {
-    let value = Number(Math.round(this.value * this.scaleFactor));
+    const value = Number(Math.round(this.value * this.scaleFactor));
     if (!value && this.zeroValue) {
       return this.zeroValue;
     }
@@ -65,12 +61,12 @@ export class TimeSlider extends LitElement {
 
   getUnit() {
     switch (this.unit) {
-      case "sec":
-        return localize("components.time_slider.seconds", this.hass!.language);
-      case "min":
-        return localize("components.time_slider.minutes", this.hass!.language);
+      case 'sec':
+        return localize('components.time_slider.seconds', this.hass!.language);
+      case 'min':
+        return localize('components.time_slider.minutes', this.hass!.language);
       default:
-        return "";
+        return '';
     }
   }
 
@@ -94,9 +90,9 @@ export class TimeSlider extends LitElement {
   }
 
   toggleUnit() {
-    this.unit = this.unit == "min" ? "sec" : "min";
-    this.scaleFactor = (this.unit == "min") ? 1 / 60 : 1;
-    this.step = (this.unit == "min") ? 1 : 10;
+    this.unit = this.unit == 'min' ? 'sec' : 'min';
+    this.scaleFactor = this.unit == 'min' ? 1 / 60 : 1;
+    this.step = this.unit == 'min' ? 1 : 10;
   }
 
   static styles = css`

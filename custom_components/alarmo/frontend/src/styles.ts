@@ -86,7 +86,8 @@ export const commonStyle = css`
     width: 100%;
   }
 
-  a, a:visited { 
+  a,
+  a:visited {
     color: var(--primary-color);
   }
   mwc-button ha-icon {
@@ -103,7 +104,7 @@ export const commonStyle = css`
   }
   mwc-button.vertical div {
     display: flex;
-    flex-direction: column; 
+    flex-direction: column;
   }
   mwc-button.vertical span {
     display: flex;
@@ -116,12 +117,13 @@ export const commonStyle = css`
     --mdc-icon-size: 20px;
   }
   mwc-tab.disabled {
-      --mdc-theme-primary: var(--disabled-text-color);
-      --mdc-tab-color-default: var(--disabled-text-color);
-      --mdc-tab-text-label-color-default: var(--disabled-text-color);
+    --mdc-theme-primary: var(--disabled-text-color);
+    --mdc-tab-color-default: var(--disabled-text-color);
+    --mdc-tab-text-label-color-default: var(--disabled-text-color);
   }
 
-  ha-card settings-row:first-child, ha-card settings-row:first-of-type {
+  ha-card settings-row:first-child,
+  ha-card settings-row:first-of-type {
     border-top: 0px;
   }
 

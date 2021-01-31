@@ -1,7 +1,7 @@
 import { HomeAssistant, stateIcon, fireEvent } from 'custom-card-helpers';
 import { HassEntity } from 'home-assistant-js-websocket';
 import { platform, AlarmStates, AlarmCommands } from './const';
-import { Dictionary, AlarmoConfig, EArmModes, AlarmoArea } from './types';
+import { Dictionary, EArmModes, AlarmoModeConfig } from './types';
 import { html, TemplateResult } from 'lit-element';
 
 export function getDomain(entity: string | HassEntity) {
@@ -37,7 +37,6 @@ export function Without(array: any[], item: any) {
   return array.filter(e => e !== item);
 }
 
-
 export function pick(obj: Dictionary<any> | null | undefined, keys: string[]): Dictionary<any> {
   if (!obj) return {};
   return Object.entries(obj)
@@ -52,36 +51,37 @@ export function omit(obj: Dictionary<any> | null | undefined, keys: string[]): D
     .reduce((obj, [key, val]) => Object.assign(obj, { [key]: val }), {});
 }
 
-export function IsEqual(obj1: Object | any[], obj2: Object | any[]) {
+export function IsEqual(obj1: Record<string, any> | any[], obj2: Record<string, any> | any[]) {
   const keys1 = Object.keys(obj1);
   const keys2 = Object.keys(obj2);
 
   if (keys1.length !== keys2.length) return false;
-  for (let key of keys1) {
-    if (typeof obj1[key] === "object" && typeof obj2[key] === "object") {
+  for (const key of keys1) {
+    if (typeof obj1[key] === 'object' && typeof obj2[key] === 'object') {
       if (IsEqual(obj1[key], obj2[key])) return false;
-    }
-    else if (obj1[key] !== obj2[key]) return false;
+    } else if (obj1[key] !== obj2[key]) return false;
   }
   return true;
 }
-
-
 
 export function showErrorDialog(ev: Event, error: string | TemplateResult) {
   const elem = ev.target as HTMLElement;
   fireEvent(elem, 'show-dialog', {
     dialogTag: 'error-dialog',
     dialogImport: () => import('./dialogs/error-dialog'),
-    dialogParams: { error: error }
+    dialogParams: { error: error },
   });
 }
 
 export function handleError(err: any, ev: Event) {
-  let errorMessage = html`
-    <b>Something went wrong!</b><br>
-    ${err.body.message ? html`${err.body.message}<br><br>` : ''}
-    ${err.error}<br><br>
+  const errorMessage = html`
+    <b>Something went wrong!</b><br />
+    ${err.body.message
+      ? html`
+          ${err.body.message}<br /><br />
+        `
+      : ''}
+    ${err.error}<br /><br />
     Please <a href="https://github.com/nielsfaber/alarmo/issues">report</a> the bug.
   `;
   showErrorDialog(ev, errorMessage);
@@ -102,27 +102,27 @@ export const commandToState = (command: string) => {
     default:
       return undefined;
   }
-}
+};
 
-export const filterState = (state: string, _config: AlarmoConfig) => {
+export const filterState = (state: string, config: Record<EArmModes, AlarmoModeConfig>) => {
   if (!state) return false;
   switch (state) {
     case AlarmStates.STATE_ALARM_ARMED_AWAY:
-      return true;//config.modes[EArmModes.ArmedAway].enabled;
+      return config[EArmModes.ArmedAway].enabled;
     case AlarmStates.STATE_ALARM_ARMED_HOME:
-      return true;//config.modes[EArmModes.ArmedHome].enabled;
+      return config[EArmModes.ArmedHome].enabled;
     case AlarmStates.STATE_ALARM_ARMED_NIGHT:
-      return true;//config.modes[EArmModes.ArmedNight].enabled;
+      return config[EArmModes.ArmedNight].enabled;
     case AlarmStates.STATE_ALARM_ARMED_CUSTOM_BYPASS:
-      return true;//config.modes[EArmModes.ArmedCustom].enabled;
+      return config[EArmModes.ArmedCustom].enabled;
     default:
       return true;
   }
-}
+};
 
 export function Assign<Type>(obj: Type, changes: Partial<Type>): Type {
   Object.entries(changes).forEach(([key, val]) => {
-    if (key in obj && typeof obj[key] == "object" && obj[key] !== null) obj = { ...obj, [key]: Assign(obj[key], val) };
+    if (key in obj && typeof obj[key] == 'object' && obj[key] !== null) obj = { ...obj, [key]: Assign(obj[key], val) };
     else obj = { ...obj, [key]: val };
   });
   return obj;

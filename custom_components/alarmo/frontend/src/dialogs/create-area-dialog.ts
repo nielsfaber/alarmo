@@ -8,7 +8,6 @@ import { UnsubscribeFunc } from 'home-assistant-js-websocket';
 import { SubscribeMixin } from '../subscribe-mixin';
 import { handleError } from '../helpers';
 
-
 import './confirm-delete-dialog';
 
 @customElement('create-area-dialog')
@@ -20,18 +19,13 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
   @property() sensors: Dictionary<AlarmoSensor> = {};
   @property() automations: Dictionary<AlarmoAutomation> = {};
 
-  @property() name: string = "";
+  @property() name = '';
   @property() area_id?: string;
   @property() selectedArea?: string;
 
   public hassSubscribe(): Promise<UnsubscribeFunc>[] {
     this._fetchData();
-    return [
-      this.hass!.connection.subscribeEvents(
-        () => this._fetchData(),
-        "alarmo_updated"
-      ),
-    ];
+    return [this.hass!.connection.subscribeEvents(() => this._fetchData(), 'alarmo_updated')];
   }
 
   private async _fetchData(): Promise<void> {
@@ -54,76 +48,70 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
   public async closeDialog() {
     this._params = undefined;
     this.area_id = undefined;
-    this.name = "";
+    this.name = '';
   }
 
   render() {
     if (!this._params) return html``;
     return html`
-      <ha-dialog
-        open
-        .heading=${true}
-        @closed=${this.closeDialog}
-        @close-dialog=${this.closeDialog}
-      >
+      <ha-dialog open .heading=${true} @closed=${this.closeDialog} @close-dialog=${this.closeDialog}>
         <div slot="heading">
           <ha-header-bar>
-            <ha-icon-button
-              slot="navigationIcon"
-              dialogAction="cancel"
-              icon="mdi:close"
-            >
-            </ha-icon-button>
+            <ha-icon-button slot="navigationIcon" dialogAction="cancel" icon="mdi:close"> </ha-icon-button>
             <span slot="title">
-      ${this.area_id
-        ? localize("panels.general.dialogs.edit_area.title", this.hass.language, "{area}", this.areas[this.area_id!].name)
-        : localize("panels.general.dialogs.create_area.title", this.hass.language)
-      }
+              ${this.area_id
+                ? localize(
+                    'panels.general.dialogs.edit_area.title',
+                    this.hass.language,
+                    '{area}',
+                    this.areas[this.area_id!].name
+                  )
+                : localize('panels.general.dialogs.create_area.title', this.hass.language)}
             </span>
           </ha-header-bar>
         </div>
         <div class="wrapper">
           <paper-input
-            label=${this.hass.localize("ui.components.area-picker.add_dialog.name")}
-            @value-changed=${(ev: Event) => this.name = (ev.target as HTMLInputElement).value}
+            label=${this.hass.localize('ui.components.area-picker.add_dialog.name')}
+            @value-changed=${(ev: Event) => (this.name = (ev.target as HTMLInputElement).value)}
             value="${this.name}"
           >
           </paper-input>
-      ${this.area_id
-        ? html`<span class="note">${localize("panels.general.dialogs.edit_area.name_warning", this.hass.language)}</span>`
-        : ''
-      }
-      ${!this.area_id
-        ? html`
-        <alarmo-select
-          .items=${Object.values(this.areas).map(e => Object({ value: e.area_id, name: e.name }))}
-          value=${this.selectedArea}
-          label="${localize("panels.general.dialogs.create_area.fields.copy_from", this.hass.language)}"
-          clearable=${true}
-          @value-changed=${(ev: Event) => this.selectedArea = (ev.target as HTMLInputElement).value}
-        >
-        </alarmo-select>
-        `
-        : ''
-      }
+          ${this.area_id
+            ? html`
+                <span class="note"
+                  >${localize('panels.general.dialogs.edit_area.name_warning', this.hass.language)}</span
+                >
+              `
+            : ''}
+          ${!this.area_id
+            ? html`
+                <alarmo-select
+                  .items=${Object.values(this.areas).map(e => Object({ value: e.area_id, name: e.name }))}
+                  value=${this.selectedArea}
+                  label="${localize('panels.general.dialogs.create_area.fields.copy_from', this.hass.language)}"
+                  clearable=${true}
+                  @value-changed=${(ev: Event) => (this.selectedArea = (ev.target as HTMLInputElement).value)}
+                >
+                </alarmo-select>
+              `
+            : ''}
         </div>
-        <mwc-button
-          slot="primaryAction"
-          @click=${this.saveClick}
-        >
-          ${this.hass.localize("ui.common.save")}
+        <mwc-button slot="primaryAction" @click=${this.saveClick}>
+          ${this.hass.localize('ui.common.save')}
         </mwc-button>
-        ${this.area_id ?
-        html`
-        <mwc-button
-          slot="secondaryAction"
-          @click=${this.deleteClick}
-          class="warning"
-          ?disabled=${Object.keys(this.areas!).length == 1}
-        >
-          ${this.hass.localize("ui.common.delete")}
-        </mwc-button>
-        ` : ''}
+        ${this.area_id
+          ? html`
+              <mwc-button
+                slot="secondaryAction"
+                @click=${this.deleteClick}
+                class="warning"
+                ?disabled=${Object.keys(this.areas!).length == 1}
+              >
+                ${this.hass.localize('ui.common.delete')}
+              </mwc-button>
+            `
+          : ''}
       </ha-dialog>
     `;
   }
@@ -133,14 +121,16 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
     if (!name.length) return;
 
     let data: Partial<AlarmoArea> = {
-      name: name
-    }
+      name: name,
+    };
     if (this.area_id) data = { ...data, area_id: this.area_id };
-    else if(this.selectedArea) data = { ...data, modes: { ...this.areas[this.selectedArea].modes } };
-    
+    else if (this.selectedArea) data = { ...data, modes: { ...this.areas[this.selectedArea].modes } };
+
     saveArea(this.hass, data)
-    .catch(e => handleError(e, ev))
-      .then(() => { this.closeDialog() });
+      .catch(e => handleError(e, ev))
+      .then(() => {
+        this.closeDialog();
+      });
   }
 
   private async deleteClick(ev: Event) {
@@ -149,16 +139,21 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
     const automations = Object.values(this.automations).filter(e => e.area == this.area_id).length;
     let result = false;
     if (sensors || automations) {
-      result = await new Promise((resolve) => {
+      result = await new Promise(resolve => {
         fireEvent(ev.target as HTMLElement, 'show-dialog', {
           dialogTag: 'confirm-delete-dialog',
           dialogImport: () => import('./confirm-delete-dialog'),
           dialogParams: {
-            title: localize("panels.general.dialogs.remove_area.title", this.hass.language),
-            description: localize("panels.general.dialogs.remove_area.description", this.hass.language, ["{sensors}", "{automations}"], [String(sensors), String(automations)]),
+            title: localize('panels.general.dialogs.remove_area.title', this.hass.language),
+            description: localize(
+              'panels.general.dialogs.remove_area.description',
+              this.hass.language,
+              ['{sensors}', '{automations}'],
+              [String(sensors), String(automations)]
+            ),
             cancel: () => resolve(false),
-            confirm: () => resolve(true)
-          }
+            confirm: () => resolve(true),
+          },
         });
       });
     } else result = true;
@@ -166,7 +161,9 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
     if (result) {
       deleteArea(this.hass, this.area_id)
         .catch(e => handleError(e, ev))
-        .then(() => { this.closeDialog() });
+        .then(() => {
+          this.closeDialog();
+        });
     }
   }
 

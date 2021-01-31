@@ -354,6 +354,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
         await super().async_will_remove_from_hass()
         _LOGGER.debug("{} is removed from hass".format(self.entity_id))
 
+
 class AlarmoAreaEntity(AlarmoBaseEntity):
     """Defines a base alarm_control_panel entity."""
 

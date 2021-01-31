@@ -1,11 +1,8 @@
-import { HassEntity } from "home-assistant-js-websocket";
-import { AlarmoSensor, EArmModes, Dictionary } from "../types";
-import { getDomain } from "../helpers";
-import { computeDomain } from "custom-card-helpers";
-import { ESensorTypes } from "../const";
-
-
-
+import { HassEntity } from 'home-assistant-js-websocket';
+import { AlarmoSensor, EArmModes, Dictionary } from '../types';
+import { getDomain } from '../helpers';
+import { computeDomain } from 'custom-card-helpers';
+import { ESensorTypes } from '../const';
 
 export const isValidSensor = (entity: HassEntity, showAllDeviceClasses: boolean) => {
   const domain = getDomain(entity.entity_id);
@@ -37,56 +34,43 @@ export const isValidSensor = (entity: HassEntity, showAllDeviceClasses: boolean)
     return false;
   }
   return false;
-}
+};
 
 export const binarySensorConfig = (stateObj: HassEntity): Partial<AlarmoSensor> => {
-
   switch (stateObj.attributes.device_class) {
     case 'door':
     case 'garage_door':
     case 'lock':
     case 'opening':
       return {
-        modes: [
-          EArmModes.ArmedAway,
-          EArmModes.ArmedHome,
-          EArmModes.ArmedNight,
-        ]
-      }
+        modes: [EArmModes.ArmedAway, EArmModes.ArmedHome, EArmModes.ArmedNight],
+      };
     case 'window':
       return {
-        modes: [
-          EArmModes.ArmedAway,
-          EArmModes.ArmedHome,
-          EArmModes.ArmedNight,
-        ],
-        immediate: true
-      }
+        modes: [EArmModes.ArmedAway, EArmModes.ArmedHome, EArmModes.ArmedNight],
+        immediate: true,
+      };
     case 'gas':
     case 'heat':
     case 'moisture':
     case 'smoke':
       return {
         always_on: true,
-      }
+      };
     case 'motion':
     case 'moving':
     case 'occupancy':
     case 'presence':
     case 'sound':
       return {
-        modes: [
-          EArmModes.ArmedAway,
-        ]
-      }
+        modes: [EArmModes.ArmedAway],
+      };
     default:
-      return {
-      }
+      return {};
   }
-}
+};
 
 export const sensorClassToType = (stateObj: HassEntity): ESensorTypes | undefined => {
-
   switch (stateObj.attributes.device_class) {
     case 'door':
     case 'garage_door':
@@ -100,53 +84,22 @@ export const sensorClassToType = (stateObj: HassEntity): ESensorTypes | undefine
     case 'moisture':
     case 'smoke':
     case 'safety':
-      return ESensorTypes.Environmental
+      return ESensorTypes.Environmental;
     case 'motion':
     case 'moving':
     case 'occupancy':
     case 'presence':
-      return ESensorTypes.Motion
+      return ESensorTypes.Motion;
     case 'sound':
     case 'opening':
     case 'vibration':
-      return ESensorTypes.Tamper
+      return ESensorTypes.Tamper;
     default:
       return;
   }
-}
-
-export function defaultSensorConfig(stateObj: HassEntity | undefined, modeList: EArmModes[]) {
-  if (!stateObj) return null;
-  const domain = computeDomain(stateObj.entity_id);
-
-  let config: AlarmoSensor = {
-    entity_id: stateObj.entity_id,
-    name: stateObj.attributes.friendly_name || stateObj.entity_id,
-    modes: [],
-    immediate: false,
-    arm_on_close: false,
-    allow_open: false,
-    always_on: false,
-    trigger_unavailable: false,
-    type: ESensorTypes.Other,
-    enabled: true
-  };
-
-  if (domain == 'binary_sensor') {
-    const type = sensorClassToType(stateObj);
-    if (type) {
-      config = {
-        ...config,
-        type: type,
-        ...sensorConfigByType(modeList)[type]
-      };
-    }
-  }
-  return config;
-}
+};
 
 export const sensorConfigByType = (modeList: EArmModes[]): Dictionary<Partial<AlarmoSensor>> => {
-
   const filterModes = (modes: EArmModes[]) => modes.filter(e => modeList.includes(e));
 
   return {
@@ -184,6 +137,36 @@ export const sensorConfigByType = (modeList: EArmModes[]): Dictionary<Partial<Al
       allow_open: false,
       arm_on_close: false,
       immediate: false,
-    }
+    },
   };
+};
+
+export function defaultSensorConfig(stateObj: HassEntity | undefined, modeList: EArmModes[]) {
+  if (!stateObj) return null;
+  const domain = computeDomain(stateObj.entity_id);
+
+  let config: AlarmoSensor = {
+    entity_id: stateObj.entity_id,
+    name: stateObj.attributes.friendly_name || stateObj.entity_id,
+    modes: [],
+    immediate: false,
+    arm_on_close: false,
+    allow_open: false,
+    always_on: false,
+    trigger_unavailable: false,
+    type: ESensorTypes.Other,
+    enabled: true,
+  };
+
+  if (domain == 'binary_sensor') {
+    const type = sensorClassToType(stateObj);
+    if (type) {
+      config = {
+        ...config,
+        type: type,
+        ...sensorConfigByType(modeList)[type],
+      };
+    }
+  }
+  return config;
 }

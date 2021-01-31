@@ -75,12 +75,11 @@ class MqttHandler:
             mqtt.async_publish(self.hass, topic, message, retain=True)
             _LOGGER.debug("Published state '{}' on topic '{}'".format(message, topic))
 
-
         async_dispatcher_connect(self.hass, "alarmo_state_updated", async_alarm_state_changed)
 
         @callback
         def async_handle_event(event: str, area_id: str, args: dict = {}):
-            
+
             if not self._config[ATTR_MQTT][const.ATTR_ENABLED]:
                 return
 
@@ -135,7 +134,7 @@ class MqttHandler:
                 }
             else:
                 return
-            
+
             payload = json.dumps(payload, cls=JSONEncoder)
             mqtt.async_publish(self.hass, topic, payload)
 
@@ -250,4 +249,3 @@ class MqttHandler:
             await entity.async_alarm_arm_home(code, skip_code)
         elif command == command_payloads[const.COMMAND_ARM_CUSTOM_BYPASS]:
             await entity.async_alarm_arm_custom_bypass(code, skip_code)
-

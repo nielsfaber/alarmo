@@ -21,7 +21,7 @@ export class MyAlarmPanel extends LitElement {
   @property() userConfig?: Dictionary<AlarmoUser>;
 
   async firstUpdated() {
-    window.addEventListener("location-changed", () => {
+    window.addEventListener('location-changed', () => {
       this.requestUpdate();
     });
 
@@ -31,91 +31,89 @@ export class MyAlarmPanel extends LitElement {
   }
 
   render() {
-    if (!customElements.get('ha-app-layout') || !this.userConfig) return html`loading...`;
-    const matchingUser = Object.values(this.userConfig!).find(e => e.name.toLowerCase() == this.hass!.user.name.toLowerCase());
+    if (!customElements.get('ha-app-layout') || !this.userConfig)
+      return html`
+        loading...
+      `;
+    const matchingUser = Object.values(this.userConfig!).find(
+      e => e.name.toLowerCase() == this.hass!.user.name.toLowerCase()
+    );
 
     if (!this.hass.user.is_admin && (!matchingUser || !matchingUser.is_admin)) {
       return html`
-      <ha-app-layout>
-        <app-header fixed slot="header">
-          <app-toolbar>
-            <ha-menu-button
-              .hass=${this.hass}
-              .narrow=${this.narrow}
-            >
-            </ha-menu-button>
-            <div main-title>
-              Alarm panel
-            </div>
-          </app-toolbar>
-        </app-header>
-      </ha-app-layout>
-      <div class="view">
-        <div>
-          <ha-card header="Access is blocked">
-            <div class="card-content">
-              You have no access to view this page.
-              Please check the following:
-              <ul>
-                <li>
-                  You are logged in using HA user account <b>${this.hass!.user.name}</b>.
-                  This account <b>${this.hass!.user.is_admin ? 'does' : 'does NOT'}</b> have administrator permission.
-                </li>
-              </ul>
-              <ul>
-                <li>
-                  There is <b>${matchingUser ? 'a' : 'NO'}</b> user configured in Alarmo with name <b>${this.hass!.user.name}</b>.
-                  ${matchingUser ? `This user ${matchingUser.is_admin ? 'does' : 'does NOT'}</b> have administrator permission. ` : ''}
-                </li>
-              </ul>
-            </div>
-          </ha-card>
+        <ha-app-layout>
+          <app-header fixed slot="header">
+            <app-toolbar>
+              <ha-menu-button .hass=${this.hass} .narrow=${this.narrow}> </ha-menu-button>
+              <div main-title>
+                Alarm panel
+              </div>
+            </app-toolbar>
+          </app-header>
+        </ha-app-layout>
+        <div class="view">
+          <div>
+            <ha-card header="Access is blocked">
+              <div class="card-content">
+                You have no access to view this page. Please check the following:
+                <ul>
+                  <li>
+                    You are logged in using HA user account <b>${this.hass!.user.name}</b>. This account
+                    <b>${this.hass!.user.is_admin ? 'does' : 'does NOT'}</b> have administrator permission.
+                  </li>
+                </ul>
+                <ul>
+                  <li>
+                    There is <b>${matchingUser ? 'a' : 'NO'}</b> user configured in Alarmo with name
+                    <b>${this.hass!.user.name}</b>.
+                    ${matchingUser
+                      ? `This user ${matchingUser.is_admin ? 'does' : 'does NOT'}</b> have administrator permission. `
+                      : ''}
+                  </li>
+                </ul>
+              </div>
+            </ha-card>
+          </div>
         </div>
-      </div>
-      `
-    }
-    else {
+      `;
+    } else {
       return html`
-      <ha-app-layout>
-        <app-header fixed slot="header">
-          <app-toolbar>
-            <ha-menu-button
-              .hass=${this.hass}
-              .narrow=${this.narrow}
+        <ha-app-layout>
+          <app-header fixed slot="header">
+            <app-toolbar>
+              <ha-menu-button .hass=${this.hass} .narrow=${this.narrow}> </ha-menu-button>
+              <div main-title>
+                ${localize('title', this.hass.language)}
+              </div>
+              <div class="version">
+                v${VERSION}
+              </div>
+            </app-toolbar>
+            <paper-tabs
+              scrollable
+              attr-for-selected="page-name"
+              .selected=${this.getPath()}
+              @iron-activate=${this.handlePageSelected}
             >
-            </ha-menu-button>
-            <div main-title>
-              ${localize("title", this.hass.language)}
-            </div>
-            <div class="version">
-              v${VERSION}
-            </div>
-          </app-toolbar>
-          <paper-tabs
-            scrollable
-            attr-for-selected="page-name"
-            .selected=${this.getPath()}
-            @iron-activate=${this.handlePageSelected}
-          >
-            <paper-tab page-name="general">
-              ${localize("panels.general.title", this.hass.language)}
-            </paper-tab>
-            <paper-tab page-name="sensors">
-              ${localize("panels.sensors.title", this.hass.language)}
-            </paper-tab>
-            <paper-tab page-name="codes">
-              ${localize("panels.codes.title", this.hass.language)}
-            </paper-tab>
-            <paper-tab page-name="actions">
-              ${localize("panels.actions.title", this.hass.language)}
-            </paper-tab>
-          </paper-tabs>
-        </app-header>
-      </ha-app-layout>
-      <div class="view">
-        ${this.getView()}
-      </div>
-    `;
+              <paper-tab page-name="general">
+                ${localize('panels.general.title', this.hass.language)}
+              </paper-tab>
+              <paper-tab page-name="sensors">
+                ${localize('panels.sensors.title', this.hass.language)}
+              </paper-tab>
+              <paper-tab page-name="codes">
+                ${localize('panels.codes.title', this.hass.language)}
+              </paper-tab>
+              <paper-tab page-name="actions">
+                ${localize('panels.actions.title', this.hass.language)}
+              </paper-tab>
+            </paper-tabs>
+          </app-header>
+        </ha-app-layout>
+        <div class="view">
+          ${this.getView()}
+        </div>
+      `;
     }
   }
 
@@ -125,47 +123,37 @@ export class MyAlarmPanel extends LitElement {
 
   getView() {
     const path = this.getPath();
-    const view = path[2] || "general";
+    const view = path[2] || 'general';
     const args = path.slice(3);
 
     switch (view) {
-      case "general":
+      case 'general':
         return html`
-        <alarm-view-general
-          .hass=${this.hass}
-          .narrow=${this.narrow}
-          .path=${args.length ? args : null}
-        ></alarm-view-general>
-      `;
-      case "sensors":
+          <alarm-view-general
+            .hass=${this.hass}
+            .narrow=${this.narrow}
+            .path=${args.length ? args : null}
+          ></alarm-view-general>
+        `;
+      case 'sensors':
         return html`
-        <alarm-view-sensors
-          .hass=${this.hass}
-          .narrow=${this.narrow}
-          .path=${args.length ? args : null}
-        >
-        </alarm-view-sensors>
-      `;
-      case "codes":
+          <alarm-view-sensors .hass=${this.hass} .narrow=${this.narrow} .path=${args.length ? args : null}>
+          </alarm-view-sensors>
+        `;
+      case 'codes':
         return html`
-        <alarm-view-codes
-          .hass=${this.hass}
-          .narrow=${this.narrow}
-          .path=${args.length ? args : null}
-        >
-        </alarm-view-codes>
-      `;
-      case "actions":
+          <alarm-view-codes .hass=${this.hass} .narrow=${this.narrow} .path=${args.length ? args : null}>
+          </alarm-view-codes>
+        `;
+      case 'actions':
         return html`
-        <alarm-view-actions
-          .hass=${this.hass}
-          .narrow=${this.narrow}
-          .path=${args.length ? args : null}
-        >
-        </alarm-view-actions>
-      `;
+          <alarm-view-actions .hass=${this.hass} .narrow=${this.narrow} .path=${args.length ? args : null}>
+          </alarm-view-actions>
+        `;
       default:
-        return html`no view`;
+        return html`
+          no view
+        `;
     }
   }
 
@@ -181,9 +169,7 @@ export class MyAlarmPanel extends LitElement {
 
   static get styles(): CSSResult {
     return css`
-      ${commonStyle}
-
-      :host {
+      ${commonStyle} :host {
         color: var(--primary-text-color);
         --paper-card-header-color: var(--primary-text-color);
       }

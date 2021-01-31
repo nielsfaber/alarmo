@@ -21,5 +21,5 @@ def friendly_name_for_entity_id(entity_id: str, hass: HomeAssistant):
     state = hass.states.get(entity_id)
     if state and state.attributes["friendly_name"]:
         return state.attributes["friendly_name"]
-    
+
     return entity_id

@@ -1,13 +1,13 @@
-import { fireEvent, HomeAssistant } from "custom-card-helpers";
-import { css, CSSResult, customElement, html, internalProperty, LitElement, property, query, TemplateResult } from "lit-element";
+import { fireEvent, HomeAssistant } from 'custom-card-helpers';
+import { css, CSSResult, customElement, html, LitElement, property, TemplateResult } from 'lit-element';
 
 export type Option = {
-  name: string,
-  value: string,
-  count?: number
-}
+  name: string;
+  value: string;
+  count?: number;
+};
 
-@customElement("alarmo-chips")
+@customElement('alarmo-chips')
 export class AlarmoChips extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
 
@@ -18,25 +18,23 @@ export class AlarmoChips extends LitElement {
     return html`
       ${this.items.map(e => {
         return html`
-          <div class="chip ${this.value == e.value ? "selected" : ""}" @click=${() => this.selectItem(e.value)}>
+          <div class="chip ${this.value == e.value ? 'selected' : ''}" @click=${() => this.selectItem(e.value)}>
             ${e.count !== undefined
-              ? html`<span class="count">${e.count > 99 ? 99 : e.count}</span>`
-              : ''
-            }
+              ? html`
+                  <span class="count">${e.count > 99 ? 99 : e.count}</span>
+                `
+              : ''}
             <span class="label">${e.name}</span>
           </div>
-        `
-      })
-      }
-    `
+        `;
+      })}
+    `;
   }
 
   selectItem(value: string) {
-    this.value = this.value == value
-      ? null
-      : value;
+    this.value = this.value == value ? null : value;
 
-    fireEvent(this, "value-changed");
+    fireEvent(this, 'value-changed');
   }
 
   static get styles(): CSSResult {

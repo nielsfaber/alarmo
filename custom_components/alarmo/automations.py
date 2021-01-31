@@ -11,7 +11,6 @@ from homeassistant.const import (
     ATTR_SERVICE,
     ATTR_SERVICE_DATA,
     ATTR_ENTITY_ID,
-    ATTR_NAME,
     # STATE_UNKNOWN,
     # STATE_OPEN,
     # STATE_CLOSED,
