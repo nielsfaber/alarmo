@@ -392,8 +392,8 @@ The following table shows the events which are published on the event topic, tog
 | `TRIGGER` | The alarm has been triggered | - `sensors`: list of sensors (usually a single sensor) which caused the triggering of the alarm. Each list item is a struct with the `entity_id` and `name` of the sensor entity).<br>- `delay`: entry delay (in seconds) configured to postpone the triggering (i.e. time during which the alarm is in state `pending`). |
 | `FAILED_TO_ARM` | The arming was prevented or cancelled due to one or more blocking sensors. | - `sensors`: list of sensors which prevented the arming operation. Each list item is a struct with the `entity_id` and `name` of the sensor entity). |
 | `COMMAND_NOT_ALLOWED` | The conditions for which the command is allowed are not met (see [commands](#commands)). | - `state`: current [state](#states) of the alarm entity.<br>- `command`: the command that was provided by the user. |
-| `NO_CODE_PROVIDED` | The arming was prevented because no code was provided, while the operation requires a code. | |
-| `INVALID_CODE_PROVIDED` | The arming was prevented because a wrong code was provided, or the provided code is not allowed for the operation. | |
+| `NO_CODE_PROVIDED` | The command was rejected because no code was provided, while the operation requires a code. | |
+| `INVALID_CODE_PROVIDED` | The command was rejected because a wrong code was provided, or the provided code is not allowed for the operation. | |
 
 Example payload on the event topic (*Consider the scenario where the alarm is armed in state `armed_away` and the front door is opened):*
 ```yaml
