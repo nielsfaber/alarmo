@@ -16,10 +16,11 @@ This is an alarm system integration for Home Assistant. It provides a user inter
     - [Alarmo entity](#alarmo-entity)
       - [States](#states)
       - [Attributes](#attributes)
-      - [Areas](#areas)
-      - [Alarm Master](#alarm-master)
+      - [Commands](#commands)
+    - [Areas](#areas)
+    - [Alarm Master](#alarm-master)
         - [States](#states-1)
-        - [Commands](#commands)
+        - [Commands](#commands-1)
     - [Sensor configuration](#sensor-configuration)
       - [Sensor types](#sensor-types)
       - [Immediate](#immediate)
@@ -32,6 +33,7 @@ This is an alarm system integration for Home Assistant. It provides a user inter
       - [Administrator](#administrator)
     - [MQTT](#mqtt)
       - [State topic](#state-topic)
+      - [Event topic](#event-topic)
       - [Command topic](#command-topic)
       - [Multiple area usage](#multiple-area-usage)
     - [Actions](#actions)
@@ -39,7 +41,7 @@ This is an alarm system integration for Home Assistant. It provides a user inter
         - [Actionable notifications](#actionable-notifications)
       - [Device actions](#device-actions)
     - [Lovelace alarm panel card](#lovelace-alarm-panel-card)
-- [Say thank you](#say-thank-you)
+  - [Say thank you](#say-thank-you)
 
 
 ## Introduction
@@ -190,7 +192,18 @@ The Alarmo entity defines the following attributes:
 | `open_sensors`     | `null`        | `{binary_sensor.backdoor: on}` | Dictionary of sensors with their entity-ID + state, that caused the alarm to change state.<br>Set when arming attempt failed (due to one or more sensors).<br>Set when alarm is triggered (only first sensor that caused the triggering is stored). |
 | `bypassed_sensors` | `null`        | `[binary_sensor.backdoor]`     | List of sensors that are temporarily excluded from the alarm, due to arming in force.                                                                                                                                                               |
 
-#### Areas
+#### Commands
+The Alarmo entities support the following commands:
+
+| Command | Description | Conditions |
+| ------- | ----------- | ------------ |
+| `ARM_AWAY` | Arm the alarm in mode `armed_away`. | - The entity has the mode `away` enabled.<br>- The current alarm state is `disarmed`, `armed_home`, `armed_night`, or `armed_custom_bypass`. |
+| `ARMED_HOME` | Arm the alarm in mode `armed_home`. | - The entity has the mode `home` enabled.<br>- The current alarm state is `disarmed`, `armed_away`, `armed_night`, or `armed_custom_bypass`. |
+| `ARM_NIGHT` | Arm the alarm in mode `armed_night`. | - The entity has the mode `night` enabled.<br>- The current alarm state is `disarmed`, `armed_away`, `armed_home`, or `armed_custom_bypass`. |
+| `ARM_CUSTOM_BYPASS` | Arm the alarm in mode `armed_custom_bypass`. | - The entity has the mode `custom` enabled.<br>- The current alarm state is `disarmed`, `armed_away`, `armed_home`, or `armed_night`. |
+| `DISARM` | Disarm the alarm. | - The current alarm state is not `disarmed` |
+
+### Areas
 An area is a physical compartment of your house, such as a garage, 1st floor of the house, garden, etc.
 Alarmo will create an `alarm_control_panel` entity for each area which can be armed and disarmed independently. An area has its own set of sensors and can have dedicated configuration for arm modes, exit/entry times and automations.
 
@@ -204,7 +217,7 @@ The entity will be instantly renamed after saving.
 **Warning**: renaming an area changes the entity ID, which might break your Lovelace cards and automations outside of Alarmo, so treat it with care.
 
 
-#### Alarm Master
+### Alarm Master
 Alarmo has the option for enabling an alarm master.
 The option appears in the *general* tab in *general settings* if you have multiple areas defined.
 
@@ -340,9 +353,9 @@ Alarmo supports MQTT for external control of the alarm. This function is intende
 The MQTT support needs to be enabled before it can be used. This setting is available in tab "*General*".
 
 #### State topic
-The state topic shall be used to publish state changes of the `alarm_control_panel` entities.
+The state topic is used to publish state changes of the `alarm_control_panel` entities.
 
-The state topic is an output topic, i.e. the data is sent by Alarmo and should be received by another application (such as a wall panel).
+The state topic is an output topic, i.e. the data is sent by Alarmo and should be received by another application (such as a wall panel display).
 
 Default state topic (can be configured):
 ```
@@ -355,7 +368,47 @@ See [here](#states) for the complete list of payloads.
 
 The data published on the state topic shall be sent with a *retain* flag. This means that the last sent payload shall be stored in the broker, and as soon as an application subscribed to the topic, the most recent data shall be available for it.
 
+#### Event topic
+The event topic is used for publishing additional status updates of the `alarm_control_panel` entities.
 
+The event topic is an output topic, i.e. the data is sent by Alarmo and should be received by another application (such as a wall panel display).
+
+Default event topic (can be configured):
+```
+alarmo/event
+```
+
+The published payloads on this topic are formatted as JSON struct, which contains the  event name, and optionally some extra parameters.
+
+The following table shows the events which are published on the event topic, together with the parameters which are sent for a certain event):
+
+
+| Event               | Description                                            | Parameters                                                                                                             |
+| ------------------- | ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| `ARM_AWAY`          | The alarm has been armed in mode `armed_away`          | - `delay`: exit delay (in seconds) configured for the operation (i.e. time during which the alarm is in state `arming`). |
+| `ARM_HOME`          | The alarm has been armed in mode `armed_home`          |      - `delay`: exit delay (in seconds) configured for the operation (i.e. time during which the alarm is in state `arming`). | 
+| `ARM_NIGHT`         | The alarm has been armed in mode `armed_night`         |- `delay`: exit delay (in seconds) configured for the operation (i.e. time during which the alarm is in state `arming`). |
+| `ARM_CUSTOM_BYPASS` | The alarm has been armed in mode `armed_custom_bypass` | - `delay`: exit delay (in seconds) configured for the operation (i.e. time during which the alarm is in state `arming`). |
+| `TRIGGER` | The alarm has been triggered | - `sensors`: list of sensors (usually a single sensor) which caused the triggering of the alarm. Each list item is a struct with the `entity_id` and `name` of the sensor entity).<br>- `delay`: entry delay (in seconds) configured to postpone the triggering (i.e. time during which the alarm is in state `pending`). |
+| `FAILED_TO_ARM` | The arming was prevented or cancelled due to one or more blocking sensors. | - `sensors`: list of sensors which prevented the arming operation. Each list item is a struct with the `entity_id` and `name` of the sensor entity). |
+| `COMMAND_NOT_ALLOWED` | The conditions for which the command is allowed are not met (see [commands](#commands)). | - `state`: current [state](#states) of the alarm entity.<br>- `command`: the command that was provided by the user. |
+| `NO_CODE_PROVIDED` | The arming was prevented because no code was provided, while the operation requires a code. | |
+
+| `INVALID_CODE_PROVIDED` | The arming was prevented because a wrong code was provided, or the provided code is not allowed for the operation. | |
+
+Example payload on the event topic (*Consider the scenario where the alarm is armed in state `armed_away` and the front door is opened):*
+```yaml
+{
+  "event": "TRIGGER",
+  "sensors": [ # list of sensor(s) that causes the triggering
+    {
+      "entity_id": "binary_sensor.frontdoor",
+      "name": "Front Door"
+    }
+  ],
+  "delay": 60 # entry delay
+}
+```
 #### Command topic
 
 The command topic can be used for external control of Alarmo through MQTT.
@@ -368,7 +421,7 @@ alarmo/command
 ```
 
 If Alarmo is configured to require a pincode or password for the (arm/disarm) command, the payload must be formatted as JSON according to the following format:
-```
+```json
 {
   "command": "<my command>",
   "code": "<my pin or password>"
@@ -376,14 +429,7 @@ If Alarmo is configured to require a pincode or password for the (arm/disarm) co
 ```
 If Alarmo does not require any code for the command, the command can be sent directly as text/string value.
 
-
-Alarmo supports the following command values by default (these can be customized as desired):
-* disarm
-* arm_away
-* arm_home
-* arm_night
-* arm_custom_bypass
-
+The supported commands can be found in [commands](#commands).
 
 If the provided payload does not have the correct format, lacks a code when it is required or contains a wrong code, the command shall be ignored. 
 In other cases, you should see a change in the state topic.
@@ -401,7 +447,7 @@ Alarmo shall publish the state updates for the Master Alarm and the areas in ded
 * Area: `alarmo/<area_name>/state`
 
 For targeting an arm/disarm command to a specific area, the JSON payload can be extended with the *area* property:
-```
+```json
 {
   "command": "<my command>",
   "code": "<my pin or password>",
@@ -410,7 +456,7 @@ For targeting an arm/disarm command to a specific area, the JSON payload can be 
 ```
 
 **Notes**: 
-* The MQTT configuration allows customizing the state topic for the Master Alarm only. The topics for the areas are automatically derived by inserting the area name. Example: setting state topic to `my/custom/topic` gives `my/custom/<area_name>/topic` as state topic for an area.
+* The MQTT configuration allows defining the topics for the Master Alarm only. The input topics (state/event topics) for the areas are automatically derived by inserting the area name. Example: setting state topic to `my/custom/topic` gives `my/custom/<area_name>/topic` as state topic for an area. 
 * `<area_name>` is a *slug* of the name that is given to an area. This means that the name shall be in lowercase and all non-alphanumerical characters are replaced by underscores (similar to the entity_IDs in HA).
 * If no area is provided, the command is addressed to the Master Alarm. If the Master Alarm is disabled, the command is ignored.
 

@@ -92,6 +92,16 @@ export class MqttConfigCard extends SubscribeMixin(LitElement) {
         </collapsible-section>
 
         <settings-row .narrow=${this.narrow}>
+          <span slot="heading">${localize("panels.general.cards.mqtt.fields.event_topic.heading", this.hass.language)}</span>
+          <span slot="description">${localize("panels.general.cards.mqtt.fields.event_topic.description", this.hass.language)}</span>
+          <paper-input
+            label="${localize("panels.general.cards.mqtt.fields.event_topic.heading", this.hass.language)}"
+            value=${this.selection.event_topic}
+            @change=${(ev: Event) => { this.selection = { ...this.selection!, event_topic: (ev.target as HTMLInputElement).value } }}
+          ></paper-input>
+        </settings-row>
+
+        <settings-row .narrow=${this.narrow}>
           <span slot="heading">${localize("panels.general.cards.mqtt.fields.command_topic.heading", this.hass.language)}</span>
           <span slot="description">${localize("panels.general.cards.mqtt.fields.command_topic.description", this.hass.language)}</span>
           <paper-input
