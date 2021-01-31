@@ -634,6 +634,7 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
     def __init__(self, hass: HomeAssistant, name: str, entity_id: str) -> None:
         """Initialize the alarm_control_panel entity."""
         super().__init__(hass, name, entity_id)
+        self.area_id = None
 
     @property
     def supported_features(self) -> int:
@@ -678,11 +679,19 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
 
         @callback
         async def async_handle_event(event: str, area_id: str, args: dict = {}):
-            if event != const.EVENT_FAILED_TO_ARM:
+            if not area_id or event not in [const.EVENT_FAILED_TO_ARM, const.EVENT_TRIGGER]:
                 return
-            if self._state == STATE_ALARM_ARMING:
+            if const.EVENT_FAILED_TO_ARM and self._state == STATE_ALARM_ARMING:
                 open_sensors = args["open_sensors"]
                 await self.async_arm_failure(open_sensors)
+            if const.EVENT_TRIGGER and self._state not in [STATE_ALARM_PENDING, STATE_ALARM_TRIGGERED]:
+                async_dispatcher_send(
+                        self.hass,
+                        "alarmo_event",
+                        const.EVENT_TRIGGER,
+                        self.area_id,
+                        args
+                    )
 
         async_dispatcher_connect(self.hass, "alarmo_event", async_handle_event)
 
@@ -776,6 +785,23 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
 
         if open_sensors:
             await self.async_arm_failure(open_sensors)
+        else:
+            delay = 0
+            area_config = self.hass.data[const.DOMAIN]["coordinator"].store.async_get_areas()
+            for (area_id, entity) in self.hass.data[const.DOMAIN]["areas"].items():
+                if entity.state == STATE_ALARM_ARMING:
+                    t = area_config[area_id][const.ATTR_MODES][arm_mode]["exit_time"]
+                    delay = t if t > delay else delay
+            async_dispatcher_send(
+                    self.hass,
+                    "alarmo_event",
+                    const.EVENT_ARM,
+                    self.area_id,
+                    {
+                        "arm_mode": arm_mode,
+                        "delay": delay,
+                    }
+                )
 
     async def async_arm_failure(self, open_sensors: dict):
         self.open_sensors = open_sensors

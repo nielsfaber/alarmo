@@ -456,7 +456,7 @@ For targeting an arm/disarm command to a specific area, the JSON payload can be 
 ```
 
 **Notes**: 
-* The MQTT configuration allows customizing the state topic for the Master Alarm only. The topics for the areas are automatically derived by inserting the area name. Example: setting state topic to `my/custom/topic` gives `my/custom/<area_name>/topic` as state topic for an area.
+* The MQTT configuration allows defining the topics for the Master Alarm only. The input topics (state/event topics) for the areas are automatically derived by inserting the area name. Example: setting state topic to `my/custom/topic` gives `my/custom/<area_name>/topic` as state topic for an area. 
 * `<area_name>` is a *slug* of the name that is given to an area. This means that the name shall be in lowercase and all non-alphanumerical characters are replaced by underscores (similar to the entity_IDs in HA).
 * If no area is provided, the command is addressed to the Master Alarm. If the Master Alarm is disabled, the command is ignored.
 
