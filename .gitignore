@@ -2,6 +2,7 @@
 custom_components/alarmo/__pycache__/*
 .vscode
 custom_components/alarmo/frontend/node_modules
+custom_components/alarmo/card/node_modules
 ._*
 README.html
 package-lock.json

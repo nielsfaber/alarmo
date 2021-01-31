@@ -39,6 +39,9 @@ PANEL_TITLE = NAME
 PANEL_ICON = "mdi:shield-home"
 PANEL_NAME = "alarm-panel"
 
+CARD_FOLDER = "card"
+CARD_FILENAME = "dist/alarmo-card.js"
+CARD_URL = "/alarmo-card"
 
 INITIALIZATION_TIME = datetime.timedelta(seconds=30)
 SENSOR_ARM_TIME = datetime.timedelta(seconds=5)
