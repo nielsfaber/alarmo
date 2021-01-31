@@ -507,8 +507,8 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
     async def async_trigger(self, skip_delay: bool = False, open_sensors: dict = None):
         """Trigger request. Will only be called the first time a sensor trips."""
 
-        entry_delay = self._config[const.ATTR_MODES][self._arm_mode]["entry_time"]
-        trigger_time = self._config[const.ATTR_MODES][self._arm_mode]["trigger_time"]
+        entry_delay = self._config[const.ATTR_MODES][self._arm_mode]["entry_time"] if self._arm_mode else 0
+        trigger_time = self._config[const.ATTR_MODES][self._arm_mode]["trigger_time"] if self._arm_mode else 0
 
         if open_sensors:
             self.open_sensors = open_sensors
