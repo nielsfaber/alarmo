@@ -129,6 +129,7 @@ export type MqttConfig = {
   command_topic: string,
   command_payload: Dictionary<string>,
   require_code: boolean,
+  event_topic: string,
 }
 
 export type MasterConfig = {

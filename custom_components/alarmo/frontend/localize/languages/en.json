@@ -85,6 +85,10 @@
               "heading": "State topic",
               "description": "Topic on which state updates are published"
             },
+            "event_topic": {
+              "heading": "Event topic",
+              "description": "Topic on which alarm events are published"
+            },
             "command_topic": {
               "heading": "Command topic",
               "description": "Topic on which arm/disarm commands are sent."

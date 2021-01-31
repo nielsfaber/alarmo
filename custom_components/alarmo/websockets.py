@@ -39,6 +39,10 @@ from homeassistant.components.mqtt import (
     CONF_COMMAND_TOPIC,
 )
 
+from .mqtt import (
+    CONF_EVENT_TOPIC,
+)
+
 from .sensors import (
     ATTR_IMMEDIATE,
     ATTR_ALWAYS_ON,
@@ -91,6 +95,7 @@ class AlarmoConfigView(HomeAssistantView):
                         vol.Optional(const.COMMAND_DISARM): cv.string,
                     }),
                     vol.Required(const.ATTR_REQUIRE_CODE): cv.boolean,
+                    vol.Required(CONF_EVENT_TOPIC): cv.string,
                 }),
                 vol.Optional(const.ATTR_MASTER): vol.Schema({
                     vol.Required(const.ATTR_ENABLED): cv.boolean,

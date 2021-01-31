@@ -55,6 +55,8 @@ class MqttConfig:
     command_topic = attr.ib(type=str, default="alarmo/command")
     command_payload = attr.ib(type=dict, default={})
     require_code = attr.ib(type=bool, default=True)
+    event_topic = attr.ib(type=str, default="alarmo/event")
+
 
 
 @attr.s(slots=True, frozen=True)
