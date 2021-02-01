@@ -85,6 +85,10 @@
               "heading": "Etat de données",
               "description": "Donnée sur laquelle les mises à jour d'état sont publiées"
             },
+             "event_topic": {
+              "heading": "Evènement de données",
+              "description": "Donnée sur laquelle les évènements d'état sont publiés"
+            },
             "command_topic": {
               "heading": "Commande de donnée",
               "description": "Donnée sur laquelle les commandes d'armement / désarmement sont envoyées."
@@ -142,7 +146,7 @@
         }
       }
     },
-    "capteurs": {
+    "sensors": {
       "title": "Capteurs",
       "cards": {
         "sensors": {
@@ -412,7 +416,7 @@
             }
           },
           "actions": {
-            "test": "Try it"
+            "test": "Essai"
           }
         },
         "new_action": {
