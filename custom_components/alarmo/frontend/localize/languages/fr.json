@@ -25,7 +25,7 @@
       "yaml_mode": "Afficher l'éditeur de code"
     }
   },
-  "title": "Alarm panel",
+  "title": "Gestion de L'alarme",
   "panels": {
     "general": {
       "title": "Généraux",
@@ -59,7 +59,7 @@
               "armed_away": "Ce mode sera utilisé lorsque toutes les personnes auront quitté la maison. Toutes les portes et fenêtres permettant l'accès à la maison seront surveillées, les détecteurs de mouvement à l'intérieur de la maison seront opérationnels.",
               "armed_home": "Ce mode sera utilisée lorsque des personnes sont dans la maison. Toutes les portes et fenêtres permettant l'accès à la maison seront surveillées (périmétrie), les détecteurs de mouvement à l'intérieur de la maison seront inopérants.",
               "armed_night": "Ce mode sera utilisée lors du réglage de l'alarme avant de s'endormir. Toutes les portes et fenêtres permettant l'accès à la maison seront surveillées, et les capteurs de mouvement sélectionnés (ex : rez de chaussée) dans la maison seront opérationnels.",
-              "armed_custom_bypass": "ce mode supplémentaire permet de définir votre propre périmètre de sécurité.",
+              "armed_custom_bypass": "Ce mode supplémentaire permet de définir votre propre périmètre de sécurité.",
               "enabled": "Actif",
               "disabled": "Inactif"
             },
@@ -157,8 +157,8 @@
             "always_on": "(Toujours)"
           },
           "filter": {
-            "label": "Filter by area",
-            "no_area": "(No area)"
+            "label": "Filtrer par zone",
+            "no_area": "Aucune zone"
           }
         },
         "add_sensors": {
@@ -347,12 +347,12 @@
             "new_notification": "Nouvelle notification"
           },
           "filter": {
-            "label": "Filter by area",
-            "no_area": "Alarm master"
+            "label": "Filtrer par zone",
+            "no_area": "Alarme principale"
           }
         },
         "actions": {
-          "description": "Ce panneau est encore en développement. Il sera utilisé pour changer d'état les appareils de votre choix.",
+          "description": "Ce panneau est  utilisé pour changer d'état les appareils de votre choix.",
           "table": {
             "no_items": "Il n'y a aucune action de créer."
           },
@@ -373,28 +373,28 @@
               "description": "Détermine quand la notification doit être envoyée",
               "choose": {
                 "armed": {
-                  "name": "Alarm is armed",
-                  "description": "The alarm is succesfully armed"
+                  "name": "Alarme activée ",
+                  "description": "l'alarme s'est correctement activée"
                 },
                 "disarmed": {
-                  "name": "Alarm is disarmed",
-                  "description": "The alarm is disarmed"
+                  "name": "Alarme désactivée",
+                  "description": "L'alarme est désactivée"
                 },
                 "triggered": {
-                  "name": "Alarm is triggered",
-                  "description": "The alarm is triggered"
+                  "name": "Alarme déclenchée",
+                  "description": "L'alarme est déclenchée"
                 },
                 "arm_failure": {
-                  "name": "Failed to arm",
-                  "description": "The arming of the alarm failed due to one or more open sensors"
+                  "name": "Armement impossible",
+                  "description": "L'armement est impossible dû à un ou plusieurs capteurs"
                 },
                 "arming": {
-                  "name": "Exit delay started",
-                  "description": "Exit delay started, ready to leave the house."
+                  "name": "Délai de sortie activé",
+                  "description": "Le délai de sortie est activé, vous devez quitter la maison."
                 },
                 "pending": {
-                  "name": "Entry delay started",
-                  "description": "Entry delay started, the alarm will trigger soon."
+                  "name": "Délai d'entrée activé",
+                  "description": "Le délai d'entrée est activé, l'alarme va se déclencher."
                 }
               }
             },
