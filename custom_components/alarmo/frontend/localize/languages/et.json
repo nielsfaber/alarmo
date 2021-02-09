@@ -52,16 +52,16 @@
           }
         },
         "modes": {
-          "title": "Modes",
-          "description": "This panel can be used to set up the arm modes of the alarm.",
+          "title": "Režiimid",
+          "description": "Selles vaates seadistatakse valvestamise režiime.",
           "fields": {
             "mode": {
               "armed_away": "Täielik valvestamine kui kedagi pole kodus. Kasutusel on kõik andurid.",
               "armed_home": "Valvestatud kodus ei kasuta liikumisandureid kuid väisuksed ja aknad on valve all.",
               "armed_night": "Valvestatud ööseks ei kasuta määratud liikumisandureid, välisperimeeter on valve all.",
               "armed_custom_bypass": "Valikulise valvestuse puhul saab määrata kasutatavad andurid.",
-              "enabled": "Enabled",
-              "disabled": "Disabled"
+              "enabled": "Lubatud",
+              "disabled": "Keelatud"
             },
             "exit_delay": {
               "heading": "Ooteaeg valvestamisel",
@@ -104,41 +104,41 @@
           }
         },
         "areas": {
-          "title": "Areas",
-          "description": "Areas can be used for dividing your alarm system into multiple compartments.",
-          "no_items": "There are no areas defined yet.",
+          "title": "Alad",
+          "description": "Alasid kasutatakse elamise jagamiseks valvetsoonideks.",
+          "no_items": "Valvestamise alad on loomata.",
           "table": {
-            "remarks": "Remarks",
-            "summary": "This area contains {summary_sensors} and {summary_automations}.",
-            "summary_sensors": "{number} sensors",
-            "summary_automations": "{number} automations"
+            "remarks": "Ala teave",
+            "summary": "See ala sisaldab {summary_sensors} ja {summary_automations}.",
+            "summary_sensors": "{number} andur(it)",
+            "summary_automations": "{number} automatiseering(ut)"
           },
           "actions": {
-            "add": "Add"
+            "add": "Lisa"
           }
         }
       },
       "dialogs": {
         "create_area": {
-          "title": "New area",
+          "title": "Uus ala",
           "fields": {
-            "copy_from": "Copy settings from"
+            "copy_from": "Koperri sätted allikast:"
           }
         },
         "edit_area": {
-          "title": "Editing area '{area}'",
-          "name_warning": "Note: changing the name will change the entity ID"
+          "title": "Ala '{area}' muutmine",
+          "name_warning": "NB! Nime muutmisel muutub ka olemi ID"
         },
         "remove_area": {
-          "title": "Remove area?",
-          "description": "Are you sure you want to remove this area? This area contains {sensors} sensors and {automations} automations, which will be removed as well."
+          "title": "Kas kustutada ala?",
+          "description": "Kas kustutada see ala? Ala kaasab andurid {sensors} ja automatiseeringud {automations} mis samuti eemaldatakse."
         },
         "edit_master": {
-          "title": "Master configuration"
+          "title": "Põhiala seaded"
         },
         "disable_master": {
-          "title": "Disable master?",
-          "description": "Are you sure you want to remove the alarm master? This area contains {automations} automations, which will be removed with this action."
+          "title": "Kas keelata põhiala?",
+          "description": "Kas keelata põhiala? Ala kaasab andurid {sensors} ja automatiseeringud {automations} mis samuti eemaldatakse.."
         }
       }
     },
@@ -153,8 +153,8 @@
             "always_on": "(alati)"
           },
           "filter": {
-            "label": "Filter by area",
-            "no_area": "(No area)"
+            "label": "Sordi ala järgi",
+            "no_area": "(Alad puuduvad)"
           }
         },
         "add_sensors": {
@@ -175,35 +175,35 @@
               "description": "Muuda kuvatavat nime."
             },
             "area": {
-              "heading": "Area",
-              "description": "Select an area which contains this sensor."
+              "heading": "Ala",
+              "description": "Vali ala kus see andur asub."
             },
             "device_type": {
-              "heading": "Device Type",
-              "description": "Choose a device type to automatically apply appropriate settings.",
+              "heading": "Seadme tüüp",
+              "description": "Vali anduri tüüp, et automaatselt rakendada sobivad sätted.",
               "choose": {
                 "door": {
-                  "name": "Door",
-                  "description": "A door, gate or other entrance that is used for entering/leaving the home."
+                  "name": "Uks",
+                  "description": "Uks, värav või muu piire mida kasutatakse sisenemiseks või väljumiseks."
                 },
                 "window": {
-                  "name": "Window",
-                  "description": "A window, or a door not used for entering the house such as balcony."
+                  "name": "Aken",
+                  "description": "Aken või uks mida ei kasutata sisenemiseks nagu rõduuks."
                 },
                 "motion": {
-                  "name": "Motion",
-                  "description": "Presence sensor or similar device having a delay between activations."
+                  "name": "Liikumisandur",
+                  "description": "Kohaloleku andurid mille rakendumiste vahel on viide."
                 },
                 "tamper": {
-                  "name": "Tamper",
-                  "description": "Detector of sensor cover removal, glass break sensor, etc."
+                  "name": "Terviklikkus",
+                  "description": "Anduri muukimine või klaasipurustusandur jms."
                 },
                 "environmental": {
-                  "name": "Environmental",
-                  "description": "Smoke/gas sensor, leak detector, etc. (not related to burglar protection)."
+                  "name": "Ohu andurid",
+                  "description": "Suitsu või gaasilekke andur, veeleke jne. (ei ole seotud sissetungimisega)."
                 },
                 "other": {
-                  "name": "Generic"
+                  "name": "Tavaandur"
                 }
               }
             },
@@ -233,13 +233,13 @@
             }  
           },
           "actions": {
-            "toggle_advanced": "Advanced settings",
-            "remove": "Remove"
+            "toggle_advanced": "Täpsemad sätted",
+            "remove": "Eemalda"
           },
           "errors": {
-            "description": "Please correct the following errors:",
-            "no_area": "No area is selected",
-            "no_modes": "No modes are selected for which the sensor should be active"
+            "description": "Palun paranda jägmised vead:",
+            "no_area": "Ala pole määratud",
+            "no_modes": "Anduri tüüp on määramata, ei tea kuida kasutada"
           }
         }
       }
@@ -343,8 +343,8 @@
             "new_notification": "Uus teavitus"
           },
           "filter": {
-            "label": "Filter by area",
-            "no_area": "Alarm master"
+            "label": "Sordi alade järgi",
+            "no_area": "Põhiala"
           }
         },
         "actions": {
@@ -369,28 +369,28 @@
               "description": "Mille puhul teavitada",
               "choose": {
                 "armed": {
-                  "name": "Alarm is armed",
-                  "description": "The alarm is succesfully armed"
+                  "name": "Valvestatud",
+                  "description": "Valvestamine oli edukas"
                 },
                 "disarmed": {
-                  "name": "Alarm is disarmed",
-                  "description": "The alarm is disarmed"
+                  "name": "Valvest maas",
+                  "description": "Valve mahavõtmine õnnestus"
                 },
                 "triggered": {
-                  "name": "Alarm is triggered",
-                  "description": "The alarm is triggered"
+                  "name": "Häire",
+                  "description": "Valvesüsteem andis häire"
                 },
                 "arm_failure": {
-                  "name": "Failed to arm",
-                  "description": "The arming of the alarm failed due to one or more open sensors"
+                  "name": "Valvestamine nurjus",
+                  "description": "Valvestamine ei õnnestunud mõne anduri oleku või vea tõttu"
                 },
                 "arming": {
-                  "name": "Exit delay started",
-                  "description": "Exit delay started, ready to leave the house."
+                  "name": "Valvestamise eelne viivitus algas",
+                  "description": "Algas valvestamise eelviide, majast võib lahkuda."
                 },
                 "pending": {
-                  "name": "Entry delay started",
-                  "description": "Entry delay started, the alarm will trigger soon."
+                  "name": "Sisenemise viide rakendus",
+                  "description": "Märgati sisenemist, häire rakendub peale viidet."
                 }
               }
             },
@@ -428,8 +428,8 @@
               "description": "Millisel juhul käivitada toiming"
             },
             "area": {
-              "heading": "Area",
-              "description": "Area for which the event applies, leave empty to select the global alarm."
+              "heading": "Ala",
+              "description": "Ala millele sündmus rakendub, põhiala puhul jäta tühjaks."
             },
             "mode": {
               "heading": "Olek",
