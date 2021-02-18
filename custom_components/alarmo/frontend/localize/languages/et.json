@@ -42,13 +42,13 @@
               "description": "Luba nupustiku juhtimist MQTT abil."
             },
             "enable_master": {
-              "heading": "Enable alarm master",
-              "description": "Creates an entity for controlling all areas simultaneously."
+              "heading": "Luba põhivalvestus",
+              "description": "Loob olemi mis haldab kõiki valvestamise alasid korraga."
             }
           },
           "actions": {
             "setup_mqtt": "MQTT seadistamine",
-            "setup_master": "Master Configuration"
+            "setup_master": "Põhivalvestuse sätted"
           }
         },
         "modes": {
@@ -122,7 +122,7 @@
         "create_area": {
           "title": "Uus ala",
           "fields": {
-            "copy_from": "Koperri sätted allikast:"
+            "copy_from": "Kopeeri sätted allikast:"
           }
         },
         "edit_area": {
@@ -216,8 +216,8 @@
               "description": "Valve olekud kus seda andurit kasutatakse."
             },
             "arm_on_close": {
-              "heading": "Arm after closing",
-              "description": "After deactivation of this sensor, the remaining exit delay will automatically be skipped."
+              "heading": "Valvesta sulgemisel",
+              "description": "Selle anduri rakendumisel valvestatakse kohe ilma viiveta."
             },
             "immediate": {
               "heading": "Viivituseta",
