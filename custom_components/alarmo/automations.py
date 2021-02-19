@@ -55,6 +55,9 @@ class AutomationHandler:
             else:
                 alarm_entity = self.hass.data[const.DOMAIN]["master"]
 
+            if not alarm_entity:
+                return
+
             _LOGGER.debug("state of {} is updated from {} to {}".format(alarm_entity.entity_id, old_state, new_state))
 
             if new_state in const.ARM_MODES:
@@ -152,6 +155,7 @@ class AutomationHandler:
                 if "{{arm_mode}}" in data[ATTR_MESSAGE]:
                     _LOGGER.debug(alarm_entity.arm_mode)
                     arm_mode = alarm_entity.arm_mode if alarm_entity.arm_mode else ""
+                    arm_mode = " ".join(w.capitalize() for w in arm_mode.split("_"))
                     data[ATTR_MESSAGE] = data[ATTR_MESSAGE].replace("{{arm_mode}}", arm_mode)
 
                 if "{{changed_by}}" in data[ATTR_MESSAGE]:
