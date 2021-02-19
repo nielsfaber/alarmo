@@ -214,7 +214,7 @@ export class SensorEditorCard extends LitElement {
                     ?disabled=${this.data.always_on || this.data.arm_on_close}
                     @change=${(ev: Event) =>
                       (this.data = (ev.target as HTMLInputElement).checked
-                        ? { ...this.data, immediate: true, arm_on_close: false, always_on: false, allow_open: false }
+                        ? { ...this.data, immediate: true, arm_on_close: false, always_on: false }
                         : { ...this.data, immediate: false })}
                   >
                   </ha-switch>
@@ -233,10 +233,10 @@ export class SensorEditorCard extends LitElement {
 
                   <ha-switch
                     ?checked=${this.data.allow_open}
-                    ?disabled=${this.data.always_on || this.data.immediate || this.data.arm_on_close}
+                    ?disabled=${this.data.always_on || this.data.arm_on_close}
                     @change=${(ev: Event) =>
                       (this.data = (ev.target as HTMLInputElement).checked
-                        ? { ...this.data, allow_open: true, arm_on_close: false, always_on: false, immediate: false }
+                        ? { ...this.data, allow_open: true, arm_on_close: false, always_on: false }
                         : { ...this.data, allow_open: false })}
                   >
                   </ha-switch>
