@@ -67,7 +67,7 @@ export class MyAlarmPanel extends LitElement {
                     There is <b>${matchingUser ? 'a' : 'NO'}</b> user configured in Alarmo with name
                     <b>${this.hass!.user.name}</b>.
                     ${matchingUser
-                      ? `This user ${matchingUser.is_admin ? 'does' : 'does NOT'}</b> have administrator permission. `
+                      ? `This user <b>${matchingUser.is_admin ? 'does' : 'does NOT'}</b> have administrator permission. `
                       : ''}
                   </li>
                 </ul>
@@ -89,10 +89,10 @@ export class MyAlarmPanel extends LitElement {
                 v${VERSION}
               </div>
             </app-toolbar>
-            <paper-tabs
+            <ha-tabs
               scrollable
               attr-for-selected="page-name"
-              .selected=${this.getPath()}
+              .selected=${this.getPath()[2] || "general"}
               @iron-activate=${this.handlePageSelected}
             >
               <paper-tab page-name="general">
@@ -107,7 +107,7 @@ export class MyAlarmPanel extends LitElement {
               <paper-tab page-name="actions">
                 ${localize('panels.actions.title', this.hass.language)}
               </paper-tab>
-            </paper-tabs>
+            </ha-tabs>
           </app-header>
         </ha-app-layout>
         <div class="view">
@@ -169,16 +169,21 @@ export class MyAlarmPanel extends LitElement {
 
   static get styles(): CSSResult {
     return css`
-      ${commonStyle} :host {
+      ${commonStyle}
+
+      :host {
         color: var(--primary-text-color);
         --paper-card-header-color: var(--primary-text-color);
       }
 
-      ha-app-layout,
-      app-toolbar,
-      paper-tabs {
-        background: var(--primary-color);
-        color: var(--text-primary-color);
+      app-header,
+      app-toolbar {
+        background-color: var(--app-header-background-color);
+        font-weight: 400;
+        color: var(--app-header-text-color, white);
+      }
+      app-toolbar {
+        height: var(--header-height);
       }
 
       ha-app-layout {
@@ -186,8 +191,17 @@ export class MyAlarmPanel extends LitElement {
         z-index: 2;
       }
 
-      paper-tabs {
-        --paper-tabs-selection-bar-color: #fff;
+      app-toolbar [main-title] {
+        margin-left: 20px;
+      }
+
+      ha-tabs {
+        margin-left: max(env(safe-area-inset-left), 24px);
+        margin-right: max(env(safe-area-inset-right), 24px);
+        --paper-tabs-selection-bar-color: var(
+          --app-header-selection-bar-color,
+          var(--app-header-text-color, #fff)
+        );
         text-transform: uppercase;
       }
 
