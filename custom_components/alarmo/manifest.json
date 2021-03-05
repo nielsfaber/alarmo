@@ -15,5 +15,6 @@
     "@nielsfaber"
   ],
   "requirements": [],
-  "config_flow": true
+  "config_flow": true,
+  "version": "v1.5.4"
 }
