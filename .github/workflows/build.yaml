@@ -1,0 +1,29 @@
+
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Get version
+        id: version
+        uses: home-assistant/actions/helpers/version@master
+
+      - name: Patch manifest and zip
+        run: |
+          sed -i 's/v0.0.0/${{ steps.version.outputs.version }}/' custom_components/alarmo/manifest.json
+        
+          cd custom_components/alarmo/
+          zip ../../alarmo.zip ./* frontend/dist/* -x '.*'
+      - uses: gacts/upload-to-release@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          file: ./alarmo.zip
+          type: application/zip
