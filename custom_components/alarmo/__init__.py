@@ -263,13 +263,14 @@ class AlarmoCoordinator(DataUpdateCoordinator):
         async def async_handle_event(event):
             action = None
             if (
-                event.data and "categoryName" in event.data
+                event.data
+                and "categoryName" in event.data
                 and "actionName" in event.data
                 and event.data["categoryName"] in const.EVENT_CATEGORIES
             ):
                 # IOS push notification format
                 action = event.data["actionName"]
-            elif event.data["action"]:
+            elif "action" in "action" and event.data["action"]:
                 # Android push notification format
                 action = event.data["action"]
 
