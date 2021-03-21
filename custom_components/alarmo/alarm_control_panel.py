@@ -266,7 +266,6 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             _LOGGER.warning("Wrong code provided.")
             return
         else:
-            self._arm_mode = None
             self.open_sensors = None
             self.bypassed_sensors = None
             await self.async_update_state(STATE_ALARM_DISARMED)
@@ -449,6 +448,9 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
 
         if self._timer:
             self._timer()
+
+        if state == STATE_ALARM_DISARMED:
+            self._arm_mode = None
 
         async_dispatcher_send(self.hass, "alarmo_state_updated", self.area_id, old_state, state)
 
