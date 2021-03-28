@@ -1,7 +1,6 @@
-import { LitElement, html, customElement, property, CSSResult, css, internalProperty, PropertyValues, TemplateResult } from 'lit-element';
+import { LitElement, html, customElement, property, CSSResult, css, internalProperty, TemplateResult } from 'lit-element';
 import { HomeAssistant, LovelaceCardEditor, fireEvent } from 'custom-card-helpers';
 import { CardConfig } from './types';
-import { localize } from './localize/localize';
 
 
 @customElement('alarmo-card-editor')

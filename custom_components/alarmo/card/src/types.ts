@@ -1,9 +1,13 @@
+<<<<<<< HEAD
 import { HassEvent, HassEntity } from "home-assistant-js-websocket"
+=======
+>>>>>>> 6190b6ef6d4619f7b2b4e1a6c3b2d7568e02a303
 
 
 
 export type CardConfig = {
     type: string;
+<<<<<<< HEAD
     entity: string
 }
 
@@ -23,4 +27,7 @@ export type AlarmoEntity = HassEntity & {
         code_format?: string,
         code_arm_required?: boolean
     }
+=======
+    entity: string,
+>>>>>>> 6190b6ef6d4619f7b2b4e1a6c3b2d7568e02a303
 }
