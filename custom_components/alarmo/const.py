@@ -86,6 +86,7 @@ EVENT_FAILED_TO_ARM = "failed_to_arm"
 EVENT_COMMAND_NOT_ALLOWED = "command_not_allowed"
 EVENT_INVALID_CODE_PROVIDED = "invalid_code_provided"
 EVENT_NO_CODE_PROVIDED = "no_code_provided"
+EVENT_TRIGGER_TIME_EXPIRED = "trigger_time_expired"
 
 ATTR_MODES = "modes"
 ATTR_CODE_DISARM_REQUIRED = "code_disarm_required"

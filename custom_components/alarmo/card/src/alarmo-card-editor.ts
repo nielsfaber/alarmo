@@ -1,6 +1,7 @@
 import { LitElement, html, customElement, property, CSSResult, css, internalProperty, PropertyValues, TemplateResult } from 'lit-element';
 import { HomeAssistant, LovelaceCardEditor, fireEvent } from 'custom-card-helpers';
 import { CardConfig } from './types';
+import { localize } from './localize/localize';
 
 
 @customElement('alarmo-card-editor')
@@ -26,25 +27,27 @@ export class AlarmoCardEditor extends LitElement implements LovelaceCardEditor {
           .hass=${this.hass}
           .value="${this._entity}"
           .includeDomains=${["alarm_control_panel"]}
-          @change=${this._entityChanged}
+          @change=${(ev: Event) => this._updateConfig("entity", (ev.target as HTMLInputElement).value)}
           allow-custom-entity
         ></ha-entity-picker>
+      </div>
     `;
   }
 
-  private _entityChanged(ev: Event): void {
-    if (!this._config || !this.hass) return;
-    const target = ev.target as HTMLInputElement;
-    if (target.value === "") {
-    this._config = { ...this._config };
-    delete this._config["entity"];
-    } else {
-        this._config = {
-            ...this._config,
-            ["entity"]: target.value,
-        };
+  private _updateConfig(property: string, value: any) {
+    this._config = {
+      ...this._config,
+      [property]: value
     }
     fireEvent(this, "config-changed", { config: this._config });
+  }
+
+  static get styles(): CSSResult {
+    return css`
+      ha-formfield {
+        padding: 20px 0px;
+      }
+    `;
   }
 }
 
