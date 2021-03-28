@@ -39,6 +39,9 @@ PANEL_TITLE = NAME
 PANEL_ICON = "mdi:shield-home"
 PANEL_NAME = "alarm-panel"
 
+CARD_FOLDER = "card"
+CARD_FILENAME = "dist/alarmo-card.js"
+CARD_URL = "/alarmo-card"
 
 INITIALIZATION_TIME = datetime.timedelta(seconds=30)
 SENSOR_ARM_TIME = datetime.timedelta(seconds=5)
@@ -83,6 +86,7 @@ EVENT_FAILED_TO_ARM = "failed_to_arm"
 EVENT_COMMAND_NOT_ALLOWED = "command_not_allowed"
 EVENT_INVALID_CODE_PROVIDED = "invalid_code_provided"
 EVENT_NO_CODE_PROVIDED = "no_code_provided"
+EVENT_TRIGGER_TIME_EXPIRED = "trigger_time_expired"
 
 ATTR_MODES = "modes"
 ATTR_CODE_DISARM_REQUIRED = "code_disarm_required"
