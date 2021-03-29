@@ -20,7 +20,7 @@ jobs:
           sed -i 's/v0.0.0/${{ steps.version.outputs.version }}/' custom_components/alarmo/manifest.json
         
           cd custom_components/alarmo/
-          zip ../../alarmo.zip ./* frontend/dist/* -x '.*'
+          zip ../../alarmo.zip ./* frontend/dist/* card/dist/* -x '.*'
       - uses: gacts/upload-to-release@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
