@@ -2226,7 +2226,7 @@ const Yt=new WeakMap,Bt=(e=>(...t)=>{const a=e(...t);return g.set(a,!0),a})(e=>t
                 ${nt("title",this.hass.language)}
               </div>
               <div class="version">
-                v${"1.5.4"}
+                v${"1.5.5"}
               </div>
             </app-toolbar>
             <ha-tabs

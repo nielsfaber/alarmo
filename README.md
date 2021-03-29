@@ -41,6 +41,9 @@ This is an alarm system integration for Home Assistant. It provides a user inter
         - [Actionable notifications](#actionable-notifications)
       - [Device actions](#device-actions)
     - [Lovelace alarm panel card](#lovelace-alarm-panel-card)
+  - [Alarmo-card](#alarmo-card)
+    - [Demonstration](#demonstration)
+    - [Configuration](#configuration)
   - [Say thank you](#say-thank-you)
 
 
@@ -48,6 +51,11 @@ This is an alarm system integration for Home Assistant. It provides a user inter
 This is an integration for the `alarm_control_panel` domain in HA.
 It allows to combine existing sensors for creating a security system for your house. 
 The integration is comparable with the [Manual Alarm](https://www.home-assistant.io/integrations/manual/) in HA, but also has some additional features that makes it easier to use. 
+
+Alarmo consists of 3 parts:
+* Alarmo component: a custom component for HA that controls the states of the alarm panel entities in HA.
+* Alarmo panel: a GUI for configuring the settings of your alarm (sensors, delays, actions etc.)
+* Alarmo card: a custom card for arming / disarming the alarm.
 
 ### Features
 * Fully compatible with Home Assistant and the [Alarm Panel Card](https://www.home-assistant.io/lovelace/alarm-panel/).
@@ -57,8 +65,8 @@ The integration is comparable with the [Manual Alarm](https://www.home-assistant
 * Supports configuring your existing HA entities as security sensors. These sensors will be watched automatically. 
 * Allows setting up multiple users with individual pincode and permission levels.
 * Will restore its previous state after restart of HA.
-* Receive push notifications when anything changes in the alarm.
-* Activate a siren when the alarm is triggered.
+* Built-in actions: receive push notifications when anything changes in the alarm, activate a siren when the alarm is triggered, etc.
+* Supports splitting up your house security system into multiple areas which can be armed independently.
 
 ### Preview
 
@@ -195,13 +203,13 @@ The Alarmo entity defines the following attributes:
 #### Commands
 The Alarmo entities support the following commands:
 
-| Command | Description | Conditions |
-| ------- | ----------- | ------------ |
-| `ARM_AWAY` | Arm the alarm in mode `armed_away`. | - The entity has the mode `away` enabled.<br>- The current alarm state is `disarmed`, `armed_home`, `armed_night`, or `armed_custom_bypass`. |
-| `ARMED_HOME` | Arm the alarm in mode `armed_home`. | - The entity has the mode `home` enabled.<br>- The current alarm state is `disarmed`, `armed_away`, `armed_night`, or `armed_custom_bypass`. |
-| `ARM_NIGHT` | Arm the alarm in mode `armed_night`. | - The entity has the mode `night` enabled.<br>- The current alarm state is `disarmed`, `armed_away`, `armed_home`, or `armed_custom_bypass`. |
-| `ARM_CUSTOM_BYPASS` | Arm the alarm in mode `armed_custom_bypass`. | - The entity has the mode `custom` enabled.<br>- The current alarm state is `disarmed`, `armed_away`, `armed_home`, or `armed_night`. |
-| `DISARM` | Disarm the alarm. | - The current alarm state is not `disarmed` |
+| Command             | Description                                  | Conditions                                                                                                                                   |
+| ------------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ARM_AWAY`          | Arm the alarm in mode `armed_away`.          | - The entity has the mode `away` enabled.<br>- The current alarm state is `disarmed`, `armed_home`, `armed_night`, or `armed_custom_bypass`. |
+| `ARMED_HOME`        | Arm the alarm in mode `armed_home`.          | - The entity has the mode `home` enabled.<br>- The current alarm state is `disarmed`, `armed_away`, `armed_night`, or `armed_custom_bypass`. |
+| `ARM_NIGHT`         | Arm the alarm in mode `armed_night`.         | - The entity has the mode `night` enabled.<br>- The current alarm state is `disarmed`, `armed_away`, `armed_home`, or `armed_custom_bypass`. |
+| `ARM_CUSTOM_BYPASS` | Arm the alarm in mode `armed_custom_bypass`. | - The entity has the mode `custom` enabled.<br>- The current alarm state is `disarmed`, `armed_away`, `armed_home`, or `armed_night`.        |
+| `DISARM`            | Disarm the alarm.                            | - The current alarm state is not `disarmed`                                                                                                  |
 
 ### Areas
 An area is a physical compartment of your house, such as a garage, 1st floor of the house, garden, etc.
@@ -383,17 +391,17 @@ The published payloads on this topic are formatted as JSON struct, which contain
 The following table shows the events which are published on the event topic, together with the parameters which are sent for a certain event):
 
 
-| Event               | Description                                            | Parameters                                                                                                             |
-| ------------------- | ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
-| `ARM_AWAY`          | The alarm has been armed in mode `armed_away`          | - `delay`: exit delay (in seconds) configured for the operation (i.e. time during which the alarm is in state `arming`). |
-| `ARM_HOME`          | The alarm has been armed in mode `armed_home`          |      - `delay`: exit delay (in seconds) configured for the operation (i.e. time during which the alarm is in state `arming`). | 
-| `ARM_NIGHT`         | The alarm has been armed in mode `armed_night`         |- `delay`: exit delay (in seconds) configured for the operation (i.e. time during which the alarm is in state `arming`). |
-| `ARM_CUSTOM_BYPASS` | The alarm has been armed in mode `armed_custom_bypass` | - `delay`: exit delay (in seconds) configured for the operation (i.e. time during which the alarm is in state `arming`). |
-| `TRIGGER` | The alarm has been triggered | - `sensors`: list of sensors (usually a single sensor) which caused the triggering of the alarm. Each list item is a struct with the `entity_id` and `name` of the sensor entity).<br>- `delay`: entry delay (in seconds) configured to postpone the triggering (i.e. time during which the alarm is in state `pending`). |
-| `FAILED_TO_ARM` | The arming was prevented or cancelled due to one or more blocking sensors. | - `sensors`: list of sensors which prevented the arming operation. Each list item is a struct with the `entity_id` and `name` of the sensor entity). |
-| `COMMAND_NOT_ALLOWED` | The conditions for which the command is allowed are not met (see [commands](#commands)). | - `state`: current [state](#states) of the alarm entity.<br>- `command`: the command that was provided by the user. |
-| `NO_CODE_PROVIDED` | The command was rejected because no code was provided, while the operation requires a code. | |
-| `INVALID_CODE_PROVIDED` | The command was rejected because a wrong code was provided, or the provided code is not allowed for the operation. | |
+| Event                   | Description                                                                                                        | Parameters                                                                                                                                                                                                                                                                                                                |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ARM_AWAY`              | The alarm has been armed in mode `armed_away`                                                                      | - `delay`: exit delay (in seconds) configured for the operation (i.e. time during which the alarm is in state `arming`).                                                                                                                                                                                                  |
+| `ARM_HOME`              | The alarm has been armed in mode `armed_home`                                                                      | - `delay`: exit delay (in seconds) configured for the operation (i.e. time during which the alarm is in state `arming`).                                                                                                                                                                                                  |
+| `ARM_NIGHT`             | The alarm has been armed in mode `armed_night`                                                                     | - `delay`: exit delay (in seconds) configured for the operation (i.e. time during which the alarm is in state `arming`).                                                                                                                                                                                                  |
+| `ARM_CUSTOM_BYPASS`     | The alarm has been armed in mode `armed_custom_bypass`                                                             | - `delay`: exit delay (in seconds) configured for the operation (i.e. time during which the alarm is in state `arming`).                                                                                                                                                                                                  |
+| `TRIGGER`               | The alarm has been triggered                                                                                       | - `sensors`: list of sensors (usually a single sensor) which caused the triggering of the alarm. Each list item is a struct with the `entity_id` and `name` of the sensor entity).<br>- `delay`: entry delay (in seconds) configured to postpone the triggering (i.e. time during which the alarm is in state `pending`). |
+| `FAILED_TO_ARM`         | The arming was prevented or cancelled due to one or more blocking sensors.                                         | - `sensors`: list of sensors which prevented the arming operation. Each list item is a struct with the `entity_id` and `name` of the sensor entity).                                                                                                                                                                      |
+| `COMMAND_NOT_ALLOWED`   | The conditions for which the command is allowed are not met (see [commands](#commands)).                           | - `state`: current [state](#states) of the alarm entity.<br>- `command`: the command that was provided by the user.                                                                                                                                                                                                       |
+| `NO_CODE_PROVIDED`      | The command was rejected because no code was provided, while the operation requires a code.                        |                                                                                                                                                                                                                                                                                                                           |
+| `INVALID_CODE_PROVIDED` | The command was rejected because a wrong code was provided, or the provided code is not allowed for the operation. |                                                                                                                                                                                                                                                                                                                           |
 
 Example payload on the event topic (*Consider the scenario where the alarm is armed in state `armed_away` and the front door is opened):*
 ```yaml
@@ -549,7 +557,41 @@ Make sure that the card is configured with the same modes (they are referred to 
 There is currently no functionality in place to detect this setting automatically.
 
 ---
+## Alarmo-card
 
+The installation of Alarmo automatically adds the alarmo-card to Lovelace.
+This card allows you to control your alarm through the HA web interface.
+
+The alarmo-card is similar to the [Lovelace alarm panel card](https://www.home-assistant.io/lovelace/alarm-panel/), but brings some extra functions:
+
+* A countdown timer is displayed when the alarm is in `arming` or `pending` state. It shows you how much time you have left for leaving the house / disarming the alarm.
+* A message is displayed when the arming of the alarm failed or the alarm has triggered, with an overview of the sensor(s) involved.
+* The card gives you feedback when a wrong code was entered. 
+
+### Demonstration
+See the alarmo-card in action:
+
+<img src="https://raw.githubusercontent.com/nielsfaber/alarmo/main/screenshots/alarmo-card.gif">
+
+
+### Configuration
+
+For setting up the card, you need to assign the correct entity to the card.
+All settings regarding delay times, arming modes, code settings are automatically detected.
+
+Example YAML configuration:
+```yaml
+type: 'custom:alarmo-card'
+entity: alarm_control_panel.alarmo
+```
+
+Configuration using UI mode:
+1. Go to the Lovelace page where you want to add the card
+2. Click "Edit Dashboard" on the right (under the button with the 3 dots)
+* Click the "Add card" button on the bottom
+* Choose "Custom: Alarmo Card" and pick the correct entity.
+
+---
 
 ## Say thank you
 If you want to make donation as appreciation of my work, you can buy me a coffee. Thank you!
