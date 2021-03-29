@@ -299,6 +299,9 @@ class AlarmoCoordinator(DataUpdateCoordinator):
             elif action == const.EVENT_ACTION_RETRY_ARM:
                 _LOGGER.info("Received request for retry arming")
                 await alarm_entity.async_arm(arm_mode)
+            elif action == const.EVENT_ACTION_DISARM:
+                _LOGGER.info("Received request for disarming")
+                await alarm_entity.async_alarm_disarm(None, True)
 
         for event in const.PUSH_EVENTS:
             handle = self.hass.bus.async_listen(event, async_handle_event)

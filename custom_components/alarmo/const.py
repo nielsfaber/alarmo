@@ -26,7 +26,7 @@ from homeassistant.components.alarm_control_panel import (
 
 from homeassistant.helpers import config_validation as cv
 
-VERSION = "1.5.4"
+VERSION = "1.5.5"
 NAME = "Alarmo"
 MANUFACTURER = "@nielsfaber"
 
@@ -145,6 +145,7 @@ EVENT_CATEGORIES = [
 ]
 EVENT_ACTION_FORCE_ARM = "ALARMO_FORCE_ARM"
 EVENT_ACTION_RETRY_ARM = "ALARMO_RETRY_ARM"
+EVENT_ACTION_DISARM = "ALARMO_DISARM"
 
 MODES_TO_SUPPORTED_FEATURES = {
     STATE_ALARM_ARMED_AWAY: SUPPORT_ALARM_ARM_AWAY,
