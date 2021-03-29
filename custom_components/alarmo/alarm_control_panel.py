@@ -112,7 +112,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
         self._name = name
         self._state = None
         self.hass = hass
-        self._config = None
+        self._config = {}
         self._arm_mode = None
         self._changed_by = None
         self._open_sensors = {}
@@ -271,7 +271,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
         elif state != STATE_ALARM_DISARMED and not self._config[ATTR_CODE_ARM_REQUIRED]:
             self._changed_by = None
             return (True, None)
-        elif not code or not len(code):
+        elif not code or len(code) < 1:
             return (False, const.EVENT_NO_CODE_PROVIDED)
 
         res = self.hass.data[const.DOMAIN]["coordinator"].async_authenticate_user(code)
@@ -365,7 +365,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
                 self._changed_by = None
 
             self.open_sensors = None
-            self.bpassed_sensors = None
+            self.bypassed_sensors = None
             return await self.async_arm(
                 arm_mode,
                 bypass_open_sensors=bypass_open_sensors,
@@ -375,22 +375,22 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
     async def async_alarm_arm_away(self, code=None, skip_code=False):
         """Send arm away command."""
         _LOGGER.debug("alarm_arm_away")
-        await self.async_handle_arm_request(STATE_ALARM_ARMED_AWAY, code, skip_code=skip_code)
+        await self.async_handle_arm_request(STATE_ALARM_ARMED_AWAY, code=code, skip_code=skip_code)
 
     async def async_alarm_arm_home(self, code=None, skip_code=False):
         """Send arm home command."""
         _LOGGER.debug("alarm_arm_home")
-        await self.async_handle_arm_request(STATE_ALARM_ARMED_HOME, code, skip_code=skip_code)
+        await self.async_handle_arm_request(STATE_ALARM_ARMED_HOME, code=code, skip_code=skip_code)
 
     async def async_alarm_arm_night(self, code=None, skip_code=False):
         """Send arm night command."""
         _LOGGER.debug("alarm_arm_night")
-        await self.async_handle_arm_request(STATE_ALARM_ARMED_NIGHT, code, skip_code=skip_code)
+        await self.async_handle_arm_request(STATE_ALARM_ARMED_NIGHT, code=code, skip_code=skip_code)
 
     async def async_alarm_arm_custom_bypass(self, code=None, skip_code=False):
         """Send arm custom_bypass command."""
         _LOGGER.debug("alarm_arm_custom_bypass")
-        await self.async_handle_arm_request(STATE_ALARM_ARMED_CUSTOM_BYPASS, code, skip_code=skip_code)
+        await self.async_handle_arm_request(STATE_ALARM_ARMED_CUSTOM_BYPASS, code=code, skip_code=skip_code)
 
     async def async_added_to_hass(self):
         """Connect to dispatcher listening for entity data notifications."""
