@@ -40,7 +40,6 @@ This is an alarm system integration for Home Assistant. It provides a user inter
       - [Push notifications](#push-notifications)
         - [Actionable notifications](#actionable-notifications)
       - [Device actions](#device-actions)
-    - [Lovelace alarm panel card](#lovelace-alarm-panel-card)
   - [Alarmo-card](#alarmo-card)
     - [Demonstration](#demonstration)
     - [Configuration](#configuration)
@@ -545,16 +544,6 @@ It is only intended to provide a more integrated means of setting up your alarm.
 
 The actions are currently limited to *turning on* or *turning off* a HA entity. 
 For more advanced actions, you can use the built-in YAML editor to define your own HA service call.
-
-
-### Lovelace alarm panel card
-The [Lovelace alarm panel card](https://www.home-assistant.io/lovelace/alarm-panel/) is an excellent companion for Alarmo.
-It is highly recommended to use it for controlling the alarm.
-
-This card will show you the current state of the alarm, and will allow you to enter a pin (the format is automatically detected).
-
-Make sure that the card is configured with the same modes (they are referred to as `states` in the card), as you have set up in Alarmo.
-There is currently no functionality in place to detect this setting automatically.
 
 ---
 ## Alarmo-card
