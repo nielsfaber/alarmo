@@ -1,6 +1,6 @@
 """Store constants."""
 import datetime
-
+import voluptuous as vol
 
 from homeassistant.const import (
     STATE_ALARM_ARMED_AWAY,
@@ -11,6 +11,9 @@ from homeassistant.const import (
     STATE_ALARM_TRIGGERED,
     STATE_ALARM_PENDING,
     STATE_ALARM_ARMING,
+    ATTR_ENTITY_ID,
+    CONF_MODE,
+    CONF_CODE,
 )
 
 from homeassistant.components.alarm_control_panel import (
@@ -20,6 +23,8 @@ from homeassistant.components.alarm_control_panel import (
     SUPPORT_ALARM_ARM_NIGHT,
     SUPPORT_ALARM_ARM_CUSTOM_BYPASS,
 )
+
+from homeassistant.helpers import config_validation as cv
 
 VERSION = "1.5.4"
 NAME = "Alarmo"
@@ -124,6 +129,13 @@ ATTR_VERSION = "version"
 ATTR_STATE_PAYLOAD = "state_payload"
 ATTR_COMMAND_PAYLOAD = "command_payload"
 
+ATTR_FORCE = "force"
+ATTR_SKIP_DELAY = "skip_delay"
+ARM_MODE_AWAY = "away"
+ARM_MODE_HOME = "home"
+ARM_MODE_NIGHT = "night"
+ARM_MODE_CUSTOM = "custom"
+
 PUSH_EVENTS = [
     "ios.notification_action_fired",
     "mobile_app_notification_action",
@@ -139,4 +151,28 @@ MODES_TO_SUPPORTED_FEATURES = {
     STATE_ALARM_ARMED_HOME: SUPPORT_ALARM_ARM_HOME,
     STATE_ALARM_ARMED_NIGHT: SUPPORT_ALARM_ARM_NIGHT,
     STATE_ALARM_ARMED_CUSTOM_BYPASS: SUPPORT_ALARM_ARM_CUSTOM_BYPASS,
+}
+
+SERVICE_ARM = "arm"
+
+SERVICE_ARM_SCHEMA = vol.Schema(
+    {
+        vol.Required(ATTR_ENTITY_ID): cv.entity_id,
+        vol.Optional(CONF_CODE): cv.string,
+        vol.Optional(CONF_MODE, default=ARM_MODE_AWAY): vol.In([
+            ARM_MODE_AWAY,
+            ARM_MODE_HOME,
+            ARM_MODE_NIGHT,
+            ARM_MODE_CUSTOM
+        ]),
+        vol.Optional(ATTR_SKIP_DELAY, default=False): cv.boolean,
+        vol.Optional(ATTR_FORCE, default=False): cv.boolean,
+    }
+)
+
+ARM_MODE_TO_STATE = {
+    ARM_MODE_AWAY: STATE_ALARM_ARMED_AWAY,
+    ARM_MODE_HOME: STATE_ALARM_ARMED_HOME,
+    ARM_MODE_NIGHT: STATE_ALARM_ARMED_NIGHT,
+    ARM_MODE_CUSTOM: STATE_ALARM_ARMED_CUSTOM_BYPASS,
 }

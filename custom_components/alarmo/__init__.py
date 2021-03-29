@@ -19,7 +19,6 @@ from homeassistant.helpers.dispatcher import (
     async_dispatcher_connect,
     async_dispatcher_send,
 )
-
 from . import const
 from .store import async_get_registry
 from .panel import (
@@ -28,7 +27,6 @@ from .panel import (
 )
 from .card import (
     async_register_card,
-    async_unregister_card,
 )
 from .websockets import async_register_websockets
 from .sensors import SensorHandler
