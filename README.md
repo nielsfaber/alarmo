@@ -24,9 +24,9 @@ This is an alarm system integration for Home Assistant. It provides a user inter
     - [Sensor configuration](#sensor-configuration)
       - [Sensor types](#sensor-types)
       - [Immediate](#immediate)
-      - [Always-on](#always-on)
-      - [Allow-open](#allow-open)
-      - [Arm on close](#arm-on-close)
+      - [Always on](#always-on)
+      - [Allow open while arming](#allow-open-while-arming)
+      - [Arm after closing](#arm-after-closing)
       - [Trigger when unavailable](#trigger-when-unavailable)
     - [Codes and users](#codes-and-users)
       - [Codes](#codes)
@@ -280,7 +280,7 @@ When assigning sensors to Alarmo, the type of the sensor is automatically determ
 Note that assigning a sensor type is not mandatory, and all configuration settings can also be set manually. It is also possible to deviate from the predefined configuration after setting a type.
 
 The following table defines the sensor types and the predefined configuration:
-| Type          | Device classes                      | Arm modes                           | Always on | Immediate | Arm on close | Allow open |
+| Type          | Device classes                      | Arm modes                           | Always on | Immediate | Arm after closing | Allow open |
 | ------------- | ----------------------------------- | ----------------------------------- | --------- | --------- | ------------ | ---------- |
 | Door          | door, garage_door, lock. opening    | Armed Away, Armed Home, Armed Night | No        | No        | Yes          | No         |
 | Window        | window                              | Armed Away, Armed Home, Armed Night | No        | Yes       | No           | No         |
@@ -296,24 +296,24 @@ An immediate sensor must be closed before you can enable the alarm. It is not al
 Example of use cases: in mode *armed away* you would normally leave and enter the house via a door. 
 If a window is opened when the alarm is armed, this means bad news. The siren should be enabled ASAP.
 
-#### Always-on
-When marking a sensor as always-on, it will **always** be able to trigger the alarm, even when the alarm is disarmed. The triggering occurs as soon as the sensor is activated and entry delays will be ignored.
+#### Always on
+When marking a sensor as always on, it will **always** be able to trigger the alarm, even when the alarm is disarmed. The triggering occurs as soon as the sensor is activated and entry delays will be ignored.
 
 This functionality is intended for safety sensors, such as fire detectors. 
 
-#### Allow-open 
-The allow-open property allows a sensor to be in the active state, while (and after) the alarm is armed. Setting this property is not the same as bypassing a sensor, since as soon as the sensor returns to the inactive state, it is capable of triggering the alarm. The property only ignores the initial state of the sensor.
+#### Allow open while arming 
+The allow open while arming property allows a sensor to be in the active state, while (and after) the alarm is armed. Setting this property is not the same as bypassing a sensor, since as soon as the sensor returns to the inactive state, it is capable of triggering the alarm. The property only ignores the initial state of the sensor.
 
 This property is intended for motion sensors, which have a relatively long period before they return to inactive state, after the zone is clear.
 By setting this property, it is possible to set a leave delay that is lower than the reset period of this sensor.
 
-#### Arm on close
+#### Arm after closing
 The alarm on close feature is intended for entrances only. 
 When setting this property to a door/contact sensor, Alarmo will watch this sensor while the alarm is in state *arming*, and determine if the user left the house.
 
 Once the sensor state changes from open to closed, this is interpreted as the user closing the (front) door. 
 Alarmo will skip the remaining of the exit delay, and proceed directly to the *armed* state.
-If any sensor (without the *allow-open* setting) is still open, the alarm will return to *disarmed* state.
+If any sensor (without the *allow open while arming* setting) is still open, the alarm will return to *disarmed* state.
 
 Note: Alarmo uses a built-in 5 seconds delay to allow for contact bounce (the chattering of a door when pulling it shut).
 
@@ -515,7 +515,7 @@ Step 4: Go to YAML mode. Look for the part that has `service_data`, and extend i
       ... # your message and title should be here already
       data:
         push:
-          category: ALARMO_ARM_FAILURE
+          category: alarmo_arm_failure
 ```
 **For Android devices**
 Step 1: In the Alarmo notifications editor, create a notification for the 'Failed to arm' event. Choose your Android device as target.
