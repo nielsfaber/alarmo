@@ -28,6 +28,13 @@ export class AlarmoCard extends SubscribeMixin(LitElement) {
     return document.createElement("alarmo-card-editor");
   }
 
+  public async getCardSize(): Promise<number> {
+    if (!this._config || !this.hass) return 9;
+    const stateObj = this.hass.states[this._config.entity] as AlarmoEntity;
+    if(!stateObj || stateObj.attributes.code_format !== FORMAT_NUMBER) return 4;
+    return (!this._codeRequired(stateObj) && !this._config.keep_keypad_visible) ? 4 : 9;
+  }
+
   public setConfig(config?: CardConfig): void {
     if (
       !config ||
@@ -101,6 +108,14 @@ export class AlarmoCard extends SubscribeMixin(LitElement) {
     }
   }
 
+  private _codeRequired(stateObj: AlarmoEntity) {    
+    return stateObj.attributes.code_format &&
+       (
+        (stateObj.state === "disarmed" && stateObj.attributes.code_arm_required)
+      || (stateObj.state !== "disarmed" && stateObj.attributes.code_disarm_required)
+      );
+  }
+
   protected render(): TemplateResult {
     if (!this._config || !this.hass) {
       return html``;
@@ -154,13 +169,13 @@ export class AlarmoCard extends SubscribeMixin(LitElement) {
       })}
         </div>
 
-        ${!stateObj.attributes.code_format
-        || (stateObj.state === "disarmed" && !stateObj.attributes.code_arm_required)
+        ${!this._codeRequired(stateObj) && !this._config.keep_keypad_visible
         ? html``
         : html`
               <paper-input
                 .value=${this._input}
                 .label=${this.hass.localize("ui.card.alarm_control_panel.code")}
+                ?disabled=${!this._codeRequired(stateObj)}
                 @value-changed=${(ev: Event) => {
             this._hideInvalidInput();
             this._input = (ev.target as HTMLInputElement).value;
@@ -171,8 +186,8 @@ export class AlarmoCard extends SubscribeMixin(LitElement) {
                 .inputmode=${stateObj.attributes.code_format === FORMAT_NUMBER ? "numeric" : "text"}
               ></paper-input>
             `}
-        ${stateObj.attributes.code_format !== FORMAT_NUMBER
-        || (stateObj.state === "disarmed" && !stateObj.attributes.code_arm_required)
+        ${(!this._codeRequired(stateObj) && !this._config.keep_keypad_visible)
+          || stateObj.attributes.code_format !== FORMAT_NUMBER
         ? html``
         : html`
               <div id="keypad">
@@ -183,6 +198,7 @@ export class AlarmoCard extends SubscribeMixin(LitElement) {
                         <mwc-button
                           .value="${value}"
                           @click=${this._handlePadClick}
+                          ?disabled=${!this._codeRequired(stateObj)}
                           outlined
                           class="${value !== "clear" ? "numberKey" : ""}"
                         >

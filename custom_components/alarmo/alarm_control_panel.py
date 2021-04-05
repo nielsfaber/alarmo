@@ -188,6 +188,14 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             return self._config[ATTR_CODE_ARM_REQUIRED]
 
     @property
+    def code_disarm_required(self):
+        """Whether the code is required for disarm actions."""
+        if not self._config:
+            return None
+        else:
+            return self._config[const.ATTR_CODE_DISARM_REQUIRED]
+
+    @property
     def arm_mode(self):
         """Return the arm mode."""
         return self._arm_mode
@@ -255,6 +263,8 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
 
         return {
             "changed_by": self.changed_by,
+            "code_arm_required": self.code_arm_required,
+            "code_disarm_required": self.code_disarm_required,
             "arm_mode": self.arm_mode,
             "open_sensors": self.open_sensors,
             "bypassed_sensors": self.bypassed_sensors,

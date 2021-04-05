@@ -1,4 +1,7 @@
 {
+  "editor": {
+    "keep_keypad_visible": "Keep the keypad always visible, also when no code input is required."
+  },
   "errors": {
     "blocking_sensors": "Could not arm due to the following sensors",
     "triggered_sensors": "Alarm was triggered by the following sensors"
