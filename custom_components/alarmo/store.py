@@ -105,6 +105,7 @@ class SensorEntry:
     arm_on_close = attr.ib(type=bool, default=False)
     allow_open = attr.ib(type=bool, default=False)
     trigger_unavailable = attr.ib(type=bool, default=False)
+    auto_bypass = attr.ib(type=bool, default=False)
     area = attr.ib(type=str, default=None)
     enabled = attr.ib(type=bool, default=True)
 

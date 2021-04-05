@@ -160,7 +160,7 @@ export class SensorEditorCard extends LitElement {
                     ?checked=${this.data.always_on}
                     @change=${(ev: Event) =>
                       (this.data = (ev.target as HTMLInputElement).checked
-                        ? { ...this.data, always_on: true, arm_on_close: false, immediate: true, allow_open: false }
+                        ? { ...this.data, always_on: true, arm_on_close: false, immediate: true, allow_open: false, auto_bypass: false }
                         : { ...this.data, always_on: false })}
                   >
                   </ha-switch>
@@ -243,6 +243,29 @@ export class SensorEditorCard extends LitElement {
                 </settings-row>
               `
             : ''}
+
+            ${!this.data.type || [ESensorTypes.Window, ESensorTypes.Other].includes(this.data.type)
+              ? html`
+                  <settings-row .narrow=${this.narrow}>
+                    <span slot="heading"
+                      >${localize('panels.sensors.cards.editor.fields.auto_bypass.heading', this.hass.language)}</span
+                    >
+                    <span slot="description"
+                      >${localize('panels.sensors.cards.editor.fields.auto_bypass.description', this.hass.language)}</span
+                    >
+  
+                    <ha-switch
+                      ?checked=${this.data.auto_bypass}
+                      ?disabled=${this.data.always_on}
+                      @change=${(ev: Event) =>
+                        (this.data = (ev.target as HTMLInputElement).checked
+                          ? { ...this.data, auto_bypass: true, always_on: false }
+                          : { ...this.data, auto_bypass: false })}
+                    >
+                    </ha-switch>
+                  </settings-row>
+                `
+              : ''}
 
           <settings-row .narrow=${this.narrow}>
             <span slot="heading"

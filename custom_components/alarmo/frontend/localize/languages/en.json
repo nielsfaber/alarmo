@@ -231,6 +231,10 @@
               "heading": "Allow open while arming",
               "description": "Allow this sensor to be active shortly after leaving such that it will not block arming."
             },
+            "auto_bypass": {
+              "heading": "Bypass automatically",
+              "description": "Exclude this sensor from the alarm if it is open while arming."
+            },
             "trigger_unavailable": {
               "heading": "Trigger when unavailable",
               "description": "When the sensor state becomes 'unavailable', this will activate the sensor."

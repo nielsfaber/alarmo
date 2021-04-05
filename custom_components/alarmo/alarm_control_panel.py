@@ -566,12 +566,13 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
             or not leave_delay
         ):  # immediate arm event
 
-            open_sensors = self.hass.data[const.DOMAIN]["sensor_handler"].validate_event(
+            (open_sensors, bypassed_sensors) = self.hass.data[const.DOMAIN]["sensor_handler"].validate_event(
                 area_id=self.area_id,
                 event=const.EVENT_ARM,
+                bypass_open_sensors=bypass_open_sensors,
             )
 
-            if open_sensors and not bypass_open_sensors:
+            if open_sensors:
                 # there where errors -> abort the arm
                 _LOGGER.info(
                     "Cannot transition from state {} to state {}, there are open sensors".format(self._state, arm_mode)
@@ -580,8 +581,8 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
                 return False
             else:
                 # proceed the arm
-                if open_sensors:
-                    self._bypassed_sensors = list(open_sensors.keys())
+                if bypassed_sensors:
+                    self.bypassed_sensors = bypassed_sensors
                 self.open_sensors = None
                 _LOGGER.info(
                     "Alarm is now armed ({}).".format(arm_mode)
@@ -602,12 +603,13 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
 
         else:  # normal arm event (from disarmed via arming)
 
-            open_sensors = self.hass.data[const.DOMAIN]["sensor_handler"].validate_event(
+            (open_sensors, _bypassed_sensors) = self.hass.data[const.DOMAIN]["sensor_handler"].validate_event(
                 area_id=self.area_id,
                 event=const.EVENT_LEAVE,
+                bypass_open_sensors=bypass_open_sensors,
             )
 
-            if open_sensors and not bypass_open_sensors:
+            if open_sensors:
                 # there where errors -> abort the arm
                 _LOGGER.info("Cannot arm right now, there are open sensors")
                 await self.async_arm_failure(open_sensors)

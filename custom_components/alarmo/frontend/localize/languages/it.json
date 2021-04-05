@@ -227,6 +227,10 @@
               "heading": "Permetti apertura",
               "description": "Consentire a questo sensore di rimanere attivo poco dopo essere usciti."
             },
+            "auto_bypass": {
+              "heading": "Bypass automatically",
+              "description": "Exclude this sensor from the alarm if it is open while arming."
+            },
             "trigger_unavailable": {
               "heading": "Fai scattare l'allarme quando non disponibile",
               "description": "L'allarme scatterà quando lo stato del sensore diverrà 'non disponibile'."

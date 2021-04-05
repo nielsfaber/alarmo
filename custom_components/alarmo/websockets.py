@@ -49,6 +49,7 @@ from .sensors import (
     ATTR_ARM_ON_CLOSE,
     ATTR_ALLOW_OPEN,
     ATTR_TRIGGER_UNAVAILABLE,
+    ATTR_AUTO_BYPASS,
     SENSOR_TYPES,
 )
 
@@ -190,6 +191,7 @@ class AlarmoSensorView(HomeAssistantView):
                 vol.Optional(ATTR_ALLOW_OPEN): cv.boolean,
                 vol.Optional(ATTR_ALWAYS_ON): cv.boolean,
                 vol.Optional(ATTR_TRIGGER_UNAVAILABLE): cv.boolean,
+                vol.Optional(ATTR_AUTO_BYPASS): cv.boolean,
                 vol.Optional(const.ATTR_AREA): cv.string,
                 vol.Optional(const.ATTR_ENABLED): cv.boolean
             }

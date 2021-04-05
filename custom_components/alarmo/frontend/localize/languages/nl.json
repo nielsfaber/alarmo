@@ -227,6 +227,10 @@
               "heading": "Sta open toe tijdens het inschakelen",
               "description": "Sta toe dat deze sensor kort na het verlaten actief is, zodat hij het inschakelen niet blokkeert."
             },
+            "auto_bypass": {
+              "heading": "Automatisch uitsluiten",
+              "description": "Elimineer de sensor als deze actief is tijdens het inschakelen van het alarm."
+            },
             "trigger_unavailable": {
               "heading": "Activeren indien niet beschikbaar",
               "description": "Wanneer de sensorstatus 'niet beschikbaar' wordt, wordt de sensor geactiveerd."

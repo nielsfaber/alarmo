@@ -54,6 +54,7 @@ export type AlarmoSensor = {
   allow_open: boolean;
   always_on: boolean;
   trigger_unavailable: boolean;
+  auto_bypass: boolean;
   area?: string;
   enabled: boolean;
 };

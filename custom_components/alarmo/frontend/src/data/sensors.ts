@@ -153,6 +153,7 @@ export function defaultSensorConfig(stateObj: HassEntity | undefined, modeList: 
     arm_on_close: false,
     allow_open: false,
     always_on: false,
+    auto_bypass: false,
     trigger_unavailable: false,
     type: ESensorTypes.Other,
     enabled: true,

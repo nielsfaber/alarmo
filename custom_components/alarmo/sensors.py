@@ -38,6 +38,7 @@ ATTR_ALWAYS_ON = "always_on"
 ATTR_ARM_ON_CLOSE = "arm_on_close"
 ATTR_ALLOW_OPEN = "allow_open"
 ATTR_TRIGGER_UNAVAILABLE = "trigger_unavailable"
+ATTR_AUTO_BYPASS = "auto_bypass"
 
 SENSOR_STATES_OPEN = [STATE_ON, STATE_OPEN, STATE_UNLOCKED]
 SENSOR_STATES_CLOSED = [STATE_OFF, STATE_CLOSED, STATE_LOCKED]
@@ -126,9 +127,10 @@ class SensorHandler:
                 entities.append(entity)
         return entities
 
-    def validate_event(self, area_id: str = None, event: str = None) -> bool:
+    def validate_event(self, area_id: str = None, event: str = None, bypass_open_sensors: bool = False) -> bool:
         """"check if sensors have correct state"""
         open_sensors = {}
+        bypassed_sensors = []
 
         sensors_list = self.active_sensors_for_alarm_state(area_id)
 
@@ -136,7 +138,9 @@ class SensorHandler:
             sensor_config = self._config[entity]
             if event == const.EVENT_LEAVE and not sensor_config[ATTR_IMMEDIATE]:
                 continue
-            if event in [const.EVENT_LEAVE, const.EVENT_ARM] and sensor_config[ATTR_ALLOW_OPEN]:
+            elif event in [const.EVENT_LEAVE, const.EVENT_ARM] and (
+                sensor_config[ATTR_ALLOW_OPEN]
+            ):
                 continue
 
             state = parse_sensor_state(self.hass.states.get(entity))
@@ -144,9 +148,12 @@ class SensorHandler:
             if state in [STATE_UNAVAILABLE, STATE_UNKNOWN] and not sensor_config[ATTR_TRIGGER_UNAVAILABLE]:
                 continue
             elif state in [STATE_OPEN, STATE_UNAVAILABLE, STATE_UNKNOWN]:
-                open_sensors[entity] = state
+                if bypass_open_sensors or sensor_config[ATTR_AUTO_BYPASS]:
+                    bypassed_sensors.append(entity)
+                else:
+                    open_sensors[entity] = state
 
-        return open_sensors
+        return (open_sensors, bypassed_sensors)
 
     @callback
     async def async_sensor_state_changed(self, entity, old_state, new_state):
