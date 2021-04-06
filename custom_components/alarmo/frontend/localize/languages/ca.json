@@ -1,0 +1,473 @@
+{
+  "common": {
+    "modes_long": {
+      "armed_away": "Mode fora de casa activat",
+      "armed_home": "Mode a casa activat",
+      "armed_night": "Mode nit activat",
+      "armed_custom_bypass": "Mode personalitzat activat"
+    },
+    "modes_short": {
+      "armed_away": "Fora",
+      "armed_home": "Casa",
+      "armed_night": "Nit",
+      "armed_custom_bypass": "Personalitzat"
+    }
+  },
+  "components": {
+    "time_slider": {
+      "seconds": "seg",
+      "minutes": "min",
+      "infinite": "infinit",
+      "none": "cap"
+    },
+    "editor": {
+      "ui_mode": "Canvia a UI",
+      "yaml_mode": "Canvia a YAML"
+    }
+  },
+  "title": "Tauler alarma",
+  "panels": {
+    "general": {
+      "title": "General",
+      "cards": {
+        "general": {
+          "description": "Aquest tauler defineix alguns paràmetres globals de l'alarma.",
+          "fields": {
+            "disarm_after_trigger": {
+              "heading": "Desactivar després del disparador",
+              "description": "Quan hagi transcorregut el temps d’activació, desactiveu l’alarma en lloc de tornar a l’estat armat."
+            },
+            "enable_mqtt": {
+              "heading": "Activa MQTT",
+              "description": "Permet controlar el tauler d'alarma mitjançant MQTT."
+            },
+            "enable_master": {
+              "heading": "Activa l'alarma mestra",
+              "description": "Crea una entitat per controlar totes les àrees simultàniament."
+            }
+          },
+          "actions": {
+            "setup_mqtt": "Configuració MQTT",
+            "setup_master": "Configuració mestra"
+          }
+        },
+        "modes": {
+          "title": "Modes",
+          "description": "Aquest tauler es pot utilitzar per configurar els modes d'activació de l'alarma.",
+          "fields": {
+            "mode": {
+              "armed_away": "El mode fora de casa s'utilitzarà quan totes les persones surtin de casa. Es controlen totes les portes i finestres que permeten l'accés a la casa, així com els sensors de moviment dins de la casa.",
+              "armed_home": "El mode a casa (també conegut com mode casa) s'utilitzarà quan configureu l'alarma mentre hi hagi persones a la casa. Es controlen totes les portes i finestres que permetin l'accés a la casa, però no els sensors de moviment a l'interior de la casa.",
+              "armed_night": "El mode nit s'utilitzarà quan configureu l'alarma abans d'anar a dormir. Es controlaran totes les portes i finestres que permetin l'accés a la casa i es seleccionaran els sensors de moviment (per exemple, a la planta baixa) de la casa.",
+              "armed_custom_bypass": "Un mode addicional per definir el vostre propi perímetre de seguretat.",
+              "enabled": "Activat",
+              "disabled": "Desactivat"
+            },
+            "exit_delay": {
+              "heading": "Retard de sortida",
+              "description": "Quan activeu l'alarma, en aquest període de temps els sensors encara no activaran l'alarma."
+            },
+            "entry_delay": {
+              "heading": "Retard d'entrada",
+              "description": "Temps de retard fins que s'activi l'alarma després que s'activi un dels sensors."
+            },
+            "trigger_time": {
+              "heading": "Temps d'activació",
+              "description": "Temps durant el qual sonarà la sirena"
+            }
+          }
+        },
+        "mqtt": {
+          "title": "Configuració MQTT",
+          "description": "Aquest tauler es pot utilitzar per configurar la interfície MQTT.",
+          "fields": {
+            "state_topic": {
+              "heading": "Tema d'estat",
+              "description": "Tema sobre el qual es publiquen les actualitzacions d'estat"
+            },
+            "event_topic": {
+              "heading": "Tema d'esdeveniment",
+              "description": "Tema sobre el qual es publiquen els esdeveniments d'alarma"
+            },
+            "command_topic": {
+              "heading": "Tama d'ordre",
+              "description": "Tema sobre el qual s'envien les ordres d'activació/desactivació."
+            },
+            "require_code": {
+              "heading": "Requereix codi",
+              "description": "Requereix l'enviament d'un codi amb l'ordre."
+            },
+            "state_payload": {
+              "heading": "Configura la càrrega útil per estat",
+              "item": "Definiu una càrrega útil per a l'estat '{state}'"
+            },
+            "command_payload": {
+              "heading": "Configura la càrrega útil per ordre",
+              "item": "Definiu una càrrega útil per a l'ordre '{command}'"
+            }
+          }
+        },
+        "areas": {
+          "title": "Àrees",
+          "description": "Les àrees es poden utilitzar per dividir el sistema d'alarma en diversos compartiments.",
+          "no_items": "Encara no hi ha àrees definides.",
+          "table": {
+            "remarks": "Observacions",
+            "summary": "Aquesta àrea conté {summary_sensors} i {summary_automations}.",
+            "summary_sensors": "{number} sensors",
+            "summary_automations": "{number} automatismes"
+          },
+          "actions": {
+            "add": "Afegeix"
+          }
+        }
+      },
+      "dialogs": {
+        "create_area": {
+          "title": "Àrea nova",
+          "fields": {
+            "copy_from": "Copia la configuració de"
+          }
+        },
+        "edit_area": {
+          "title": "Edita l'àrea '{area}'",
+          "name_warning": "Nota: si canvieu el nom, es canviarà l'identificador d'entitat"
+        },
+        "remove_area": {
+          "title": "Voleu eliminar l'àrea?",
+          "description": "Confirmeu que voleu eliminar aquesta àrea? Aquesta àrea conté {sensors} sensors i {automatismes} automatismes, que també s'eliminaran."
+        },
+        "edit_master": {
+          "title": "Configuració mestra"
+        },
+        "disable_master": {
+          "title": "Voleu desactivar l'alarma mestra?",
+          "description": "Confirmeu que voleu eliminar l'alarma mestra? Aquesta àrea conté automatismes {automatismes}, que s'eliminaran amb aquesta acció."
+        }
+      }
+    },
+    "sensors": {
+      "title": "Sensors",
+      "cards": {
+        "sensors": {
+          "description": "Sensors configurats actualment. Feu clic a una entitat per fer canvis.",
+          "no_items": "No hi ha cap sensor per mostrar",
+          "table": {
+            "arm_modes": "Modes d'armat",
+            "always_on": "(Sempre)"
+          },
+          "filter": {
+            "label": "Filtra per àrea",
+            "no_area": "(Sense àrea)"
+          }
+        },
+        "add_sensors": {
+          "title": "Afegeix sensors",
+          "description": "Afegiu més sensors. Assegureu-vos que els vostres sensors tinguin un friendly_name perquè pugueu identificar-los.",
+          "no_items": "No hi ha entitats HA disponibles que es puguin configurar per a l'alarma. Assegureu-vos d'incloure entitats del tipus binary_sensor.",
+          "actions": {
+            "add_to_alarm": "afegeix a l'alarma",
+            "show_all": "Mostra-ho tot"
+          }
+        },
+        "editor": {
+          "title": "Edita el sensor",
+          "description": "Edita la configuració del sensor de '{entity}'.",
+          "fields": {
+            "name": {
+              "heading": "Nom",
+              "description": "Sobreescriu el friendly_name"
+            },
+            "area": {
+              "heading": "Àrea",
+              "description": "Seleccioneu una àrea que contingui aquest sensor."
+            },
+            "device_type": {
+              "heading": "Tipus de dispositiu",
+              "description": "Trieu un tipus de dispositiu per aplicar automàticament la configuració adequada.",
+              "choose": {
+                "door": {
+                  "name": "Porta",
+                  "description": "Porta, porta de garatge o altra entrada que s'utilitzi per entrar/sortir de casa."
+                },
+                "window": {
+                  "name": "Finestra",
+                  "description": "Finestra o una porta que no s'utilitza per entrar a la casa, com ara un balcó."
+                },
+                "motion": {
+                  "name": "Moviment",
+                  "description": "Sensor de presència o dispositiu similar que té un retard entre les activacions."
+                },
+                "tamper": {
+                  "name": "Antisabotatge",
+                  "description": "Detector de retirada de la coberta del sensor, sensor de trencament de vidre, etc."
+                },
+                "environmental": {
+                  "name": "Ambiental",
+                  "description": "Sensor de fum o gas, detector de fuites, etc. (no relacionat amb la protecció antirobatori)."
+                },
+                "other": {
+                  "name": "Genèric"
+                }
+              }
+            },
+            "always_on": {
+              "heading": "Sempre activat",
+              "description": "El sensor sempre ha de disparar l'alarma."
+            },
+            "modes": {
+              "heading": "Modes habilitats",
+              "description": "Modes d'alarma en què aquest sensor està actiu."
+            },
+            "arm_on_close": {
+              "heading": "Arma després de tancar",
+              "description": "Després de la desactivació d'aquest sensor, s'omet automàticament el temps de retard de sortida restant."
+            },
+            "immediate": {
+              "heading": "Immediat",
+              "description": "L'activació d'aquest sensor activarà l'alarma directament sense temps de retard a l'entrada."
+            },
+            "allow_open": {
+              "heading": "Permet obrir mentre s'arma l'alarma",
+              "description": "Permeteu que aquest sensor estigui actiu poc després de configurar-lo de manera que no bloquegi l'activació de l'alarma."
+            },
+            "auto_bypass": {
+              "heading": "Omet automàticament",
+              "description": "Excloeu aquest sensor de l'alarma si està obert mentre s'arma l'alarma."
+            },
+            "trigger_unavailable": {
+              "heading": "Activador quan no estigui disponible",
+              "description": "Quan l'estat del sensor no estigui disponible, això activarà el sensor."
+            }
+          },
+          "actions": {
+            "toggle_advanced": "Configuració avançada",
+            "remove": "Elimina"
+          },
+          "errors": {
+            "description": "Corregiu els errors següents:",
+            "no_area": "No s'ha seleccionat cap àrea",
+            "no_modes": "No s'han seleccionat modes per als quals el sensor hauria d'estar actiu"
+          }
+        }
+      }
+    },
+    "codes": {
+      "title": "Codis",
+      "cards": {
+        "codes": {
+          "description": "Canvieu la configuració del codi.",
+          "fields": {
+            "code_arm_required": {
+              "heading": "Utilitzeu un codi d'activació",
+              "description": "Requereix un codi per activar l'alarma"
+            },
+            "code_disarm_required": {
+              "heading": "Utilitzeu un codi de desactivació",
+              "description": "Requereix un codi per desactivar l'alarma"
+            },
+            "code_format": {
+              "heading": "Format del codi",
+              "description": "Estableix el tipus de codi per a la targeta d'alarma Lovelace.",
+              "code_format_number": "codi PIN",
+              "code_format_text": "contrasenya"
+            }
+          }
+        },
+        "user_management": {
+          "title": "Gestió d'usuaris",
+          "description": "Cada usuari té el seu propi codi per activar/desactivar l'alarma.",
+          "no_items": "Encara no hi ha usuaris",
+          "table": {
+            "remarks": "Observacions",
+            "administrator": "Administrador"
+          },
+          "actions": {
+            "new_user": "usuari nou"
+          }
+        },
+        "new_user": {
+          "title": "Crea un usuari nou",
+          "description": "Es poden crear usuaris per proporcionar accés al funcionament de l'alarma.",
+          "fields": {
+            "name": {
+              "heading": "Nom",
+              "description": "Nom de l'usuari."
+            },
+            "code": {
+              "heading": "Codi",
+              "description": "Codi d'aquest usuari."
+            },
+            "confirm_code": {
+              "heading": "Confirmeu el codi",
+              "description": "Repetiu el codi."
+            },
+            "is_admin": {
+              "heading": "L'usuari és administrador",
+              "description": "Permetre a l'usuari fer canvis"
+            },
+            "can_arm": {
+              "heading": "Permetre que el codi active l'alarma",
+              "description": "Entering this code activates the alarm"
+            },
+            "can_disarm": {
+              "heading": "Permetre que el codi desactive l'alarma",
+              "description": "Entering this code deactivates the alarm"
+            },
+            "is_override_code": {
+              "heading": "És un codi de sobreescriptura",
+              "description": "Si introduïu aquest codi, es forçarà l'estat d'activació de l'alarma"
+            }
+          },
+          "errors": {
+            "no_name": "No s'ha proporcionat cap nom.",
+            "no_code": "El codi ha de tenir 4 caràcters o números com a mínim.",
+            "code_mismatch": "Els codis no coincideixen."
+          }
+        },
+        "edit_user": {
+          "title": "Edita l'usuari",
+          "description": "Canvia la configuració de l'usuari '{name}'.",
+          "fields": {
+            "old_code": {
+              "heading": "Codi actual",
+              "description": "Codi actual, deixeu-lo en blanc per deixar-lo sense canvis."
+            }
+          }
+        }
+      }
+    },
+    "actions": {
+      "title": "Accions",
+      "cards": {
+        "notifications": {
+          "title": "Notificacions",
+          "description": "Utilitzant aquest tauler, podeu gestionar les notificacions que s'envien quan es produeix un determinat esdeveniment d'alarma.",
+          "table": {
+            "enabled": "Activat",
+            "no_items": "Encara no s'han creat notificacions."
+          },
+          "actions": {
+            "new_notification": "nova notificació"
+          },
+          "filter": {
+            "label": "Filtra per àrea",
+            "no_area": "Alarma mestra"
+          }
+        },
+        "actions": {
+          "description": "Aquest tauler es pot utilitzar per canviar un dispositiu quan l'estat d'alarma canvia.",
+          "table": {
+            "no_items": "Encara no s'han creat accions."
+          },
+          "actions": {
+            "new_action": "nova acció"
+          }
+        },
+        "new_notification": {
+          "title": "Crea una notificació",
+          "description": "Crea una nova notificació.",
+          "fields": {
+            "name": {
+              "heading": "Nom",
+              "description": "Descripció d'aquesta notificació"
+            },
+            "event": {
+              "heading": "Esdeveniment",
+              "description": "Quan s'ha d'enviar la notificació",
+              "choose": {
+                "armed": {
+                  "name": "L'alarma està activada",
+                  "description": "L'alarma s'ha activat correctament"
+                },
+                "disarmed": {
+                  "name": "L'alarma està desactivada",
+                  "description": "L'alarma està desactivada"
+                },
+                "triggered": {
+                  "name": "L'alarma s'activat per esdeveniment",
+                  "description": "L'alarma s'activat per esdeveniment"
+                },
+                "arm_failure": {
+                  "name": "No s'ha pogut activar l'alarma",
+                  "description": "L'activació de l'alarma ha fallat a causa d'un o més sensors estan oberts"
+                },
+                "arming": {
+                  "name": "S'ha iniciat el retard de sortida",
+                  "description": "S'ha iniciat el retard de sortida, a punt per sortir de casa."
+                },
+                "pending": {
+                  "name": "S'ha iniciat el retard d'entrada",
+                  "description": "El retard d'entrada s'ha iniciat, l'alarma s'activarà aviat."
+                }
+              }
+            },
+            "mode": {
+              "heading": "Mode",
+              "description": "Limita l'acció a modes específics d'activació (opcional)"
+            },
+            "title": {
+              "heading": "Títol",
+              "description": "Títol del missatge de notificació"
+            },
+            "message": {
+              "heading": "Missatge",
+              "description": "Contingut del missatge de notificació"
+            },
+            "target": {
+              "heading": "Destinatari",
+              "description": "Dispositiu al qual enviar el missatge"
+            }
+          },
+          "actions": {
+            "test": "Prova-ho"
+          }
+        },
+        "new_action": {
+          "title": "Crea una acció",
+          "description": "Aquest tauler es pot utilitzar per canviar un dispositiu quan l'estat d'alarma canvia.",
+          "fields": {
+            "name": {
+              "heading": "Nom",
+              "description": "Descripció d'aquesta acció"
+            },
+            "event": {
+              "heading": "Esdeveniment",
+              "description": "Quan s'ha d'executar l'acció"
+            },
+            "area": {
+              "heading": "Àrea",
+              "description": "Àrea per a la qual s'aplica l'esdeveniment, deixeu-la en blanc per seleccionar l'alarma global."
+            },
+            "mode": {
+              "heading": "Mode",
+              "description": "Limita l'acció a modes específics d'activació (opcional)"
+            },
+            "entity": {
+              "heading": "Entitat",
+              "description": "Entitat en què es realitzarà l'acció"
+            },
+            "action": {
+              "heading": "Acció",
+              "description": "Acció a realitzar a l'entitat",
+              "turn_on": "Activa",
+              "turn_off": "Desactiva"
+            }
+          }
+        }
+      },
+      "validation_errors": {
+        "no_triggers": "No s'ha proporcionat cap estat ni cap esdeveniment per activar aquesta automatització.",
+        "empty_trigger": "No s'ha proporcionat estat ni esdeveniment d'un dels activadors.",
+        "invalid_trigger": "Un dels activadors té un valor no vàlid: {trigger}",
+        "invalid_mode": "S'ha proporcionat una entrada no vàlida per al mode: {mode}",
+        "no_actions": "No s'han indicat accions per aquesta automatització",
+        "no_service": "Falta un servei a una de les accions.",
+        "invalid_service": "S'ha proporcionat un nom de servei no vàlid per a una de les accions: {service}",
+        "no_service_data": "No s'han proporcionat dades de servei per a una de les accions.",
+        "no_entity_in_service_data": "No s'ha proporcionat cap entity_id a la service_data d'una de les accions.",
+        "no_message_in_service_data": "No s'ha proporcionat cap missatge a la service_data d'una de les accions."
+      }
+    }
+  }
+}
