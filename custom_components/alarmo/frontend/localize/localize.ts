@@ -3,13 +3,15 @@ import * as et from './languages/et.json';
 import * as nl from './languages/nl.json';
 import * as fr from './languages/fr.json';
 import * as it from './languages/it.json';
+import * as ca from './languages/ca.json';
 
 var languages: any = {
   en: en,
   et: et,
   nl: nl,
   fr: fr,
-  it: it
+  it: it,
+  ca: ca
 };
 
 export function localize(string: string, language: string, search: string | string[] = '', replace: string | string[] = '') {
