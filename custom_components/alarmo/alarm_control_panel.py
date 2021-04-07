@@ -535,11 +535,12 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
         if self._bypass_mode:
             return
         self._open_sensors = open_sensors
+        self._arm_mode = None
 
         if not self._state or self._state == STATE_ALARM_ARMING:
             await self.async_update_state(STATE_ALARM_DISARMED)
         else:
-            # when disarmed or switching arm modes, only update the attribute
+            # when disarmed or switching arm modes, only update the attributes
             self.async_write_ha_state()
         async_dispatcher_send(
             self.hass,
