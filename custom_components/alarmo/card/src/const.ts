@@ -1,6 +1,6 @@
 
 
-export const CARD_VERSION = "v1.5.5"
+export const CARD_VERSION = "v1.5.6"
 
 export const BUTTONS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "", "0", "clear"];
 
