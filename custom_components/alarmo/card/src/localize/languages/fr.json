@@ -1,0 +1,9 @@
+{
+  "editor": {
+    "keep_keypad_visible": "Gardez le clavier toujours visible, même lorsqu'aucune saisie de code n'est requise."
+  },
+  "errors": {
+    "blocking_sensors": "Impossible d'armer en raison des capteurs suivants",
+    "triggered_sensors": "L'alarme a été déclenchée par les capteurs suivants"
+  }
+}
