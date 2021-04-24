@@ -4,8 +4,7 @@ import attr
 from collections import OrderedDict
 from typing import MutableMapping, cast
 from homeassistant.loader import bind_hass
-from homeassistant.core import callback
-from homeassistant.helpers.typing import HomeAssistantType
+from homeassistant.core import (callback, HomeAssistant)
 from homeassistant.helpers.storage import Store
 
 from homeassistant.const import (
@@ -184,7 +183,7 @@ class MigratableStore(Store):
 class AlarmoStorage:
     """Class to hold alarmo configuration data."""
 
-    def __init__(self, hass: HomeAssistantType) -> None:
+    def __init__(self, hass: HomeAssistant) -> None:
         """Initialize the storage."""
         self.hass = hass
         self.config: Config = Config()
@@ -509,7 +508,7 @@ class AlarmoStorage:
 
 
 @bind_hass
-async def async_get_registry(hass: HomeAssistantType) -> AlarmoStorage:
+async def async_get_registry(hass: HomeAssistant) -> AlarmoStorage:
     """Return alarmo storage instance."""
     task = hass.data.get(DATA_REGISTRY)
 

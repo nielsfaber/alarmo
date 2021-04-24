@@ -28,13 +28,7 @@ async def async_register_card(hass):
 
     hass.http.register_static_path(card_path, card_real_path)
 
-    if DATA_EXTRA_MODULE_URL not in hass.data:
-        hass.data[DATA_EXTRA_MODULE_URL] = set()
-
-    url_set = set()
-    url_set.add(card_path)
-
-    hass.data[DATA_EXTRA_MODULE_URL].update(url_set)
+    hass.data[DATA_EXTRA_MODULE_URL].add(card_path)
 
     @callback
     def async_handle_event(event: str, area_id: str, args: dict = {}):
