@@ -123,7 +123,7 @@ export const defaultAutomationData: AlarmoAutomation = {
 };
 
 export function messagePlaceHolder(data: AlarmoNotification) {
-  if (data.triggers.length != 1) return '';
+  if (data.triggers?.length != 1) return '';
 
   if (data.triggers[0].state) {
     switch (data.triggers[0].state) {
@@ -155,7 +155,7 @@ export function messagePlaceHolder(data: AlarmoNotification) {
 export const ActionDomains = ['switch', 'input_boolean', 'light', 'script'];
 
 export function validateData(data: AlarmoAutomation | AlarmoNotification, hass: HomeAssistant) {
-  if (!data.triggers.length) return localize('panels.actions.validation_errors.no_triggers', hass.language);
+  if (!data.triggers?.length) return localize('panels.actions.validation_errors.no_triggers', hass.language);
 
   for (let i = 0; i < data.triggers.length; i++) {
     const trigger = data.triggers[i];
@@ -177,7 +177,7 @@ export function validateData(data: AlarmoAutomation | AlarmoNotification, hass: 
         return localize('panels.actions.validation_errors.empty_trigger', hass.language, '{mode}', mode);
     }
   }
-  if (!data.actions.length) return localize('panels.actions.validation_errors.no_actions', hass.language);
+  if (!data.actions?.length) return localize('panels.actions.validation_errors.no_actions', hass.language);
   for (let i = 0; i < data.actions.length; i++) {
     const action = data.actions[i];
     if (!action.service) return localize('panels.actions.validation_errors.no_service', hass.language);
