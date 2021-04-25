@@ -232,8 +232,8 @@
               "description": "Permet à ce capteur d'être actif, peu de temps après votre départ afin qu'il ne bloque pas l'armement."
             },
             "auto_bypass": {
-              "heading": "Bypass automatically",
-              "description": "Exclude this sensor from the alarm if it is open while arming."
+              "heading": "Bypass automatique",
+              "description": "Exclut ce capteur de l'alarme s'il est ouvert lors de l'armement."
             },
             "trigger_unavailable": {
               "heading": "Déclenchement lorsqu'il n'est pas disponible",
