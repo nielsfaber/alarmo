@@ -155,6 +155,7 @@ MODES_TO_SUPPORTED_FEATURES = {
 }
 
 SERVICE_ARM = "arm"
+SERVICE_DISARM = "disarm"
 
 SERVICE_ARM_SCHEMA = vol.Schema(
     {
@@ -168,6 +169,13 @@ SERVICE_ARM_SCHEMA = vol.Schema(
         ]),
         vol.Optional(ATTR_SKIP_DELAY, default=False): cv.boolean,
         vol.Optional(ATTR_FORCE, default=False): cv.boolean,
+    }
+)
+
+SERVICE_DISARM_SCHEMA = vol.Schema(
+    {
+        vol.Required(ATTR_ENTITY_ID): cv.entity_id,
+        vol.Optional(CONF_CODE, default=""): cv.string,
     }
 )
 

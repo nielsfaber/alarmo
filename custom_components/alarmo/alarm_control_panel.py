@@ -103,6 +103,11 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
         const.SERVICE_ARM_SCHEMA,
         "async_service_arm_handler",
     )
+    platform.async_register_entity_service(
+        const.SERVICE_DISARM,
+        const.SERVICE_DISARM_SCHEMA,
+        "async_service_disarm_handler",
+    )
 
 
 class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
@@ -291,6 +296,12 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             self._changed_by = res[ATTR_NAME]
 
         return (True, res)
+
+    async def async_service_disarm_handler(self, code):
+        """handle external disarm request from alarmo.disarm service"""
+        await self.async_alarm_disarm(
+            code=code,
+        )
 
     async def async_alarm_disarm(self, code=None, skip_code=False):
         """Send disarm command."""

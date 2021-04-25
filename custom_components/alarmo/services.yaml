@@ -48,3 +48,23 @@ arm:
       default: false
       selector:
         boolean:
+disarm:
+  name: Disarm
+  description: "Disarm an Alarmo entity."
+  fields:
+    entity_id:
+      name: Entity ID
+      description: Name of entity that should be disarmed.
+      example: "alarm_control_panel.alarm"
+      required: true
+      selector:
+        entity:
+          integration: alarmo
+          domain: alarm_control_panel
+    code:
+      name: Code
+      description: Code to disarm the alarm with.
+      example: "1234"
+      required: false
+      selector:
+        text:
