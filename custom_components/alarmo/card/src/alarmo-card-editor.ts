@@ -2,7 +2,7 @@ import { LitElement, html, customElement, property, CSSResult, css, internalProp
 import { HomeAssistant, LovelaceCardEditor, fireEvent } from 'custom-card-helpers';
 import { AlarmoEntity, CardConfig } from './types';
 import { localize } from './localize/localize';
-import { FORMAT_NUMBER } from './const';
+import { FORMAT_NUMBER, maxButtonScale, minButtonScale } from './const';
 
 
 @customElement('alarmo-card-editor')
@@ -42,6 +42,18 @@ export class AlarmoCardEditor extends LitElement implements LovelaceCardEditor {
         ></ha-formfield>`
         : ''
         }
+        <ha-formfield
+          .label=${localize("editor.button_scale", this.hass.language)}
+        >
+          <ha-slider
+            .checked=${this._config!.button_scale}
+            @change=${(ev: Event) => this._updateConfig("button_scale", Number((ev.target as HTMLInputElement).value))}
+            min="${minButtonScale}"
+            max="${maxButtonScale}"
+            step="0.1"
+            pin
+          ></ha-slider>
+        </ha-formfield>
       </div>
     `;
   }

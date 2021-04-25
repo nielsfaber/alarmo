@@ -3,12 +3,13 @@ import { HomeAssistant, fireEvent } from 'custom-card-helpers';
 import { STATE_NOT_RUNNING, UnsubscribeFunc } from "home-assistant-js-websocket";
 
 
-import { CARD_VERSION, BUTTONS, FORMAT_NUMBER, EVENT, EVENT_INVALID_CODE, EVENT_NO_CODE, EVENT_FAILED_TO_ARM } from './const';
+import { CARD_VERSION, BUTTONS, FORMAT_NUMBER, EVENT, EVENT_INVALID_CODE, EVENT_NO_CODE, EVENT_FAILED_TO_ARM, defaultCardConfig, maxButtonScale, minButtonScale } from './const';
 import { CardConfig, AlarmoEvent, AlarmoEntity } from './types';
 
 import "./alarmo-card-editor";
 import "./components/alarmo-state-badge";
 import "./components/alarmo-sensor-badge";
+import "./components/alarmo-button";
 
 import { SubscribeMixin } from './subscribe-mixin';
 import { localize } from './localize/localize';
@@ -31,7 +32,7 @@ export class AlarmoCard extends SubscribeMixin(LitElement) {
   public async getCardSize(): Promise<number> {
     if (!this._config || !this.hass) return 9;
     const stateObj = this.hass.states[this._config.entity] as AlarmoEntity;
-    if(!stateObj || stateObj.attributes.code_format !== FORMAT_NUMBER) return 4;
+    if (!stateObj || stateObj.attributes.code_format !== FORMAT_NUMBER) return 4;
     return (!this._codeRequired(stateObj) && !this._config.keep_keypad_visible) ? 4 : 9;
   }
 
@@ -41,9 +42,17 @@ export class AlarmoCard extends SubscribeMixin(LitElement) {
       !config.entity ||
       config.entity.split(".")[0] !== "alarm_control_panel"
     ) {
-      throw new Error("Invalid configuration");
+      throw new Error("Invalid configuration provided for entity");
     }
-    this._config = { ...config };
+    else if (config.button_scale !== undefined) {
+      if (
+        typeof config.button_scale !== "number" ||
+        config.button_scale < minButtonScale ||
+        config.button_scale > maxButtonScale
+      )
+        throw new Error("Invalid configuration provided for button_scale");
+    }
+    this._config = { ...defaultCardConfig, ...config };
   }
 
   public hassSubscribe(): Promise<UnsubscribeFunc>[] {
@@ -108,11 +117,11 @@ export class AlarmoCard extends SubscribeMixin(LitElement) {
     }
   }
 
-  private _codeRequired(stateObj: AlarmoEntity) {    
+  private _codeRequired(stateObj: AlarmoEntity) {
     return stateObj.attributes.code_format &&
-       (
+      (
         (stateObj.state === "disarmed" && stateObj.attributes.code_arm_required)
-      || (stateObj.state !== "disarmed" && stateObj.attributes.code_disarm_required)
+        || (stateObj.state !== "disarmed" && stateObj.attributes.code_disarm_required)
       );
   }
 
@@ -159,12 +168,13 @@ export class AlarmoCard extends SubscribeMixin(LitElement) {
         : ["disarm"]
       ).map((state) => {
         return html`
-              <mwc-button
-                @click=${(ev) => this._handleActionClick(ev, state)}
-                outlined
+              <alarmo-button
+                @click=${(ev: Event) => this._handleActionClick(ev, state)}
+                style="--content-scale: ${this._config!.button_scale}"
+                ?scaled=${this._config!.button_scale != 1}
               >
                 ${this.hass!.localize(`ui.card.alarm_control_panel.${state}`)}
-              </mwc-button>
+              </alarmo-button>
             `;
       })}
         </div>
@@ -187,25 +197,34 @@ export class AlarmoCard extends SubscribeMixin(LitElement) {
               ></paper-input>
             `}
         ${(!this._codeRequired(stateObj) && !this._config.keep_keypad_visible)
-          || stateObj.attributes.code_format !== FORMAT_NUMBER
+        || stateObj.attributes.code_format !== FORMAT_NUMBER
         ? html``
         : html`
-              <div id="keypad">
+              <div
+                id="keypad"
+                style="max-width: ${this._config.button_scale * 300}px"
+              >
                 ${BUTTONS.map((value) => {
           return value === ""
-            ? html` <mwc-button disabled></mwc-button> `
+            ? html` 
+                        <alarmo-button
+                          disabled
+                          style="--content-scale: ${this._config!.button_scale}"
+                          ?scaled=${this._config!.button_scale != 1}
+                        ></alarmo-button> `
             : html`
-                        <mwc-button
+                        <alarmo-button
                           .value="${value}"
                           @click=${this._handlePadClick}
                           ?disabled=${!this._codeRequired(stateObj)}
-                          outlined
                           class="${value !== "clear" ? "numberKey" : ""}"
+                          style="--content-scale: ${this._config!.button_scale}"
+                          ?scaled=${this._config!.button_scale != 1}
                         >
                           ${value === "clear"
                 ? this.hass!.localize(`ui.card.alarm_control_panel.clear_code`)
                 : value}
-                        </mwc-button>
+                        </alarmo-button>
                       `;
         })}
               </div>
@@ -355,7 +374,7 @@ export class AlarmoCard extends SubscribeMixin(LitElement) {
         flex-wrap: wrap;
         justify-content: center;
       }
-      .actions mwc-button {
+      .actions alarmo-button {
         margin: 0 4px 4px;
       }
       paper-input {
@@ -374,8 +393,8 @@ export class AlarmoCard extends SubscribeMixin(LitElement) {
         margin: auto;
         width: 100%;
       }
-      #keypad mwc-button {
-        padding: 8px;
+      #keypad alarmo-button {
+        padding: 4px;
         width: 30%;
         box-sizing: border-box;
       }

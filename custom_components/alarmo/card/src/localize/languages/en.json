@@ -1,6 +1,7 @@
 {
   "editor": {
-    "keep_keypad_visible": "Keep the keypad always visible, also when no code input is required."
+    "keep_keypad_visible": "Keep the keypad always visible, also when no code input is required.",
+    "button_scale": "Scaling factor to apply for resizing the buttons."
   },
   "errors": {
     "blocking_sensors": "Could not arm due to the following sensors",

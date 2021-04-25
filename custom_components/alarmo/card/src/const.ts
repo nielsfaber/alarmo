@@ -1,3 +1,4 @@
+import { CardConfig } from "./types";
 
 
 export const CARD_VERSION = "v1.5.6"
@@ -23,3 +24,13 @@ export const EVENT_INVALID_CODE = "invalid_code_provided";
 export const EVENT_FAILED_TO_ARM = "failed_to_arm";
 
 export const PENDING_STATES = ["arming", "pending"];
+
+export const defaultCardConfig: CardConfig = {
+  type: "",
+  entity: "",
+  keep_keypad_visible: false,
+  button_scale: 1,
+}
+
+export const minButtonScale = 1;
+export const maxButtonScale = 2.5;

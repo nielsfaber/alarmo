@@ -4,6 +4,7 @@ export type CardConfig = {
     type: string,
     entity: string,
     keep_keypad_visible: boolean,
+    button_scale: number,
 }
 
 export type AlarmoEvent = HassEvent & {

@@ -1,6 +1,7 @@
 {
   "editor": {
-    "keep_keypad_visible": "Gardez le clavier toujours visible, même lorsqu'aucune saisie de code n'est requise."
+    "keep_keypad_visible": "Gardez le clavier toujours visible, même lorsqu'aucune saisie de code n'est requise.",
+    "button_scale": "Scaling factor to apply for resizing the buttons."
   },
   "errors": {
     "blocking_sensors": "Impossible d'armer en raison des capteurs suivants",
