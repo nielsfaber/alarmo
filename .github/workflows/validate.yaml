@@ -12,6 +12,6 @@ jobs:
     steps:
       - uses: "actions/checkout@v2"
       - name: HACS validation
-        uses: "hacs/integration/action@main"
+        uses: "hacs/action@main"
         with:
-          CATEGORY: "integration"
+          category: "integration"
