@@ -46,7 +46,7 @@ export class AlarmoCardEditor extends LitElement implements LovelaceCardEditor {
           .label=${localize("editor.button_scale", this.hass.language)}
         >
           <ha-slider
-            .checked=${this._config!.button_scale}
+            value=${this._config!.button_scale || 1}
             @change=${(ev: Event) => this._updateConfig("button_scale", Number((ev.target as HTMLInputElement).value))}
             min="${minButtonScale}"
             max="${maxButtonScale}"
