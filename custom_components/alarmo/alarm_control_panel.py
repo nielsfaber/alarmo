@@ -325,6 +325,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             _LOGGER.warning("Wrong code provided.")
             return
         else:
+            self._arm_mode = None
             self.open_sensors = None
             self.bypassed_sensors = None
             await self.async_update_state(STATE_ALARM_DISARMED)
@@ -505,8 +506,8 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
             async def async_initialization_timer_finished(now):
                 """Update state at a scheduled point in time."""
                 _LOGGER.info("Not all sensors are initialized yet, starting anyway.")
-                if self.arm_mode:
-                    await self.async_arm(self.arm_mode)
+                if initial_state in ARM_MODES:
+                    await self.async_arm(initial_state)
                 else:
                     await self.async_update_state(STATE_ALARM_DISARMED)
 
@@ -535,9 +536,6 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
         if self.state not in [STATE_ALARM_ARMING, STATE_ALARM_PENDING]:
             self.delay = None
 
-        if state == STATE_ALARM_DISARMED:
-            self._arm_mode = None
-
         async_dispatcher_send(self.hass, "alarmo_state_updated", self.area_id, old_state, state)
 
         self.async_write_ha_state()
@@ -546,7 +544,6 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
         if self._bypass_mode:
             return
         self._open_sensors = open_sensors
-        self._arm_mode = None
 
         if not self._state or self._state == STATE_ALARM_ARMING:
             await self.async_update_state(STATE_ALARM_DISARMED)
