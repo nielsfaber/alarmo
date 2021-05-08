@@ -30,6 +30,12 @@ from homeassistant.components.alarm_control_panel import (
     FORMAT_TEXT as CODE_FORMAT_TEXT,
     ATTR_CODE_ARM_REQUIRED,
 )
+from homeassistant.components.websocket_api import (decorators, async_register_command)
+
+from homeassistant.helpers.dispatcher import (
+    async_dispatcher_connect,
+    async_dispatcher_send,
+)
 
 from . import const
 
@@ -54,7 +60,29 @@ from .sensors import (
 )
 
 _LOGGER = logging.getLogger(__name__)
-EVENT = "alarmo_updated"
+
+
+@callback
+@decorators.websocket_command({
+    vol.Required("type"): "alarmo_config_updated",
+})
+@decorators.async_response
+async def handle_subscribe_updates(hass, connection, msg):
+    """Handle subscribe updates."""
+
+    @callback
+    def async_handle_event():
+        """Forward events to websocket."""
+        connection.send_message({
+            "id": msg["id"],
+            "type": "event",
+        })
+    connection.subscriptions[msg["id"]] = async_dispatcher_connect(
+        hass,
+        "alarmo_update_frontend",
+        async_handle_event
+    )
+    connection.send_result(msg["id"])
 
 
 class AlarmoConfigView(HomeAssistantView):
@@ -110,7 +138,7 @@ class AlarmoConfigView(HomeAssistantView):
         hass = request.app["hass"]
         coordinator = hass.data[const.DOMAIN]["coordinator"]
         await coordinator.async_update_config(data)
-        request.app["hass"].bus.async_fire(EVENT)
+        async_dispatcher_send(hass, "alarmo_update_frontend")
         return self.json({"success": True})
 
 
@@ -165,7 +193,7 @@ class AlarmoAreaView(HomeAssistantView):
         else:
             area = None
         await coordinator.async_update_area_config(area, data)
-        request.app["hass"].bus.async_fire(EVENT)
+        async_dispatcher_send(hass, "alarmo_update_frontend")
         return self.json({"success": True})
 
 
@@ -204,7 +232,7 @@ class AlarmoSensorView(HomeAssistantView):
         entity = data[ATTR_ENTITY_ID]
         del data[ATTR_ENTITY_ID]
         coordinator.async_update_sensor_config(entity, data)
-        request.app["hass"].bus.async_fire(EVENT)
+        async_dispatcher_send(hass, "alarmo_update_frontend")
         return self.json({"success": True})
 
 
@@ -238,7 +266,7 @@ class AlarmoUserView(HomeAssistantView):
             user_id = data[const.ATTR_USER_ID]
             del data[const.ATTR_USER_ID]
         coordinator.async_update_user_config(user_id, data)
-        request.app["hass"].bus.async_fire(EVENT)
+        async_dispatcher_send(hass, "alarmo_update_frontend")
         return self.json({"success": True})
 
 
@@ -298,7 +326,7 @@ class AlarmoAutomationView(HomeAssistantView):
             automation_id = data[const.ATTR_AUTOMATION_ID]
             del data[const.ATTR_AUTOMATION_ID]
         coordinator.async_update_automation_config(automation_id, data)
-        request.app["hass"].bus.async_fire(EVENT)
+        async_dispatcher_send(hass, "alarmo_update_frontend")
         return self.json({"success": True})
 
 
@@ -350,35 +378,45 @@ async def async_register_websockets(hass):
     hass.http.register_view(AlarmoAutomationView)
     hass.http.register_view(AlarmoAreaView)
 
-    hass.components.websocket_api.async_register_command(
+    async_register_command(
+        hass,
+        handle_subscribe_updates
+    )
+
+    async_register_command(
+        hass,
         "alarmo/config",
         websocket_get_config,
         websocket_api.BASE_COMMAND_MESSAGE_SCHEMA.extend(
             {vol.Required("type"): "alarmo/config"}
         ),
     )
-    hass.components.websocket_api.async_register_command(
+    async_register_command(
+        hass,
         "alarmo/areas",
         websocket_get_areas,
         websocket_api.BASE_COMMAND_MESSAGE_SCHEMA.extend(
             {vol.Required("type"): "alarmo/areas"}
         ),
     )
-    hass.components.websocket_api.async_register_command(
+    async_register_command(
+        hass,
         "alarmo/sensors",
         websocket_get_sensors,
         websocket_api.BASE_COMMAND_MESSAGE_SCHEMA.extend(
             {vol.Required("type"): "alarmo/sensors"}
         ),
     )
-    hass.components.websocket_api.async_register_command(
+    async_register_command(
+        hass,
         "alarmo/users",
         websocket_get_users,
         websocket_api.BASE_COMMAND_MESSAGE_SCHEMA.extend(
             {vol.Required("type"): "alarmo/users"}
         ),
     )
-    hass.components.websocket_api.async_register_command(
+    async_register_command(
+        hass,
         "alarmo/automations",
         websocket_get_automations,
         websocket_api.BASE_COMMAND_MESSAGE_SCHEMA.extend(

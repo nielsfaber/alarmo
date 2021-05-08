@@ -36,7 +36,7 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
 
   public hassSubscribe(): Promise<UnsubscribeFunc>[] {
     this._fetchData();
-    return [this.hass!.connection.subscribeEvents(() => this._fetchData(), 'alarmo_updated')];
+    return [this.hass!.connection.subscribeMessage(() => this._fetchData(), { type: 'alarmo_config_updated' })];
   }
 
   private async _fetchData(): Promise<void> {
@@ -151,9 +151,9 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
               <ha-switch
                 ?checked=${e.enabled}
                 @click=${(ev: Event) => {
-                  ev.stopPropagation();
-                  this.toggleEnable(ev, e.automation_id!);
-                }}
+                ev.stopPropagation();
+                this.toggleEnable(ev, e.automation_id!);
+              }}
               ></ha-switch>
             `,
           })
@@ -179,9 +179,9 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
               <ha-switch
                 ?checked=${e.enabled}
                 @click=${(ev: Event) => {
-                  ev.stopPropagation();
-                  this.toggleEnable(ev, e.automation_id!);
-                }}
+                ev.stopPropagation();
+                this.toggleEnable(ev, e.automation_id!);
+              }}
               ></ha-switch>
             `,
           })
@@ -194,7 +194,7 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
           </div>
 
           ${this.notificationFilterOptions.length > 1
-            ? html`
+          ? html`
                 <div class="table-filter" ?narrow=${this.narrow}>
                   <span class="header"
                     >${localize('panels.actions.cards.notifications.filter.label', this.hass.language)}:</span
@@ -207,15 +207,15 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
                   </alarmo-chips>
                 </div>
               `
-            : ''}
+          : ''}
           <alarmo-table
             ?selectable=${true}
             .columns=${columns}
             .data=${notificationData}
             @row-click=${(ev: CustomEvent) => {
-              const id = String(ev.detail.id);
-              navigate(this, `/alarmo/actions/edit_notification/${id}`, true);
-            }}
+          const id = String(ev.detail.id);
+          navigate(this, `/alarmo/actions/edit_notification/${id}`, true);
+        }}
           >
             ${localize('panels.actions.cards.notifications.table.no_items', this.hass.language)}
           </alarmo-table>
@@ -231,7 +231,7 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
           <div class="card-content">${localize('panels.actions.cards.actions.description', this.hass.language)}</div>
 
           ${this.automationFilterOptions.length > 1
-            ? html`
+          ? html`
                 <div class="table-filter" ?narrow=${this.narrow}>
                   <span class="header"
                     >${localize('panels.actions.cards.notifications.filter.label', this.hass.language)}:</span
@@ -244,15 +244,15 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
                   </alarmo-chips>
                 </div>
               `
-            : ''}
+          : ''}
           <alarmo-table
             ?selectable=${true}
             .columns=${columns}
             .data=${automationData}
             @row-click=${(ev: CustomEvent) => {
-              const id = String(ev.detail.id);
-              navigate(this, `/alarmo/actions/edit_action/${id}`, true);
-            }}
+          const id = String(ev.detail.id);
+          navigate(this, `/alarmo/actions/edit_action/${id}`, true);
+        }}
           >
             ${localize('panels.actions.cards.actions.table.no_items', this.hass.language)}
           </alarmo-table>

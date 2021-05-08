@@ -32,7 +32,7 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
 
   public hassSubscribe(): Promise<UnsubscribeFunc>[] {
     this._fetchData();
-    return [this.hass!.connection.subscribeEvents(() => this._fetchData(), 'alarmo_updated')];
+    return [this.hass!.connection.subscribeMessage(() => this._fetchData(), { type: 'alarmo_config_updated' })];
   }
 
   private async _fetchData(): Promise<void> {
@@ -74,14 +74,14 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
             >
             <span slot="description"
               >${localize(
-                'panels.general.cards.general.fields.disarm_after_trigger.description',
-                this.hass.language
-              )}</span
+        'panels.general.cards.general.fields.disarm_after_trigger.description',
+        this.hass.language
+      )}</span
             >
             <ha-switch
               ?checked=${this.data!.disarm_after_trigger}
               @change=${(ev: Event) =>
-                (this.data = { ...this.data, disarm_after_trigger: (ev.target as HTMLInputElement).checked })}
+          (this.data = { ...this.data, disarm_after_trigger: (ev.target as HTMLInputElement).checked })}
               }}
             >
             </ha-switch>
@@ -97,35 +97,35 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
             <ha-switch
               ?checked=${this.data?.mqtt?.enabled}
               @change=${(ev: Event) => {
-                this.data = {
-                  ...this.data!,
-                  mqtt: { ...this.data!.mqtt!, enabled: (ev.target as HTMLInputElement).checked },
-                };
-              }}
+          this.data = {
+            ...this.data!,
+            mqtt: { ...this.data!.mqtt!, enabled: (ev.target as HTMLInputElement).checked },
+          };
+        }}
             >
             </ha-switch>
           </settings-row>
 
           ${this.data?.mqtt?.enabled
-            ? html`
+          ? html`
                 <div style="padding: 0px 0px 16px 16px">
                   <mwc-button outlined @click=${() => navigate(this, '/alarmo/general/mqtt_configuration', true)}>
                     ${localize('panels.general.cards.general.actions.setup_mqtt', this.hass.language)}
                   </mwc-button>
                 </div>
               `
-            : ''}
+          : ''}
           ${Object.keys(this.areas).length >= 2
-            ? html`
+          ? html`
                 <settings-row .narrow=${this.narrow}>
                   <span slot="heading"
                     >${localize('panels.general.cards.general.fields.enable_master.heading', this.hass.language)}</span
                   >
                   <span slot="description"
                     >${localize(
-                      'panels.general.cards.general.fields.enable_master.description',
-                      this.hass.language
-                    )}</span
+            'panels.general.cards.general.fields.enable_master.description',
+            this.hass.language
+          )}</span
                   >
                   <ha-switch
                     ?checked=${this.data?.master?.enabled && Object.keys(this.areas).length >= 2}
@@ -135,16 +135,16 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
                   </ha-switch>
                 </settings-row>
               `
-            : ''}
+          : ''}
           ${this.data?.master?.enabled && Object.keys(this.areas).length >= 2
-            ? html`
+          ? html`
                 <div style="padding: 0px 0px 16px 16px">
                   <mwc-button outlined @click=${this.setupMasterClick}>
                     ${localize('panels.general.cards.general.actions.setup_master', this.hass.language)}
                   </mwc-button>
                 </div>
               `
-            : ''}
+          : ''}
 
           <div class="card-actions">
             <mwc-button @click=${this.saveClick}>

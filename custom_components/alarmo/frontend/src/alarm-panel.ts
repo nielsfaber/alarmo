@@ -58,17 +58,17 @@ export class MyAlarmPanel extends LitElement {
                 You have no access to view this page. Please check the following:
                 <ul>
                   <li>
-                    You are logged in using HA user account <b>${this.hass!.user.name}</b>. This account
+                    You are logged in using HA user account <b>'${this.hass!.user.name}'</b>. This account
                     <b>${this.hass!.user.is_admin ? 'does' : 'does NOT'}</b> have administrator permission.
                   </li>
                 </ul>
                 <ul>
                   <li>
-                    There is <b>${matchingUser ? 'a' : 'NO'}</b> user configured in Alarmo with name
-                    <b>${this.hass!.user.name}</b>.
+                    There is ${matchingUser ? 'a' : 'no'} user configured in Alarmo with name
+                    <b>'${this.hass!.user.name}'</b>.
                     ${matchingUser
-                      ? `This user <b>${matchingUser.is_admin ? 'does' : 'does NOT'}</b> have administrator permission. `
-                      : ''}
+          ? html`This user <b>${matchingUser.is_admin ? 'does' : 'does NOT'}</b> have administrator permission. `
+          : ''}
                   </li>
                 </ul>
               </div>
@@ -152,7 +152,12 @@ export class MyAlarmPanel extends LitElement {
         `;
       default:
         return html`
-          no view
+            <ha-card header="Page not found">
+              <div class="card-content">
+                The page you are trying to reach cannot be found. 
+                Please select a page from the menu above to continue.
+              </div>
+            </ha-card>
         `;
     }
   }
