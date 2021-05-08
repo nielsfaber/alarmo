@@ -111,7 +111,7 @@ class AlarmoCoordinator(DataUpdateCoordinator):
         async_dispatcher_connect(
             hass, "alarmo_platform_loaded", self.setup_alarm_entities
         )
-        self.listen_push_events()
+        self.register_events()
 
         super().__init__(hass, _LOGGER, name=const.DOMAIN)
 
@@ -261,9 +261,10 @@ class AlarmoCoordinator(DataUpdateCoordinator):
     async def async_delete(self):
         await self.store.async_delete()
 
-    def listen_push_events(self):
+    def register_events(self):
+        # handle push notifications with action buttons
         @callback
-        async def async_handle_event(event):
+        async def async_handle_push_event(event):
             action = None
             if (
                 event.data
@@ -304,8 +305,39 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                 await alarm_entity.async_alarm_disarm(None, True)
 
         for event in const.PUSH_EVENTS:
-            handle = self.hass.bus.async_listen(event, async_handle_event)
+            handle = self.hass.bus.async_listen(event, async_handle_push_event)
             self._push_listeners.append(handle)
+
+        @callback
+        async def async_handle_event(event: str, area_id: str, args: dict = {}):
+            """fire events in HA for use with automations"""
+            if event not in [
+                const.EVENT_FAILED_TO_ARM,
+                const.EVENT_COMMAND_NOT_ALLOWED,
+                const.EVENT_INVALID_CODE_PROVIDED,
+                const.EVENT_NO_CODE_PROVIDED
+            ]:
+                return
+
+            reasons = {
+                const.EVENT_FAILED_TO_ARM: "open_sensors",
+                const.EVENT_COMMAND_NOT_ALLOWED: "not_allowed",
+                const.EVENT_INVALID_CODE_PROVIDED: "invalid_code",
+                const.EVENT_NO_CODE_PROVIDED: "invalid_code",
+            }
+
+            data = {
+                "reason": reasons[event],
+                "command": args["command"].upper()
+            }
+            if event == const.EVENT_FAILED_TO_ARM:
+                data["sensors"] = list(args["open_sensors"].keys())
+
+            self.hass.bus.fire("alarmo_failed_to_arm", data)
+
+        async_dispatcher_connect(
+            self.hass, "alarmo_event", async_handle_event
+        )
 
     async def async_remove_entity(self, area_id: str):
         entity_registry = await self.hass.helpers.entity_registry.async_get_registry()
