@@ -225,7 +225,7 @@
             },
             "immediate": {
               "heading": "Inmediato",
-              "description": La activación de este sensor activará la alarma directamente en lugar de después del retardo de entrada."
+              "description": "La activación de este sensor activará la alarma directamente en lugar de después del retardo de entrada."
             },
             "allow_open": {
               "heading": "Permitir abrir mientras se arma",
