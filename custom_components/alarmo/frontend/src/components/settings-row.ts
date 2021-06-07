@@ -40,6 +40,12 @@ export class SettingsRow extends LitElement {
         border-top: 1px solid var(--divider-color);
         padding: 16px 16px;
       }
+      :host([first]) {
+        border-top: none;
+      }
+      :host([last]) {
+        border-bottom: none;
+      }
       ::slotted(ha-switch) {
         padding: 16px 0;
       }
@@ -52,6 +58,9 @@ export class SettingsRow extends LitElement {
       }
       .secondary {
         color: var(--secondary-text-color);
+      }
+      :host(:not([large]):not([narrow])) ::slotted(*) {
+        max-width: 66%;
       }
     `;
   }

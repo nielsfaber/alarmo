@@ -21,7 +21,6 @@ export class AlarmoCard extends SubscribeMixin(LitElement) {
   @internalProperty() private _input: string = "";
   @internalProperty() private warning: string = "";
 
-  timer: number = 0;
   subscribedEntities: string[] = [];
 
   public static async getConfigElement() {
@@ -56,11 +55,10 @@ export class AlarmoCard extends SubscribeMixin(LitElement) {
   }
 
   public hassSubscribe(): Promise<UnsubscribeFunc>[] {
-    if (!this.hass?.user.is_admin) return [];
     return [
-      this.hass!.connection.subscribeEvents(
+      this.hass!.connection.subscribeMessage(
         (ev) => this._fetchData(ev as unknown as AlarmoEvent),
-        EVENT
+        { type: "alarmo_updated" }
       ),
     ];
   }
@@ -100,7 +98,6 @@ export class AlarmoCard extends SubscribeMixin(LitElement) {
       (oldState.state == "disarmed" && newState.state != "disarmed")
       || (newState.state == "disarmed" && oldState.state != "disarmed")
     ) {
-      window.clearTimeout(this.timer);
       this._hideInvalidInput();
       this._input = "";
     }
@@ -296,25 +293,7 @@ export class AlarmoCard extends SubscribeMixin(LitElement) {
       entity_id: this._config!.entity,
       code: this._input,
     });
-    if (!this.hass?.user.is_admin) {
-      window.clearTimeout(this.timer);
-      this.timer = window.setTimeout(() => { this._handleTimeout() }, 600);
-    }
     this.warning = "";
-  }
-
-  private _handleTimeout() {
-    if (!this.hass || !this._config) return;
-    const stateObj = this.hass.states[this._config.entity] as AlarmoEntity;
-    if (!stateObj.attributes.open_sensors) {
-      //assume the code was wrong
-      this._showInvalidInput();
-    }
-    else {
-      //assume there were blocking sensors
-      this.warning = "blocking_sensors";
-      this._input = "";
-    }
   }
 
   private _showInvalidInput() {

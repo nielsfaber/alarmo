@@ -22,7 +22,8 @@
     },
     "editor": {
       "ui_mode": "Afficher l'éditeur visuel",
-      "yaml_mode": "Afficher l'éditeur de code"
+      "yaml_mode": "Afficher l'éditeur de code",
+      "edit_in_yaml": "Edit in YAML"
     }
   },
   "title": "Gestion de L'alarme",
@@ -85,7 +86,7 @@
               "heading": "Etat de données",
               "description": "Donnée sur laquelle les mises à jour d'état sont publiées"
             },
-             "event_topic": {
+            "event_topic": {
               "heading": "Evènement de données",
               "description": "Donnée sur laquelle les évènements d'état sont publiés"
             },
@@ -158,7 +159,7 @@
           },
           "filter": {
             "label": "Filtrer par zone",
-            "no_area": "Aucune zone"
+            "no_area": "(Aucune zone)"
           }
         },
         "add_sensors": {
@@ -352,7 +353,7 @@
           },
           "filter": {
             "label": "Filtrer par zone",
-            "no_area": "Alarme principale"
+            "no_area": "(Aucune zone)"
           }
         },
         "actions": {
@@ -367,11 +368,10 @@
         "new_notification": {
           "title": "Créer une notification",
           "description": "Créer une nouvelle notification.",
+          "trigger": "Condition",
+          "action": "Task",
+          "options": "Options",
           "fields": {
-            "name": {
-              "heading": "Nom",
-              "description": "Description de la notification"
-            },
             "event": {
               "heading": "Evènement",
               "description": "Détermine quand la notification doit être envoyée",
@@ -412,11 +412,36 @@
             },
             "message": {
               "heading": "Message",
-              "description": "Contenu du message de la notification"
+              "description": "Contenu du message de la notification",
+              "insert_wildcard": "Insert wildcard",
+              "placeholders": {
+                "armed": "The alarm is set to {{arm_mode}}",
+                "disarmed": "The alarm is now OFF",
+                "triggered": "The alarm is triggered! Cause: {{open_sensors}}.",
+                "arm_failure": "The alarm could not be armed right now, due to: {{open_sensors}}.",
+                "arming": "The alarm will be armed soon, please leave the house.",
+                "pending": "The alarm is about to trigger, disarm it quickly!"
+              }
             },
             "target": {
               "heading": "Cible",
               "description": "Appareil recevant le message"
+            },
+            "name": {
+              "heading": "Nom",
+              "description": "Description de la notification",
+              "placeholders": {
+                "armed": "Notify {target} upon arming",
+                "disarmed": "Notify {target} upon disarming",
+                "triggered": "Notify {target} when triggered",
+                "arm_failure": "Notify {target} on failure",
+                "arming": "Notify {target} when leaving",
+                "pending": "Notify {target} when arriving"
+              }
+            },
+            "delete": {
+              "heading": "Delete automation",
+              "description": "Permanently remove this automation"
             }
           },
           "actions": {
@@ -427,10 +452,6 @@
           "title": "Créer une action",
           "description": "Ce panneau peut être utilisé pour commuter un appareil lorsque l'état de l'alarme change.",
           "fields": {
-            "name": {
-              "heading": "Nom",
-              "description": "Description de  l'action"
-            },
             "event": {
               "heading": "Evènement",
               "description": "Détermine quand l'action doit être exécutée"
@@ -452,21 +473,21 @@
               "description": "Action à exécuter sur l'entité",
               "turn_on": "Mettre à on",
               "turn_off": "Mettre à off"
+            },
+            "name": {
+              "heading": "Nom",
+              "description": "Description de  l'action",
+              "placeholders": {
+                "armed": "Set {entity} to {state} upon arming",
+                "disarmed": "Set {entity} to {state} upon disarming",
+                "triggered": "Set {entity} to {state} when triggered",
+                "arm_failure": "Set {entity} to {state} on failure",
+                "arming": "Set {entity} to {state} when leaving",
+                "pending": "Set {entity} to {state} when arriving"
+              }
             }
           }
         }
-      },
-      "validation_errors": {
-        "no_triggers": "Aucun état ou évènement prévu pour le déclenchement de cette automatisation.",
-        "empty_trigger": "L'un des déclencheurs n'a aucun état ou évènement fourni.",
-        "invalid_trigger": "L'un des déclencheurs a une valeur non valide: {trigger}",
-        "invalid_mode": "Entrée non valide fournie par  le 'mode': {mode}",
-        "no_actions": "Aucune action n'est prévue pour être effectuée par cette automatisation.",
-        "no_service": "Il manque un service dans l’une des actions.",
-        "invalid_service": "Un nom de service non valide a été fourni pour l'une des actions: {service}",
-        "no_service_data": "Aucune donnée de service n'a été fournie pour l'une des actions.",
-        "no_entity_in_service_data": "Aucun entity_id n'a été fourni dans le service_data de l'une des actions.",
-        "no_message_in_service_data": "Aucun message n'a été fourni dans le service_data de l'une des actions."
       }
     }
   }

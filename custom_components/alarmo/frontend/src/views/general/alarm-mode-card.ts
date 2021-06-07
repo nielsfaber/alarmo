@@ -1,16 +1,16 @@
 import { LitElement, html, customElement, property } from 'lit-element';
 import { HomeAssistant } from 'custom-card-helpers';
-
-import '../components/time-slider';
-import '../components/alarmo-select';
-import { commonStyle } from '../styles';
-import { localize } from '../../localize/localize';
-import { AlarmoModeConfig, AlarmoConfig, EArmModes, Dictionary, AlarmoArea } from '../types';
-import { fetchAreas, saveArea } from '../data/websockets';
-import { handleError } from '../helpers';
-import { SubscribeMixin } from '../subscribe-mixin';
+import { commonStyle } from '../../styles';
+import { localize } from '../../../localize/localize';
+import { AlarmoModeConfig, AlarmoConfig, EArmModes, Dictionary, AlarmoArea } from '../../types';
+import { fetchAreas, saveArea } from '../../data/websockets';
+import { handleError } from '../../helpers';
+import { SubscribeMixin } from '../../subscribe-mixin';
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
-import { EArmModeIcons } from '../const';
+import { EArmModeIcons } from '../../const';
+
+import '../../components/time-slider';
+import '../../components/alarmo-select';
 
 @customElement('alarm-mode-card')
 export class AlarmModeCard extends SubscribeMixin(LitElement) {
@@ -26,7 +26,7 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
 
   public hassSubscribe(): Promise<UnsubscribeFunc>[] {
     this._fetchData();
-    return [this.hass!.connection.subscribeEvents(() => this._fetchData(), 'alarmo_updated')];
+    return [this.hass!.connection.subscribeMessage(() => this._fetchData(), { type: 'alarmo_config_updated' })];
   }
 
   private async _fetchData(): Promise<void> {
@@ -53,7 +53,7 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
           </div>
 
           ${Object.keys(this.areas).length > 1
-            ? html`
+        ? html`
               <alarmo-select
             .items=${Object.values(this.areas).map(e => Object({ value: e.area_id, name: e.name }))}
             value=${this.selectedArea}
@@ -62,7 +62,7 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
 
               </alarmo-select>
               `
-            : ''}
+        : ''}
         </div>
         <div class="card-content">
           ${localize('panels.general.cards.modes.description', this.hass.language)}
@@ -73,7 +73,7 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
           @MDCTabBar:activated=${(ev: CustomEvent) => (this.currentTab = Number(ev.detail.index))}
         >
           ${Object.entries(EArmModes).map(
-            ([k, v]) => html`
+          ([k, v]) => html`
               <mwc-tab
                 label="${localize(`common.modes_short.${v}`, this.hass.language)}"
                 hasImageIcon
@@ -83,7 +83,7 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
                 <ha-icon icon="${EArmModeIcons[k]}" slot="icon"></ha-icon>
               </mwc-tab>
             `
-          )}
+        )}
         </mwc-tab-bar>
 
         <settings-row .narrow=${this.narrow} .large=${true}>
@@ -109,7 +109,7 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
         </settings-row>
 
         ${this.data[mode].enabled
-          ? html`
+        ? html`
               <settings-row .narrow=${this.narrow}>
                 <span slot="heading"
                   >${localize('panels.general.cards.modes.fields.exit_delay.heading', this.hass.language)}</span
@@ -124,10 +124,10 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
                   zeroValue=${localize('components.time_slider.none', this.hass.language)}
                   value=${this.data[mode].exit_time || 0}
                   @change=${(ev: Event) =>
-                    (this.data = {
-                      ...this.data,
-                      [mode]: { ...this.data[mode], exit_time: Number((ev.target as HTMLInputElement).value) },
-                    })}
+            (this.data = {
+              ...this.data,
+              [mode]: { ...this.data[mode], exit_time: Number((ev.target as HTMLInputElement).value) },
+            })}
                 >
                 </time-slider>
               </settings-row>
@@ -146,10 +146,10 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
                   zeroValue=${localize('components.time_slider.none', this.hass.language)}
                   value=${this.data[mode].entry_time || 0}
                   @change=${(ev: Event) =>
-                    (this.data = {
-                      ...this.data,
-                      [mode]: { ...this.data[mode], entry_time: Number((ev.target as HTMLInputElement).value) },
-                    })}
+            (this.data = {
+              ...this.data,
+              [mode]: { ...this.data[mode], entry_time: Number((ev.target as HTMLInputElement).value) },
+            })}
                 >
                 </time-slider>
               </settings-row>
@@ -168,15 +168,15 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
                   zeroValue=${localize('components.time_slider.infinite', this.hass.language)}
                   value=${this.data[mode].trigger_time || 0}
                   @change=${(ev: Event) =>
-                    (this.data = {
-                      ...this.data,
-                      [mode]: { ...this.data[mode], trigger_time: Number((ev.target as HTMLInputElement).value) },
-                    })}
+            (this.data = {
+              ...this.data,
+              [mode]: { ...this.data[mode], trigger_time: Number((ev.target as HTMLInputElement).value) },
+            })}
                 >
                 </time-slider>
               </settings-row>
             `
-          : ''}
+        : ''}
 
         <div class="card-actions">
           <mwc-button @click=${this.saveClick}>

@@ -25,7 +25,7 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
 
   public hassSubscribe(): Promise<UnsubscribeFunc>[] {
     this._fetchData();
-    return [this.hass!.connection.subscribeEvents(() => this._fetchData(), 'alarmo_updated')];
+    return [this.hass!.connection.subscribeEvents(() => this._fetchData(), 'alarmo_config_updated')];
   }
 
   private async _fetchData(): Promise<void> {
@@ -60,13 +60,13 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
             <ha-icon-button slot="navigationIcon" dialogAction="cancel" icon="mdi:close"> </ha-icon-button>
             <span slot="title">
               ${this.area_id
-                ? localize(
-                    'panels.general.dialogs.edit_area.title',
-                    this.hass.language,
-                    '{area}',
-                    this.areas[this.area_id!].name
-                  )
-                : localize('panels.general.dialogs.create_area.title', this.hass.language)}
+        ? localize(
+          'panels.general.dialogs.edit_area.title',
+          this.hass.language,
+          '{area}',
+          this.areas[this.area_id!].name
+        )
+        : localize('panels.general.dialogs.create_area.title', this.hass.language)}
             </span>
           </ha-header-bar>
         </div>
@@ -78,14 +78,14 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
           >
           </paper-input>
           ${this.area_id
-            ? html`
+        ? html`
                 <span class="note"
                   >${localize('panels.general.dialogs.edit_area.name_warning', this.hass.language)}</span
                 >
               `
-            : ''}
+        : ''}
           ${!this.area_id
-            ? html`
+        ? html`
                 <alarmo-select
                   .items=${Object.values(this.areas).map(e => Object({ value: e.area_id, name: e.name }))}
                   value=${this.selectedArea}
@@ -95,13 +95,13 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
                 >
                 </alarmo-select>
               `
-            : ''}
+        : ''}
         </div>
         <mwc-button slot="primaryAction" @click=${this.saveClick}>
           ${this.hass.localize('ui.common.save')}
         </mwc-button>
         ${this.area_id
-          ? html`
+        ? html`
               <mwc-button
                 slot="secondaryAction"
                 @click=${this.deleteClick}
@@ -111,7 +111,7 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
                 ${this.hass.localize('ui.common.delete')}
               </mwc-button>
             `
-          : ''}
+        : ''}
       </ha-dialog>
     `;
   }
@@ -136,7 +136,7 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
   private async deleteClick(ev: Event) {
     if (!this.area_id) return;
     const sensors = Object.values(this.sensors).filter(e => e.area == this.area_id).length;
-    const automations = Object.values(this.automations).filter(e => e.area == this.area_id).length;
+    const automations = Object.values(this.automations).filter(e => e.triggers?.map(e => e.area).includes(this.area_id)).length;
     let result = false;
     if (sensors || automations) {
       result = await new Promise(resolve => {

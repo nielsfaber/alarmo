@@ -21,8 +21,9 @@
       "none": "geen"
     },
     "editor": {
-      "ui_mode": "Wissel naar UI",
-      "yaml_mode": "Wissel naar YAML"
+      "ui_mode": "Naar UI",
+      "yaml_mode": "Naar YAML",
+      "edit_in_yaml": "In YAML bewerken"
     }
   },
   "title": "Alarmpaneel",
@@ -84,6 +85,10 @@
             "state_topic": {
               "heading": "Toestand topic",
               "description": "Topic waarop statusupdates worden gepubliceerd"
+            },
+            "event_topic": {
+              "heading": "Gebeurtenis topic",
+              "description": "Topic waarop gebeurtenissen worden gepubliceerd"
             },
             "command_topic": {
               "heading": "Commando topic",
@@ -348,7 +353,7 @@
           },
           "filter": {
             "label": "Filter op gebied",
-            "no_area": "Alarm master"
+            "no_area": "(Geen gebied)"
           }
         },
         "actions": {
@@ -361,19 +366,18 @@
           }
         },
         "new_notification": {
-          "title": "Maak een melding",
-          "description": "Maak een nieuwe melding.",
+          "title": "Notificatie instellen",
+          "description": "Ontvang een notificatie wanneer het alarm wordt in- of uitgeschakeld, wordt geactiveerd etc.",
+          "trigger": "Conditie",
+          "action": "Taak",
+          "options": "Opties",
           "fields": {
-            "name": {
-              "heading": "Naam",
-              "description": "Beschrijving voor deze melding"
-            },
             "event": {
               "heading": "Gebeurtenis",
-              "description": "Wanneer moet de melding worden verzonden",
+              "description": "Wanneer moet de notificatie worden verzonden",
               "choose": {
                 "armed": {
-                  "name": "Alarm is is ingeschakeld",
+                  "name": "Alarm is ingeschakeld",
                   "description": "Het alarm is succesvol ingeschakeld"
                 },
                 "disarmed": {
@@ -399,34 +403,55 @@
               }
             },
             "mode": {
-              "heading": "Mode",
-              "description": "Beperk de actie tot specifieke inschakel modi (optioneel)"
+              "heading": "Modi",
+              "description": "Beperk de actie tot specifieke inschakel modi."
             },
             "title": {
               "heading": "Titel",
-              "description": "Titel voor het meldingsbericht"
+              "description": "Titel voor de notificatie"
             },
             "message": {
               "heading": "Bericht",
-              "description": "Inhoud van het meldingsbericht"
+              "description": "Tekst voor de notificatie",
+              "insert_wildcard": "Wildcard invoegen",
+              "placeholders": {
+                "armed": "Het alarm is ingeschakeld op {{arm_mode}}",
+                "disarmed": "Het alarm is nu uit",
+                "triggered": "Het alarm is geactiveerd! Oorzaak: {{open_sensors}}.",
+                "arm_failure": "Het alarm kon niet worden ingeschakeld. Oorzaak: {{open_sensors}}.",
+                "arming": "Het alarm wordt ingeschakeld, verlaat het huis.",
+                "pending": "Het alarm moet nu worden uitgeschakeld, anders wordt deze geactiveerd."
+              }
             },
             "target": {
               "heading": "Doel",
               "description": "Apparaat om het push-bericht naar te sturen"
+            },
+            "name": {
+              "heading": "Naam",
+              "description": "Beschrijving voor deze notificatie",
+              "placeholders": {
+                "armed": "Stuur notificatie naar {target} bij inschakelen",
+                "disarmed": "Stuur notificatie naar {target} bij uitschakelen",
+                "triggered": "Stuur notificatie naar {target} bij alarm",
+                "arm_failure": "Stuur notificatie naar {target} bij fout",
+                "arming": "Stuur notificatie naar {target} bij vertrek",
+                "pending": "Stuur notificatie naar {target} bij binnenkomst"
+              }
+            },
+            "delete": {
+              "heading": "Automatisering verwijderen",
+              "description": "Verwijder deze automatisering permanent"
             }
           },
           "actions": {
-            "test": "Uitproberen"
+            "test": "Testen"
           }
         },
         "new_action": {
-          "title": "Maak een actie",
-          "description": "Dit paneel kan worden gebruikt om een apparaat te schakelen wanneer de alarmstatus verandert.",
+          "title": "Actie instellen",
+          "description": "Schakel verlichting of apparaatuur (bijv. sirene) wanneer het alarm wordt in- of uitgeschakeld, wordt geactiveerd etc.",
           "fields": {
-            "name": {
-              "heading": "Naam",
-              "description": "Beschrijving voor deze actie"
-            },
             "event": {
               "heading": "Gebeurtenis",
               "description": "Wanneer moet de actie worden uitgevoerd"
@@ -448,21 +473,21 @@
               "description": "Actie die op de entiteit moet worden uitgevoerd",
               "turn_on": "Zet aan",
               "turn_off": "Zet uit"
+            },
+            "name": {
+              "heading": "Naam",
+              "description": "Beschrijving voor deze actie",
+              "placeholders": {
+                "armed": "Schakel {target} naar {state} bij inschakelen",
+                "disarmed": "Schakel {target} naar {state} bij uitschakelen",
+                "triggered": "Schakel {target} naar {state} bij alarm",
+                "arm_failure": "Schakel {target} naar {state} bij fout",
+                "arming": "Schakel {target} naar {state} bij vertrek",
+                "pending": "Schakel {target} naar {state} bij binnenkomst"
+              }
             }
           }
         }
-      },
-      "validation_errors": {
-        "no_triggers": "Er is geen toestand of gebeurtenis voorzien voor het activeren van deze automatisering.",
-        "empty_trigger": "Voor een van de triggers is geen status of gebeurtenis opgegeven.",
-        "invalid_trigger": "Een van de triggers heeft een ongeldige waarde: {trigger}",
-        "invalid_mode": "Ongeldige invoer opgegeven voor 'mode': {mode}",
-        "no_actions": "Er zijn geen acties ingesteld uit te voeren door deze automatisering.",
-        "no_service": "Een van de acties mist een service.",
-        "invalid_service": "Er is een ongeldige servicenaam opgegeven voor een van de acties: {service}",
-        "no_service_data": "Voor een van de acties zijn geen servicegegevens opgegeven.",
-        "no_entity_in_service_data": "Er is geen entity_id opgegeven in de service_data van een van de acties.",
-        "no_message_in_service_data": "Er is geen bericht opgegeven in de service_data van een van de acties."
       }
     }
   }

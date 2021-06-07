@@ -1,18 +1,19 @@
 import { LitElement, html, customElement, property } from 'lit-element';
 import { HomeAssistant, navigate } from 'custom-card-helpers';
 
-import { prettyPrint, handleError } from '../helpers';
-import { AlarmoConfig, Dictionary, AlarmoUser } from '../types';
+import { prettyPrint, handleError } from '../../helpers';
+import { AlarmoConfig, Dictionary, AlarmoUser } from '../../types';
 
-import '../cards/user-editor-card.ts';
-import '../components/settings-row.ts';
-import '../components/alarmo-table.ts';
-import { commonStyle } from '../styles';
-import { localize } from '../../localize/localize';
-import { SubscribeMixin } from '../subscribe-mixin';
+import './user-editor-card.ts';
+import '../../components/settings-row.ts';
+import '../../components/alarmo-table.ts';
+
+import { commonStyle } from '../../styles';
+import { localize } from '../../../localize/localize';
+import { SubscribeMixin } from '../../subscribe-mixin';
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
-import { fetchConfig, fetchUsers, saveConfig } from '../data/websockets';
-import { TableData, TableColumn } from '../components/alarmo-table';
+import { fetchConfig, fetchUsers, saveConfig } from '../../data/websockets';
+import { TableData, TableColumn } from '../../components/alarmo-table';
 
 @customElement('alarm-view-codes')
 export class AlarmViewCodes extends SubscribeMixin(LitElement) {
@@ -28,7 +29,7 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
 
   public hassSubscribe(): Promise<UnsubscribeFunc>[] {
     this._fetchData();
-    return [this.hass!.connection.subscribeEvents(() => this._fetchData(), 'alarmo_updated')];
+    return [this.hass!.connection.subscribeMessage(() => this._fetchData(), { type: 'alarmo_config_updated' })];
   }
 
   private async _fetchData(): Promise<void> {
@@ -73,8 +74,8 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
             <ha-switch
               ?checked=${this.code_arm_required}
               @change=${(ev: Event) => {
-                this.code_arm_required = (ev.target as HTMLInputElement).checked;
-              }}
+          this.code_arm_required = (ev.target as HTMLInputElement).checked;
+        }}
             >
             </ha-switch>
           </settings-row>
@@ -89,8 +90,8 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
             <ha-switch
               ?checked=${this.code_disarm_required}
               @change=${(ev: Event) => {
-                this.code_disarm_required = (ev.target as HTMLInputElement).checked;
-              }}
+          this.code_disarm_required = (ev.target as HTMLInputElement).checked;
+        }}
             >
             </ha-switch>
           </settings-row>
@@ -104,32 +105,32 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
             >
             <mwc-button
               class="${this.code_format == 'number' ? 'active' : ''} ${!this.code_arm_required &&
-              !this.code_disarm_required
-                ? 'disabled'
-                : ''}"
+          !this.code_disarm_required
+          ? 'disabled'
+          : ''}"
               @click=${() => {
-                this.code_format = 'number';
-              }}
+          this.code_format = 'number';
+        }}
               ?disabled=${!this.code_arm_required && !this.code_disarm_required}
               >${localize(
-                'panels.codes.cards.codes.fields.code_format.code_format_number',
-                this.hass.language
-              )}</mwc-button
+          'panels.codes.cards.codes.fields.code_format.code_format_number',
+          this.hass.language
+        )}</mwc-button
             >
             <mwc-button
               class="${this.code_format == 'text' ? 'active' : ''} ${!this.code_arm_required &&
-              !this.code_disarm_required
-                ? 'disabled'
-                : ''}"
+          !this.code_disarm_required
+          ? 'disabled'
+          : ''}"
               @click=${() => {
-                this.code_format = 'text';
-              }}
+          this.code_format = 'text';
+        }}
               ?disabled=${!this.code_arm_required && !this.code_disarm_required}
             >
               ${localize(
-                'panels.codes.cards.codes.fields.code_format.code_format_text',
-                this.hass.language
-              )}</mwc-button
+          'panels.codes.cards.codes.fields.code_format.code_format_text',
+          this.hass.language
+        )}</mwc-button
             >
           </settings-row>
 
@@ -194,9 +195,9 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
           .columns=${columns}
           .data=${data}
           @row-click=${(ev: CustomEvent) => {
-            const id = String(ev.detail.id);
-            navigate(this, `/alarmo/codes/edit_user/${id}`, true);
-          }}
+        const id = String(ev.detail.id);
+        navigate(this, `/alarmo/codes/edit_user/${id}`, true);
+      }}
         >
           ${localize('panels.codes.cards.user_management.no_items', this.hass.language)}
         </alarmo-table>

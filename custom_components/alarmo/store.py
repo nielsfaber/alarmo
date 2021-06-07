@@ -30,7 +30,7 @@ _LOGGER = logging.getLogger(__name__)
 
 DATA_REGISTRY = f"{DOMAIN}_storage"
 STORAGE_KEY = f"{DOMAIN}.storage"
-STORAGE_VERSION = 2
+STORAGE_VERSION = 3
 SAVE_DELAY = 10
 
 
@@ -123,11 +123,20 @@ class UserEntry:
 
 
 @attr.s(slots=True, frozen=True)
-class TriggerEntry:
+class AlarmoTriggerEntry:
     """Trigger storage Entry."""
 
     event = attr.ib(type=str, default="")
-    state = attr.ib(type=str, default="")
+    area = attr.ib(type=str, default=None)
+    modes = attr.ib(type=list, default=[])
+
+
+@attr.s(slots=True, frozen=True)
+class EntityTriggerEntry:
+    """Trigger storage Entry."""
+
+    entity_id = attr.ib(type=str, default=None)
+    state = attr.ib(type=str, default=None)
 
 
 @attr.s(slots=True, frozen=True)
@@ -144,13 +153,33 @@ class AutomationEntry:
     """Automation storage Entry."""
 
     automation_id = attr.ib(type=str, default=None)
+    type = attr.ib(type=str, default=None)
     name = attr.ib(type=str, default="")
-    modes = attr.ib(type=list, default=[])
-    triggers = attr.ib(type=[TriggerEntry], default=[])
+    triggers = attr.ib(type=[AlarmoTriggerEntry], default=[])
     actions = attr.ib(type=[ActionEntry], default=[])
     enabled = attr.ib(type=bool, default=True)
-    is_notification = attr.ib(type=bool, default=False)
-    area = attr.ib(type=str, default=None)
+
+
+def parse_automation_entry(data: dict):
+    def create_trigger_entity(config: dict):
+        if "event" in config:
+            return AlarmoTriggerEntry(**config)
+        else:
+            return EntityTriggerEntry(**config)
+
+    output = {
+        "triggers": list(map(create_trigger_entity, data["triggers"])),
+        "actions": list(map(lambda el: ActionEntry(**el), data["actions"])),
+    }
+    if "automation_id" in data:
+        output["automation_id"] = data["automation_id"]
+    if "name" in data:
+        output["name"] = data["name"]
+    if "type" in data:
+        output["type"] = data["type"]
+    if "enabled" in data:
+        output["enabled"] = data["enabled"]
+    return output
 
 
 class MigratableStore(Store):
@@ -177,6 +206,28 @@ class MigratableStore(Store):
                 for sensor in data["sensors"]:
                     sensor["area"] = area_id
 
+        if old_version <= 2:
+            data["automations"] = [
+                attr.asdict(AutomationEntry(
+                    **parse_automation_entry({
+                        **automation,
+                        **{
+                            "triggers": list(map(
+                                lambda el: attr.asdict(AlarmoTriggerEntry(
+                                    event=el["state"] if "state" in el else el["event"],
+                                    area=automation["area"] if "area" in el else None,
+                                    modes=automation["modes"]
+                                )),
+                                automation["triggers"]
+                            )),
+                            "type": "notification"
+                            if "is_notification" in automation and automation["is_notification"]
+                            else "action"
+                        }
+                    })
+                ))
+                for automation in data["automations"]
+            ]
         return data
 
 
@@ -247,7 +298,7 @@ class AlarmoStorage:
 
             if "automations" in data:
                 for automation in data["automations"]:
-                    automations[automation["automation_id"]] = AutomationEntry(**automation)
+                    automations[automation["automation_id"]] = AutomationEntry(**parse_automation_entry(automation))
 
         self.config = config
         self.areas = areas
@@ -480,9 +531,7 @@ class AlarmoStorage:
     def async_create_automation(self, data: dict) -> AutomationEntry:
         """Create a new AutomationEntry."""
         automation_id = str(int(time.time()))
-        if "area" in data and not data["area"]:
-            data["area"] = None
-        new_automation = AutomationEntry(**data, automation_id=automation_id)
+        new_automation = AutomationEntry(**parse_automation_entry(data), automation_id=automation_id)
         self.automations[automation_id] = new_automation
         self.async_schedule_save()
         return new_automation
@@ -499,10 +548,8 @@ class AlarmoStorage:
     @callback
     def async_update_automation(self, automation_id: str, changes: dict) -> AutomationEntry:
         """Update existing AutomationEntry."""
-        if "area" in changes and not changes["area"]:
-            changes["area"] = None
         old = self.automations[automation_id]
-        new = self.automations[automation_id] = attr.evolve(old, **changes)
+        new = self.automations[automation_id] = attr.evolve(old, **parse_automation_entry(changes))
         self.async_schedule_save()
         return new
 

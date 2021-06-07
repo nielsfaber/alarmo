@@ -1,5 +1,6 @@
 import os
 import logging
+import voluptuous as vol
 
 from homeassistant.core import callback
 
@@ -14,8 +15,41 @@ from homeassistant.helpers.dispatcher import (
     async_dispatcher_connect,
 )
 
+from homeassistant.components.websocket_api import (decorators, async_register_command)
+
 DATA_EXTRA_MODULE_URL = 'frontend_extra_module_url'
 _LOGGER = logging.getLogger(__name__)
+
+
+@callback
+@decorators.websocket_command({
+    vol.Required("type"): "alarmo_updated",
+})
+@decorators.async_response
+async def handle_subscribe_updates(hass, connection, msg):
+    """Handle subscribe updates."""
+
+    @callback
+    def async_handle_event(event: str, area_id: str, args: dict = {}):
+        """Forward events to websocket."""
+        data = dict(**args, **{
+            "event": event,
+            "area_id": area_id
+        })
+        connection.send_message({
+            "id": msg["id"],
+            "type": "event",
+            "event": {
+                "data": data
+            }
+        })
+
+    connection.subscriptions[msg["id"]] = async_dispatcher_connect(
+        hass,
+        "alarmo_event",
+        async_handle_event
+    )
+    connection.send_result(msg["id"])
 
 
 async def async_register_card(hass):
@@ -30,16 +64,7 @@ async def async_register_card(hass):
 
     hass.data[DATA_EXTRA_MODULE_URL].add(card_path)
 
-    @callback
-    def async_handle_event(event: str, area_id: str, args: dict = {}):
-        data = args.copy()
-        data.update({
-            "event": event,
-            "area_id": area_id
-        })
-        hass.bus.async_fire("alarmo_event", data)
-
-    async_dispatcher_connect(hass, "alarmo_event", async_handle_event)
+    async_register_command(hass, handle_subscribe_updates)
 
 
 def async_unregister_card(hass):

@@ -43,6 +43,13 @@ This is an alarm system integration for Home Assistant. It provides a user inter
   - [Alarmo-card](#alarmo-card)
     - [Demonstration](#demonstration)
     - [Configuration](#configuration)
+  - [Automations](#automations)
+    - [Sending notifications](#sending-notifications)
+      - [Wildcards](#wildcards)
+    - [Triggering an action](#triggering-an-action)
+    - [Custom automations](#custom-automations)
+      - [Automatic arming](#automatic-arming)
+      - [Advanced actions](#advanced-actions)
   - [Say thank you](#say-thank-you)
 
 
@@ -281,12 +288,12 @@ Note that assigning a sensor type is not mandatory, and all configuration settin
 
 The following table defines the sensor types and the predefined configuration:
 | Type          | Device classes                      | Arm modes                           | Always on | Immediate | Arm after closing | Allow open |
-| ------------- | ----------------------------------- | ----------------------------------- | --------- | --------- | ------------ | ---------- |
-| Door          | door, garage_door, lock. opening    | Armed Away, Armed Home, Armed Night | No        | No        | Yes          | No         |
-| Window        | window                              | Armed Away, Armed Home, Armed Night | No        | Yes       | No           | No         |
-| Motion        | motion, moving, occupancy, presence | Armed Away                          | No        | No        | No           | Yes        |
-| Tamper        | sound, opening, vibration           | Armed Away, Armed Home, Armed Night | No        | Yes       | No           | No         |
-| Environmental | gas, heat, moisture, smoke, safety  | N/A                                 | Yes       | Yes       | No           | No         |
+| ------------- | ----------------------------------- | ----------------------------------- | --------- | --------- | ----------------- | ---------- |
+| Door          | door, garage_door, lock. opening    | Armed Away, Armed Home, Armed Night | No        | No        | Yes               | No         |
+| Window        | window                              | Armed Away, Armed Home, Armed Night | No        | Yes       | No                | No         |
+| Motion        | motion, moving, occupancy, presence | Armed Away                          | No        | No        | No                | Yes        |
+| Tamper        | sound, opening, vibration           | Armed Away, Armed Home, Armed Night | No        | Yes       | No                | No         |
+| Environmental | gas, heat, moisture, smoke, safety  | N/A                                 | Yes       | Yes       | No                | No         |
 
 #### Immediate
 When the alarm is armed with an immediate sensor, this sensor will trigger the alarm directly instead of waiting for the (optional) entry delay.
@@ -579,6 +586,113 @@ Configuration using UI mode:
 2. Click "Edit Dashboard" on the right (under the button with the 3 dots)
 * Click the "Add card" button on the bottom
 * Choose "Custom: Alarmo Card" and pick the correct entity.
+
+--
+
+## Automations
+For creating a powerful security system, you should combine Alarmo with automations.
+
+### Sending notifications
+Alarmo can send a push message to your phone when the alarm is armed, disarmed, triggered, something went wrong, etc.
+For doing so, you first need to set up the mobile app for HA.
+
+Procedure for setting up a notification:
+1. In the Alarmo configuration panel, click "Actions" in the top menu.
+2. In the panel labeled "Notifications", click on "New Notification".
+3. Choose an event for which you would like to receive a push message, and choose the message content + title. Pick your device as target, and save the automation.
+4. Now Alarmo should start sending you messages :tada:
+
+Example of the notification editor:
+
+<img src="https://raw.githubusercontent.com/nielsfaber/alarmo/main/screenshots/notification_gui.png">
+
+#### Wildcards
+The alarmo notifications editor contains some wildcards which can be used to provide extra info to your push message.
+By adding the wildcard in a message (including the brackets) it will be automatically be replaced by the applicable text.
+
+| Wildcard               | Description                                                    | Example Text       | Suitable events                       |
+| ---------------------- | -------------------------------------------------------------- | ------------------ | ------------------------------------- |
+| `{{open_sensors}}`     | List of sensors (with their states) which are currently active | *Backdoor is open* | Failed to arm<br> Triggered<br> Entry |
+| `{{bypassed_sensors}}` | List of sensors which are bypassed                             | *Bedroom window*   | Armed                                 |
+| `{{arm_mode}}`         | Current arming mode.                                           | *Armed Away*       | Leave<br> Armed                       |
+| `{{changed_by}}`       | User who's code has been entered.                              | *Niels*            | Armed<br> Disarmed                    |
+
+
+### Triggering an action
+An important feature of a security system are the actuators (such as siren, lights, ...), which will hopefully cause a burglar threspassing your property to flee.
+
+Alarmo features a built-in panel which can be used for switching devices on/off, depending on the state of the alarm.
+
+Procedure for setting up an action:
+1. In the Alarmo configuration panel, click "Actions" in the top menu.
+2. In the panel labeled "Actions", click on "New Action".
+3. Choose an event for which you would like to trigger a device, pick the HA entity from the list, choose whether it should be switched on, and save the automation.
+4. Now the device should automatically be triggered together with the alarm :tada:
+
+Currently the following HA entity types are supported: `switch`, `input_boolean`, `light`, `script`.
+
+### Custom automations
+
+#### Automatic arming
+If you want to control the state of Alarmo through an external device (e.g. a keyfob, button panel, or phone with geofencing), you can do so by means of an automation.
+
+Example of arming with a remote button:
+```yaml
+trigger:
+  - platform: state
+    entity_id: switch.my_remote
+    to: 'on'
+action:
+  - service: alarm_control_panel.alarm_arm_away
+    target:
+      entity_id: alarm_control_panel.alarmo
+```
+
+#### Advanced actions
+In case the built-in Actions panel does not offer the flexibility you are looking for, you can set up custom automations in HA.
+It's recommended to trigger on a state change of the `alarm_control_panel` entity.
+
+Example:
+```yaml
+trigger:
+  - platform: state
+    entity_id: alarm_control_panel.alarmo
+    to: 'triggered'
+action:
+  - service: switch.turn_on
+    target:
+      entity_id: swich.my_siren
+```
+
+For the "failed to arm" condition, you can trigger on event instead:
+```yaml
+trigger:
+  - platform: event
+    event_type: alarmo_failed_to_arm
+condition:
+  - condition: template
+    value_template: '{{ trigger.event.data.reason == ''open_sensors'' }}'
+action:
+  - service: notify.mobile_app_my_phone
+    data:
+      message: >
+        Could not arm because of the following problems:
+        {% for entity_id in trigger.event.data.sensors %}
+          - {{ state_attr(entity_id, 'friendly_name') }} is {{ states(entity_id) }}
+        {% endfor %}
+      title: test
+```
+
+
+Structure of the event data:
+```javascript
+{
+  "reason": "open_sensors", //other options: not_allowed, invalid_code
+  "sensors": [ //only applicable if reason = open_sensors
+    "binary_sensor.balcony_door"
+  ],
+}
+```
 
 ---
 

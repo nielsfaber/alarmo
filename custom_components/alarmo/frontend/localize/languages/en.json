@@ -21,8 +21,9 @@
       "none": "none"
     },
     "editor": {
-      "ui_mode": "Switch to UI",
-      "yaml_mode": "Switch to YAML"
+      "ui_mode": "To UI",
+      "yaml_mode": "To YAML",
+      "edit_in_yaml": "Edit in YAML"
     }
   },
   "title": "Alarm panel",
@@ -352,7 +353,7 @@
           },
           "filter": {
             "label": "Filter by area",
-            "no_area": "Alarm master"
+            "no_area": "(No area)"
           }
         },
         "actions": {
@@ -365,13 +366,12 @@
           }
         },
         "new_notification": {
-          "title": "Create notification",
-          "description": "Create a new notification.",
+          "title": "Configure notification",
+          "description": "Receive a notification when arming/disarming the alarm, on activation, etc.",
+          "trigger": "Condition",
+          "action": "Task",
+          "options": "Options",
           "fields": {
-            "name": {
-              "heading": "Name",
-              "description": "Description for this notification"
-            },
             "event": {
               "heading": "Event",
               "description": "When should the notification be sent",
@@ -412,11 +412,36 @@
             },
             "message": {
               "heading": "Message",
-              "description": "Content of the notification message"
+              "description": "Content of the notification message",
+              "insert_wildcard": "Insert wildcard",
+              "placeholders": {
+                "armed": "The alarm is set to {{arm_mode}}",
+                "disarmed": "The alarm is now OFF",
+                "triggered": "The alarm is triggered! Cause: {{open_sensors}}.",
+                "arm_failure": "The alarm could not be armed right now, due to: {{open_sensors}}.",
+                "arming": "The alarm will be armed soon, please leave the house.",
+                "pending": "The alarm is about to trigger, disarm it quickly!"
+              }
             },
             "target": {
               "heading": "Target",
               "description": "Device to send the push message to"
+            },
+            "name": {
+              "heading": "Name",
+              "description": "Description for this notification",
+              "placeholders": {
+                "armed": "Notify {target} upon arming",
+                "disarmed": "Notify {target} upon disarming",
+                "triggered": "Notify {target} when triggered",
+                "arm_failure": "Notify {target} on failure",
+                "arming": "Notify {target} when leaving",
+                "pending": "Notify {target} when arriving"
+              }
+            },
+            "delete": {
+              "heading": "Delete automation",
+              "description": "Permanently remove this automation"
             }
           },
           "actions": {
@@ -424,13 +449,9 @@
           }
         },
         "new_action": {
-          "title": "Create action",
-          "description": "This panel can be used to switch a device when the alarm state changes.",
+          "title": "Configure action",
+          "description": "Switch lights or devices (such as sirens) when arming/disarming the alarm, on activation, etc.",
           "fields": {
-            "name": {
-              "heading": "Name",
-              "description": "Description for this action"
-            },
             "event": {
               "heading": "Event",
               "description": "When should the action be executed"
@@ -452,21 +473,21 @@
               "description": "Action to perform on the entity",
               "turn_on": "Turn on",
               "turn_off": "Turn off"
+            },
+            "name": {
+              "heading": "Name",
+              "description": "Description for this action",
+              "placeholders": {
+                "armed": "Set {entity} to {state} upon arming",
+                "disarmed": "Set {entity} to {state} upon disarming",
+                "triggered": "Set {entity} to {state} when triggered",
+                "arm_failure": "Set {entity} to {state} on failure",
+                "arming": "Set {entity} to {state} when leaving",
+                "pending": "Set {entity} to {state} when arriving"
+              }
             }
           }
         }
-      },
-      "validation_errors": {
-        "no_triggers": "No state or event provided for the triggering of this automation.",
-        "empty_trigger": "One of the triggers has no state or event provided.",
-        "invalid_trigger": "One of the triggers has an invalid value: {trigger}",
-        "invalid_mode": "Invalid input provided for 'mode': {mode}",
-        "no_actions": "No actions are provided to be performed by this automation.",
-        "no_service": "One of the actions is missing a service.",
-        "invalid_service": "An invalid service name was provided for one of the actions: {service}",
-        "no_service_data": "No service data was provided for one of the actions.",
-        "no_entity_in_service_data": "No entity_id was provided in the service_data of one of the actions.",
-        "no_message_in_service_data": "No message was provided in the service_data of one of the actions."
       }
     }
   }

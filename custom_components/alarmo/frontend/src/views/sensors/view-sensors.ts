@@ -1,23 +1,23 @@
 import { LitElement, html, customElement, property } from 'lit-element';
 import { HomeAssistant, navigate } from 'custom-card-helpers';
-import { loadHaForm } from '../load-ha-form';
+import { loadHaForm } from '../../load-ha-form';
 
-import { computeIcon, prettyPrint, computeName, handleError } from '../helpers';
-import { Dictionary, AlarmoSensor, EArmModes, AlarmoArea } from '../types';
+import { computeIcon, prettyPrint, computeName, handleError } from '../../helpers';
+import { Dictionary, AlarmoSensor, EArmModes, AlarmoArea } from '../../types';
 
-import '../cards/sensor-editor-card.ts';
-import '../components/alarmo-table.ts';
-import '../components/alarmo-chips.ts';
+import './sensor-editor-card.ts';
+import '../../components/alarmo-table.ts';
+import '../../components/alarmo-chips.ts';
 
-import { commonStyle } from '../styles';
+import { commonStyle } from '../../styles';
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
-import { fetchSensors, saveSensor, fetchAreas } from '../data/websockets';
-import { SubscribeMixin } from '../subscribe-mixin';
-import { localize } from '../../localize/localize';
-import { TableColumn, TableData } from '../components/alarmo-table';
-import { defaultSensorConfig, isValidSensor } from '../data/sensors';
-import { ESensorIcons, ESensorTypes } from '../const';
-import { Option } from '../components/alarmo-chips';
+import { fetchSensors, saveSensor, fetchAreas } from '../../data/websockets';
+import { SubscribeMixin } from '../../subscribe-mixin';
+import { localize } from '../../../localize/localize';
+import { TableColumn, TableData } from '../../components/alarmo-table';
+import { defaultSensorConfig, isValidSensor } from '../../data/sensors';
+import { ESensorIcons, ESensorTypes } from '../../const';
+import { AlarmoChip } from '../../components/alarmo-chips';
 
 @customElement('alarm-view-sensors')
 export class AlarmViewSensors extends SubscribeMixin(LitElement) {
@@ -33,11 +33,11 @@ export class AlarmViewSensors extends SubscribeMixin(LitElement) {
   @property() showAllSensorEntities = false;
   @property() selectedArea?: string;
 
-  @property() areaFilterOptions: Option[] = [];
+  @property() areaFilterOptions: AlarmoChip[] = [];
 
   public hassSubscribe(): Promise<UnsubscribeFunc>[] {
     this._fetchData();
-    return [this.hass!.connection.subscribeEvents(() => this._fetchData(), 'alarmo_updated')];
+    return [this.hass!.connection.subscribeMessage(() => this._fetchData(), { type: 'alarmo_config_updated' })];
   }
 
   private async _fetchData(): Promise<void> {
@@ -47,23 +47,22 @@ export class AlarmViewSensors extends SubscribeMixin(LitElement) {
     this.areas = await fetchAreas(this.hass);
     this.sensors = await fetchSensors(this.hass);
 
-    this.areaFilterOptions = [
-      {
+    this.areaFilterOptions = Object.values(this.areas)
+      .map(e =>
+        Object({
+          value: e.area_id,
+          name: e.name,
+          count: Object.values(this.sensors).filter(el => el.area == e.area_id).length
+        })
+      )
+      .sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1))
+
+    if (Object.values(this.sensors).filter(e => !e.area).length)
+      this.areaFilterOptions = [{
         value: 'no_area',
         name: localize('panels.sensors.cards.sensors.filter.no_area', this.hass.language),
-        count: Object.values(this.sensors).filter(e => !e.area).length,
-      },
-    ].concat(
-      Object.values(this.areas)
-        .map(e =>
-          Object({
-            value: e.area_id,
-            name: e.name,
-            count: Object.values(this.sensors).filter(el => el.area == e.area_id).length,
-          })
-        )
-        .sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1))
-    );
+        count: Object.values(this.sensors).filter(e => !e.area).length
+      }, ...this.areaFilterOptions];
   }
 
   firstUpdated() {
@@ -135,9 +134,9 @@ export class AlarmViewSensors extends SubscribeMixin(LitElement) {
           icon: html`
             <paper-tooltip animation-delay="0">
               ${localize(
-                `panels.sensors.cards.editor.fields.device_type.choose.${ESensorTypes[type]}.name`,
-                this.hass!.language
-              )}
+            `panels.sensors.cards.editor.fields.device_type.choose.${ESensorTypes[type]}.name`,
+            this.hass!.language
+          )}
             </paper-tooltip>
             <ha-icon icon="${ESensorIcons[type]}"> </ha-icon>
           `,
@@ -150,15 +149,15 @@ export class AlarmViewSensors extends SubscribeMixin(LitElement) {
             ${this.sensors[item.id].always_on
               ? localize('panels.sensors.cards.sensors.table.always_on', this.hass!.language)
               : Object.values(EArmModes)
-                  .filter(e => this.sensors[item.id].modes.includes(e))
-                  .map(e => localize(`common.modes_short.${e}`, this.hass!.language))
-                  .join(', ')}
+                .filter(e => this.sensors[item.id].modes.includes(e))
+                .map(e => localize(`common.modes_short.${e}`, this.hass!.language))
+                .join(', ')}
           `,
           enabled: html`
             <ha-switch
               @click=${(ev: Event) => {
-                ev.stopPropagation();
-              }}
+              ev.stopPropagation();
+            }}
               ?checked=${this.sensors[item.id].enabled}
               @change=${(ev: Event) => this.toggleEnabled(ev, item.id)}
             >
@@ -175,7 +174,7 @@ export class AlarmViewSensors extends SubscribeMixin(LitElement) {
         </div>
 
         ${this.areaFilterOptions.length > 1
-          ? html`
+        ? html`
               <div class="table-filter" ?narrow=${this.narrow}>
                 <span class="header"
                   >${localize('panels.sensors.cards.sensors.filter.label', this.hass.language)}:</span
@@ -183,20 +182,21 @@ export class AlarmViewSensors extends SubscribeMixin(LitElement) {
                 <alarmo-chips
                   .items=${this.areaFilterOptions}
                   value=${this.selectedArea}
+                  selectable
                   @value-changed=${(ev: Event) => (this.selectedArea = (ev.target as HTMLInputElement).value)}
                 >
                 </alarmo-chips>
               </div>
             `
-          : ''}
+        : ''}
         <alarmo-table
           ?selectable=${true}
           .columns=${columns}
           .data=${data}
           @row-click=${(ev: CustomEvent) => {
-            const id = String(ev.detail.id);
-            navigate(this, `/alarmo/sensors/edit/${id}`, true);
-          }}
+        const id = String(ev.detail.id);
+        navigate(this, `/alarmo/sensors/edit/${id}`, true);
+      }}
         >
           ${localize('panels.sensors.cards.sensors.no_items', this.hass.language)}
         </alarmo-table>
@@ -268,8 +268,8 @@ export class AlarmViewSensors extends SubscribeMixin(LitElement) {
         <div style="display: flex; justify-content: flex-end; padding: 8px 16px">
           <ha-switch
             @change=${(ev: Event) => {
-              this.showAllSensorEntities = (ev.target as HTMLInputElement).checked;
-            }}
+        this.showAllSensorEntities = (ev.target as HTMLInputElement).checked;
+      }}
             style="padding: 0px 8px"
           >
           </ha-switch>
@@ -295,8 +295,8 @@ export class AlarmViewSensors extends SubscribeMixin(LitElement) {
       checked && !this.addSelection.includes(id)
         ? [...this.addSelection, id]
         : !checked
-        ? this.addSelection.filter(e => e != id)
-        : this.addSelection;
+          ? this.addSelection.filter(e => e != id)
+          : this.addSelection;
   }
 
   toggleEnabled(ev: Event, id: string) {
@@ -322,8 +322,8 @@ export class AlarmViewSensors extends SubscribeMixin(LitElement) {
       .map(e =>
         Object.keys(this.areas).length == 1
           ? Object.assign(e, {
-              area: Object.keys(this.areas)[0],
-            })
+            area: Object.keys(this.areas)[0],
+          })
           : e
       )
       .filter(e => e) as AlarmoSensor[];
