@@ -1,40 +1,64 @@
-import { fireEvent, HomeAssistant } from 'custom-card-helpers';
+import { fireEvent } from 'custom-card-helpers';
 import { css, CSSResult, customElement, html, LitElement, property, TemplateResult } from 'lit-element';
 
-export type Option = {
+
+export type AlarmoChip = {
   name: string;
   value: string;
-  count?: number;
-};
+  icon?: string;
+  count?: Number;
+}
 
 @customElement('alarmo-chips')
 export class AlarmoChips extends LitElement {
-  @property({ attribute: false }) public hass!: HomeAssistant;
 
-  @property() items: Option[] = [];
-  @property() value: string | null = null;
+  @property()
+  items: AlarmoChip[] = [];
+
+  @property()
+  value: string | null = null;
+
+  @property({ type: Boolean })
+  selectable = false;
 
   protected render(): TemplateResult {
     return html`
-      ${this.items.map(e => {
-        return html`
-          <div class="chip ${this.value == e.value ? 'selected' : ''}" @click=${() => this.selectItem(e.value)}>
-            ${e.count !== undefined
-              ? html`
-                  <span class="count">${e.count > 99 ? 99 : e.count}</span>
-                `
-              : ''}
-            <span class="label">${e.name}</span>
+      ${
+      this.items.map(e =>
+        html`
+          <div
+            class="chip ${this.value == e.value ? 'selected' : ''}"
+            @click=${() => this.selectItem(e.value)}
+          >
+            ${this.renderBadge(e)}
+            <span class="label">
+              ${e.name}
+            </span>
           </div>
-        `;
-      })}
+        `)
+      }
+    `;
+  }
+
+  private renderBadge(item: AlarmoChip) {
+    return html`
+    ${
+      item.count !== undefined
+        ? html`<span class="count">${item.count > 99 ? 99 : item.count}</span>`
+        : ''
+      }
+    `;
+  }
+
+  private renderIcon(_item: AlarmoChip) {
+    return html`
     `;
   }
 
   selectItem(value: string) {
-    this.value = this.value == value ? null : value;
+    if (this.selectable) this.value = this.value == value ? null : value;
 
-    fireEvent(this, 'value-changed');
+    fireEvent(this, 'value-changed', { value: value });
   }
 
   static get styles(): CSSResult {
@@ -53,6 +77,7 @@ export class AlarmoChips extends LitElement {
         height: 32px;
         min-width: 35px;
         font-weight: 500;
+        font-size: 0.9rem;
         cursor: pointer;
         user-select: none;
       }
@@ -68,7 +93,7 @@ export class AlarmoChips extends LitElement {
         width: 20px;
         justify-content: center;
         align-items: flex-start;
-        font-size: 12px;
+        font-size: 0.8rem;
         line-height: 20px;
       }
       .chip:hover {

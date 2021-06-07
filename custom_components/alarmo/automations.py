@@ -171,3 +171,11 @@ class AutomationHandler:
                 self.hass,
                 service_call
             )
+
+    def get_automations_by_area(self, area_id: str):
+        result = []
+        for (automation_id, config) in self._config.items():
+            if any(el[const.ATTR_AREA] == area_id for el in config[const.ATTR_TRIGGERS]):
+                result.append(automation_id)
+
+        return result

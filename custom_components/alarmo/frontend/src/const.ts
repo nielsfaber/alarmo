@@ -47,3 +47,8 @@ export enum ESensorIcons {
   Environmental = 'hass:fire',
   Other = 'hass:contactless-payment-circle-outline',
 }
+
+export enum EAutomationTypes {
+  Notification = "notification",
+  Action = "action",
+}

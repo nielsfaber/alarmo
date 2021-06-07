@@ -1,18 +1,19 @@
 import { LitElement, html, customElement, property } from 'lit-element';
 import { HomeAssistant, navigate } from 'custom-card-helpers';
 
-import { prettyPrint, handleError } from '../helpers';
-import { AlarmoConfig, Dictionary, AlarmoUser } from '../types';
+import { prettyPrint, handleError } from '../../helpers';
+import { AlarmoConfig, Dictionary, AlarmoUser } from '../../types';
 
-import '../cards/user-editor-card.ts';
-import '../components/settings-row.ts';
-import '../components/alarmo-table.ts';
-import { commonStyle } from '../styles';
-import { localize } from '../../localize/localize';
-import { SubscribeMixin } from '../subscribe-mixin';
+import './user-editor-card.ts';
+import '../../components/settings-row.ts';
+import '../../components/alarmo-table.ts';
+
+import { commonStyle } from '../../styles';
+import { localize } from '../../../localize/localize';
+import { SubscribeMixin } from '../../subscribe-mixin';
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
-import { fetchConfig, fetchUsers, saveConfig } from '../data/websockets';
-import { TableData, TableColumn } from '../components/alarmo-table';
+import { fetchConfig, fetchUsers, saveConfig } from '../../data/websockets';
+import { TableData, TableColumn } from '../../components/alarmo-table';
 
 @customElement('alarm-view-codes')
 export class AlarmViewCodes extends SubscribeMixin(LitElement) {

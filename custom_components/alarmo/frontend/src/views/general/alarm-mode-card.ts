@@ -1,16 +1,16 @@
 import { LitElement, html, customElement, property } from 'lit-element';
 import { HomeAssistant } from 'custom-card-helpers';
-
-import '../components/time-slider';
-import '../components/alarmo-select';
-import { commonStyle } from '../styles';
-import { localize } from '../../localize/localize';
-import { AlarmoModeConfig, AlarmoConfig, EArmModes, Dictionary, AlarmoArea } from '../types';
-import { fetchAreas, saveArea } from '../data/websockets';
-import { handleError } from '../helpers';
-import { SubscribeMixin } from '../subscribe-mixin';
+import { commonStyle } from '../../styles';
+import { localize } from '../../../localize/localize';
+import { AlarmoModeConfig, AlarmoConfig, EArmModes, Dictionary, AlarmoArea } from '../../types';
+import { fetchAreas, saveArea } from '../../data/websockets';
+import { handleError } from '../../helpers';
+import { SubscribeMixin } from '../../subscribe-mixin';
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
-import { EArmModeIcons } from '../const';
+import { EArmModeIcons } from '../../const';
+
+import '../../components/time-slider';
+import '../../components/alarmo-select';
 
 @customElement('alarm-mode-card')
 export class AlarmModeCard extends SubscribeMixin(LitElement) {

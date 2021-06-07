@@ -11,11 +11,11 @@ import {
   TemplateResult,
   PropertyValues,
 } from 'lit-element';
-import { IsEqual } from '../helpers';
+import { IsEqual, isDefined } from '../helpers';
 
-type Option = {
+export type Option = {
   name: string;
-  description: string;
+  description?: string;
   value: string;
   icon?: string;
 };
@@ -29,7 +29,11 @@ export class AlarmoSelect extends LitElement {
   @property() items: Option[] = [];
   @property() clearable = false;
   @property() icons = false;
+  @property({ type: Boolean }) disabled = false;
   @internalProperty() private _opened?: boolean;
+
+  @property({ type: Boolean })
+  invalid = false;
 
   @query('vaadin-combo-box-light', true) private _comboBox!: HTMLElement;
   public open() {
@@ -47,7 +51,7 @@ export class AlarmoSelect extends LitElement {
   shouldUpdate(changedProps: PropertyValues) {
     if (changedProps.get('items')) {
       if (!IsEqual(this.items, changedProps.get('items') as Option[])) this.firstUpdated();
-      else return false;
+      else if (changedProps.size == 1) return false;
     }
     return true;
   }
@@ -64,6 +68,7 @@ export class AlarmoSelect extends LitElement {
         item-label-path="name"
         .value=${this._value}
         .renderer=${this.rowRenderer}
+        ?disabled=${this.disabled}
         @opened-changed=${this._openedChanged}
         @value-changed=${this._valueChanged}
       >
@@ -74,22 +79,24 @@ export class AlarmoSelect extends LitElement {
           autocomplete="off"
           autocorrect="off"
           spellcheck="false"
+          ?disabled=${this.disabled}
+          ?invalid=${this.invalid}
         >
-          ${this._value && this.items.find(e => e.value == this._value)
-            ? html`
+          ${isDefined(this._value) && this.items.find(e => e.value == this._value)
+        ? html`
                 ${this.icons
-                  ? html`
+            ? html`
                       <ha-icon slot="prefix" icon="${this.items.find(e => e.value == this._value)!.icon}"> </ha-icon>
                     `
-                  : ''}
+            : ''}
                 ${this.clearable
-                  ? html`
+            ? html`
                       <ha-icon-button slot="suffix" class="clear-button" @click=${this._clearValue} icon="hass:close">
                       </ha-icon-button>
                     `
-                  : ''}
-              `
             : ''}
+              `
+        : ''}
           <ha-icon-button
             slot="suffix"
             class="toggle-button"
@@ -140,7 +147,7 @@ export class AlarmoSelect extends LitElement {
         `;
     }
     root.querySelector('.name')!.textContent = entry.item.name;
-    root.querySelector('[secondary]')!.textContent = entry.item.description;
+    root.querySelector('[secondary]')!.textContent = entry.item.description || "";
     if (this.icons) (root.querySelector('ha-icon')! as any).icon = entry.item.icon;
   };
 
@@ -150,7 +157,7 @@ export class AlarmoSelect extends LitElement {
   }
 
   private get _value() {
-    return this.value || '';
+    return isDefined(this.value) ? this.value : '';
   }
 
   private _openedChanged(ev: CustomEvent) {

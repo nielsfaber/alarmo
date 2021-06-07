@@ -22,7 +22,8 @@
     },
     "editor": {
       "ui_mode": "Canvia a UI",
-      "yaml_mode": "Canvia a YAML"
+      "yaml_mode": "Canvia a YAML",
+      "edit_in_yaml": "Edit in YAML"
     }
   },
   "title": "Tauler alarma",
@@ -352,7 +353,7 @@
           },
           "filter": {
             "label": "Filtra per àrea",
-            "no_area": "Alarma mestra"
+            "no_area": "(Sense àrea)"
           }
         },
         "actions": {
@@ -367,11 +368,10 @@
         "new_notification": {
           "title": "Crea una notificació",
           "description": "Crea una nova notificació.",
+          "trigger": "Condition",
+          "action": "Task",
+          "options": "Options",
           "fields": {
-            "name": {
-              "heading": "Nom",
-              "description": "Descripció d'aquesta notificació"
-            },
             "event": {
               "heading": "Esdeveniment",
               "description": "Quan s'ha d'enviar la notificació",
@@ -412,11 +412,36 @@
             },
             "message": {
               "heading": "Missatge",
-              "description": "Contingut del missatge de notificació"
+              "description": "Contingut del missatge de notificació",
+              "insert_wildcard": "Insert wildcard",
+              "placeholders": {
+                "armed": "The alarm is set to {{arm_mode}}",
+                "disarmed": "The alarm is now OFF",
+                "triggered": "The alarm is triggered! Cause: {{open_sensors}}.",
+                "arm_failure": "The alarm could not be armed right now, due to: {{open_sensors}}.",
+                "arming": "The alarm will be armed soon, please leave the house.",
+                "pending": "The alarm is about to trigger, disarm it quickly!"
+              }
             },
             "target": {
               "heading": "Destinatari",
               "description": "Dispositiu al qual enviar el missatge"
+            },
+            "name": {
+              "heading": "Nom",
+              "description": "Descripció d'aquesta notificació",
+              "placeholders": {
+                "armed": "Notify {target} upon arming",
+                "disarmed": "Notify {target} upon disarming",
+                "triggered": "Notify {target} when triggered",
+                "arm_failure": "Notify {target} on failure",
+                "arming": "Notify {target} when leaving",
+                "pending": "Notify {target} when arriving"
+              }
+            },
+            "delete": {
+              "heading": "Delete automation",
+              "description": "Permanently remove this automation"
             }
           },
           "actions": {
@@ -427,10 +452,6 @@
           "title": "Crea una acció",
           "description": "Aquest tauler es pot utilitzar per canviar un dispositiu quan l'estat d'alarma canvia.",
           "fields": {
-            "name": {
-              "heading": "Nom",
-              "description": "Descripció d'aquesta acció"
-            },
             "event": {
               "heading": "Esdeveniment",
               "description": "Quan s'ha d'executar l'acció"
@@ -452,21 +473,21 @@
               "description": "Acció a realitzar a l'entitat",
               "turn_on": "Activa",
               "turn_off": "Desactiva"
+            },
+            "name": {
+              "heading": "Nom",
+              "description": "Descripció d'aquesta acció",
+              "placeholders": {
+                "armed": "Set {entity} to {state} upon arming",
+                "disarmed": "Set {entity} to {state} upon disarming",
+                "triggered": "Set {entity} to {state} when triggered",
+                "arm_failure": "Set {entity} to {state} on failure",
+                "arming": "Set {entity} to {state} when leaving",
+                "pending": "Set {entity} to {state} when arriving"
+              }
             }
           }
         }
-      },
-      "validation_errors": {
-        "no_triggers": "No s'ha proporcionat cap estat ni cap esdeveniment per activar aquesta automatització.",
-        "empty_trigger": "No s'ha proporcionat estat ni esdeveniment d'un dels activadors.",
-        "invalid_trigger": "Un dels activadors té un valor no vàlid: {trigger}",
-        "invalid_mode": "S'ha proporcionat una entrada no vàlida per al mode: {mode}",
-        "no_actions": "No s'han indicat accions per aquesta automatització",
-        "no_service": "Falta un servei a una de les accions.",
-        "invalid_service": "S'ha proporcionat un nom de servei no vàlid per a una de les accions: {service}",
-        "no_service_data": "No s'han proporcionat dades de servei per a una de les accions.",
-        "no_entity_in_service_data": "No s'ha proporcionat cap entity_id a la service_data d'una de les accions.",
-        "no_message_in_service_data": "No s'ha proporcionat cap missatge a la service_data d'una de les accions."
       }
     }
   }

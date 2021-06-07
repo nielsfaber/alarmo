@@ -136,7 +136,7 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
   private async deleteClick(ev: Event) {
     if (!this.area_id) return;
     const sensors = Object.values(this.sensors).filter(e => e.area == this.area_id).length;
-    const automations = Object.values(this.automations).filter(e => e.area == this.area_id).length;
+    const automations = Object.values(this.automations).filter(e => e.triggers?.map(e => e.area).includes(this.area_id)).length;
     let result = false;
     if (sensors || automations) {
       result = await new Promise(resolve => {

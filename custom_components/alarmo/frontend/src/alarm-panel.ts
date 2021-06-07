@@ -2,10 +2,10 @@ import { LitElement, html, customElement, property, CSSResult, css } from 'lit-e
 import { HomeAssistant, navigate } from 'custom-card-helpers';
 import { loadHaForm } from './load-ha-form';
 
-import './views/view-general.ts';
-import './views/view-sensors.ts';
-import './views/view-codes.ts';
-import './views/view-actions.ts';
+import './views/general/view-general.ts';
+import './views/sensors/view-sensors.ts';
+import './views/codes/view-codes.ts';
+import './views/actions/view-actions.ts';
 
 import { commonStyle } from './styles';
 import { VERSION } from './const';

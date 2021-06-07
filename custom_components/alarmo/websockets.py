@@ -281,16 +281,26 @@ class AlarmoAutomationView(HomeAssistantView):
             {
                 vol.Optional(const.ATTR_AUTOMATION_ID): cv.string,
                 vol.Optional(ATTR_NAME): cv.string,
+                vol.Optional(const.ATTR_TYPE): cv.string,
                 vol.Optional(const.ATTR_TRIGGERS): vol.All(
                     cv.ensure_list,
                     [vol.Any(
                         vol.Schema(
                             {
                                 vol.Required(const.ATTR_EVENT): cv.string,
+                                vol.Optional(const.ATTR_AREA): vol.Any(
+                                    int,
+                                    cv.string,
+                                ),
+                                vol.Optional(const.ATTR_MODES): vol.All(
+                                    cv.ensure_list,
+                                    [vol.In(const.ARM_MODES)]
+                                ),
                             }
                         ),
                         vol.Schema(
                             {
+                                vol.Required(ATTR_ENTITY_ID): cv.string,
                                 vol.Required(ATTR_STATE): cv.string,
                             }
                         )
@@ -306,14 +316,8 @@ class AlarmoAutomationView(HomeAssistantView):
                         }
                     )]
                 ),
-                vol.Optional(const.ATTR_MODES): vol.All(
-                    cv.ensure_list,
-                    [vol.In(const.ARM_MODES)]
-                ),
                 vol.Optional(const.ATTR_ENABLED): cv.boolean,
                 vol.Optional(const.ATTR_REMOVE): cv.boolean,
-                vol.Optional(const.ATTR_IS_NOTIFICATION): cv.boolean,
-                vol.Optional(const.ATTR_AREA): cv.string,
             }
         )
     )

@@ -1,18 +1,18 @@
 import { LitElement, html, customElement, property } from 'lit-element';
 import { HomeAssistant, navigate } from 'custom-card-helpers';
-import { loadHaForm } from '../load-ha-form';
-import { AlarmoConfig, MqttConfig, AlarmoArea, Dictionary } from '../types';
-import { commonStyle } from '../styles';
+import { loadHaForm } from '../../load-ha-form';
+import { AlarmoConfig, MqttConfig, AlarmoArea, Dictionary } from '../../types';
+import { commonStyle } from '../../styles';
 
-import '../components/settings-row.ts';
-import '../components/collapsible-section.ts';
+import '../../components/settings-row.ts';
+import '../../components/collapsible-section.ts';
 
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
-import { fetchConfig, saveConfig, fetchAreas } from '../data/websockets';
-import { SubscribeMixin } from '../subscribe-mixin';
-import { localize } from '../../localize/localize';
-import { omit, handleError, prettyPrint, filterState, commandToState, Assign } from '../helpers';
-import { AlarmStates, AlarmCommands } from '../const';
+import { fetchConfig, saveConfig, fetchAreas } from '../../data/websockets';
+import { SubscribeMixin } from '../../subscribe-mixin';
+import { localize } from '../../../localize/localize';
+import { handleError, prettyPrint, filterState, commandToState, Assign } from '../../helpers';
+import { AlarmStates, AlarmCommands } from '../../const';
 
 @customElement('mqtt-config-card')
 export class MqttConfigCard extends SubscribeMixin(LitElement) {
@@ -35,7 +35,7 @@ export class MqttConfigCard extends SubscribeMixin(LitElement) {
     const config = await fetchConfig(this.hass);
     this.config = config;
     this.areas = await fetchAreas(this.hass);
-    this.selection = omit(config.mqtt, ['availability_topic']) as MqttConfig;
+    this.selection = config.mqtt;
   }
 
   firstUpdated() {

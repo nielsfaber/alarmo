@@ -139,10 +139,9 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                 if data["master"]["enabled"]:
                     async_dispatcher_send(self.hass, "alarmo_register_master", data["master"])
                 else:
-                    automations = self.store.async_get_automations()
-                    automations = dict(filter(lambda el: el[1]["area"] is None, automations.items()))
-                    if automations:
-                        for el in automations.keys():
+                    automations = self.hass.data[const.DOMAIN]["automation_handler"].get_automations_by_area(None)
+                    if len(automations):
+                        for el in automations:
                             self.store.async_delete_automation(el)
                         async_dispatcher_send(self.hass, "alarmo_automations_updated")
 
@@ -162,10 +161,9 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                     self.store.async_delete_sensor(el)
                 async_dispatcher_send(self.hass, "alarmo_sensors_updated")
 
-            automations = self.store.async_get_automations()
-            automations = dict(filter(lambda el: el[1]["area"] == area_id, automations.items()))
-            if automations:
-                for el in automations.keys():
+            automations = self.hass.data[const.DOMAIN]["automation_handler"].get_automations_by_area(area_id)
+            if len(automations):
+                for el in automations:
                     self.store.async_delete_automation(el)
                 async_dispatcher_send(self.hass, "alarmo_automations_updated")
 

@@ -2,19 +2,19 @@ import { LitElement, html, customElement, property } from 'lit-element';
 import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
 import { HomeAssistant, fireEvent } from 'custom-card-helpers';
 
-import { prettyPrint } from '../helpers';
-import { AlarmoConfig, Dictionary, AlarmoArea, AlarmoSensor, AlarmoAutomation } from '../types';
+import { prettyPrint } from '../../helpers';
+import { AlarmoConfig, Dictionary, AlarmoArea, AlarmoSensor, AlarmoAutomation } from '../../types';
 
-import '../components/settings-row.ts';
-import '../components/alarmo-table.ts';
-import '../dialogs/create-area-dialog';
+import '../../components/settings-row.ts';
+import '../../components/alarmo-table.ts';
+import '../../dialogs/create-area-dialog';
 
-import { commonStyle } from '../styles';
-import { localize } from '../../localize/localize';
-import { SubscribeMixin } from '../subscribe-mixin';
+import { commonStyle } from '../../styles';
+import { localize } from '../../../localize/localize';
+import { SubscribeMixin } from '../../subscribe-mixin';
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
-import { fetchAreas, fetchSensors, fetchAutomations } from '../data/websockets';
-import { TableData, TableColumn } from '../components/alarmo-table';
+import { fetchAreas, fetchSensors, fetchAutomations } from '../../data/websockets';
+import { TableData, TableColumn } from '../../components/alarmo-table';
 
 @customElement('area-config-card')
 export class AreaConfigCard extends SubscribeMixin(LitElement) {
@@ -67,8 +67,8 @@ export class AreaConfigCard extends SubscribeMixin(LitElement) {
       const sensors = Object.values(this.sensors).filter(e => e.area == item.area_id).length;
       const automations =
         Object.values(areas).length == 1
-          ? Object.values(this.automations).filter(e => !e.area || e.area == item.area_id).length
-          : Object.values(this.automations).filter(e => e.area == item.area_id).length;
+          ? Object.values(this.automations).filter(e => e.triggers?.map(e => e.area).includes(item.area_id) || !e.triggers?.map(e => e.area).length).length
+          : Object.values(this.automations).filter(e => e.triggers?.map(e => e.area).includes(item.area_id)).length;
       const summary_sensors = `<a href="/alarmo/sensors/filter/${item.area_id}">${localize(
         'panels.general.cards.areas.table.summary_sensors',
         this.hass!.language,
@@ -121,7 +121,7 @@ export class AreaConfigCard extends SubscribeMixin(LitElement) {
     const element = ev.target as HTMLElement;
     fireEvent(element, 'show-dialog', {
       dialogTag: 'create-area-dialog',
-      dialogImport: () => import('../dialogs/create-area-dialog'),
+      dialogImport: () => import('../../dialogs/create-area-dialog'),
       dialogParams: {},
     });
   }
@@ -130,7 +130,7 @@ export class AreaConfigCard extends SubscribeMixin(LitElement) {
     const element = ev.target as HTMLElement;
     fireEvent(element, 'show-dialog', {
       dialogTag: 'create-area-dialog',
-      dialogImport: () => import('../dialogs/create-area-dialog'),
+      dialogImport: () => import('../../dialogs/create-area-dialog'),
       dialogParams: { area_id: area_id },
     });
   }

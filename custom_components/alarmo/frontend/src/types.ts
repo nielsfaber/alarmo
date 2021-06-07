@@ -70,56 +70,34 @@ export type AlarmoUser = {
   is_override_code: boolean;
 };
 
-export type Trigger = {
-  state?: string;
-  event?: string;
-};
-
-export type Action = {
-  service: string;
-  service_data?: Dictionary<any> & { entity_id?: string };
-};
-
-export type NotificationAction = {
-  service: string;
-  service_data: Dictionary<any> & {
-    title?: string;
-    message: string;
-  };
-};
-
-export enum EAlarmStates {
-  Disarmed = 'disarmed',
-  Armed = 'armed',
-  Triggered = 'triggered',
-  Pending = 'pending',
-  Arming = 'arming',
+export type AutomationTrigger = {
+  event?: EAlarmEvent,
+  area?: string | number,
+  modes?: EArmModes[]
 }
 
-export enum EAlarmEvents {
-  ArmFailure = 'arm_failure',
+export type AutomationAction = {
+  service?: string;
+  service_data?: Dictionary<any> & { entity_id?: any, message?: any, title?: any };
 }
 
 export interface AlarmoAutomation {
   automation_id?: string;
   name?: string;
-  triggers: Trigger[];
-  actions: Action[];
+  triggers: [AutomationTrigger, ...AutomationTrigger[]];
+  actions: [AutomationAction, ...AutomationAction[]];
   enabled?: boolean;
-  modes?: EArmModes[];
-  is_notification?: boolean;
-  area?: string;
+  type: string;
 }
 
-export interface AlarmoNotification extends AlarmoAutomation {
-  automation_id?: string;
-  name?: string;
-  triggers: Trigger[];
-  actions: NotificationAction[];
-  enabled?: boolean;
-  modes?: EArmModes[];
-  area?: string;
-}
+export enum EAlarmEvent {
+  Armed = 'armed',
+  Disarmed = 'disarmed',
+  Triggered = 'triggered',
+  ArmFailure = 'arm_failure',
+  Arming = 'arming',
+  Pending = 'pending',
+};
 
 export type MqttConfig = {
   enabled: boolean;

@@ -1,22 +1,22 @@
 import { LitElement, html, customElement, property } from 'lit-element';
 import { HomeAssistant, navigate, fireEvent } from 'custom-card-helpers';
-import { loadHaForm } from '../load-ha-form';
-import { AlarmoConfig, Dictionary, AlarmoArea, AlarmoAutomation } from '../types';
-import { commonStyle } from '../styles';
+import { loadHaForm } from '../../load-ha-form';
+import { AlarmoConfig, Dictionary, AlarmoArea, AlarmoAutomation } from '../../types';
+import { commonStyle } from '../../styles';
 
-import '../components/time-slider';
-import '../cards/alarm-mode-card';
-import '../components/settings-row.ts';
-import '../cards/mqtt-config-card.ts';
-import '../cards/area-config-card.ts';
-import '../dialogs/edit-master-dialog.ts';
-import '../dialogs/confirm-delete-dialog.ts';
+import './alarm-mode-card';
+import './mqtt-config-card.ts';
+import './area-config-card.ts';
+import '../../components/time-slider';
+import '../../components/settings-row.ts';
+import '../../dialogs/edit-master-dialog.ts';
+import '../../dialogs/confirm-delete-dialog.ts';
 
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
-import { fetchConfig, saveConfig, fetchAreas, fetchAutomations } from '../data/websockets';
-import { SubscribeMixin } from '../subscribe-mixin';
-import { localize } from '../../localize/localize';
-import { pick, handleError } from '../helpers';
+import { fetchConfig, saveConfig, fetchAreas, fetchAutomations } from '../../data/websockets';
+import { SubscribeMixin } from '../../subscribe-mixin';
+import { localize } from '../../../localize/localize';
+import { pick, handleError } from '../../helpers';
 
 @customElement('alarm-view-general')
 export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
@@ -164,7 +164,7 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
     const element = ev.target as HTMLElement;
     fireEvent(element, 'show-dialog', {
       dialogTag: 'edit-master-dialog',
-      dialogImport: () => import('../dialogs/edit-master-dialog'),
+      dialogImport: () => import('../../dialogs/edit-master-dialog'),
       dialogParams: {},
     });
   }
@@ -173,12 +173,12 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
     const target = ev.target as HTMLInputElement;
     let enabled = target.checked;
     if (!enabled) {
-      const automations = Object.values(this.automations).filter(e => !e.area).length;
+      const automations = Object.values(this.automations).filter(e => !e.triggers?.map(e => e.area).length).length;
       if (automations) {
         const result = await new Promise(resolve => {
           fireEvent(target, 'show-dialog', {
             dialogTag: 'confirm-delete-dialog',
-            dialogImport: () => import('../dialogs/confirm-delete-dialog'),
+            dialogImport: () => import('../../dialogs/confirm-delete-dialog'),
             dialogParams: {
               title: localize('panels.general.dialogs.disable_master.title', this.hass!.language),
               description: localize(

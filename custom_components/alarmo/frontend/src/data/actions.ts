@@ -1,200 +1,261 @@
-import { EAlarmStates, EAlarmEvents, AlarmoNotification, Dictionary, AlarmoAutomation, EArmModes } from '../types';
-import { HomeAssistant, computeDomain, computeEntity } from 'custom-card-helpers';
-import { localize } from '../../localize/localize';
+import { localize } from "../../localize/localize";
+import { EArmModes, AlarmoArea, EAlarmEvent, Dictionary, AlarmoConfig } from "../types";
+import { EArmModeIcons } from "../const";
 
-export const triggerOptions = (hass: HomeAssistant) => [
-  {
-    value: EAlarmStates.Armed,
-    name: localize('panels.actions.cards.new_notification.fields.event.choose.armed.name', hass.language),
-    description: localize('panels.actions.cards.new_notification.fields.event.choose.armed.description', hass.language),
-    icon: 'hass:shield-check-outline',
-    trigger: {
-      state: EAlarmStates.Armed,
-    },
-  },
-  {
-    value: EAlarmStates.Disarmed,
-    name: localize('panels.actions.cards.new_notification.fields.event.choose.disarmed.name', hass.language),
-    description: localize(
-      'panels.actions.cards.new_notification.fields.event.choose.disarmed.description',
-      hass.language
-    ),
-    icon: 'hass:shield-off-outline',
-    trigger: {
-      state: EAlarmStates.Disarmed,
-    },
-  },
-  {
-    value: EAlarmStates.Triggered,
-    name: localize('panels.actions.cards.new_notification.fields.event.choose.triggered.name', hass.language),
-    description: localize(
-      'panels.actions.cards.new_notification.fields.event.choose.triggered.description',
-      hass.language
-    ),
-    icon: 'hass:bell-alert-outline',
-    trigger: {
-      state: EAlarmStates.Triggered,
-    },
-  },
-  {
-    value: EAlarmEvents.ArmFailure,
-    name: localize('panels.actions.cards.new_notification.fields.event.choose.arm_failure.name', hass.language),
-    description: localize(
-      'panels.actions.cards.new_notification.fields.event.choose.arm_failure.description',
-      hass.language
-    ),
-    icon: 'hass:alert-outline',
-    trigger: {
-      event: EAlarmEvents.ArmFailure,
-    },
-  },
-  {
-    value: EAlarmStates.Arming,
-    name: localize('panels.actions.cards.new_notification.fields.event.choose.arming.name', hass.language),
-    description: localize(
-      'panels.actions.cards.new_notification.fields.event.choose.arming.description',
-      hass.language
-    ),
-    icon: 'hass:home-export-outline',
-    trigger: {
-      state: EAlarmStates.Arming,
-    },
-  },
-  {
-    value: EAlarmStates.Pending,
-    name: localize('panels.actions.cards.new_notification.fields.event.choose.pending.name', hass.language),
-    description: localize(
-      'panels.actions.cards.new_notification.fields.event.choose.pending.description',
-      hass.language
-    ),
-    icon: 'hass:home-import-outline',
-    trigger: {
-      state: EAlarmStates.Pending,
-    },
-  },
+import { computeDomain, computeEntity, HomeAssistant, computeStateDisplay, stateIcon, domainIcon } from "custom-card-helpers";
+import { Unique, flatten, isDefined } from "../helpers";
+
+export const computeArmModeDisplay = (val: EArmModes, hass: HomeAssistant) => {
+  switch (val) {
+    case EArmModes.ArmedAway:
+      return {
+        value: EArmModes.ArmedAway,
+        name: localize('common.modes_long.armed_away', hass.language),
+        icon: EArmModeIcons.ArmedAway,
+      };
+    case EArmModes.ArmedHome:
+      return {
+        value: EArmModes.ArmedHome,
+        name: localize('common.modes_long.armed_home', hass.language),
+        icon: EArmModeIcons.ArmedHome
+      };
+    case EArmModes.ArmedNight:
+      return {
+        value: EArmModes.ArmedNight,
+        name: localize('common.modes_long.armed_night', hass.language),
+        icon: EArmModeIcons.ArmedNight
+      };
+    case EArmModes.ArmedCustom:
+      return {
+        value: EArmModes.ArmedCustom,
+        name: localize('common.modes_long.armed_custom_bypass', hass.language),
+        icon: EArmModeIcons.ArmedCustom
+      };
+  }
+}
+
+export const computeEventDisplay = (event: EAlarmEvent, hass: HomeAssistant) => {
+  switch (event) {
+    case EAlarmEvent.Armed:
+      return {
+        value: EAlarmEvent.Armed,
+        name: localize('panels.actions.cards.new_notification.fields.event.choose.armed.name', hass.language),
+        description: localize('panels.actions.cards.new_notification.fields.event.choose.armed.description', hass.language),
+        icon: 'hass:shield-check-outline'
+      };
+    case EAlarmEvent.Disarmed:
+      return {
+        value: EAlarmEvent.Disarmed,
+        name: localize('panels.actions.cards.new_notification.fields.event.choose.disarmed.name', hass.language),
+        description: localize('panels.actions.cards.new_notification.fields.event.choose.disarmed.description', hass.language),
+        icon: 'hass:shield-off-outline',
+      };
+    case EAlarmEvent.Triggered:
+      return {
+        value: EAlarmEvent.Triggered,
+        name: localize('panels.actions.cards.new_notification.fields.event.choose.triggered.name', hass.language),
+        description: localize('panels.actions.cards.new_notification.fields.event.choose.triggered.description', hass.language),
+        icon: 'hass:bell-alert-outline',
+      };
+    case EAlarmEvent.ArmFailure:
+      return {
+        value: EAlarmEvent.ArmFailure,
+        name: localize('panels.actions.cards.new_notification.fields.event.choose.arm_failure.name', hass.language),
+        description: localize('panels.actions.cards.new_notification.fields.event.choose.arm_failure.description', hass.language),
+        icon: 'hass:alert-outline'
+      };
+    case EAlarmEvent.Arming:
+      return {
+        value: EAlarmEvent.Arming,
+        name: localize('panels.actions.cards.new_notification.fields.event.choose.arming.name', hass.language),
+        description: localize('panels.actions.cards.new_notification.fields.event.choose.arming.description', hass.language),
+        icon: 'hass:home-export-outline'
+      };
+    case EAlarmEvent.Pending:
+      return {
+        value: EAlarmEvent.Pending,
+        name: localize('panels.actions.cards.new_notification.fields.event.choose.pending.name', hass.language),
+        description: localize('panels.actions.cards.new_notification.fields.event.choose.pending.description', hass.language),
+        icon: 'hass:home-import-outline'
+      }
+  }
+}
+
+export const computeAreaDisplay = (area: string | number, areaConfig: Dictionary<AlarmoArea>, alarmoConfig: AlarmoConfig) => {
+  if (area == 0) {
+    return {
+      name: alarmoConfig.master.name,
+      value: 0
+    }
+  }
+  else if (Object.keys(areaConfig).includes(String(area))) {
+    return {
+      name: areaConfig[area].name,
+      value: area
+    }
+  }
+  else {
+    return {
+      name: String(area),
+      value: area
+    }
+  }
+}
+
+
+export const computeServiceDisplay = (hass: HomeAssistant, ...services: (string | undefined)[]) => {
+
+  let output = services.map(service => {
+    if (!service) return null;
+    const domain = computeDomain(service);
+    const domainService = computeEntity(service);
+
+    let data = {
+      value: service,
+      name: domainService.replace(/_/g, ' ').split(' ').map(e => e.substring(0, 1).toUpperCase() + e.substring(1)).join(' '),
+      icon: 'hass:home',
+      description: service
+    }
+
+    switch (domain) {
+      case 'notify':
+        const stateObj = hass.states[`device_tracker.${domainService.replace('mobile_app_', '')}`];
+        data = stateObj
+          ? {
+            ...data,
+            name: stateObj.attributes.friendly_name || computeEntity(stateObj.entity_id),
+            icon: stateObj.attributes.icon || 'hass:cellphone-text',
+          }
+          : { ...data, icon: 'hass:comment-alert' };
+        break;
+      case 'tts':
+        data = { ...data, icon: 'hass:microphone' };
+        break;
+    }
+
+    return data;
+  })
+    .filter(isDefined);
+  output.sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1));
+
+  return output;
+}
+
+export const getAreaOptions = (areaConfig: Dictionary<AlarmoArea>, alarmoConfig: AlarmoConfig) => {
+
+  let areas: (string | number)[] = [];
+
+  const area_ids = Object.keys(areaConfig)
+    .filter(e => Object.values(areaConfig[e].modes).some(v => v.enabled));
+
+  if (alarmoConfig.master.enabled && area_ids.length > 1)
+    areas = [...areas, 0];
+
+  areas = [...areas, ...area_ids];
+  return areas;
+}
+
+export const getArmModeOptions = (area: string | number | undefined, areaConfig: Dictionary<AlarmoArea>) => {
+  const areaList = (areaCfg: AlarmoArea) => (Object.keys(areaCfg.modes) as EArmModes[]).filter(mode => areaCfg.modes[mode].enabled);
+
+  if (!isDefined(area) || !Object.keys(areaConfig).includes(String(area))) {
+    const modeLists = Object.keys(areaConfig).map(e => areaList(areaConfig[e]));
+    return modeLists[0].filter(e => modeLists.every(m => m.includes(e)));
+  }
+  else {
+    return areaList(areaConfig[area]);
+  }
+};
+
+export const computeEntityDisplay = (entity_id: string[], hass: HomeAssistant) => {
+
+
+  let data = entity_id.map(e => {
+    let output = {
+      value: e,
+      name: hass.states[e].attributes.friendly_name || computeEntity(e),
+      icon: hass.states[e].attributes.icon || domainIcon(computeDomain(e)),
+      description: e
+    };
+    return output;
+  });
+  data.sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1));
+
+  return data;
+}
+
+export const getNotifyServices = (hass: HomeAssistant) => [
+  ...Object.keys(hass.services.notify).map(service => `notify.${service}`)
 ];
 
-export function targetOptions(hass: HomeAssistant) {
-  const list = Object.keys(hass.services.notify).map(e => {
-    let data = {
-      value: `notify.${e}`,
-      name: e,
-    };
-    const stateObj = hass.states[`device_tracker.${e.replace('mobile_app_', '')}`];
-    if (stateObj) data = { ...data, name: stateObj.attributes.friendly_name || computeEntity(stateObj.entity_id) };
-    return data;
-  });
+export const getAutomationEntities = (hass: HomeAssistant) => [
+  ...Object.keys(hass.states)
+    .filter(e => ['light', 'switch', 'input_boolean', 'script'].includes(computeDomain(e)))
+];
 
-  list.sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1));
-  return list;
+export const getWildcardOptions = (event?: EAlarmEvent) => {
+  let options: { name: string, value: string }[] = [];
+
+  options = [];
+
+  if (!event || [EAlarmEvent.Pending, EAlarmEvent.Triggered, EAlarmEvent.ArmFailure].includes(event))
+    options = [...options, {
+      name: "Open Sensors",
+      value: "{{open_sensors}}",
+    }];
+
+  if (!event || [EAlarmEvent.Armed].includes(event))
+    options = [...options, {
+      name: "Bypassed Sensors",
+      value: "{{bypassed_sensors}}",
+    }];
+
+  if (!event || [EAlarmEvent.Armed, EAlarmEvent.Arming, EAlarmEvent.Disarmed].includes(event))
+    options = [...options, {
+      name: "Changed By",
+      value: "{{changed_by}}",
+    }];
+
+  if (!event || [EAlarmEvent.Armed, EAlarmEvent.Arming, EAlarmEvent.Pending, EAlarmEvent.Triggered, EAlarmEvent.ArmFailure].includes(event))
+    options = [...options, {
+      name: "Arm Mode",
+      value: "{{arm_mode}}",
+    }];
+
+  return options;
 }
 
-export type notificationFormData = {
-  name: string;
-  triggers: string[];
-  title: string;
-  message: string;
-  targets: string[];
-  args: Dictionary<any>;
+export const isValidString = (input: any) => {
+  return typeof input == 'string' && input.trim().length
 };
 
-export const defaultNotificationData: AlarmoNotification = {
-  name: '',
-  triggers: [],
-  actions: [
-    {
-      service: '',
-      service_data: {
-        message: '',
-      },
-    },
-  ],
+export const isValidService = (input: any, hass: HomeAssistant) => {
+  return (
+    isValidString(input) &&
+    hass.services[computeDomain(input)] &&
+    hass.services[computeDomain(input)][computeEntity(input)]
+  );
 };
 
-export const defaultAutomationData: AlarmoAutomation = {
-  name: '',
-  triggers: [],
-  actions: [
-    {
-      service: '',
-      service_data: {},
-    },
-  ],
+export const isValidEntity = (input: any, hass: HomeAssistant) => {
+  return (
+    isValidString(input) &&
+    hass.states[input]
+  );
 };
 
-export function messagePlaceHolder(data: AlarmoNotification) {
-  if (data.triggers?.length != 1) return '';
+export const isObject = (input: any) => (
+  typeof input === "object" &&
+  input !== null &&
+  !Array.isArray(input)
+);
 
-  if (data.triggers[0].state) {
-    switch (data.triggers[0].state) {
-      case EAlarmStates.Armed:
-        return 'The alarm is now ON.';
-      case EAlarmStates.Disarmed:
-        return 'The alarm is now OFF.';
-      case EAlarmStates.Arming:
-        return 'The alarm will be armed soon, please leave the house.';
-      case EAlarmStates.Pending:
-        return 'The alarm is about to trigger, disarm it quickly!';
-      case EAlarmStates.Triggered:
-        return 'The alarm is triggered! Cause: {{open_sensors}}.';
-      default:
-        return '';
-    }
-  } else if (data.triggers[0].event) {
-    switch (data.triggers[0].event) {
-      case EAlarmEvents.ArmFailure:
-        return 'The alarm could not be armed right now, due to: {{open_sensors}}.';
-      default:
-        return '';
-    }
-  }
+export const isArray = (input: any) => (
+  typeof input === "object" &&
+  input !== null &&
+  Array.isArray(input)
+);
 
-  return '';
-}
-
-export const ActionDomains = ['switch', 'input_boolean', 'light', 'script'];
-
-export function validateData(data: AlarmoAutomation | AlarmoNotification, hass: HomeAssistant) {
-  if (!data.triggers?.length) return localize('panels.actions.validation_errors.no_triggers', hass.language);
-
-  for (let i = 0; i < data.triggers.length; i++) {
-    const trigger = data.triggers[i];
-    if (!trigger.event && !trigger.state)
-      return localize('panels.actions.validation_errors.empty_trigger', hass.language);
-    if (!triggerOptions(hass).find(e => JSON.stringify(e.trigger) === JSON.stringify(trigger)))
-      return localize(
-        'panels.actions.validation_errors.invalid_trigger',
-        hass.language,
-        '{trigger}',
-        JSON.stringify(trigger)
-      );
-  }
-
-  if (data.modes !== undefined && data.modes.length) {
-    for (let i = 0; i < data.modes.length; i++) {
-      const mode = data.modes[i];
-      if (!Object.values(EArmModes).includes(mode))
-        return localize('panels.actions.validation_errors.empty_trigger', hass.language, '{mode}', mode);
-    }
-  }
-  if (!data.actions?.length) return localize('panels.actions.validation_errors.no_actions', hass.language);
-  for (let i = 0; i < data.actions.length; i++) {
-    const action = data.actions[i];
-    if (!action.service) return localize('panels.actions.validation_errors.no_service', hass.language);
-    if (!Object.keys(hass.services).includes(computeDomain(action.service)))
-      return localize('panels.actions.validation_errors.invalid_service', hass.language, '{service}', action.service);
-    if (!Object.keys(hass.services[computeDomain(action.service)]).includes(computeEntity(action.service)))
-      return localize('panels.actions.validation_errors.invalid_service', hass.language, '{service}', action.service);
-    if (!action.service_data || !Object.keys(action.service_data).length)
-      return localize('panels.actions.validation_errors.no_service_data', hass.language);
-    if (data.is_notification) {
-      if (!Object.keys(action.service_data).includes('message') || !action.service_data.message.length)
-        return localize('panels.actions.validation_errors.no_message_in_service_data', hass.language);
-    } else {
-      if (!Object.keys(action.service_data).includes('entity_id'))
-        return localize('panels.actions.validation_errors.no_entity_in_service_data', hass.language);
-    }
-  }
-
-  return;
-}
+export const isString = (input: any) => (
+  typeof input === "string"
+);

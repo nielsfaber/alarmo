@@ -1,10 +1,10 @@
 import { LitElement, html, customElement, property } from 'lit-element';
 import { HomeAssistant, navigate } from 'custom-card-helpers';
-import { commonStyle } from '../styles';
-import { AlarmoConfig, AlarmoUser, Dictionary } from '../types';
-import { fetchUsers, saveUser, deleteUser } from '../data/websockets';
-import { localize } from '../../localize/localize';
-import { omit, pick, showErrorDialog, handleError } from '../helpers';
+import { commonStyle } from '../../styles';
+import { AlarmoConfig, AlarmoUser, Dictionary } from '../../types';
+import { fetchUsers, saveUser, deleteUser } from '../../data/websockets';
+import { localize } from '../../../localize/localize';
+import { omit, pick, showErrorDialog, handleError } from '../../helpers';
 
 @customElement('user-editor-card')
 export class UserEditorCard extends LitElement {
@@ -57,20 +57,20 @@ export class UserEditorCard extends LitElement {
         <div class="card-header">
           <div class="name">
             ${this.item
-              ? localize('panels.codes.cards.edit_user.title', this.hass.language)
-              : localize('panels.codes.cards.new_user.title', this.hass.language)}
+        ? localize('panels.codes.cards.edit_user.title', this.hass.language)
+        : localize('panels.codes.cards.new_user.title', this.hass.language)}
           </div>
           <ha-icon-button icon="hass:close" @click=${this.cancelClick}> </ha-icon-button>
         </div>
         <div class="card-content">
           ${this.item
-            ? localize(
-                'panels.codes.cards.edit_user.description',
-                this.hass.language,
-                '{name}',
-                this.users![this.item].name
-              )
-            : localize('panels.codes.cards.new_user.description', this.hass.language)}
+        ? localize(
+          'panels.codes.cards.edit_user.description',
+          this.hass.language,
+          '{name}',
+          this.users![this.item].name
+        )
+        : localize('panels.codes.cards.new_user.description', this.hass.language)}
         </div>
 
         <settings-row .narrow=${this.narrow}>
@@ -89,7 +89,7 @@ export class UserEditorCard extends LitElement {
         </settings-row>
 
         ${this.item
-          ? html`
+        ? html`
               <settings-row .narrow=${this.narrow}>
                 <span slot="heading"
                   >${localize('panels.codes.cards.edit_user.fields.old_code.heading', this.hass.language)}</span
@@ -104,15 +104,15 @@ export class UserEditorCard extends LitElement {
                   type="password"
                   value=${this.data.old_code}
                   @change=${(ev: Event) =>
-                    (this.data = { ...this.data!, old_code: (ev.target as HTMLInputElement).value })}
+            (this.data = { ...this.data!, old_code: (ev.target as HTMLInputElement).value })}
                 >
                 </paper-input>
               </settings-row>
             `
-          : ''}
+        : ''}
         ${this.item && !this.data.old_code.length
-          ? ''
-          : html`
+        ? ''
+        : html`
               <settings-row .narrow=${this.narrow}>
                 <span slot="heading"
                   >${localize('panels.codes.cards.new_user.fields.code.heading', this.hass.language)}</span
@@ -145,7 +145,7 @@ export class UserEditorCard extends LitElement {
                   type="password"
                   value=${this.data.confirm_code}
                   @change=${(ev: Event) =>
-                    (this.data = { ...this.data!, confirm_code: (ev.target as HTMLInputElement).value })}
+            (this.data = { ...this.data!, confirm_code: (ev.target as HTMLInputElement).value })}
                 >
                 </paper-input>
               </settings-row>
@@ -194,7 +194,7 @@ export class UserEditorCard extends LitElement {
             ?checked=${this.data.can_disarm || this.data.is_admin}
             ?disabled=${this.data.is_admin}
             @change=${(ev: Event) =>
-              (this.data = { ...this.data!, can_disarm: (ev.target as HTMLInputElement).checked })}
+        (this.data = { ...this.data!, can_disarm: (ev.target as HTMLInputElement).checked })}
           >
           </ha-switch>
         </settings-row>
@@ -210,7 +210,7 @@ export class UserEditorCard extends LitElement {
           <ha-switch
             ?checked=${this.data.is_override_code}
             @change=${(ev: Event) =>
-              (this.data = { ...this.data!, is_override_code: (ev.target as HTMLInputElement).checked })}
+        (this.data = { ...this.data!, is_override_code: (ev.target as HTMLInputElement).checked })}
           >
           </ha-switch>
         </settings-row>
@@ -221,12 +221,12 @@ export class UserEditorCard extends LitElement {
           </mwc-button>
 
           ${this.item
-            ? html`
+        ? html`
                 <mwc-button class="warning" @click=${this.deleteClick}>
                   ${this.hass.localize('ui.common.delete')}
                 </mwc-button>
               `
-            : ''}
+        : ''}
         </div>
       </ha-card>
     `;
@@ -253,7 +253,7 @@ export class UserEditorCard extends LitElement {
       if (this.data.is_admin) this.data = { ...this.data, can_arm: true, can_disarm: true };
 
       if (!this.item) {
-        saveUser(this.hass, omit(this.data, ['confirm_code', 'old_code']))
+        saveUser(this.hass, omit(this.data, 'confirm_code', 'old_code'))
           .catch(e => handleError(e, ev))
           .then(() => {
             this.cancelClick();

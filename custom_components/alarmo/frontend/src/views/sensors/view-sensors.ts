@@ -1,23 +1,23 @@
 import { LitElement, html, customElement, property } from 'lit-element';
 import { HomeAssistant, navigate } from 'custom-card-helpers';
-import { loadHaForm } from '../load-ha-form';
+import { loadHaForm } from '../../load-ha-form';
 
-import { computeIcon, prettyPrint, computeName, handleError } from '../helpers';
-import { Dictionary, AlarmoSensor, EArmModes, AlarmoArea } from '../types';
+import { computeIcon, prettyPrint, computeName, handleError } from '../../helpers';
+import { Dictionary, AlarmoSensor, EArmModes, AlarmoArea } from '../../types';
 
-import '../cards/sensor-editor-card.ts';
-import '../components/alarmo-table.ts';
-import '../components/alarmo-chips.ts';
+import './sensor-editor-card.ts';
+import '../../components/alarmo-table.ts';
+import '../../components/alarmo-chips.ts';
 
-import { commonStyle } from '../styles';
+import { commonStyle } from '../../styles';
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
-import { fetchSensors, saveSensor, fetchAreas } from '../data/websockets';
-import { SubscribeMixin } from '../subscribe-mixin';
-import { localize } from '../../localize/localize';
-import { TableColumn, TableData } from '../components/alarmo-table';
-import { defaultSensorConfig, isValidSensor } from '../data/sensors';
-import { ESensorIcons, ESensorTypes } from '../const';
-import { Option } from '../components/alarmo-chips';
+import { fetchSensors, saveSensor, fetchAreas } from '../../data/websockets';
+import { SubscribeMixin } from '../../subscribe-mixin';
+import { localize } from '../../../localize/localize';
+import { TableColumn, TableData } from '../../components/alarmo-table';
+import { defaultSensorConfig, isValidSensor } from '../../data/sensors';
+import { ESensorIcons, ESensorTypes } from '../../const';
+import { AlarmoChip } from '../../components/alarmo-chips';
 
 @customElement('alarm-view-sensors')
 export class AlarmViewSensors extends SubscribeMixin(LitElement) {
@@ -33,7 +33,7 @@ export class AlarmViewSensors extends SubscribeMixin(LitElement) {
   @property() showAllSensorEntities = false;
   @property() selectedArea?: string;
 
-  @property() areaFilterOptions: Option[] = [];
+  @property() areaFilterOptions: AlarmoChip[] = [];
 
   public hassSubscribe(): Promise<UnsubscribeFunc>[] {
     this._fetchData();
@@ -47,23 +47,22 @@ export class AlarmViewSensors extends SubscribeMixin(LitElement) {
     this.areas = await fetchAreas(this.hass);
     this.sensors = await fetchSensors(this.hass);
 
-    this.areaFilterOptions = [
-      {
+    this.areaFilterOptions = Object.values(this.areas)
+      .map(e =>
+        Object({
+          value: e.area_id,
+          name: e.name,
+          count: Object.values(this.sensors).filter(el => el.area == e.area_id).length
+        })
+      )
+      .sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1))
+
+    if (Object.values(this.sensors).filter(e => !e.area).length)
+      this.areaFilterOptions = [{
         value: 'no_area',
         name: localize('panels.sensors.cards.sensors.filter.no_area', this.hass.language),
-        count: Object.values(this.sensors).filter(e => !e.area).length,
-      },
-    ].concat(
-      Object.values(this.areas)
-        .map(e =>
-          Object({
-            value: e.area_id,
-            name: e.name,
-            count: Object.values(this.sensors).filter(el => el.area == e.area_id).length,
-          })
-        )
-        .sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1))
-    );
+        count: Object.values(this.sensors).filter(e => !e.area).length
+      }, ...this.areaFilterOptions];
   }
 
   firstUpdated() {
@@ -183,6 +182,7 @@ export class AlarmViewSensors extends SubscribeMixin(LitElement) {
                 <alarmo-chips
                   .items=${this.areaFilterOptions}
                   value=${this.selectedArea}
+                  selectable
                   @value-changed=${(ev: Event) => (this.selectedArea = (ev.target as HTMLInputElement).value)}
                 >
                 </alarmo-chips>

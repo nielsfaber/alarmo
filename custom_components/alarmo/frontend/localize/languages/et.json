@@ -22,7 +22,8 @@
     },
     "editor": {
       "ui_mode": "Kasutajaliides",
-      "yaml_mode": "Koodiredaktor"
+      "yaml_mode": "Koodiredaktor",
+      "edit_in_yaml": "Edit in YAML"
     }
   },
   "title": "Alarm panel",
@@ -85,6 +86,10 @@
               "heading": "Oleku teema (topic)",
               "description": "Teema milles avaldatakse oleku muutused."
             },
+            "event_topic": {
+              "heading": "Event topic",
+              "description": "Topic on which alarm events are published"
+            },
             "command_topic": {
               "heading": "Käskude teema (topic)",
               "description": "Teema milles avaldatakse valvestamise käsud."
@@ -142,8 +147,8 @@
         }
       }
     },
-  "sensors": {
-    "title": "Andurid",
+    "sensors": {
+      "title": "Andurid",
       "cards": {
         "sensors": {
           "description": "Kasutusel olevad andurid. Klõpsa olemil, et seadistada.",
@@ -234,7 +239,7 @@
             "trigger_unavailable": {
               "heading": "Andurite saadavus",
               "description": "Käivita häire kui andur muutub kättesaamatuks."
-            }  
+            }
           },
           "actions": {
             "toggle_advanced": "Täpsemad sätted",
@@ -348,7 +353,7 @@
           },
           "filter": {
             "label": "Sordi alade järgi",
-            "no_area": "Põhiala"
+            "no_area": "(Alad puuduvad)"
           }
         },
         "actions": {
@@ -363,11 +368,10 @@
         "new_notification": {
           "title": "Loo teavitus",
           "description": "Uue teavituse loomine.",
+          "trigger": "Condition",
+          "action": "Task",
+          "options": "Options",
           "fields": {
-            "name": {
-              "heading": "Nimi",
-              "description": "Teavituse kirjeldus"
-            },
             "event": {
               "heading": "Sündmus",
               "description": "Mille puhul teavitada",
@@ -408,11 +412,36 @@
             },
             "message": {
               "heading": "Sisu",
-              "description": "Teavitussõnumi tekst"
+              "description": "Teavitussõnumi tekst",
+              "insert_wildcard": "Insert wildcard",
+              "placeholders": {
+                "armed": "The alarm is set to {{arm_mode}}",
+                "disarmed": "The alarm is now OFF",
+                "triggered": "The alarm is triggered! Cause: {{open_sensors}}.",
+                "arm_failure": "The alarm could not be armed right now, due to: {{open_sensors}}.",
+                "arming": "The alarm will be armed soon, please leave the house.",
+                "pending": "The alarm is about to trigger, disarm it quickly!"
+              }
             },
             "target": {
               "heading": "Saaja",
               "description": "Seade millele edastada teavitus"
+            },
+            "name": {
+              "heading": "Nimi",
+              "description": "Teavituse kirjeldus",
+              "placeholders": {
+                "armed": "Notify {target} upon arming",
+                "disarmed": "Notify {target} upon disarming",
+                "triggered": "Notify {target} when triggered",
+                "arm_failure": "Notify {target} on failure",
+                "arming": "Notify {target} when leaving",
+                "pending": "Notify {target} when arriving"
+              }
+            },
+            "delete": {
+              "heading": "Delete automation",
+              "description": "Permanently remove this automation"
             }
           },
           "actions": {
@@ -423,10 +452,6 @@
           "title": "Loo toiming",
           "description": "Seadme oleku muutmine valve oleku muutmisel.",
           "fields": {
-            "name": {
-              "heading": "Nimi",
-              "description": "Toimingu kirjeldus"
-            },
             "event": {
               "heading": "Sündmus",
               "description": "Millisel juhul käivitada toiming"
@@ -448,21 +473,21 @@
               "description": "Olemi toiming",
               "turn_on": "Lülita sisse",
               "turn_off": "Lülita välja"
+            },
+            "name": {
+              "heading": "Nimi",
+              "description": "Toimingu kirjeldus",
+              "placeholders": {
+                "armed": "Set {entity} to {state} upon arming",
+                "disarmed": "Set {entity} to {state} upon disarming",
+                "triggered": "Set {entity} to {state} when triggered",
+                "arm_failure": "Set {entity} to {state} on failure",
+                "arming": "Set {entity} to {state} when leaving",
+                "pending": "Set {entity} to {state} when arriving"
+              }
             }
           }
         }
-      },
-      "validation_errors": {
-        "no_triggers": "Selle tegevuse käivitamiseks puudub vajalik olek või sündmus.",
-        "empty_trigger": "Ühel päästikul puudub oleku või sündmuse tingimus.",
-        "invalid_trigger": "Ühel päästikul: {trigger} on vigane väärtus",
-        "invalid_mode": "Valve olekule: {mode} on sisestatud vigane väärtus",
-        "no_actions": "Sellele toimingule pole määratud tegevust.",
-        "no_service": "Ühel toimingutest puudub nõutav teenus.",
-        "invalid_service": "Ühele toimingule on omistatud sobimatu teenus: {service}",
-        "no_service_data": "Ühel toimingul puuduvad teenuse andmed.",
-        "no_entity_in_service_data": "Ühel toimingul puudub teenuse andmetes olemi ID.",
-        "no_message_in_service_data": "Ühe toimingu teenuse andmetes puuduvad teenuse andmed."
       }
     }
   }
