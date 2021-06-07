@@ -60,7 +60,7 @@ async def async_register_card(hass):
     card_real_path = os.path.join(card_dir, CARD_FILENAME)
     card_path = os.path.join(CARD_URL, CARD_FILENAME)
 
-    hass.http.register_static_path(card_path, card_real_path)
+    hass.http.register_static_path(card_path, card_real_path, cache_headers=False)
 
     hass.data[DATA_EXTRA_MODULE_URL].add(card_path)
 
