@@ -378,7 +378,7 @@ export class AutomationEditorCard extends LitElement {
       this.errors = { ...this.errors, event: true };
     if (!isDefined(triggerConfig.area) || !getAreaOptions(this.areas, this.alarmoConfig).includes(triggerConfig.area))
       this.errors = { ...this.errors, area: true };
-    if (!triggerConfig.modes?.length)
+    if (!triggerConfig.modes?.every(e => getArmModeOptions(triggerConfig.area, this.areas!).includes(e)))
       this.errors = { ...this.errors, modes: true };
 
     const services = data.actions.map(e => e.service);
