@@ -360,6 +360,8 @@ export class AutomationEditorCard extends LitElement {
 
         if (isObject(entry) && isString(entry.service))
           output = { ...output, service: entry.service };
+        if (isObject(entry) && isString(entry.entity_id))
+          output = { ...output, entity_id: entry.entity_id };
         if (isObject(entry) && isObject(entry.service_data))
           output = { ...output, service_data: entry.service_data };
 
@@ -465,8 +467,10 @@ export class AutomationEditorCard extends LitElement {
     const data = this._parseAutomation();
     data.actions.forEach(action => {
       const [domain, service] = action.service!.split('.');
+      let serviceData = { ...action.service_data };
+      if (action.entity_id) serviceData = { ...serviceData, entity_id: action.entity_id };
       this.hass
-        .callService(domain, service, action.service_data)
+        .callService(domain, service, serviceData)
         .then()
         .catch(e => {
           showErrorDialog(ev, e.message);
