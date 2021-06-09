@@ -53,10 +53,13 @@ export class NotificationEditorCard extends LitElement {
     this.alarmoConfig = await fetchConfig(this.hass);
 
     if (this.item) {
-      this.config = { ...this.item };
+      let actions = this.item.actions.map(e => omit(e, 'entity_id'));
+      this.config = { ...this.item, actions: [actions[0], ...actions.slice(1)] };
       if (this.config.triggers.length > 1) this.config = { ...this.config, triggers: [this.config.triggers[0]] };
       if (!this.config.triggers[0].modes?.length) this._setModes(new CustomEvent('value-changed', { detail: { value: getArmModeOptions(this.config.triggers[0].area, this.areas) } }));
-      if (this.config.triggers[0].area === null) this._setArea(new CustomEvent('value-changed', { detail: { value: 0 } }));
+      let areaConfig = this.config.triggers[0].area;
+      if (!getAreaOptions(this.areas, this.alarmoConfig).includes(areaConfig || 0)) this._setArea(new CustomEvent('value-changed', { detail: { value: undefined } }));
+      else if (areaConfig === null) this._setArea(new CustomEvent('value-changed', { detail: { value: 0 } }));
     }
 
     //automatically set area if there is only 1 option
