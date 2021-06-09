@@ -144,7 +144,7 @@ class ActionEntry:
     """Action storage Entry."""
 
     service = attr.ib(type=str, default="")
-    entity_id = attr.ib(type=str, default="")
+    entity_id = attr.ib(type=str, default=None)
     service_data = attr.ib(type=dict, default={})
 
 

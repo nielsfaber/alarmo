@@ -400,8 +400,9 @@ export class NotificationEditorCard extends LitElement {
     if (!isValidString(actionConfig.service_data?.message))
       this.errors = { ...this.errors, message: true };
 
-    if (!isValidString(actionConfig.service_data?.title))
-      this.errors = { ...this.errors, title: true };
+    // title is optional
+    // if (!isValidString(actionConfig.service_data?.title))
+    //   this.errors = { ...this.errors, title: true };
 
     if (!isValidString(data.name))
       this.errors = { ...this.errors, name: true };

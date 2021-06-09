@@ -78,7 +78,8 @@ export type AutomationTrigger = {
 
 export type AutomationAction = {
   service?: string;
-  service_data?: Dictionary<any> & { entity_id?: any, message?: any, title?: any };
+  entity_id?: string;
+  service_data?: Dictionary<any> & { message?: any, title?: any };
 }
 
 export interface AlarmoAutomation {

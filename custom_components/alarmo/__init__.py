@@ -326,8 +326,9 @@ class AlarmoCoordinator(DataUpdateCoordinator):
 
             data = {
                 "reason": reasons[event],
-                "command": args["command"].upper()
             }
+            if "command" in args:
+                data["command"] = args["command"].upper()
             if event == const.EVENT_FAILED_TO_ARM:
                 data["sensors"] = list(args["open_sensors"].keys())
 

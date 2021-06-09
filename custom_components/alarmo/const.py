@@ -124,7 +124,7 @@ ATTR_ACTIONS = "actions"
 ATTR_EVENT = "event"
 ATTR_REQUIRE_CODE = "require_code"
 
-ATTR_IS_NOTIFICATION = "is_notification"
+ATTR_NOTIFICATION = "notification"
 ATTR_VERSION = "version"
 ATTR_STATE_PAYLOAD = "state_payload"
 ATTR_COMMAND_PAYLOAD = "command_payload"

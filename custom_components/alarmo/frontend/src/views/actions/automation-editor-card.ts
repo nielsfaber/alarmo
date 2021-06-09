@@ -157,7 +157,7 @@ export class AutomationEditorCard extends LitElement {
               .items=${computeEntityDisplay(getAutomationEntities(this.hass), this.hass)}
               ?disabled=${!getAutomationEntities(this.hass).length}
               label=${localize('panels.actions.cards.new_action.fields.entity.heading', this.hass.language)}
-              .value=${Unique(this.config.actions.map(e => e.service_data?.entity_id).filter(isDefined)) || []}
+              .value=${Unique(this.config.actions.map(e => e.entity_id).filter(isDefined)) || []}
               @value-changed=${this._setEntity}
               ?invalid=${this.errors.entity_id}
             ></alarmo-selector>
@@ -315,11 +315,11 @@ export class AutomationEditorCard extends LitElement {
     if (actionConfig.length > value.length)
       actionConfig = [actionConfig[0], ...actionConfig.slice(1, value.length)];
 
-    if (!value.length) Object.assign(actionConfig, { [0]: { ...actionConfig[0], service_data: { ...omit(actionConfig[0].service_data || {}, 'entity_id') } } });
+    if (!value.length) Object.assign(actionConfig, { [0]: omit(actionConfig[0], 'entity_id') });
 
     value.forEach((entity, i) => {
       let action = actionConfig.length > i ? { ...actionConfig[i] } : {};
-      action = { ...action, service_data: { ...action.service_data || {}, entity_id: entity } }
+      action = { ...action, entity_id: entity };
       Object.assign(actionConfig, { [i]: action });
     });
 
@@ -332,7 +332,7 @@ export class AutomationEditorCard extends LitElement {
     let actionConfig = this.config.actions;
 
     actionConfig.forEach((e, i) => {
-      const domain = e.service_data?.entity_id ? computeDomain(e.service_data?.entity_id) : 'homeassistant';
+      const domain = e.entity_id ? computeDomain(e.entity_id) : 'homeassistant';
       Object.assign(actionConfig, { [i]: { service: `${domain}.${action}`, ...omit(e, 'service') } });
     });
     this.config = { ...this.config, actions: actionConfig };
@@ -382,7 +382,7 @@ export class AutomationEditorCard extends LitElement {
     if (!services.length || !services.every(e => isValidService(e, this.hass)))
       this.errors = { ...this.errors, service: true };
 
-    let entities = data.actions.map(e => (e.service_data || {}).entity_id);
+    let entities = data.actions.map(e => e.entity_id);
     if (this.viewMode == ViewMode.Yaml) entities = entities.filter(isDefined);
     if (!data.actions.length || !entities.every(e => isValidEntity(e, this.hass)))
       this.errors = { ...this.errors, entity_id: true };
@@ -396,7 +396,7 @@ export class AutomationEditorCard extends LitElement {
   private _validAction() {
     const data = this._parseAutomation();
     const services = data.actions.map(e => e.service);
-    let entities = data.actions.map(e => (e.service_data || {}).entity_id);
+    let entities = data.actions.map(e => e.entity_id);
     if (this.viewMode == ViewMode.Yaml) entities = entities.filter(isDefined);
 
     return (
@@ -413,7 +413,7 @@ export class AutomationEditorCard extends LitElement {
   private _namePlaceholder() {
     if (!this._validAction) return "";
     const event = this.config.triggers[0].event;
-    const entities = this.config.actions.map(e => (e.service_data || {}).entity_id).filter(isDefined) as string[];
+    const entities = this.config.actions.map(e => e.entity_id).filter(isDefined) as string[];
     const entity = computeEntityDisplay(entities, this.hass).map(e => e.name).join(", ");
     const services = Unique(this.config.actions.map(e => e.service).filter(isDefined).map(e => computeEntity(e)));
     let state: string | undefined = undefined;

@@ -168,13 +168,11 @@ export const getArmModeOptions = (area: string | number | undefined, areaConfig:
 };
 
 export const computeEntityDisplay = (entity_id: string[], hass: HomeAssistant) => {
-
-
   let data = entity_id.map(e => {
     let output = {
       value: e,
-      name: hass.states[e].attributes.friendly_name || computeEntity(e),
-      icon: hass.states[e].attributes.icon || domainIcon(computeDomain(e)),
+      name: e in hass.states ? hass.states[e].attributes.friendly_name || computeEntity(e) : e,
+      icon: e in hass.states ? hass.states[e].attributes.icon || domainIcon(computeDomain(e)) : undefined,
       description: e
     };
     return output;
