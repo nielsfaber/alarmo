@@ -40,7 +40,7 @@
             },
             "enable_mqtt": {
               "heading": "MQTT inschakelen",
-              "description": "Allow the alarm panel to be controlled through MQTT."
+              "description": "Toestaan het alarmpaneel via MQTT aan te sturen."
             },
             "enable_master": {
               "heading": "Master alarm inschakelen",
@@ -214,7 +214,7 @@
             },
             "always_on": {
               "heading": "Altijd aan",
-              "description": "Sensor should always trigger the alarm."
+              "description": "Een sensor moet altijd het alarm activeren."
             },
             "modes": {
               "heading": "Ingeschakelde modi",
@@ -450,7 +450,7 @@
         },
         "new_action": {
           "title": "Actie instellen",
-          "description": "Schakel verlichting of apparaatuur (bijv. sirene) wanneer het alarm wordt in- of uitgeschakeld, wordt geactiveerd etc.",
+          "description": "Schakel verlichting of apparaatuur (bijv. sirene) wanneer het alarm wordt in- of uitgeschakeld of wordt geactiveerd etc.",
           "fields": {
             "event": {
               "heading": "Gebeurtenis",
