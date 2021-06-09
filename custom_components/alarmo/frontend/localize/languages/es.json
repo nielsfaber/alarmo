@@ -413,14 +413,14 @@
             "message": {
               "heading": "Mensaje",
               "description": "Contenido del mensaje de notificación.",
-              "insert_wildcard": "Insert wildcard",
+              "insert_wildcard": "Insertar comodín",
               "placeholders": {
-                "armed": "The alarm is set to {{arm_mode}}",
-                "disarmed": "The alarm is now OFF",
-                "triggered": "The alarm is triggered! Cause: {{open_sensors}}.",
-                "arm_failure": "The alarm could not be armed right now, due to: {{open_sensors}}.",
-                "arming": "The alarm will be armed soon, please leave the house.",
-                "pending": "The alarm is about to trigger, disarm it quickly!"
+                "armed": "La alarma está configurada en {{arm_mode}}",
+                "disarmed": "Ahora la alarma está APAGADA",
+                "triggered": "¡Se ha disparado la alarma! Causa: {{open_sensors}}.",
+                "arm_failure": "No se pudo armar la alarma en este momento debido a: {{open_sensors}}.",
+                "arming": "Se armará pronto la alarma, por favor, salga de la casa.",
+                "pending": "¡La alarma está a punto de dispararse, desarme rápidamente!"
               }
             },
             "target": {
@@ -431,17 +431,17 @@
               "heading": "Nombre",
               "description": "Descripción de esta notificación.",
               "placeholders": {
-                "armed": "Notify {target} upon arming",
-                "disarmed": "Notify {target} upon disarming",
-                "triggered": "Notify {target} when triggered",
-                "arm_failure": "Notify {target} on failure",
-                "arming": "Notify {target} when leaving",
-                "pending": "Notify {target} when arriving"
+                "armed": "Notificar a {target} al armar",
+                "disarmed": "Notificar a {target} al desarmar",
+                "triggered": "Notificar a {target} cuando se dispare",
+                "arm_failure": "Notificar a {target} si falla",
+                "arming": "Notificar a {target} cuando se vaya",
+                "pending": "Notificar a {target} cuando llegue"
               }
             },
             "delete": {
-              "heading": "Delete automation",
-              "description": "Permanently remove this automation"
+              "heading": "Eliminar automatización",
+              "description": "Eliminar esta automatización de forma permanente"
             }
           },
           "actions": {
@@ -478,12 +478,12 @@
               "heading": "Nombre",
               "description": "Descripción de esta acción.",
               "placeholders": {
-                "armed": "Set {entity} to {state} upon arming",
-                "disarmed": "Set {entity} to {state} upon disarming",
-                "triggered": "Set {entity} to {state} when triggered",
-                "arm_failure": "Set {entity} to {state} on failure",
-                "arming": "Set {entity} to {state} when leaving",
-                "pending": "Set {entity} to {state} when arriving"
+                "armed": "Establecer {entity} en {state} al armar",
+                "disarmed": "Establecer {entity} en {state} al desarmar",
+                "triggered": "Establecer {entity} en {state} cuando se dispare",
+                "arm_failure": "Establecer {entity} en {state} si falla",
+                "arming": "Establecer {entity} en {state} cuando se vaya",
+                "pending": "Establecer {entity} en {state} cuando llegue"
               }
             }
           }
