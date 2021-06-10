@@ -23,7 +23,7 @@
     "editor": {
       "ui_mode": "Afficher l'éditeur visuel",
       "yaml_mode": "Afficher l'éditeur de code",
-      "edit_in_yaml": "Edit in YAML"
+      "edit_in_yaml": "Editer en YAML"
     }
   },
   "title": "Gestion de L'alarme",
@@ -132,7 +132,7 @@
         },
         "edit_area": {
           "title": "Editer la zone '{area}'",
-          "name_warning": "Note: Changer le nom changera l'entity ID"
+          "name_warning": "Note: Changer le nom, changera l'entity ID"
         },
         "remove_area": {
           "title": "Suppression de zone?",
@@ -369,7 +369,7 @@
           "title": "Créer une notification",
           "description": "Créer une nouvelle notification.",
           "trigger": "Condition",
-          "action": "Task",
+          "action": "Action",
           "options": "Options",
           "fields": {
             "event": {
@@ -413,14 +413,14 @@
             "message": {
               "heading": "Message",
               "description": "Contenu du message de la notification",
-              "insert_wildcard": "Insert wildcard",
+              "insert_wildcard": "Inserer la wildcard",
               "placeholders": {
-                "armed": "The alarm is set to {{arm_mode}}",
-                "disarmed": "The alarm is now OFF",
-                "triggered": "The alarm is triggered! Cause: {{open_sensors}}.",
-                "arm_failure": "The alarm could not be armed right now, due to: {{open_sensors}}.",
-                "arming": "The alarm will be armed soon, please leave the house.",
-                "pending": "The alarm is about to trigger, disarm it quickly!"
+                "armed": "L'alarme est réglée sur {{arm_mode}}",
+                "disarmed": "L'alarme est maintenant désactivée",
+                "triggered": "L'alarme est déclenchée! Cause: {{open_sensors}}.",
+                "arm_failure": "L'alarme n'a pas pu être armée pour le moment, en cause: {{open_sensors}}.",
+                "arming": "L'alarme sera bientôt armée, veuillez quitter la maison.",
+                "pending": "L'alarme est sur le point de se déclencher, désarmez-la rapidement!"
               }
             },
             "target": {
@@ -431,17 +431,17 @@
               "heading": "Nom",
               "description": "Description de la notification",
               "placeholders": {
-                "armed": "Notify {target} upon arming",
-                "disarmed": "Notify {target} upon disarming",
-                "triggered": "Notify {target} when triggered",
-                "arm_failure": "Notify {target} on failure",
-                "arming": "Notify {target} when leaving",
-                "pending": "Notify {target} when arriving"
+                "armed": "Notification à l'armement de : {target}",
+                "disarmed": "Notification au désarmement de : {target}",
+                "triggered": "Notification au déclenchement de : {target}",
+                "arm_failure": "Notification en cas d'échec de : {target}",
+                "arming": "Notification en quittant de : {target}",
+                "pending": "Notification au retour de : {target}"
               }
             },
             "delete": {
-              "heading": "Delete automation",
-              "description": "Permanently remove this automation"
+              "heading": "Supprimer l'automatisme",
+              "description": "Supprimer définitivement cet automatisme"
             }
           },
           "actions": {
@@ -478,12 +478,12 @@
               "heading": "Nom",
               "description": "Description de  l'action",
               "placeholders": {
-                "armed": "Set {entity} to {state} upon arming",
-                "disarmed": "Set {entity} to {state} upon disarming",
-                "triggered": "Set {entity} to {state} when triggered",
-                "arm_failure": "Set {entity} to {state} on failure",
-                "arming": "Set {entity} to {state} when leaving",
-                "pending": "Set {entity} to {state} when arriving"
+                "armed": "Mettre {entity} à {state} lors de l'armement",
+                "disarmed": "Mettre {entity} à {state} lors du désarmement",
+                "triggered": "Mettre {entity} à {state} lors du déclenchement de l'alarme",
+                "arm_failure": "Mettre {entity} à {state} en cas d'échec de l'armement",
+                "arming": "Mettre {entity} à {state} lors du départ de la maison",
+                "pending": "Mettre {entity} à {state} lors du retour à la maison"
               }
             }
           }
