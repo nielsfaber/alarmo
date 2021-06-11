@@ -65,7 +65,3 @@ async def async_register_card(hass):
     hass.data[DATA_EXTRA_MODULE_URL].add(card_path)
 
     async_register_command(hass, handle_subscribe_updates)
-
-
-def async_unregister_card(hass):
-    """remove alarmo card from frontend"""

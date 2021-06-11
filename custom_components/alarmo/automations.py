@@ -53,13 +53,15 @@ class AutomationHandler:
     def __init__(self, hass: HomeAssistant):
         self.hass = hass
         self._config = None
-        self._listener = None
+        self._subscriptions = []
 
         def async_update_config():
             """automation config updated, reload the configuration."""
             self._config = self.hass.data[const.DOMAIN]["coordinator"].store.async_get_automations()
 
-        async_dispatcher_connect(hass, "alarmo_automations_updated", async_update_config)
+        self._subscriptions.append(
+            async_dispatcher_connect(hass, "alarmo_automations_updated", async_update_config)
+        )
         async_update_config()
 
         @callback
@@ -92,7 +94,9 @@ class AutomationHandler:
                     ):
                         await self.async_execute_automation(automation_id, alarm_entity)
 
-        async_dispatcher_connect(self.hass, "alarmo_state_updated", async_alarm_state_changed)
+        self._subscriptions.append(
+            async_dispatcher_connect(self.hass, "alarmo_state_updated", async_alarm_state_changed)
+        )
 
         @callback
         async def async_handle_event(event: str, area_id: str, args: dict = {}):
@@ -115,7 +119,14 @@ class AutomationHandler:
                     ):
                         await self.async_execute_automation(automation_id, alarm_entity)
 
-        async_dispatcher_connect(self.hass, "alarmo_event", async_handle_event)
+        self._subscriptions.append(
+            async_dispatcher_connect(self.hass, "alarmo_event", async_handle_event)
+        )
+
+    async def __del__(self):
+        """prepare for removal"""
+        while len(self._subscriptions):
+            self._subscriptions.pop()()
 
     async def async_execute_automation(self, automation_id: str, alarm_entity: AlarmoBaseEntity):
         # automation is a dict of AutomationEntry

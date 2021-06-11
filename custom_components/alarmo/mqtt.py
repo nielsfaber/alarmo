@@ -31,6 +31,7 @@ class MqttHandler:
         self.hass = hass
         self._config = None
         self._subscribed_topics = []
+        self._subscriptions = []
 
         async def async_update_config(_args=None):
             """mqtt config updated, reload the configuration."""
@@ -49,7 +50,9 @@ class MqttHandler:
 
             _LOGGER.debug("MQTT config was (re)loaded")
 
-        async_dispatcher_connect(hass, "alarmo_config_updated", async_update_config)
+        self._subscriptions.append(
+            async_dispatcher_connect(hass, "alarmo_config_updated", async_update_config)
+        )
         self.hass.async_add_job(async_update_config)
 
         @callback
@@ -75,7 +78,9 @@ class MqttHandler:
             mqtt.async_publish(self.hass, topic, message, retain=True)
             _LOGGER.debug("Published state '{}' on topic '{}'".format(message, topic))
 
-        async_dispatcher_connect(self.hass, "alarmo_state_updated", async_alarm_state_changed)
+        self._subscriptions.append(
+            async_dispatcher_connect(self.hass, "alarmo_state_updated", async_alarm_state_changed)
+        )
 
         @callback
         def async_handle_event(event: str, area_id: str, args: dict = {}):
@@ -138,18 +143,22 @@ class MqttHandler:
             payload = json.dumps(payload, cls=JSONEncoder)
             mqtt.async_publish(self.hass, topic, payload)
 
-        async_dispatcher_connect(self.hass, "alarmo_event", async_handle_event)
+        self._subscriptions.append(
+            async_dispatcher_connect(self.hass, "alarmo_event", async_handle_event)
+        )
 
-        # @callback
-        # def async_failed_to_arm(area_id: str):
-        #     _LOGGER.debug("area {} has failed to arm".format(area_id))
-
-        # async_dispatcher_connect(self.hass, "alarmo_failed_to_arm", async_failed_to_arm)
+    async def __del__(self):
+        """prepare for removal"""
+        while len(self._subscribed_topics):
+            self._subscribed_topics.pop()()
+        while len(self._subscriptions):
+            self._subscriptions.pop()()
 
     async def _async_subscribe_topics(self):
         """install a listener for the command topic."""
 
-        self._unsubscribe_topics()
+        while len(self._subscribed_topics):
+            self._subscribed_topics.pop()()
         if not self._config[ATTR_MQTT][const.ATTR_ENABLED]:
             return
 
@@ -160,11 +169,6 @@ class MqttHandler:
                     self.async_message_received,
                 )
         )
-
-    def _unsubscribe_topics(self):
-        """remove listeners."""
-        while len(self._subscribed_topics):
-            self._subscribed_topics.pop()()
 
     @callback
     async def async_message_received(self, msg):

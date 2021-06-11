@@ -79,7 +79,8 @@ class SensorHandler:
     def __init__(self, hass: HomeAssistant):
         self._config = None
         self.hass = hass
-        self._listener = None
+        self._state_listener = None
+        self._subscriptions = []
         self._arm_timers = {}
 
         def async_reload_sensor_listener(area_id: str = None, old_state: str = None, state: str = None):
@@ -88,24 +89,36 @@ class SensorHandler:
             for area in self.hass.data[const.DOMAIN]["areas"].keys():
                 sensors_list.extend(self.active_sensors_for_alarm_state(area))
 
-            if self._listener:
-                self._listener()
+            if self._state_listener:
+                self._state_listener()
 
             if len(sensors_list):
-                self._listener = async_track_state_change(
+                self._state_listener = async_track_state_change(
                     self.hass, sensors_list, self.async_sensor_state_changed
                 )
             else:
-                self._listener = None
+                self._state_listener = None
 
         def async_update_sensor_config():
             """sensor config updated, reload the configuration."""
             self._config = self.hass.data[const.DOMAIN]["coordinator"].store.async_get_sensors()
             async_reload_sensor_listener()
 
-        async_dispatcher_connect(hass, "alarmo_state_updated", async_reload_sensor_listener)
-        async_dispatcher_connect(hass, "alarmo_sensors_updated", async_update_sensor_config)
+        self._subscriptions.append(
+            async_dispatcher_connect(hass, "alarmo_state_updated", async_reload_sensor_listener)
+        )
+        self._subscriptions.append(
+            async_dispatcher_connect(hass, "alarmo_sensors_updated", async_update_sensor_config)
+        )
         async_update_sensor_config()
+
+    async def __del__(self):
+        """prepare for removal"""
+        if self._state_listener:
+            self._state_listener()
+            self._state_listener = None
+        while len(self._subscriptions):
+            self._subscriptions.pop()()
 
     def active_sensors_for_alarm_state(self, area_id: str, state: str = None):
         """Compose a list of sensors that are active for the state"""

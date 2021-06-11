@@ -307,31 +307,34 @@ class AlarmoStorage:
         self.users = users
 
         if not areas:
-            self.async_create_area({
-                "name": "Alarmo",
-                "modes": {
-                    STATE_ALARM_ARMED_AWAY: attr.asdict(
-                        ModeEntry(
-                            enabled=True,
-                            exit_time=60,
-                            entry_time=60,
-                            trigger_time=1800
-                        )
-                    ),
-                    STATE_ALARM_ARMED_HOME: attr.asdict(
-                        ModeEntry(
-                            enabled=True,
-                            trigger_time=1800
-                        )
-                    ),
-                    STATE_ALARM_ARMED_NIGHT: attr.asdict(
-                        ModeEntry()
-                    ),
-                    STATE_ALARM_ARMED_CUSTOM_BYPASS: attr.asdict(
-                        ModeEntry()
+            await self.async_factory_default()
+
+    async def async_factory_default(self):
+        self.async_create_area({
+            "name": "Alarmo",
+            "modes": {
+                STATE_ALARM_ARMED_AWAY: attr.asdict(
+                    ModeEntry(
+                        enabled=True,
+                        exit_time=60,
+                        entry_time=60,
+                        trigger_time=1800
                     )
-                }
-            })
+                ),
+                STATE_ALARM_ARMED_HOME: attr.asdict(
+                    ModeEntry(
+                        enabled=True,
+                        trigger_time=1800
+                    )
+                ),
+                STATE_ALARM_ARMED_NIGHT: attr.asdict(
+                    ModeEntry()
+                ),
+                STATE_ALARM_ARMED_CUSTOM_BYPASS: attr.asdict(
+                    ModeEntry()
+                )
+            }
+        })
 
     @callback
     def async_schedule_save(self) -> None:
@@ -368,6 +371,12 @@ class AlarmoStorage:
         """Delete config."""
         _LOGGER.warning("Removing alarmo configuration data!")
         await self._store.async_remove()
+        self.config = Config()
+        self.areas = {}
+        self.sensors = {}
+        self.users = {}
+        self.automations = {}
+        await self.async_factory_default()
 
     @callback
     def async_get_config(self):
