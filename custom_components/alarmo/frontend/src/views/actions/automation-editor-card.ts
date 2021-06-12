@@ -412,7 +412,24 @@ export class AutomationEditorCard extends LitElement {
   }
 
   private _toggleYamlMode() {
-    this.viewMode = this.viewMode == ViewMode.UI ? ViewMode.Yaml : ViewMode.UI;
+    this.viewMode = this.viewMode == ViewMode.UI
+      ? ViewMode.Yaml
+      : ViewMode.UI;
+
+    if (this.viewMode == ViewMode.Yaml)
+      this.config = {
+        ...this.config, actions: Object.assign(this.config.actions,
+          {
+            [0]: {
+              ...this.config.actions[0],
+              service: this.config.actions[0].service || '',
+              service_data: {
+                ...this.config.actions[0].service_data || {},
+              }
+            }
+          }
+        )
+      };
   }
 
   private _namePlaceholder() {
@@ -432,11 +449,7 @@ export class AutomationEditorCard extends LitElement {
     let data = { ...this.config };
 
     //fill in name placeholder
-    if (
-      !isValidString(data.name) &&
-      this.viewMode == ViewMode.UI &&
-      this._namePlaceholder()
-    )
+    if (!isValidString(data.name) && this._namePlaceholder())
       data = { ...data, name: this._namePlaceholder() };
 
     return data;

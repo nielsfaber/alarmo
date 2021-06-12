@@ -36,20 +36,17 @@ This is an alarm system integration for Home Assistant. It provides a user inter
       - [Event topic](#event-topic)
       - [Command topic](#command-topic)
       - [Multiple area usage](#multiple-area-usage)
-    - [Actions](#actions)
+    - [Automations](#automations)
       - [Push notifications](#push-notifications)
+        - [Wildcards](#wildcards)
         - [Actionable notifications](#actionable-notifications)
-      - [Device actions](#device-actions)
+      - [Actions](#actions)
+        - [Switching a device](#switching-a-device)
+        - [Advanced actions](#advanced-actions)
+      - [Automatic arming](#automatic-arming)
   - [Alarmo-card](#alarmo-card)
     - [Demonstration](#demonstration)
     - [Configuration](#configuration)
-  - [Automations](#automations)
-    - [Sending notifications](#sending-notifications)
-      - [Wildcards](#wildcards)
-    - [Triggering an action](#triggering-an-action)
-    - [Custom automations](#custom-automations)
-      - [Automatic arming](#automatic-arming)
-      - [Advanced actions](#advanced-actions)
   - [Say thank you](#say-thank-you)
 
 
@@ -473,14 +470,33 @@ For targeting an arm/disarm command to a specific area, the JSON payload can be 
 * `<area_name>` is a *slug* of the name that is given to an area. This means that the name shall be in lowercase and all non-alphanumerical characters are replaced by underscores (similar to the entity_IDs in HA).
 * If no area is provided, the command is addressed to the Master Alarm. If the Master Alarm is disabled, the command is ignored.
 
-### Actions
+### Automations
 
 #### Push notifications
-Alarmo features a built-in panel for managing push notifications.
-It can be found in the *actions* tab.
+Alarmo can send a push message to your phone when the alarm is armed, disarmed, triggered, something went wrong, etc.
+For using this, you first need to install the HA app on your iOS or Android device.
 
-This feature has the same effect as defining an automation in HA that is triggered by a state change of the `alarm_control_panel.alarmo` entity.
-It is only intended to provide a more integrated means of setting up your alarm.
+**Procedure for setting up a notification**
+1. In the Alarmo configuration panel, click "Actions" in the top menu.
+2. In the panel labeled "Notifications", click on "New Notification".
+3. Choose an event for which you would like to receive a push message, and choose the message content + title. Pick your device as target, and save the automation.
+4. Now Alarmo should start sending you messages :tada:
+
+Example of the notification editor:
+
+<img src="https://raw.githubusercontent.com/nielsfaber/alarmo/main/screenshots/notification_gui.png">
+
+##### Wildcards
+The alarmo notifications editor contains some wildcards which can be used to provide adaptive info to your push message.
+By adding the wildcard in a message (including the brackets) it will be automatically be replaced by the applicable text.
+
+| Wildcard               | Description                                                    | Example Text       | Suitable events                       |
+| ---------------------- | -------------------------------------------------------------- | ------------------ | ------------------------------------- |
+| `{{open_sensors}}`     | List of sensors (with their states) which are currently active | *Backdoor is open* | Failed to arm<br> Triggered<br> Entry |
+| `{{bypassed_sensors}}` | List of sensors which are bypassed                             | *Bedroom window*   | Armed                                 |
+| `{{arm_mode}}`         | Current arming mode.                                           | *Armed Away*       | Leave<br> Armed                       |
+| `{{changed_by}}`       | User who's code has been entered.                              | *Niels*            | Armed<br> Disarmed                    |
+
 
 ##### Actionable notifications
 This function adds buttons to a push message, that can be clicked to interact with Alarmo.
@@ -495,9 +511,9 @@ The 'Retry Arm' option will repeat the command that failed before. You could use
 
 The 'Force Arm' option will repeat the command that failed before. The sensor/sensors that failed, shall be ignored while the alarm is armed.
 
-**For iOS devices**
+**Preparation (iOS devices only)**
 
-Step 1: Add this to `the configuration.yaml` file:
+Add this to the `configuration.yaml` file:
 ```yaml
 ios:
   push:
@@ -512,46 +528,110 @@ ios:
             title: Force Arm # feel free to change this text
             destructive: true
 ```
-Step 2: Restart HA to make the configuration effective.
 
-Step 3: In the Alarmo notifications editor, create a notification for the 'Failed to arm' event. Choose your iOS device as target.
+Restart HA to make the configuration effective.
 
-Step 4: Go to YAML mode. Look for the part that has `service_data`, and extend it as follows:
+**Set up notification with actions**
+
+In the Alarmo notifications editor, create a notification with the 'Failed to arm' event.
+Choose your iOS/Android device as target, set a message and title as you want.
+
+Switch to YAML mode. Look for the part that has `service_data`, and extend it as follows:
 ```yaml
-    service_data:
-      ... # your message and title should be here already
-      data:
-        push:
-          category: alarmo_arm_failure
-```
-**For Android devices**
-Step 1: In the Alarmo notifications editor, create a notification for the 'Failed to arm' event. Choose your Android device as target.
-
-Step 2: Go to YAML mode. Look for the part that has `service_data`, and extend it as follows:
-```yaml
-    service_data:
-      ... # your message and title should be here already
-      data:
-        actions:
-          - action: ALARMO_RETRY_ARM
-            title: Retry Arm # feel free to change this text
-          - action: ALARMO_FORCE_ARM
-            title: Force Arm # feel free to change this text
-        ttl: 0
-        priority: high
+ service_data:
+   ... # your message and title should be here already
+   data:
+     actions:
+       - action: ALARMO_RETRY_ARM
+         title: Retry Arm # feel free to change this text
+       - action: ALARMO_FORCE_ARM
+         title: Force Arm # feel free to change this text
 ```
 
-#### Device actions
-Alarmo features a built-in panel for managing device actions.
-It can be found in the *actions* tab.
+#### Actions
 
+##### Switching a device
 
-This feature has the same effect as defining an automation in HA that is triggered by a state change of the `alarm_control_panel.alarmo` entity.
-It is only intended to provide a more integrated means of setting up your alarm.
+An important feature of a security system are the actuators (such as siren, lights, ...), which will hopefully cause a burglar threspassing your property to flee.
+
+Alarmo features a built-in panel which can be used for switching devices on/off, depending on the state of the alarm.
+
+**Procedure for setting up an action**
+1. In the Alarmo configuration panel, click "Actions" in the top menu.
+2. In the panel labeled "Actions", click on "New Action".
+3. Choose an event for which you would like to trigger a device, pick the HA entity from the list, choose whether it should be switched on, and save the automation.
+4. Now the device should automatically be triggered together with the alarm :tada:
+
+Currently the following HA entity types are supported: `switch`, `input_boolean`, `light`, `script`.
 
 The actions are currently limited to *turning on* or *turning off* a HA entity. 
-For more advanced actions, you can use the built-in YAML editor to define your own HA service call.
 
+
+##### Advanced actions
+In case the built-in Actions panel does not offer the flexibility you are looking for, you can set up more flexible automations in HA.
+
+It is recommended to trigger on a state change of the `alarm_control_panel` entity.
+
+Example:
+```yaml
+trigger:
+  - platform: state
+    entity_id: alarm_control_panel.alarmo
+    to: 'triggered'
+action:
+  - service: switch.turn_on
+    target:
+      entity_id: swich.my_siren
+```
+
+For the "failed to arm" condition, you can trigger on event instead:
+```yaml
+trigger:
+  - platform: event
+    event_type: alarmo_failed_to_arm
+condition:
+  - condition: template
+    value_template: '{{ trigger.event.data.reason == ''open_sensors'' }}'
+action:
+  - service: notify.mobile_app_my_phone
+    data:
+      message: >
+        Could not arm because of the following problems:
+        {% for entity_id in trigger.event.data.sensors %}
+          - {{ state_attr(entity_id, 'friendly_name') }} is {{ states(entity_id) }}
+        {% endfor %}
+      title: test
+```
+
+Structure of the event data:
+```javascript
+{
+  "reason": "open_sensors", //other options: not_allowed, invalid_code
+  "sensors": [ //only applicable if reason = open_sensors
+    "binary_sensor.balcony_door"
+  ],
+}
+```
+
+#### Automatic arming
+If you want to control the state of Alarmo through an external device (e.g. a keyfob, button panel, or phone with geofencing), you can do so by means of a HA automation.
+
+This kind of automation cannot be made from the Alarmo "Actions" panel, you should use a HA automation instead (Configuration -> Automations).
+
+Example of HA automation for arming with a remote button:
+```yaml
+trigger:
+  - platform: state
+    entity_id: switch.my_remote
+    to: 'on'
+action:
+  - service: alarmo.arm
+    data:
+      entity_id: alarm_control_panel.alarmo
+      code: '1234'
+      mode: away 
+      skip_delay: true
+```
 ---
 ## Alarmo-card
 
@@ -586,113 +666,6 @@ Configuration using UI mode:
 2. Click "Edit Dashboard" on the right (under the button with the 3 dots)
 * Click the "Add card" button on the bottom
 * Choose "Custom: Alarmo Card" and pick the correct entity.
-
---
-
-## Automations
-For creating a powerful security system, you should combine Alarmo with automations.
-
-### Sending notifications
-Alarmo can send a push message to your phone when the alarm is armed, disarmed, triggered, something went wrong, etc.
-For doing so, you first need to set up the mobile app for HA.
-
-Procedure for setting up a notification:
-1. In the Alarmo configuration panel, click "Actions" in the top menu.
-2. In the panel labeled "Notifications", click on "New Notification".
-3. Choose an event for which you would like to receive a push message, and choose the message content + title. Pick your device as target, and save the automation.
-4. Now Alarmo should start sending you messages :tada:
-
-Example of the notification editor:
-
-<img src="https://raw.githubusercontent.com/nielsfaber/alarmo/main/screenshots/notification_gui.png">
-
-#### Wildcards
-The alarmo notifications editor contains some wildcards which can be used to provide extra info to your push message.
-By adding the wildcard in a message (including the brackets) it will be automatically be replaced by the applicable text.
-
-| Wildcard               | Description                                                    | Example Text       | Suitable events                       |
-| ---------------------- | -------------------------------------------------------------- | ------------------ | ------------------------------------- |
-| `{{open_sensors}}`     | List of sensors (with their states) which are currently active | *Backdoor is open* | Failed to arm<br> Triggered<br> Entry |
-| `{{bypassed_sensors}}` | List of sensors which are bypassed                             | *Bedroom window*   | Armed                                 |
-| `{{arm_mode}}`         | Current arming mode.                                           | *Armed Away*       | Leave<br> Armed                       |
-| `{{changed_by}}`       | User who's code has been entered.                              | *Niels*            | Armed<br> Disarmed                    |
-
-
-### Triggering an action
-An important feature of a security system are the actuators (such as siren, lights, ...), which will hopefully cause a burglar threspassing your property to flee.
-
-Alarmo features a built-in panel which can be used for switching devices on/off, depending on the state of the alarm.
-
-Procedure for setting up an action:
-1. In the Alarmo configuration panel, click "Actions" in the top menu.
-2. In the panel labeled "Actions", click on "New Action".
-3. Choose an event for which you would like to trigger a device, pick the HA entity from the list, choose whether it should be switched on, and save the automation.
-4. Now the device should automatically be triggered together with the alarm :tada:
-
-Currently the following HA entity types are supported: `switch`, `input_boolean`, `light`, `script`.
-
-### Custom automations
-
-#### Automatic arming
-If you want to control the state of Alarmo through an external device (e.g. a keyfob, button panel, or phone with geofencing), you can do so by means of an automation.
-
-Example of arming with a remote button:
-```yaml
-trigger:
-  - platform: state
-    entity_id: switch.my_remote
-    to: 'on'
-action:
-  - service: alarm_control_panel.alarm_arm_away
-    target:
-      entity_id: alarm_control_panel.alarmo
-```
-
-#### Advanced actions
-In case the built-in Actions panel does not offer the flexibility you are looking for, you can set up custom automations in HA.
-It's recommended to trigger on a state change of the `alarm_control_panel` entity.
-
-Example:
-```yaml
-trigger:
-  - platform: state
-    entity_id: alarm_control_panel.alarmo
-    to: 'triggered'
-action:
-  - service: switch.turn_on
-    target:
-      entity_id: swich.my_siren
-```
-
-For the "failed to arm" condition, you can trigger on event instead:
-```yaml
-trigger:
-  - platform: event
-    event_type: alarmo_failed_to_arm
-condition:
-  - condition: template
-    value_template: '{{ trigger.event.data.reason == ''open_sensors'' }}'
-action:
-  - service: notify.mobile_app_my_phone
-    data:
-      message: >
-        Could not arm because of the following problems:
-        {% for entity_id in trigger.event.data.sensors %}
-          - {{ state_attr(entity_id, 'friendly_name') }} is {{ states(entity_id) }}
-        {% endfor %}
-      title: test
-```
-
-
-Structure of the event data:
-```javascript
-{
-  "reason": "open_sensors", //other options: not_allowed, invalid_code
-  "sensors": [ //only applicable if reason = open_sensors
-    "binary_sensor.balcony_door"
-  ],
-}
-```
 
 ---
 

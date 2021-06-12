@@ -177,7 +177,6 @@ export class NotificationEditorCard extends LitElement {
     
             <paper-input
               label="${localize('panels.actions.cards.new_notification.fields.title.heading', this.hass.language)}"
-              placeholder=""
               .value=${this.config.actions[0].service_data?.title}
               @value-changed=${this._setTitle}
               ?invalid=${this.errors.title}
@@ -344,7 +343,7 @@ export class NotificationEditorCard extends LitElement {
     ev.stopPropagation();
     const value = String(ev.detail.value);
     let actionConfig = this.config.actions;
-    Object.assign(actionConfig, { [0]: { ...actionConfig[0], service_data: { ...actionConfig[0].service_data || {}, title: value } } });
+    Object.assign(actionConfig, { [0]: { ...actionConfig[0], service: actionConfig[0].service || '', service_data: { ...actionConfig[0].service_data || {}, title: value } } });
     this.config = { ...this.config, actions: actionConfig };
     if (Object.keys(this.errors).includes('title')) this._validateConfig();
   }
@@ -353,7 +352,7 @@ export class NotificationEditorCard extends LitElement {
     ev.stopPropagation();
     const value = String(ev.detail.value);
     let actionConfig = this.config.actions;
-    Object.assign(actionConfig, { [0]: { ...actionConfig[0], service_data: { ...actionConfig[0].service_data || {}, message: value } } });
+    Object.assign(actionConfig, { [0]: { ...actionConfig[0], service: actionConfig[0].service || '', service_data: { ...actionConfig[0].service_data || {}, message: value } } });
     this.config = { ...this.config, actions: actionConfig };
     if (Object.keys(this.errors).includes('message')) this._validateConfig();
   }
@@ -419,8 +418,7 @@ export class NotificationEditorCard extends LitElement {
     return (
       actionConfig.service &&
       getNotifyServices(this.hass).includes(actionConfig.service) &&
-      isValidString(actionConfig.service_data?.message) &&
-      isValidString(actionConfig.service_data?.title)
+      isValidString(actionConfig.service_data?.message)
     );
   }
 
@@ -435,7 +433,26 @@ export class NotificationEditorCard extends LitElement {
   }
 
   private _toggleYamlMode() {
-    this.viewMode = this.viewMode == ViewMode.UI ? ViewMode.Yaml : ViewMode.UI;
+    this.viewMode = this.viewMode == ViewMode.UI
+      ? ViewMode.Yaml
+      : ViewMode.UI;
+
+    if (this.viewMode == ViewMode.Yaml)
+      this.config = {
+        ...this.config, actions: Object.assign(this.config.actions,
+          {
+            [0]: {
+              ...this.config.actions[0],
+              service: this.config.actions[0].service || '',
+              service_data: {
+                ...this.config.actions[0].service_data || {},
+                title: this.config.actions[0].service_data?.title || '',
+                message: this.config.actions[0].service_data?.message || '',
+              }
+            }
+          }
+        )
+      };
   }
 
   private _namePlaceholder() {
@@ -467,13 +484,8 @@ export class NotificationEditorCard extends LitElement {
 
 
     //fill in name placeholder
-    if (
-      !isValidString(data.name) &&
-      this.viewMode == ViewMode.UI &&
-      this._namePlaceholder()
-    ) {
+    if (!isValidString(data.name) && this._namePlaceholder())
       data = { ...data, name: this._namePlaceholder() };
-    }
 
     return data;
   }
