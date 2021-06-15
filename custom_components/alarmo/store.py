@@ -167,10 +167,11 @@ def parse_automation_entry(data: dict):
         else:
             return EntityTriggerEntry(**config)
 
-    output = {
-        "triggers": list(map(create_trigger_entity, data["triggers"])),
-        "actions": list(map(lambda el: ActionEntry(**el), data["actions"])),
-    }
+    output = {}
+    if "triggers" in data:
+        output["triggers"] = list(map(create_trigger_entity, data["triggers"]))
+    if "actions" in data:
+        output["actions"] = list(map(lambda el: ActionEntry(**el), data["actions"]))
     if "automation_id" in data:
         output["automation_id"] = data["automation_id"]
     if "name" in data:
