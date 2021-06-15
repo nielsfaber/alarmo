@@ -92,7 +92,7 @@
             },
             "command_topic": {
               "heading": "Command topic",
-              "description": "Topic on which arm/disarm commands are sent."
+              "description": "Topic which Alarmo listens to for arm/disarm commands."
             },
             "require_code": {
               "heading": "Require code",
