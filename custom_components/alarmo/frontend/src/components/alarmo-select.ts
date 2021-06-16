@@ -32,6 +32,9 @@ export class AlarmoSelect extends LitElement {
   @property({ type: Boolean }) disabled = false;
   @internalProperty() private _opened?: boolean;
 
+  @property({ attribute: "allow-custom-value", type: Boolean })
+  public allowCustomValue?: boolean;
+
   @property({ type: Boolean })
   invalid = false;
 
@@ -68,6 +71,7 @@ export class AlarmoSelect extends LitElement {
         item-label-path="name"
         .value=${this._value}
         .renderer=${this.rowRenderer}
+        .allowCustomValue=${this.allowCustomValue}
         ?disabled=${this.disabled}
         @opened-changed=${this._openedChanged}
         @value-changed=${this._valueChanged}

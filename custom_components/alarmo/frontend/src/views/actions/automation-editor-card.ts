@@ -164,7 +164,9 @@ export class AutomationEditorCard extends LitElement {
               ?invalid=${this.errors.entity_id}
             ></alarmo-selector>
           </settings-row>
-        
+
+        ${!this.config.actions.map(e => e.entity_id).length || this.config.actions.map(e => computeDomain(e.entity_id || '')).some(e => e != 'script')
+            ? html`        
           <settings-row .narrow=${this.narrow}>
             <span slot="heading">
               ${localize('panels.actions.cards.new_action.fields.action.heading', this.hass.language)}
@@ -175,14 +177,14 @@ export class AutomationEditorCard extends LitElement {
             
             <div>
               <mwc-button
-                class="${this.config.actions.map(e => e.service).every(e => e?.includes('turn_on')) ? 'active' : ''}"
+                class="${this._selectedAction() == 'turn_on' ? 'active' : ''}"
                 @click=${() => this._setAction('turn_on')}
                 ?invalid=${this.errors.service}
               >
                 ${localize('panels.actions.cards.new_action.fields.action.turn_on', this.hass.language)}
               </mwc-button>
               <mwc-button
-                class="${this.config.actions.map(e => e.service).every(e => e?.includes('turn_off')) ? 'active' : ''}"
+                class="${this._selectedAction() == 'turn_off' ? 'active' : ''}"
                 @click=${() => this._setAction('turn_off')}
                 ?invalid=${this.errors.service}
               >
@@ -191,6 +193,8 @@ export class AutomationEditorCard extends LitElement {
             </div>
 
           </settings-row>
+          `
+            : ''}
         `
         : html`
           <h2>${localize('components.editor.edit_in_yaml', this.hass.language)}</h2>
@@ -304,6 +308,14 @@ export class AutomationEditorCard extends LitElement {
     if (Object.keys(this.errors).includes('service')) this._validateConfig();
   }
 
+
+  private _selectedAction() {
+    let actions = this.config.actions.filter(e => !e.entity_id || computeDomain(e.entity_id) != 'script').map(e => e.service).filter(isDefined);
+    if (actions.length && actions.every(e => e.includes('turn_on'))) return 'turn_on';
+    else if (actions.length && actions.every(e => e.includes('turn_off'))) return 'turn_off';
+    return null;
+  }
+
   private _setEntity(ev: CustomEvent) {
     ev.stopPropagation();
     const value = ev.detail.value as string[];
@@ -311,8 +323,7 @@ export class AutomationEditorCard extends LitElement {
 
     //assign service for added entity if it is in common
     let serviceSetting: string | null = null;
-    if (value.length > actionConfig.length && actionConfig.map(e => e.service).every(e => e?.includes('turn_on'))) serviceSetting = 'turn_on';
-    if (value.length > actionConfig.length && actionConfig.map(e => e.service).every(e => e?.includes('turn_off'))) serviceSetting = 'turn_off';
+    if (value.length > actionConfig.length && this._selectedAction()) serviceSetting = this._selectedAction();
 
     if (actionConfig.length > value.length)
       actionConfig = [actionConfig[0], ...actionConfig.slice(1, value.length)];
@@ -322,6 +333,7 @@ export class AutomationEditorCard extends LitElement {
     value.forEach((entity, i) => {
       let action = actionConfig.length > i ? { ...actionConfig[i] } : {};
       action = { ...action, entity_id: entity };
+      if (computeDomain(entity) == 'script') action = { ...action, service: entity };
       Object.assign(actionConfig, { [i]: action });
     });
 
@@ -335,7 +347,8 @@ export class AutomationEditorCard extends LitElement {
 
     actionConfig.forEach((e, i) => {
       const domain = e.entity_id ? computeDomain(e.entity_id) : 'homeassistant';
-      Object.assign(actionConfig, { [i]: { service: `${domain}.${action}`, ...omit(e, 'service') } });
+      if (domain != 'script')
+        Object.assign(actionConfig, { [i]: { service: `${domain}.${action}`, ...omit(e, 'service') } });
     });
     this.config = { ...this.config, actions: actionConfig };
   }

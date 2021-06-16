@@ -1,4 +1,4 @@
-import { HomeAssistant, navigate } from 'custom-card-helpers';
+import { HomeAssistant, navigate, computeDomain } from 'custom-card-helpers';
 import { css, CSSResult, customElement, html, LitElement, property, TemplateResult } from 'lit-element';
 import { AlarmoAutomation, EAlarmEvent, EArmModes, AlarmoArea, Dictionary, AutomationAction, AlarmoConfig } from '../../types';
 
@@ -163,6 +163,7 @@ export class NotificationEditorCard extends LitElement {
               .value=${this.config.actions[0].service}
               @value-changed=${this._setService}
               ?invalid=${this.errors.service}
+              allow-custom-value
             ></alarmo-select>
           </settings-row>
     
@@ -395,7 +396,7 @@ export class NotificationEditorCard extends LitElement {
       this.errors = { ...this.errors, modes: true };
 
     const actionConfig = data.actions[0];
-    if (!actionConfig.service || !getNotifyServices(this.hass).includes(actionConfig.service))
+    if (!actionConfig.service || (!getNotifyServices(this.hass).includes(actionConfig.service) && computeDomain(actionConfig.service) != 'script'))
       this.errors = { ...this.errors, service: true };
 
     if (!isValidString(actionConfig.service_data?.message))
@@ -416,7 +417,7 @@ export class NotificationEditorCard extends LitElement {
     const actionConfig = data.actions[0];
     return (
       actionConfig.service &&
-      getNotifyServices(this.hass).includes(actionConfig.service) &&
+      (computeDomain(actionConfig.service) == 'script' || getNotifyServices(this.hass).includes(actionConfig.service)) &&
       isValidString(actionConfig.service_data?.message)
     );
   }
@@ -456,8 +457,9 @@ export class NotificationEditorCard extends LitElement {
 
   private _namePlaceholder() {
     const event = this.config.triggers[0].event;
+    const domain = this.config.actions[0].service ? computeDomain(this.config.actions[0].service) : null;
     const target = computeServiceDisplay(this.hass, this.config.actions[0].service);
-    if (!event || !target.length) return "";
+    if (!event || domain != 'notify' || !target.length) return "";
     else return localize(`panels.actions.cards.new_notification.fields.name.placeholders.${event}`, this.hass.language, '{target}', target[0].name);
   }
 
