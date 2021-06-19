@@ -85,6 +85,8 @@ class AutomationHandler:
                 new_state = "armed"
 
             for automation_id, config in self._config.items():
+                if not config[const.ATTR_ENABLED]:
+                    continue
                 for trigger in config[const.ATTR_TRIGGERS]:
                     if (
                         validate_area(trigger, area_id) and
@@ -110,6 +112,8 @@ class AutomationHandler:
             _LOGGER.debug("{} has failed to arm".format(alarm_entity.entity_id))
 
             for automation_id, config in self._config.items():
+                if not config[const.ATTR_ENABLED]:
+                    continue
                 for trigger in config[const.ATTR_TRIGGERS]:
                     if (
                         validate_area(trigger, area_id) and
