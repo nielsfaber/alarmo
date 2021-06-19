@@ -157,8 +157,11 @@ class MqttHandler:
     async def _async_subscribe_topics(self):
         """install a listener for the command topic."""
 
-        while len(self._subscribed_topics):
-            self._subscribed_topics.pop()()
+        if len(self._subscribed_topics):
+            while len(self._subscribed_topics):
+                self._subscribed_topics.pop()()
+            _LOGGER.debug("Removed subscribed topics")
+
         if not self._config[ATTR_MQTT][const.ATTR_ENABLED]:
             return
 
@@ -169,6 +172,7 @@ class MqttHandler:
                     self.async_message_received,
                 )
         )
+        _LOGGER.debug("Subscribed to topic {}".format(self._config[ATTR_MQTT][CONF_COMMAND_TOPIC]))
 
     @callback
     async def async_message_received(self, msg):
