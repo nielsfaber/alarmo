@@ -209,7 +209,7 @@ The Alarmo entities support the following commands:
 | Command             | Description                                  | Conditions                                                                                                                                   |
 | ------------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ARM_AWAY`          | Arm the alarm in mode `armed_away`.          | - The entity has the mode `away` enabled.<br>- The current alarm state is `disarmed`, `armed_home`, `armed_night`, or `armed_custom_bypass`. |
-| `ARMED_HOME`        | Arm the alarm in mode `armed_home`.          | - The entity has the mode `home` enabled.<br>- The current alarm state is `disarmed`, `armed_away`, `armed_night`, or `armed_custom_bypass`. |
+| `ARM_HOME`        | Arm the alarm in mode `armed_home`.          | - The entity has the mode `home` enabled.<br>- The current alarm state is `disarmed`, `armed_away`, `armed_night`, or `armed_custom_bypass`. |
 | `ARM_NIGHT`         | Arm the alarm in mode `armed_night`.         | - The entity has the mode `night` enabled.<br>- The current alarm state is `disarmed`, `armed_away`, `armed_home`, or `armed_custom_bypass`. |
 | `ARM_CUSTOM_BYPASS` | Arm the alarm in mode `armed_custom_bypass`. | - The entity has the mode `custom` enabled.<br>- The current alarm state is `disarmed`, `armed_away`, `armed_home`, or `armed_night`.        |
 | `DISARM`            | Disarm the alarm.                            | - The current alarm state is not `disarmed`                                                                                                  |
