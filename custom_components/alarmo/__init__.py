@@ -25,9 +25,7 @@ from .panel import (
     async_register_panel,
     async_unregister_panel,
 )
-from .card import (
-    async_register_card,
-)
+from .card import async_register_card
 from .websockets import async_register_websockets
 from .sensors import SensorHandler
 from .automations import AutomationHandler
