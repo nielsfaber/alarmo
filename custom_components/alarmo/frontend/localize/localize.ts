@@ -1,19 +1,22 @@
+
+import * as ca from './languages/ca.json';
+import * as de from './languages/de.json';
 import * as en from './languages/en.json';
+import * as es from './languages/es.json';
 import * as et from './languages/et.json';
-import * as nl from './languages/nl.json';
 import * as fr from './languages/fr.json';
 import * as it from './languages/it.json';
-import * as ca from './languages/ca.json';
-import * as es from './languages/es.json';
+import * as nl from './languages/nl.json';
 
 var languages: any = {
+  ca: ca,
+  de: de,
   en: en,
   et: et,
-  nl: nl,
+  es: es,
   fr: fr,
   it: it,
-  ca: ca,
-  es: es
+  nl: nl,
 };
 
 export function localize(string: string, language: string, search: string | string[] = '', replace: string | string[] = '') {
