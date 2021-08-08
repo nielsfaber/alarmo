@@ -62,6 +62,10 @@ class MqttHandler:
                 return
 
             topic = self._config[ATTR_MQTT][CONF_STATE_TOPIC]
+
+            if not topic:  # do not publish if no topic is provided
+                return
+
             if area_id and len(self.hass.data[const.DOMAIN]["areas"]) > 1:
                 # handle the sending of a state update for a specific area
                 area = self.hass.data[const.DOMAIN]["areas"][area_id]
@@ -89,6 +93,10 @@ class MqttHandler:
                 return
 
             topic = self._config[ATTR_MQTT][CONF_EVENT_TOPIC]
+
+            if not topic:  # do not publish if no topic is provided
+                return
+
             if area_id and len(self.hass.data[const.DOMAIN]["areas"]) > 1:
                 # handle the sending of a state update for a specific area
                 area = self.hass.data[const.DOMAIN]["areas"][area_id]
