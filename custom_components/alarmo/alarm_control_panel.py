@@ -365,6 +365,10 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
                 }
             )
             return False
+        elif self._state in ARM_MODES and self._arm_mode == arm_mode:
+            _LOGGER.warning("Alarm is already set to {}, ignoring command.".format(arm_mode))
+            return False
+
         if self._state in ARM_MODES:
             await self.async_arm(
                 arm_mode,
