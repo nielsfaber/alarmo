@@ -234,7 +234,8 @@
             },
             "auto_bypass": {
               "heading": "Bypass automatically",
-              "description": "Exclude this sensor from the alarm if it is open while arming."
+              "description": "Exclude this sensor from the alarm if it is open while arming.",
+              "modes": "Modes in which sensor may be bypassed"
             },
             "trigger_unavailable": {
               "heading": "Andurite saadavus",
@@ -248,7 +249,8 @@
           "errors": {
             "description": "Palun paranda jägmised vead:",
             "no_area": "Ala pole määratud",
-            "no_modes": "Anduri tüüp on määramata, ei tea kuida kasutada"
+            "no_modes": "Anduri tüüp on määramata, ei tea kuida kasutada",
+            "no_auto_bypass_modes": "No modes are selected for the sensor may be automatically bypassed"
           }
         }
       }

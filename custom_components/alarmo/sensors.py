@@ -39,6 +39,7 @@ ATTR_ARM_ON_CLOSE = "arm_on_close"
 ATTR_ALLOW_OPEN = "allow_open"
 ATTR_TRIGGER_UNAVAILABLE = "trigger_unavailable"
 ATTR_AUTO_BYPASS = "auto_bypass"
+ATTR_AUTO_BYPASS_MODES = "auto_bypass_modes"
 
 SENSOR_STATES_OPEN = [STATE_ON, STATE_OPEN, STATE_UNLOCKED]
 SENSOR_STATES_CLOSED = [STATE_OFF, STATE_CLOSED, STATE_LOCKED]
@@ -140,7 +141,13 @@ class SensorHandler:
                 entities.append(entity)
         return entities
 
-    def validate_event(self, area_id: str = None, event: str = None, bypass_open_sensors: bool = False) -> bool:
+    def validate_event(
+        self,
+        area_id: str = None,
+        event: str = None,
+        bypass_open_sensors: bool = False,
+        arm_mode: str = None
+    ) -> bool:
         """"check if sensors have correct state"""
         open_sensors = {}
         bypassed_sensors = []
@@ -161,7 +168,11 @@ class SensorHandler:
             if state in [STATE_UNAVAILABLE, STATE_UNKNOWN] and not sensor_config[ATTR_TRIGGER_UNAVAILABLE]:
                 continue
             elif state in [STATE_OPEN, STATE_UNAVAILABLE, STATE_UNKNOWN]:
-                if bypass_open_sensors or sensor_config[ATTR_AUTO_BYPASS]:
+                if bypass_open_sensors or (sensor_config[ATTR_AUTO_BYPASS] and (
+                        not len(sensor_config[ATTR_AUTO_BYPASS_MODES])
+                        or arm_mode in sensor_config[ATTR_AUTO_BYPASS_MODES]
+                    )
+                ):
                     bypassed_sensors.append(entity)
                 else:
                     open_sensors[entity] = state

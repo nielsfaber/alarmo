@@ -2,10 +2,18 @@ import { css, CSSResult, customElement, html, LitElement, property, SVGTemplateR
 
 @customElement('settings-row')
 export class SettingsRow extends LitElement {
-  @property({ type: Boolean, reflect: true }) public narrow!: boolean;
-  @property({ type: Boolean, reflect: true }) large?: boolean;
+
+  @property({ type: Boolean, reflect: true })
+  public narrow!: boolean;
+
+  @property({ type: Boolean, reflect: true })
+  large?: boolean;
+
   @property({ type: Boolean, attribute: 'three-line' })
   public threeLine = false;
+
+  @property({ type: Boolean })
+  nested?: boolean;
 
   protected render(): SVGTemplateResult {
     return html`
@@ -40,6 +48,15 @@ export class SettingsRow extends LitElement {
         border-top: 1px solid var(--divider-color);
         padding: 16px 16px;
       }
+      :host([nested]) {
+        border: none;
+        padding: 0px 16px 16px 16px;
+        margin-top: -16px;
+        min-height: 40px;
+      }
+      :host([nested]:not([narrow])) {
+        padding: 16px 32px 16px 32px;
+      }
       :host([first]) {
         border-top: none;
       }
@@ -55,6 +72,9 @@ export class SettingsRow extends LitElement {
       :host([large]) .info,
       :host([narrow]) .info {
         flex: 1 0 40px;
+      }
+      :host([nested]) .info {
+        flex: 1 0 26px;
       }
       .secondary {
         color: var(--secondary-text-color);

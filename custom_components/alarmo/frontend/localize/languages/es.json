@@ -234,7 +234,8 @@
             },
             "auto_bypass": {
               "heading": "Omitir automáticamente",
-              "description": "Excluya este sensor de la alarma si está abierto mientras se arma."
+              "description": "Excluya este sensor de la alarma si está abierto mientras se arma.",
+              "modes": "Modes in which sensor may be bypassed"
             },
             "trigger_unavailable": {
               "heading": "Activar cuando no esté disponible",
@@ -248,7 +249,8 @@
           "errors": {
             "description": "Por favor, corrija los siguientes errores:",
             "no_area": "No se ha seleccionado ninguna área.",
-            "no_modes": "No se han seleccionados modos para los que el sensor deba estar activo."
+            "no_modes": "No se han seleccionados modos para los que el sensor deba estar activo.",
+            "no_auto_bypass_modes": "No modes are selected for the sensor may be automatically bypassed"
           }
         }
       }

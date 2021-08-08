@@ -234,7 +234,8 @@
             },
             "auto_bypass": {
               "heading": "Bypass automatique",
-              "description": "Exclut ce capteur de l'alarme s'il est ouvert lors de l'armement."
+              "description": "Exclut ce capteur de l'alarme s'il est ouvert lors de l'armement.",
+              "modes": "Modes in which sensor may be bypassed"
             },
             "trigger_unavailable": {
               "heading": "Déclenchement lorsqu'il n'est pas disponible",
@@ -248,7 +249,8 @@
           "errors": {
             "description": "Veuillez corriger les erreurs suivantes:",
             "no_area": "Aucune zone n'est sélectionnée",
-            "no_modes": "Aucun mode sélectionné pour lequel le capteur doit être actif"
+            "no_modes": "Aucun mode sélectionné pour lequel le capteur doit être actif",
+            "no_auto_bypass_modes": "No modes are selected for the sensor may be automatically bypassed"
           }
         }
       }

@@ -233,8 +233,9 @@
               "description": "Sta toe dat deze sensor kort na het verlaten actief is, zodat hij het inschakelen niet blokkeert."
             },
             "auto_bypass": {
-              "heading": "Automatisch uitsluiten",
-              "description": "Elimineer de sensor als deze actief is tijdens het inschakelen van het alarm."
+              "heading": "Automatisch omzeilen",
+              "description": "Elimineer de sensor als deze actief is tijdens het inschakelen van het alarm.",
+              "modes": "Modi waarin de sensor automatisch omzeild mag worden"
             },
             "trigger_unavailable": {
               "heading": "Activeren indien niet beschikbaar",
@@ -248,7 +249,8 @@
           "errors": {
             "description": "Corrigeer de volgende fouten:",
             "no_area": "Er is geen gebied geselecteerd",
-            "no_modes": "Er zijn geen modi geselecteerd waarvoor de sensor actief zou moeten zijn"
+            "no_modes": "Er zijn geen modi geselecteerd waarvoor de sensor actief zou moeten zijn",
+            "no_auto_bypass_modes": "Er zijn geen modi geselecteerd waarin de sensor automatisch omzeild mag worden"
           }
         }
       }

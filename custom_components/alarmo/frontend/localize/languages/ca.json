@@ -234,7 +234,8 @@
             },
             "auto_bypass": {
               "heading": "Omet automàticament",
-              "description": "Excloeu aquest sensor de l'alarma si està obert mentre s'arma l'alarma."
+              "description": "Excloeu aquest sensor de l'alarma si està obert mentre s'arma l'alarma.",
+              "modes": "Modes in which sensor may be bypassed"
             },
             "trigger_unavailable": {
               "heading": "Activador quan no estigui disponible",
@@ -248,7 +249,8 @@
           "errors": {
             "description": "Corregiu els errors següents:",
             "no_area": "No s'ha seleccionat cap àrea",
-            "no_modes": "No s'han seleccionat modes per als quals el sensor hauria d'estar actiu"
+            "no_modes": "No s'han seleccionat modes per als quals el sensor hauria d'estar actiu",
+            "no_auto_bypass_modes": "No modes are selected for the sensor may be automatically bypassed"
           }
         }
       }

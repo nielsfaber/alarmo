@@ -579,6 +579,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
                 area_id=self.area_id,
                 event=const.EVENT_ARM,
                 bypass_open_sensors=bypass_open_sensors,
+                arm_mode=arm_mode
             )
 
             if open_sensors:
@@ -616,6 +617,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
                 area_id=self.area_id,
                 event=const.EVENT_LEAVE,
                 bypass_open_sensors=bypass_open_sensors,
+                arm_mode=arm_mode
             )
 
             if open_sensors:

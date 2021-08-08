@@ -1,8 +1,9 @@
 import { HassEntity } from 'home-assistant-js-websocket';
 import { AlarmoSensor, EArmModes, Dictionary } from '../types';
 import { getDomain } from '../helpers';
-import { computeDomain } from 'custom-card-helpers';
-import { ESensorTypes } from '../const';
+import { computeDomain, HomeAssistant } from 'custom-card-helpers';
+import { ESensorTypes, ESensorIcons } from '../const';
+import { localize } from '../../localize/localize';
 
 export const isValidSensor = (entity: HassEntity, showAllDeviceClasses: boolean) => {
   const domain = getDomain(entity.entity_id);
@@ -154,6 +155,7 @@ export function defaultSensorConfig(stateObj: HassEntity | undefined, modeList: 
     allow_open: false,
     always_on: false,
     auto_bypass: false,
+    auto_bypass_modes: [],
     trigger_unavailable: false,
     type: ESensorTypes.Other,
     enabled: true,
@@ -171,3 +173,15 @@ export function defaultSensorConfig(stateObj: HassEntity | undefined, modeList: 
   }
   return config;
 }
+
+export const getSensorTypeOptions = (hass: HomeAssistant) =>
+  Object.entries(ESensorTypes)
+    .filter(([, e]) => e != ESensorTypes.Other)
+    .map(([k, v]) =>
+      Object({
+        value: v,
+        name: localize(`panels.sensors.cards.editor.fields.device_type.choose.${v}.name`, hass.language),
+        description: localize(`panels.sensors.cards.editor.fields.device_type.choose.${v}.description`, hass.language),
+        icon: ESensorIcons[k],
+      })
+    );
