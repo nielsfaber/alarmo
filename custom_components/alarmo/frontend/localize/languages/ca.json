@@ -224,9 +224,13 @@
               "heading": "Arma després de tancar",
               "description": "Després de la desactivació d'aquest sensor, s'omet automàticament el temps de retard de sortida restant."
             },
-            "immediate": {
-              "heading": "Immediat",
-              "description": "L'activació d'aquest sensor activarà l'alarma directament sense temps de retard a l'entrada."
+            "use_exit_delay": {
+              "heading": "Use exit delay",
+              "description": "Sensor is allowed to be active when the exit delay starts."
+            },
+            "use_entry_delay": {
+              "heading": "Use entry delay",
+              "description": "Sensor activation triggers the alarm after the entry delay rather than directly."
             },
             "allow_open": {
               "heading": "Permet obrir mentre s'arma l'alarma",

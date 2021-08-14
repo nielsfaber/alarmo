@@ -224,9 +224,13 @@
               "heading": "Arm after closing",
               "description": "After deactivation of this sensor, the remaining exit delay will automatically be skipped."
             },
-            "immediate": {
-              "heading": "Immediato",
-              "description": "Il sensore si attiva saltando il ritardo."
+            "use_exit_delay": {
+              "heading": "Use exit delay",
+              "description": "Sensor is allowed to be active when the exit delay starts."
+            },
+            "use_entry_delay": {
+              "heading": "Use entry delay",
+              "description": "Sensor activation triggers the alarm after the entry delay rather than directly."
             },
             "allow_open": {
               "heading": "Permetti apertura",

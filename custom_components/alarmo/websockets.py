@@ -50,7 +50,8 @@ from .mqtt import (
 )
 
 from .sensors import (
-    ATTR_IMMEDIATE,
+    ATTR_USE_EXIT_DELAY,
+    ATTR_USE_ENTRY_DELAY,
     ATTR_ALWAYS_ON,
     ATTR_ARM_ON_CLOSE,
     ATTR_ALLOW_OPEN,
@@ -215,7 +216,8 @@ class AlarmoSensorView(HomeAssistantView):
                     cv.ensure_list,
                     [vol.In(const.ARM_MODES)]
                 ),
-                vol.Optional(ATTR_IMMEDIATE): cv.boolean,
+                vol.Optional(ATTR_USE_EXIT_DELAY): cv.boolean,
+                vol.Optional(ATTR_USE_ENTRY_DELAY): cv.boolean,
                 vol.Optional(ATTR_ARM_ON_CLOSE): cv.boolean,
                 vol.Optional(ATTR_ALLOW_OPEN): cv.boolean,
                 vol.Optional(ATTR_ALWAYS_ON): cv.boolean,

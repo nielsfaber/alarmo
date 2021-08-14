@@ -23,3 +23,11 @@ def friendly_name_for_entity_id(entity_id: str, hass: HomeAssistant):
         return state.attributes["friendly_name"]
 
     return entity_id
+
+
+def omit(obj: dict, blacklisted_keys: list):
+    return {
+        key: val
+        for key, val in obj.items()
+        if key not in blacklisted_keys
+    }

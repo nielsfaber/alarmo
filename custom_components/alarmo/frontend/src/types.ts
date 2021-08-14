@@ -49,7 +49,8 @@ export type AlarmoSensor = {
   name?: string;
   type: ESensorTypes;
   modes: EArmModes[];
-  immediate: boolean;
+  use_exit_delay: boolean;
+  use_entry_delay: boolean;
   arm_on_close: boolean;
   allow_open: boolean;
   always_on: boolean;

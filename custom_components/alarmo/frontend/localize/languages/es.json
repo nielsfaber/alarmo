@@ -224,9 +224,13 @@
               "heading": "Armar después de cerrar",
               "description": "Después de la desactivación de este sensor, el retardo de salida restante se saltará automáticamente."
             },
-            "immediate": {
-              "heading": "Inmediato",
-              "description": "La activación de este sensor activará la alarma directamente en lugar de después del retardo de entrada."
+            "use_exit_delay": {
+              "heading": "Use exit delay",
+              "description": "Sensor is allowed to be active when the exit delay starts."
+            },
+            "use_entry_delay": {
+              "heading": "Use entry delay",
+              "description": "Sensor activation triggers the alarm after the entry delay rather than directly."
             },
             "allow_open": {
               "heading": "Permitir abrir mientras se arma",

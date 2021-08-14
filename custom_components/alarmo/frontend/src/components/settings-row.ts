@@ -55,7 +55,7 @@ export class SettingsRow extends LitElement {
         min-height: 40px;
       }
       :host([nested]:not([narrow])) {
-        padding: 16px 32px 16px 32px;
+        padding: 16px 16px 16px 32px;
       }
       :host([first]) {
         border-top: none;

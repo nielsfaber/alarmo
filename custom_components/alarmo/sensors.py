@@ -33,7 +33,8 @@ from homeassistant.const import (
 
 from . import const
 
-ATTR_IMMEDIATE = "immediate"
+ATTR_USE_EXIT_DELAY = "use_exit_delay"
+ATTR_USE_ENTRY_DELAY = "use_entry_delay"
 ATTR_ALWAYS_ON = "always_on"
 ATTR_ARM_ON_CLOSE = "arm_on_close"
 ATTR_ALLOW_OPEN = "allow_open"
@@ -156,7 +157,7 @@ class SensorHandler:
 
         for entity in sensors_list:
             sensor_config = self._config[entity]
-            if event == const.EVENT_LEAVE and not sensor_config[ATTR_IMMEDIATE]:
+            if event == const.EVENT_LEAVE and sensor_config[ATTR_USE_EXIT_DELAY]:
                 continue
             elif event in [const.EVENT_LEAVE, const.EVENT_ARM] and (
                 sensor_config[ATTR_ALLOW_OPEN]
@@ -168,10 +169,9 @@ class SensorHandler:
             if state in [STATE_UNAVAILABLE, STATE_UNKNOWN] and not sensor_config[ATTR_TRIGGER_UNAVAILABLE]:
                 continue
             elif state in [STATE_OPEN, STATE_UNAVAILABLE, STATE_UNKNOWN]:
-                if bypass_open_sensors or (sensor_config[ATTR_AUTO_BYPASS] and (
-                        not len(sensor_config[ATTR_AUTO_BYPASS_MODES])
-                        or arm_mode in sensor_config[ATTR_AUTO_BYPASS_MODES]
-                    )
+                if bypass_open_sensors or (
+                    sensor_config[ATTR_AUTO_BYPASS] and
+                    arm_mode in sensor_config[ATTR_AUTO_BYPASS_MODES]
                 ):
                     bypassed_sensors.append(entity)
                 else:
@@ -215,7 +215,7 @@ class SensorHandler:
         elif alarm_entity.state == STATE_ALARM_ARMING:
             if (
                 new_state in [STATE_OPEN, STATE_UNKNOWN, STATE_UNAVAILABLE]
-                and sensor_config[ATTR_IMMEDIATE]
+                and not sensor_config[ATTR_USE_ENTRY_DELAY]
                 and not sensor_config[ATTR_ALLOW_OPEN]
                 and not self._bypass_mode
             ):
@@ -233,13 +233,13 @@ class SensorHandler:
             if new_state in [STATE_OPEN, STATE_UNKNOWN, STATE_UNAVAILABLE]:
                 _LOGGER.debug("Alarm is triggered due to sensor: {}".format(entity))
                 await alarm_entity.async_trigger(
-                    skip_delay=sensor_config[ATTR_IMMEDIATE],
+                    skip_delay=(not sensor_config[ATTR_USE_ENTRY_DELAY]),
                     open_sensors={entity: new_state}
                 )
 
         # alarm is in pending -> check if pending time needs to be aborted
         elif alarm_entity.state == STATE_ALARM_PENDING:
-            if new_state in [STATE_OPEN, STATE_UNKNOWN, STATE_UNAVAILABLE] and sensor_config[ATTR_IMMEDIATE]:
+            if new_state in [STATE_OPEN, STATE_UNKNOWN, STATE_UNAVAILABLE] and not sensor_config[ATTR_USE_ENTRY_DELAY]:
                 await alarm_entity.async_trigger(
                     skip_delay=True,
                     open_sensors={entity: new_state}

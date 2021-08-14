@@ -224,9 +224,13 @@
               "heading": "Inschakelen na sluiten",
               "description": "Na deactivering van deze sensor wordt de resterende vertrek vertraging automatisch overgeslagen."
             },
-            "immediate": {
-              "heading": "Onmiddelijk",
-              "description": "Als deze sensor wordt geactiveerd, wordt het alarm direct geactiveerd in plaats van na de binnenkomst vertraging."
+            "use_exit_delay": {
+              "heading": "Vertragingstijd bij vertrek",
+              "description": "De sensor mag actief zijn wanneer de vertrekperiode wordt gestart."
+            },
+            "use_entry_delay": {
+              "heading": "Vertragingstijd bij binnenkomst",
+              "description": "Als de sensor actief wordt, activeert deze het alarm pas na de vertragingstijd voor binnenkomst."
             },
             "allow_open": {
               "heading": "Sta open toe tijdens het inschakelen",

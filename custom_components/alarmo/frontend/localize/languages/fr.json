@@ -224,9 +224,13 @@
               "heading": "Activer après fermeture",
               "description": "Après la désactivation de ce capteur, le délai de sortie restant sera automatiquement ignoré."
             },
-            "immediate": {
-              "heading": "Immédiat",
-              "description": "L'activation de ce capteur déclenchera l'alarme immédiatement plutôt qu'après le délai d'entrée."
+            "use_exit_delay": {
+              "heading": "Use exit delay",
+              "description": "Sensor is allowed to be active when the exit delay starts."
+            },
+            "use_entry_delay": {
+              "heading": "Use entry delay",
+              "description": "Sensor activation triggers the alarm after the entry delay rather than directly."
             },
             "allow_open": {
               "heading": "Autoriser l'ouverture lors de l'activation",

@@ -37,40 +37,6 @@ export const isValidSensor = (entity: HassEntity, showAllDeviceClasses: boolean)
   return false;
 };
 
-export const binarySensorConfig = (stateObj: HassEntity): Partial<AlarmoSensor> => {
-  switch (stateObj.attributes.device_class) {
-    case 'door':
-    case 'garage_door':
-    case 'lock':
-    case 'opening':
-      return {
-        modes: [EArmModes.ArmedAway, EArmModes.ArmedHome, EArmModes.ArmedNight],
-      };
-    case 'window':
-      return {
-        modes: [EArmModes.ArmedAway, EArmModes.ArmedHome, EArmModes.ArmedNight],
-        immediate: true,
-      };
-    case 'gas':
-    case 'heat':
-    case 'moisture':
-    case 'smoke':
-      return {
-        always_on: true,
-      };
-    case 'motion':
-    case 'moving':
-    case 'occupancy':
-    case 'presence':
-    case 'sound':
-      return {
-        modes: [EArmModes.ArmedAway],
-      };
-    default:
-      return {};
-  }
-};
-
 export const sensorClassToType = (stateObj: HassEntity): ESensorTypes | undefined => {
   switch (stateObj.attributes.device_class) {
     case 'door':
@@ -109,35 +75,40 @@ export const sensorConfigByType = (modeList: EArmModes[]): Dictionary<Partial<Al
       always_on: false,
       allow_open: false,
       arm_on_close: true,
-      immediate: false,
+      use_entry_delay: true,
+      use_exit_delay: false,
     },
     [ESensorTypes.Window]: {
       modes: filterModes([EArmModes.ArmedAway, EArmModes.ArmedHome, EArmModes.ArmedNight]),
       always_on: false,
       allow_open: false,
       arm_on_close: false,
-      immediate: true,
+      use_entry_delay: false,
+      use_exit_delay: false,
     },
     [ESensorTypes.Motion]: {
       modes: filterModes([EArmModes.ArmedAway]),
       always_on: false,
       allow_open: true,
       arm_on_close: false,
-      immediate: false,
+      use_entry_delay: true,
+      use_exit_delay: true,
     },
     [ESensorTypes.Tamper]: {
       modes: filterModes([EArmModes.ArmedAway, EArmModes.ArmedHome, EArmModes.ArmedNight, EArmModes.ArmedCustom]),
       always_on: false,
       allow_open: false,
       arm_on_close: false,
-      immediate: true,
+      use_entry_delay: false,
+      use_exit_delay: false,
     },
     [ESensorTypes.Environmental]: {
       modes: filterModes([EArmModes.ArmedAway, EArmModes.ArmedHome, EArmModes.ArmedNight, EArmModes.ArmedCustom]),
       always_on: true,
       allow_open: false,
       arm_on_close: false,
-      immediate: false,
+      use_entry_delay: false,
+      use_exit_delay: false,
     },
   };
 };
@@ -150,7 +121,8 @@ export function defaultSensorConfig(stateObj: HassEntity | undefined, modeList: 
     entity_id: stateObj.entity_id,
     name: stateObj.attributes.friendly_name || stateObj.entity_id,
     modes: [],
-    immediate: false,
+    use_entry_delay: true,
+    use_exit_delay: true,
     arm_on_close: false,
     allow_open: false,
     always_on: false,
@@ -158,7 +130,7 @@ export function defaultSensorConfig(stateObj: HassEntity | undefined, modeList: 
     auto_bypass_modes: [],
     trigger_unavailable: false,
     type: ESensorTypes.Other,
-    enabled: true,
+    enabled: true
   };
 
   if (domain == 'binary_sensor') {

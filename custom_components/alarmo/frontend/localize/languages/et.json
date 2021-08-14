@@ -224,9 +224,13 @@
               "heading": "Valvesta sulgemisel",
               "description": "Selle anduri rakendumisel valvestatakse kohe ilma viiveta."
             },
-            "immediate": {
-              "heading": "Viivituseta",
-              "description": "Andur annab häire ilma viiteta."
+            "use_exit_delay": {
+              "heading": "Use exit delay",
+              "description": "Sensor is allowed to be active when the exit delay starts."
+            },
+            "use_entry_delay": {
+              "heading": "Use entry delay",
+              "description": "Sensor activation triggers the alarm after the entry delay rather than directly."
             },
             "allow_open": {
               "heading": "Lahkumisviivitus",

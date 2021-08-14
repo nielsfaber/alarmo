@@ -18,19 +18,19 @@ from homeassistant.components.alarm_control_panel import (
     FORMAT_NUMBER as CODE_FORMAT_NUMBER,
 )
 
-from .const import (
-    DOMAIN,
-)
+from .const import DOMAIN
 
 from .sensors import (
     SENSOR_TYPE_OTHER,
 )
 
+from .helpers import omit
+
 _LOGGER = logging.getLogger(__name__)
 
 DATA_REGISTRY = f"{DOMAIN}_storage"
 STORAGE_KEY = f"{DOMAIN}.storage"
-STORAGE_VERSION = 3
+STORAGE_VERSION = 4
 SAVE_DELAY = 10
 
 
@@ -99,7 +99,8 @@ class SensorEntry:
     name = attr.ib(type=str, default="")
     type = attr.ib(type=str, default=SENSOR_TYPE_OTHER)
     modes = attr.ib(type=list, default=[])
-    immediate = attr.ib(type=bool, default=False)
+    use_exit_delay = attr.ib(type=bool, default=True)
+    use_entry_delay = attr.ib(type=bool, default=True)
     always_on = attr.ib(type=bool, default=False)
     arm_on_close = attr.ib(type=bool, default=False)
     allow_open = attr.ib(type=bool, default=False)
@@ -229,6 +230,19 @@ class MigratableStore(Store):
                     })
                 ))
                 for automation in data["automations"]
+            ]
+
+        if old_version <= 3:
+            data["sensors"] = [
+                attr.asdict(SensorEntry(
+                    **{
+                        **omit(sensor, ["immediate"]),
+                        "use_exit_delay": not sensor["immediate"] and not sensor["always_on"],
+                        "use_entry_delay": not sensor["immediate"] and not sensor["always_on"],
+                        "auto_bypass_modes": sensor["modes"] if sensor["auto_bypass"] else [],
+                    }
+                ))
+                for sensor in data["sensors"]
             ]
         return data
 

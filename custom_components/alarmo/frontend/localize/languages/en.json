@@ -224,13 +224,17 @@
               "heading": "Arm after closing",
               "description": "After deactivation of this sensor, the remaining exit delay will automatically be skipped."
             },
-            "immediate": {
-              "heading": "Immediate",
-              "description": "Activating this sensor will trigger the alarm directly instead of after entry delay."
+            "use_exit_delay": {
+              "heading": "Use exit delay",
+              "description": "Sensor is allowed to be active when the exit delay starts."
+            },
+            "use_entry_delay": {
+              "heading": "Use entry delay",
+              "description": "Sensor activation triggers the alarm after the entry delay rather than directly."
             },
             "allow_open": {
-              "heading": "Allow open while arming",
-              "description": "Allow this sensor to be active shortly after leaving such that it will not block arming."
+              "heading": "Allow open after arming",
+              "description": "If the sensor is still active after the exit delay, this will not cause arming to fail."
             },
             "auto_bypass": {
               "heading": "Bypass automatically",
