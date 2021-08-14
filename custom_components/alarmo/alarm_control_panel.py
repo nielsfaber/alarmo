@@ -329,6 +329,10 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             self.open_sensors = None
             self.bypassed_sensors = None
             await self.async_update_state(STATE_ALARM_DISARMED)
+            if self.changed_by:
+                _LOGGER.info("Alarm is disarmed by {}.".format(self.changed_by))
+            else:
+                _LOGGER.info("Alarm is disarmed.")
             return True
 
     async def async_service_arm_handler(self, code, mode, skip_delay, force):
@@ -366,7 +370,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             )
             return False
         elif self._state in ARM_MODES and self._arm_mode == arm_mode:
-            _LOGGER.warning("Alarm is already set to {}, ignoring command.".format(arm_mode))
+            _LOGGER.debug("Alarm is already set to {}, ignoring command.".format(arm_mode))
             return False
 
         if self._state in ARM_MODES:
@@ -598,9 +602,10 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
                 if bypassed_sensors:
                     self.bypassed_sensors = bypassed_sensors
                 self.open_sensors = None
-                _LOGGER.info(
-                    "Alarm is now armed ({}).".format(arm_mode)
-                )
+                if self.changed_by:
+                    _LOGGER.info("Alarm is armed ({}) by {}.".format(arm_mode, self.changed_by))
+                else:
+                    _LOGGER.info("Alarm is armed ({}).".format(arm_mode))
                 if self._state and self._state != STATE_ALARM_ARMING:
                     async_dispatcher_send(
                         self.hass,
@@ -709,6 +714,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
                     )
 
                 self.async_set_timer(trigger_time, async_trigger_timer_finished)
+            _LOGGER.info("Alarm is triggered!")
 
         else:  # to pending state
             self.delay = entry_delay
@@ -723,6 +729,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
                 await self.async_trigger()
 
             self.async_set_timer(entry_delay, async_entry_timer_finished)
+            _LOGGER.info("Alarm will be triggered after {} seconds.".format(entry_delay))
 
     def async_set_timer(self, delay, cb_func):
         if self._timer:

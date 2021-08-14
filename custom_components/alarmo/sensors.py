@@ -197,7 +197,7 @@ class SensorHandler:
 
         # immediate trigger due to always on sensor
         if sensor_config[ATTR_ALWAYS_ON] and new_state in [STATE_OPEN, STATE_UNKNOWN, STATE_UNAVAILABLE]:
-            _LOGGER.debug("Alarm is triggered due to an always-on sensor: {}".format(entity))
+            _LOGGER.info("Alarm is triggered due to an always-on sensor: {}".format(entity))
             await alarm_entity.async_trigger(
                 skip_delay=True,
                 open_sensors={entity: new_state}
@@ -231,7 +231,7 @@ class SensorHandler:
         # alarm is armed -> check if need to be triggered
         elif alarm_entity.state in const.ARM_MODES:
             if new_state in [STATE_OPEN, STATE_UNKNOWN, STATE_UNAVAILABLE]:
-                _LOGGER.debug("Alarm is triggered due to sensor: {}".format(entity))
+                _LOGGER.info("Alarm is triggered due to sensor: {}".format(entity))
                 await alarm_entity.async_trigger(
                     skip_delay=(not sensor_config[ATTR_USE_ENTRY_DELAY]),
                     open_sensors={entity: new_state}
