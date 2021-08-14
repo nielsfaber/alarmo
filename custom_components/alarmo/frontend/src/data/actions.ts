@@ -186,10 +186,22 @@ export const getNotifyServices = (hass: HomeAssistant) => [
   ...Object.keys(hass.services.notify).map(service => `notify.${service}`)
 ];
 
-export const getAutomationEntities = (hass: HomeAssistant) => [
-  ...Object.keys(hass.states)
-    .filter(e => ['light', 'switch', 'input_boolean', 'script'].includes(computeDomain(e)))
-];
+export const getAutomationEntities = (hass: HomeAssistant) => {
+  const isValidDomain = (domain: string) => ['light', 'switch', 'input_boolean', 'script', 'siren'].includes(domain);
+
+  return [
+    ...Object.keys(hass.states)
+      .filter(e => {
+        const domain = computeDomain(e);
+        if (domain == 'group') {
+          const entities = hass.states[e].attributes.entity_id || [];
+          if (!entities || !Array.isArray(entities) || !entities.length) return false;
+          else return entities.map(v => computeDomain(v)).every(isValidDomain);
+        }
+        else return isValidDomain(domain);
+      })
+  ];
+}
 
 export const getWildcardOptions = (event?: EAlarmEvent) => {
   let options: { name: string, value: string }[] = [];
