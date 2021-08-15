@@ -1,6 +1,5 @@
 
 import * as ca from './languages/ca.json';
-import * as de from './languages/de.json';
 import * as en from './languages/en.json';
 import * as es from './languages/es.json';
 import * as et from './languages/et.json';
@@ -10,7 +9,6 @@ import * as nl from './languages/nl.json';
 
 var languages: any = {
   ca: ca,
-  de: de,
   en: en,
   et: et,
   es: es,
