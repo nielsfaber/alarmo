@@ -2,7 +2,7 @@ import { LitElement, html, customElement, property } from 'lit-element';
 import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
 import { HomeAssistant, fireEvent } from 'custom-card-helpers';
 
-import { prettyPrint } from '../../helpers';
+import { prettyPrint, sortAlphabetically } from '../../helpers';
 import { AlarmoConfig, Dictionary, AlarmoArea, AlarmoSensor, AlarmoAutomation } from '../../types';
 
 import '../../components/settings-row.ts';
@@ -43,7 +43,7 @@ export class AreaConfigCard extends SubscribeMixin(LitElement) {
     if (!this.hass) return html``;
 
     const areas = Object.values(this.areas);
-    areas.sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1));
+    areas.sort(sortAlphabetically);
 
     const columns: Dictionary<TableColumn> = {
       actions: {

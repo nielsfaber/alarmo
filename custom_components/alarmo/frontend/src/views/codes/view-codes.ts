@@ -1,7 +1,7 @@
 import { LitElement, html, customElement, property } from 'lit-element';
 import { HomeAssistant, navigate } from 'custom-card-helpers';
 
-import { prettyPrint, handleError } from '../../helpers';
+import { prettyPrint, handleError, sortAlphabetically } from '../../helpers';
 import { AlarmoConfig, Dictionary, AlarmoUser } from '../../types';
 
 import './user-editor-card.ts';
@@ -150,7 +150,7 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
     if (!this.hass) return html``;
 
     const users = Object.values(this.users);
-    users.sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1));
+    users.sort(sortAlphabetically);
 
     const columns: Dictionary<TableColumn> = {
       icon: {

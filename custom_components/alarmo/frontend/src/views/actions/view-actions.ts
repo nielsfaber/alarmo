@@ -9,7 +9,7 @@ import { UnsubscribeFunc } from 'home-assistant-js-websocket';
 import { commonStyle } from '../../styles';
 import { fetchAutomations, saveAutomation, fetchAreas, fetchConfig } from '../../data/websockets';
 import { TableColumn } from '../../components/alarmo-table';
-import { handleError, Unique, isDefined, flatten } from '../../helpers';
+import { handleError, Unique, isDefined, flatten, sortAlphabetically } from '../../helpers';
 import { localize } from '../../../localize/localize';
 import { AlarmoChip } from '../../components/alarmo-chips';
 
@@ -77,7 +77,7 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
           count: Object.values(automations).filter(e => e.type == EAutomationTypes.Notification).map(this.getAreaForAutomation).filter(e => e == a).length
         }))
     ]
-      .sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1));
+      .sort(sortAlphabetically);
 
     this.automationFilterOptions = [
       ...getAreaOptions(this.areas, this.config)
@@ -86,7 +86,7 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
           count: Object.values(automations).filter(e => e.type == EAutomationTypes.Action).map(this.getAreaForAutomation).filter(e => e == a).length
         }))
     ]
-      .sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1));
+      .sort(sortAlphabetically);
 
     if (Object.values(automations).filter(e => e.type == EAutomationTypes.Notification).map(this.getAreaForAutomation).filter(e => !isDefined(e)).length)
       this.notificationFilterOptions = [{

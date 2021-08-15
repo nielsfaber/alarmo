@@ -3,7 +3,7 @@ import { EArmModes, AlarmoArea, EAlarmEvent, Dictionary, AlarmoConfig } from "..
 import { EArmModeIcons } from "../const";
 
 import { computeDomain, computeEntity, HomeAssistant, computeStateDisplay, stateIcon, domainIcon } from "custom-card-helpers";
-import { Unique, flatten, isDefined } from "../helpers";
+import { Unique, flatten, isDefined, sortAlphabetically } from "../helpers";
 
 export const computeArmModeDisplay = (val: EArmModes, hass: HomeAssistant) => {
   switch (val) {
@@ -136,7 +136,7 @@ export const computeServiceDisplay = (hass: HomeAssistant, ...services: (string 
     return data;
   })
     .filter(isDefined);
-  output.sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1));
+  output.sort(sortAlphabetically);
 
   return output;
 }
@@ -177,7 +177,6 @@ export const computeEntityDisplay = (entity_id: string[], hass: HomeAssistant) =
     };
     return output;
   });
-  data.sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1));
 
   return data;
 }
@@ -186,10 +185,10 @@ export const getNotifyServices = (hass: HomeAssistant) => [
   ...Object.keys(hass.services.notify).map(service => `notify.${service}`)
 ];
 
-export const getAutomationEntities = (hass: HomeAssistant) => {
+export const getAutomationEntities = (hass: HomeAssistant, customEntities?: string[]) => {
   const isValidDomain = (domain: string) => ['light', 'switch', 'input_boolean', 'script', 'siren'].includes(domain);
 
-  return [
+  let entities = [
     ...Object.keys(hass.states)
       .filter(e => {
         const domain = computeDomain(e);
@@ -201,6 +200,16 @@ export const getAutomationEntities = (hass: HomeAssistant) => {
         else return isValidDomain(domain);
       })
   ];
+
+  if (customEntities && customEntities.length) {
+    entities = [
+      ...entities,
+      ...customEntities.filter(e => !entities.includes(e))
+    ];
+  }
+
+  entities.sort(sortAlphabetically);
+  return entities;
 }
 
 export const getWildcardOptions = (event?: EAlarmEvent) => {

@@ -163,3 +163,9 @@ export function Assign<Type>(obj: Type, changes: Partial<Type>): Type {
   });
   return obj;
 }
+
+export function sortAlphabetically(a: string | { name: string }, b: string | { name: string }) {
+  const stringVal = (s: string | { name: string }) =>
+    typeof s === 'object' ? stringVal(s.name) : s.trim().toLowerCase();
+  return stringVal(a) < stringVal(b) ? -1 : 1;
+}

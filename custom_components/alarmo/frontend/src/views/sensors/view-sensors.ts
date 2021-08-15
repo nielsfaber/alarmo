@@ -2,7 +2,7 @@ import { LitElement, html, customElement, property } from 'lit-element';
 import { HomeAssistant, navigate } from 'custom-card-helpers';
 import { loadHaForm } from '../../load-ha-form';
 
-import { computeIcon, prettyPrint, computeName, handleError } from '../../helpers';
+import { computeIcon, prettyPrint, computeName, handleError, sortAlphabetically } from '../../helpers';
 import { Dictionary, AlarmoSensor, EArmModes, AlarmoArea } from '../../types';
 
 import './sensor-editor-card.ts';
@@ -55,7 +55,7 @@ export class AlarmViewSensors extends SubscribeMixin(LitElement) {
           count: Object.values(this.sensors).filter(el => el.area == e.area_id).length
         })
       )
-      .sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1))
+      .sort(sortAlphabetically)
 
     if (Object.values(this.sensors).filter(e => !e.area).length)
       this.areaFilterOptions = [{
@@ -96,7 +96,7 @@ export class AlarmViewSensors extends SubscribeMixin(LitElement) {
       };
     });
 
-    sensorsList.sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1));
+    sensorsList.sort(sortAlphabetically);
 
     const columns: Dictionary<TableColumn> = {
       icon: {
@@ -216,9 +216,9 @@ export class AlarmViewSensors extends SubscribeMixin(LitElement) {
           name: computeName(e),
           icon: computeIcon(e),
         })
-      );
+      ) as { id: string, name: string, icon: string }[];
 
-    addSensorsList.sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1));
+    addSensorsList.sort(sortAlphabetically);
 
     const columns: Dictionary<TableColumn> = {
       checkbox: {

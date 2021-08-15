@@ -59,6 +59,7 @@ export class AutomationEditorCard extends LitElement {
       let areaConfig = this.config.triggers[0].area;
       if (!getAreaOptions(this.areas, this.alarmoConfig).includes(areaConfig || 0)) this._setArea(new CustomEvent('value-changed', { detail: { value: undefined } }));
       else if (areaConfig === null) this._setArea(new CustomEvent('value-changed', { detail: { value: 0 } }));
+      if (this._hasCustomEntities()) this.viewMode = ViewMode.Yaml;
     }
 
     //automatically set area if there is only 1 option
@@ -156,10 +157,10 @@ export class AutomationEditorCard extends LitElement {
     
             <alarmo-selector
               .hass=${this.hass}
-              .items=${computeEntityDisplay(getAutomationEntities(this.hass), this.hass)}
-              ?disabled=${!getAutomationEntities(this.hass).length}
+              .items=${computeEntityDisplay(getAutomationEntities(this.hass, this._getEntities()), this.hass)}
+              ?disabled=${!getAutomationEntities(this.hass, this._getEntities()).length}
               label=${localize('panels.actions.cards.new_action.fields.entity.heading', this.hass.language)}
-              .value=${Unique(this.config.actions.map(e => e.entity_id).filter(isDefined)) || []}
+              .value=${this._getEntities()}
               @value-changed=${this._setEntity}
               ?invalid=${this.errors.entity_id}
             ></alarmo-selector>
@@ -455,6 +456,18 @@ export class AutomationEditorCard extends LitElement {
     if (services.length == 1 && services[0]?.includes("turn_off")) state = this.hass.localize("state.default.off");
     if (!event || !entity || !state) return "";
     else return localize(`panels.actions.cards.new_action.fields.name.placeholders.${event}`, this.hass.language, ['{entity}', '{state}'], [entity, state]);
+  }
+
+  private _getEntities() {
+    return Unique(
+      this.config.actions
+        .map(e => e.entity_id)
+        .filter(isDefined)
+    ) || [];
+  }
+
+  private _hasCustomEntities() {
+    return this._getEntities().some(e => !getAutomationEntities(this.hass).includes(e));
   }
 
   private _parseAutomation() {
