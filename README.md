@@ -23,11 +23,7 @@ This is an alarm system integration for Home Assistant. It provides a user inter
         - [Commands](#commands-1)
     - [Sensor configuration](#sensor-configuration)
       - [Sensor types](#sensor-types)
-      - [Immediate](#immediate)
-      - [Always on](#always-on)
-      - [Allow open while arming](#allow-open-while-arming)
-      - [Arm after closing](#arm-after-closing)
-      - [Trigger when unavailable](#trigger-when-unavailable)
+      - [Configuration options](#configuration-options)
     - [Codes and users](#codes-and-users)
       - [Codes](#codes)
       - [Administrator](#administrator)
@@ -44,9 +40,7 @@ This is an alarm system integration for Home Assistant. It provides a user inter
         - [Switching a device](#switching-a-device)
         - [Advanced actions](#advanced-actions)
       - [Automatic arming](#automatic-arming)
-  - [Alarmo-card](#alarmo-card)
-    - [Demonstration](#demonstration)
-    - [Configuration](#configuration)
+    - [Alarmo-card](#alarmo-card)
   - [Say thank you](#say-thank-you)
 
 
@@ -209,7 +203,7 @@ The Alarmo entities support the following commands:
 | Command             | Description                                  | Conditions                                                                                                                                   |
 | ------------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ARM_AWAY`          | Arm the alarm in mode `armed_away`.          | - The entity has the mode `away` enabled.<br>- The current alarm state is `disarmed`, `armed_home`, `armed_night`, or `armed_custom_bypass`. |
-| `ARM_HOME`        | Arm the alarm in mode `armed_home`.          | - The entity has the mode `home` enabled.<br>- The current alarm state is `disarmed`, `armed_away`, `armed_night`, or `armed_custom_bypass`. |
+| `ARM_HOME`          | Arm the alarm in mode `armed_home`.          | - The entity has the mode `home` enabled.<br>- The current alarm state is `disarmed`, `armed_away`, `armed_night`, or `armed_custom_bypass`. |
 | `ARM_NIGHT`         | Arm the alarm in mode `armed_night`.         | - The entity has the mode `night` enabled.<br>- The current alarm state is `disarmed`, `armed_away`, `armed_home`, or `armed_custom_bypass`. |
 | `ARM_CUSTOM_BYPASS` | Arm the alarm in mode `armed_custom_bypass`. | - The entity has the mode `custom` enabled.<br>- The current alarm state is `disarmed`, `armed_away`, `armed_home`, or `armed_night`.        |
 | `DISARM`            | Disarm the alarm.                            | - The current alarm state is not `disarmed`                                                                                                  |
@@ -284,49 +278,31 @@ When assigning sensors to Alarmo, the type of the sensor is automatically determ
 Note that assigning a sensor type is not mandatory, and all configuration settings can also be set manually. It is also possible to deviate from the predefined configuration after setting a type.
 
 The following table defines the sensor types and the predefined configuration:
-| Type          | Device classes                      | Arm modes                           | Always on | Immediate | Arm after closing | Allow open |
-| ------------- | ----------------------------------- | ----------------------------------- | --------- | --------- | ----------------- | ---------- |
-| Door          | door, garage_door, lock. opening    | Armed Away, Armed Home, Armed Night | No        | No        | Yes               | No         |
-| Window        | window                              | Armed Away, Armed Home, Armed Night | No        | Yes       | No                | No         |
-| Motion        | motion, moving, occupancy, presence | Armed Away                          | No        | No        | No                | Yes        |
-| Tamper        | sound, opening, vibration           | Armed Away, Armed Home, Armed Night | No        | Yes       | No                | No         |
-| Environmental | gas, heat, moisture, smoke, safety  | N/A                                 | Yes       | Yes       | No                | No         |
+| Type          | Device classes                                        | Arm modes                                      | Enabled configuration options             |
+| ------------- | ----------------------------------------------------- | ---------------------------------------------- | ----------------------------------------- |
+| Door          | `door`<br> `garage_door`<br>`lock`<br> `opening `     | `Armed Away`<br> `Armed Home`<br>`Armed Night` | `Arm after closing`<br> `Use entry delay` |
+| Window        | `window`                                              | `Armed Away`<br>`Armed Home`<br>`Armed Night`  | -                                         |
+| Motion        | `motion`<br>`moving`<br>`occupancy`<br>`presence`     | `Armed Away`                                   | `Use exit delay`<br>`Use entry delay`     |
+| Tamper        | `sound`<br>`opening`<br> `vibration`                  | `Armed Away`<br>`Armed Home`<br>`Armed Night`  | -                                         |
+| Environmental | `gas`<br> `heat`<br>`moisture`<br>`smoke`<br>`safety` | N/A                                            | `Always on`                               |
 
-#### Immediate
-When the alarm is armed with an immediate sensor, this sensor will trigger the alarm directly instead of waiting for the (optional) entry delay.
 
-An immediate sensor must be closed before you can enable the alarm. It is not allowed to be open while you are leaving the house. In other words, the exit delay is not applicable to immediate sensors.
+#### Configuration options
+The following table summarizes the configuration options available per sensor.
 
-Example of use cases: in mode *armed away* you would normally leave and enter the house via a door. 
-If a window is opened when the alarm is armed, this means bad news. The siren should be enabled ASAP.
+Note that depending on the sensor type, some options may be hidden.
+This is done for your convenience, if this is undesired you can clear the sensor type to have all options selectable.
 
-#### Always on
-When marking a sensor as always on, it will **always** be able to trigger the alarm, even when the alarm is disarmed. The triggering occurs as soon as the sensor is activated and entry delays will be ignored.
 
-This functionality is intended for safety sensors, such as fire detectors. 
-
-#### Allow open while arming 
-The allow open while arming property allows a sensor to be in the active state, while (and after) the alarm is armed. Setting this property is not the same as bypassing a sensor, since as soon as the sensor returns to the inactive state, it is capable of triggering the alarm. The property only ignores the initial state of the sensor.
-
-This property is intended for motion sensors, which have a relatively long period before they return to inactive state, after the zone is clear.
-By setting this property, it is possible to set a leave delay that is lower than the reset period of this sensor.
-
-#### Arm after closing
-The alarm on close feature is intended for entrances only. 
-When setting this property to a door/contact sensor, Alarmo will watch this sensor while the alarm is in state *arming*, and determine if the user left the house.
-
-Once the sensor state changes from open to closed, this is interpreted as the user closing the (front) door. 
-Alarmo will skip the remaining of the exit delay, and proceed directly to the *armed* state.
-If any sensor (without the *allow open while arming* setting) is still open, the alarm will return to *disarmed* state.
-
-Note: Alarmo uses a built-in 5 seconds delay to allow for contact bounce (the chattering of a door when pulling it shut).
-
-#### Trigger when unavailable
-
-HA defines the *unavailable* state for sensors for which the state is undeterminate (can be either open or closed). The *unavailable* state usually occurs when a battery-powered sensor loses connection to the gateway. This might be a harmless scenario (such as an empty battery) but it could also be the result of tampering of the sensor.
-
-Since Alarmo cannot guarantee the security of your house when this occurs, it might be desirable to have the alarm trigger if this occurs. 
-Setting the *trigger when unavailable* setting has the effect that the *unavailable* state is treated the same as the sensor being *open*.
+| Option                     | Description                                                                                                                                                                                                                                                                                                                                                             | Recommended usage                                                                                        |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `Use exit delay`           | Allow the sensor to be active when arming starts.<br>If disabled, the sensor must be inactive prior to arming the alarm, otherwise the arming will fail.<br>Only applies to [arm modes](#arm-modes) having an exit delay.<br>Only applies to the moment of arming: after the exit delay has started, the sensor may become active (allows you to leave the house).      | Motion sensors (and optionally doors) in the path between your alarm panel and the exit.                 |
+| `Use entry delay`          | Use entry delay (as set for the [arm modes](#arm-modes)) for the sensor.<br>If enabled, the sensor triggers the alarm after the entry delay, otherwise this happens immediately.br>Only applies to [arm modes](#arm-modes) having an entry delay.                                                                                                                       | Motion + door sensors in the path between entering the house and reaching the alarm panel.               |
+| `Always on`                | Activation of the sensor **always** triggers the alarm, even when the alarm is disarmed.<br>The triggering is immediate (entry delay is not used).                                                                                                                                                                                                                      | Safety sensors, such as fire detectors.                                                                  |
+| `Allow open after arming`  | Sensor is allowed to remain active until after the alarm is set to armed.<br>The initial activation is ignored, a second activation (after becoming inactive) triggers the alarm.                                                                                                                                                                                       | Motion sensors which have a long delay until being reset (longer than the exit delay).                   |
+| `Arm after closing`        | Deactivation of the sensor during the exit delay causes the alarm to proceed to *armed* state.<br>If other sensors are still active at this moment, the arming fails.<br>Alarmo uses a built-in 5 seconds delay to allow for contact bounce (the chattering of a door when pulling it shut).                                                                            | Front door sensor (combined with `Allow open after arming` on motion sensors which may be still active). |
+| `Bypass automatically`     | If the sensor is still active when the alarm is armed, the sensor will be excluded from the alarm (instead of causing the arming to fail) until the alarm is disarmed again.<br>This setting can be defined per arm mode.                                                                                                                                               | Windows that may be left open (e.g. when going to sleep).                                                |
+| `Trigger when unavailable` | If the sensor state becomes *unavailable* this is treated the same as the sensor being activated.<br>HA defines the *unavailable* state for sensors for which the state is undeterminate (can be either open or closed). This usually occurs when a battery-powered sensor loses connection to the gateway, but it could also be the result of tampering of the sensor. | Sensors for which reliability is important.                                                              |
 
 
 ### Codes and users
@@ -633,39 +609,15 @@ action:
       skip_delay: true
 ```
 ---
-## Alarmo-card
+### Alarmo-card
 
-The installation of Alarmo automatically adds the alarmo-card to Lovelace.
-This card allows you to control your alarm through the HA web interface.
+After setting up Alarmo, it can be used for securing your house.
 
-The alarmo-card is similar to the [Lovelace alarm panel card](https://www.home-assistant.io/lovelace/alarm-panel/), but brings some extra functions:
+For controlling the alarm through the HA frontend, you can set up a Lovelace card.
+There are two cards available:
+* [Lovelace Alarm Panel card](https://www.home-assistant.io/lovelace/alarm-panel/) which comes with HA. This offers basic arm/disarm functionality and displays the current state.
+* [Alarmo-card](https://github.com/nielsfaber/alarmo-card) which is intended as a companion for Alarmo. It offers some extra functionality on top of the standard alarm panel card, such as countdown timer for exit / entry delay and feedback messages with sensor(s) causing the alarm to be triggered or unable to arm.
 
-* A countdown timer is displayed when the alarm is in `arming` or `pending` state. It shows you how much time you have left for leaving the house / disarming the alarm.
-* A message is displayed when the arming of the alarm failed or the alarm has triggered, with an overview of the sensor(s) involved.
-* The card gives you feedback when a wrong code was entered. 
-
-### Demonstration
-See the alarmo-card in action:
-
-<img src="https://raw.githubusercontent.com/nielsfaber/alarmo/main/screenshots/alarmo-card.gif">
-
-
-### Configuration
-
-For setting up the card, you need to assign the correct entity to the card.
-All settings regarding delay times, arming modes, code settings are automatically detected.
-
-Example YAML configuration:
-```yaml
-type: 'custom:alarmo-card'
-entity: alarm_control_panel.alarmo
-```
-
-Configuration using UI mode:
-1. Go to the Lovelace page where you want to add the card
-2. Click "Edit Dashboard" on the right (under the button with the 3 dots)
-* Click the "Add card" button on the bottom
-* Choose "Custom: Alarmo Card" and pick the correct entity.
 
 ---
 
