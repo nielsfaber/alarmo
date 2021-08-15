@@ -1,8 +1,8 @@
+import { TemplateResult, html } from 'lit';
 import { HomeAssistant, stateIcon, fireEvent } from 'custom-card-helpers';
 import { HassEntity } from 'home-assistant-js-websocket';
 import { platform, AlarmStates, AlarmCommands } from './const';
 import { Dictionary, EArmModes, AlarmoModeConfig } from './types';
-import { html, TemplateResult } from 'lit-element';
 
 export function getDomain(entity: string | HassEntity) {
   const entity_id: string = typeof entity == 'string' ? entity : entity.entity_id;

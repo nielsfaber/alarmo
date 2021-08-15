@@ -1,16 +1,6 @@
+import { LitElement, html, TemplateResult, css, PropertyValues, CSSResultGroup } from 'lit';
+import { property, customElement, state, query } from 'lit/decorators.js';
 import { fireEvent, HomeAssistant } from 'custom-card-helpers';
-import {
-  css,
-  CSSResult,
-  customElement,
-  html,
-  internalProperty,
-  LitElement,
-  property,
-  query,
-  TemplateResult,
-  PropertyValues,
-} from 'lit-element';
 import { IsEqual, isDefined } from '../helpers';
 
 export type Option = {
@@ -30,7 +20,7 @@ export class AlarmoSelect extends LitElement {
   @property() clearable = false;
   @property() icons = false;
   @property({ type: Boolean }) disabled = false;
-  @internalProperty() private _opened?: boolean;
+  @state() private _opened?: boolean;
 
   @property({ attribute: "allow-custom-value", type: Boolean })
   public allowCustomValue?: boolean;
@@ -183,7 +173,7 @@ export class AlarmoSelect extends LitElement {
     }, 0);
   }
 
-  static get styles(): CSSResult {
+  static get styles(): CSSResultGroup {
     return css`
       :host {
         line-height: 1em;

@@ -1,5 +1,6 @@
+import { LitElement, html, TemplateResult, css, PropertyValues, CSSResultGroup } from 'lit';
+import { property, customElement } from 'lit/decorators.js';
 import { fireEvent, HomeAssistant } from 'custom-card-helpers';
-import { css, CSSResult, customElement, html, LitElement, property, TemplateResult, PropertyValues } from 'lit-element';
 import { isDefined, IsEqual } from '../helpers';
 
 export type Option = {
@@ -91,7 +92,7 @@ export class alarmoSelector extends LitElement {
     fireEvent(this, 'value-changed', { value: [...this.value] });
   }
 
-  static get styles(): CSSResult {
+  static get styles(): CSSResultGroup {
     return css`
       div.chip {
         height: 32px;

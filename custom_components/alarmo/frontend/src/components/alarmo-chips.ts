@@ -1,6 +1,6 @@
+import { LitElement, html, TemplateResult, css, CSSResultGroup } from 'lit';
+import { property, customElement } from 'lit/decorators.js';
 import { fireEvent } from 'custom-card-helpers';
-import { css, CSSResult, customElement, html, LitElement, property, TemplateResult } from 'lit-element';
-
 
 export type AlarmoChip = {
   name: string;
@@ -61,7 +61,7 @@ export class AlarmoChips extends LitElement {
     fireEvent(this, 'value-changed', { value: value });
   }
 
-  static get styles(): CSSResult {
+  static get styles(): CSSResultGroup {
     return css`
       :host {
       }

@@ -1,4 +1,5 @@
-import { LitElement, html, customElement, property, CSSResult, css } from 'lit-element';
+import { LitElement, html, CSSResultGroup, css } from 'lit';
+import { property, customElement } from 'lit/decorators.js';
 import { HomeAssistant, navigate } from 'custom-card-helpers';
 import { loadHaForm } from './load-ha-form';
 
@@ -172,7 +173,7 @@ export class MyAlarmPanel extends LitElement {
     }
   }
 
-  static get styles(): CSSResult {
+  static get styles(): CSSResultGroup {
     return css`
       ${commonStyle}
 

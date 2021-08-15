@@ -1,4 +1,5 @@
-import { LitElement, html, customElement, property, CSSResult, css, internalProperty } from 'lit-element';
+import { LitElement, html, css, CSSResultGroup } from 'lit';
+import { property, customElement, state } from 'lit/decorators.js';
 import { HomeAssistant, fireEvent } from 'custom-card-helpers';
 import { saveArea, deleteArea, fetchAreas, fetchSensors, fetchAutomations } from '../data/websockets';
 import { AlarmoArea, Dictionary, AlarmoSensor, AlarmoAutomation } from '../types';
@@ -14,7 +15,7 @@ import './confirm-delete-dialog';
 export class CreateAreaDialog extends SubscribeMixin(LitElement) {
   @property({ attribute: false }) public hass!: HomeAssistant;
 
-  @internalProperty() private _params?: any;
+  @state() private _params?: any;
   @property() areas: Dictionary<AlarmoArea> = {};
   @property() sensors: Dictionary<AlarmoSensor> = {};
   @property() automations: Dictionary<AlarmoAutomation> = {};
@@ -167,7 +168,7 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
     }
   }
 
-  static get styles(): CSSResult {
+  static get styles(): CSSResultGroup {
     return css`
       ${commonStyle}
       div.wrapper {

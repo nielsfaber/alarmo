@@ -1,4 +1,5 @@
-import { css, CSSResult, customElement, html, LitElement, property } from 'lit-element';
+import { LitElement, html, css, CSSResultGroup } from 'lit';
+import { property, customElement } from 'lit/decorators.js';
 
 @customElement('collapsible-section')
 export class CollapsibleSection extends LitElement {
@@ -12,34 +13,26 @@ export class CollapsibleSection extends LitElement {
         ? html`
             <div class="header open">
               <span
-                @click=${() => {
-                  this.open = false;
-                }}
+                @click=${() => { this.open = false; }}
               >
                 ${this.header}
               </span>
               <ha-icon-button
                 icon="hass:chevron-down"
-                @click=${() => {
-                  this.open = false;
-                }}
+                @click=${() => { this.open = false; }}
               >
               </ha-icon-button>
             </div>
             <slot></slot>
             <div class="header open">
               <span
-                @click=${() => {
-                  this.open = false;
-                }}
+                @click=${() => { this.open = false; }}
               >
                 ${this.header}
               </span>
               <ha-icon-button
                 icon="hass:chevron-up"
-                @click=${() => {
-                  this.open = false;
-                }}
+                @click=${() => { this.open = false; }}
               >
               </ha-icon-button>
             </div>
@@ -47,17 +40,13 @@ export class CollapsibleSection extends LitElement {
         : html`
             <div class="header">
               <span
-                @click=${() => {
-                  this.open = true;
-                }}
+                @click=${() => { this.open = true; }}
               >
                 ${this.header}
               </span>
               <ha-icon-button
                 icon="hass:chevron-right"
-                @click=${() => {
-                  this.open = true;
-                }}
+                @click=${() => { this.open = true; }}
               >
               </ha-icon-button>
             </div>
@@ -65,7 +54,7 @@ export class CollapsibleSection extends LitElement {
     `;
   }
 
-  static get styles(): CSSResult {
+  static get styles(): CSSResultGroup {
     return css`
       :host {
       }

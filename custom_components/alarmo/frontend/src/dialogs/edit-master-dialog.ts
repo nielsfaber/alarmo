@@ -1,4 +1,5 @@
-import { LitElement, html, customElement, property, CSSResult, css, internalProperty } from 'lit-element';
+import { LitElement, html, css, CSSResultGroup } from 'lit';
+import { property, customElement, state } from 'lit/decorators.js';
 import { HomeAssistant } from 'custom-card-helpers';
 import { localize } from '../../localize/localize';
 import { fetchConfig, saveConfig } from '../data/websockets';
@@ -7,7 +8,7 @@ import { fetchConfig, saveConfig } from '../data/websockets';
 export class EditMasterDialog extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
 
-  @internalProperty() private _params?: any;
+  @state() private _params?: any;
   @property() name = '';
 
   public async showDialog(params: any): Promise<void> {
@@ -66,7 +67,7 @@ export class EditMasterDialog extends LitElement {
       });
   }
 
-  static get styles(): CSSResult {
+  static get styles(): CSSResultGroup {
     return css`
       div.wrapper {
         color: var(--primary-text-color);

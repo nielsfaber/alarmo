@@ -1,4 +1,5 @@
-import { LitElement, html, customElement, property } from 'lit-element';
+import { LitElement, html } from 'lit';
+import { property, customElement } from 'lit/decorators.js';
 import { HomeAssistant, navigate } from 'custom-card-helpers';
 import { commonStyle } from '../../styles';
 import { AlarmoSensor, EArmModes, Dictionary, AlarmoArea } from '../../types';

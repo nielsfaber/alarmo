@@ -1,4 +1,5 @@
-import { LitElement, html, customElement, css, property } from 'lit-element';
+import { LitElement, html, css } from 'lit';
+import { property, customElement } from 'lit/decorators.js';
 import { HomeAssistant } from 'custom-card-helpers';
 
 type OptionValue = string;
@@ -39,8 +40,8 @@ export class AlarmoMultiEntitySelect extends LitElement {
         <div class="dropdown-holder">
           <ha-entity-picker
             @change=${(ev: Event) => {
-              this.selectedChange(ev, index);
-            }}
+        this.selectedChange(ev, index);
+      }}
             .includeDomains=${this.includeDomains}
             .hass=${this.hass}
             value=${this.getValue(index)}

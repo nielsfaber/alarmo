@@ -1,4 +1,5 @@
-import { LitElement, html, customElement, css, property } from 'lit-element';
+import { LitElement, html, TemplateResult, css } from 'lit';
+import { property, customElement } from 'lit/decorators.js';
 import { IsEqual } from '../helpers';
 
 type OptionValue = string | number;
@@ -41,7 +42,7 @@ export class AlarmoMultiSelect extends LitElement {
             selected=${this.getSelected(index)}
             @selected-item-changed=${(ev: ChangeEvent) => this.selectedChange(ev, index)}
           >
-            ${this.renderOptions(index)}
+            ${this.renderSelectOptions(index)}
           </paper-listbox>
         </paper-dropdown-menu>
         ${this.renderButton(index)}
@@ -68,7 +69,7 @@ export class AlarmoMultiSelect extends LitElement {
       `;
   }
 
-  private renderOptions(index: number) {
+  private renderSelectOptions(index: number): TemplateResult[] {
     const list = this.value.slice(0, index).concat(this.value.slice(index + 1));
     return this.options
       .filter(e => e.value)

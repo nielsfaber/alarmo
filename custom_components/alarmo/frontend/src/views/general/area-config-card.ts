@@ -1,4 +1,5 @@
-import { LitElement, html, customElement, property } from 'lit-element';
+import { LitElement, html } from 'lit';
+import { property, customElement } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
 import { HomeAssistant, fireEvent } from 'custom-card-helpers';
 

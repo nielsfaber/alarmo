@@ -1,5 +1,6 @@
+import { PropertyValues, ReactiveElement } from 'lit';
+import { property } from 'lit/decorators.js';
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
-import { property, PropertyValues, UpdatingElement } from 'lit-element';
 import { HomeAssistant } from 'custom-card-helpers';
 
 export interface HassSubscribeElement {
@@ -7,7 +8,7 @@ export interface HassSubscribeElement {
 }
 export type Constructor<T = any> = new (...args: any[]) => T;
 
-export const SubscribeMixin = <T extends Constructor<UpdatingElement>>(superClass: T) => {
+export const SubscribeMixin = <T extends Constructor<ReactiveElement>>(superClass: T) => {
   class SubscribeClass extends superClass {
     @property({ attribute: false }) public hass?: HomeAssistant;
 

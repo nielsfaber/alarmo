@@ -1,4 +1,5 @@
-import { css, CSSResult, customElement, html, LitElement, property, SVGTemplateResult } from 'lit-element';
+import { LitElement, html, css, CSSResultGroup, TemplateResult } from 'lit';
+import { property, customElement } from 'lit/decorators.js';
 
 @customElement('settings-row')
 export class SettingsRow extends LitElement {
@@ -15,7 +16,7 @@ export class SettingsRow extends LitElement {
   @property({ type: Boolean })
   nested?: boolean;
 
-  protected render(): SVGTemplateResult {
+  protected render(): TemplateResult {
     return html`
       <div class="info">
         <slot name="heading"></slot>
@@ -25,7 +26,7 @@ export class SettingsRow extends LitElement {
     `;
   }
 
-  static get styles(): CSSResult {
+  static get styles(): CSSResultGroup {
     return css`
       :host {
         display: flex;

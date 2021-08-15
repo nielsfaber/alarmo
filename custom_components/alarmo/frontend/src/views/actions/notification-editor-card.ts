@@ -1,5 +1,6 @@
+import { LitElement, html, TemplateResult, CSSResultGroup, css } from 'lit';
+import { property, customElement } from 'lit/decorators.js';
 import { HomeAssistant, navigate, computeDomain } from 'custom-card-helpers';
-import { css, CSSResult, customElement, html, LitElement, property, TemplateResult } from 'lit-element';
 import { AlarmoAutomation, EAlarmEvent, EArmModes, AlarmoArea, Dictionary, AutomationAction, AlarmoConfig } from '../../types';
 
 import { handleError, omit, showErrorDialog, isDefined } from '../../helpers';
@@ -541,7 +542,7 @@ export class NotificationEditorCard extends LitElement {
     navigate(this, '/alarmo/actions', true);
   }
 
-  static get styles(): CSSResult {
+  static get styles(): CSSResultGroup {
     return css`
       div.content {
         padding: 28px 20px 0;
