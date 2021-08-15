@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
-import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { HomeAssistant, fireEvent } from 'custom-card-helpers';
 
 import { prettyPrint, sortAlphabetically } from '../../helpers';
