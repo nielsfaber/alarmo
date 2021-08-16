@@ -239,7 +239,9 @@ class MigratableStore(Store):
                         **omit(sensor, ["immediate"]),
                         "use_exit_delay": not sensor["immediate"] and not sensor["always_on"],
                         "use_entry_delay": not sensor["immediate"] and not sensor["always_on"],
-                        "auto_bypass_modes": sensor["modes"] if sensor["auto_bypass"] else [],
+                        "auto_bypass_modes": sensor["modes"]
+                        if "auto_bypass" in sensor and sensor["auto_bypass"]
+                        else [],
                     }
                 ))
                 for sensor in data["sensors"]
