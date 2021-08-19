@@ -2413,7 +2413,7 @@ class rt extends class{constructor(e){}T(e,a,t){this.Σdt=e,this.M=a,this.Σct=t
                 ${ya("title",this.hass.language)}
               </div>
               <div class="version">
-                v${"1.7.1"}
+                v${"1.7.2"}
               </div>
             </app-toolbar>
             <ha-tabs
