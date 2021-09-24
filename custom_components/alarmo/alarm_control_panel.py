@@ -161,8 +161,8 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
         """Return one or more digits/characters."""
         if (
             self._config and (
-                self._config[ATTR_CODE_ARM_REQUIRED]
-                or self._config[const.ATTR_CODE_DISARM_REQUIRED]
+                self.code_arm_required or
+                self.code_disarm_required
             )
         ):
             return self._config[ATTR_CODE_FORMAT]
@@ -187,16 +187,16 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
     @property
     def code_arm_required(self):
         """Whether the code is required for arm actions."""
-        if not self._config:
-            return None
+        if not self._config or not ATTR_CODE_ARM_REQUIRED in self._config:
+            return True # assume code is needed (conservative approach)
         else:
             return self._config[ATTR_CODE_ARM_REQUIRED]
 
     @property
     def code_disarm_required(self):
         """Whether the code is required for disarm actions."""
-        if not self._config:
-            return None
+        if not self._config or not const.ATTR_CODE_DISARM_REQUIRED in self._config:
+            return True # assume code is needed (conservative approach)
         else:
             return self._config[const.ATTR_CODE_DISARM_REQUIRED]
 
@@ -280,10 +280,10 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
     def _validate_code(self, code, state):
         """Validate given code."""
 
-        if state == STATE_ALARM_DISARMED and not self._config[const.ATTR_CODE_DISARM_REQUIRED]:
+        if state == STATE_ALARM_DISARMED and not self.code_disarm_required:
             self._changed_by = None
             return (True, None)
-        elif state != STATE_ALARM_DISARMED and not self._config[ATTR_CODE_ARM_REQUIRED]:
+        elif state != STATE_ALARM_DISARMED and not self.code_arm_required:
             self._changed_by = None
             return (True, None)
         elif not code or len(code) < 1:
@@ -307,8 +307,11 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
         """Send disarm command."""
         _LOGGER.debug("alarm_disarm")
 
-        if self._state == STATE_ALARM_DISARMED:
-            _LOGGER.warning("Cannot go to state {} from state {}.".format(STATE_ALARM_DISARMED, self._state))
+        if self._state == STATE_ALARM_DISARMED or not self._config:
+            if not self._config:
+                _LOGGER.warning("Cannot process disarm command, alarm is not initialized yet.")
+            else:
+                _LOGGER.warning("Cannot go to state {} from state {}.".format(STATE_ALARM_DISARMED, self._state))
             async_dispatcher_send(
                 self.hass, "alarmo_event",
                 const.EVENT_COMMAND_NOT_ALLOWED,
@@ -353,9 +356,12 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
 
         if (
             not (const.MODES_TO_SUPPORTED_FEATURES[arm_mode] & self.supported_features) or
-            (self._state != STATE_ALARM_DISARMED and self._state not in ARM_MODES)
+            (self._state != STATE_ALARM_DISARMED and self._state not in ARM_MODES) or
+            not self._config
         ):
-            if not (const.MODES_TO_SUPPORTED_FEATURES[arm_mode] & self.supported_features):
+            if not self._config or not self._state:
+                _LOGGER.warning("Cannot process arm command, alarm is not initialized yet.")
+            elif not (const.MODES_TO_SUPPORTED_FEATURES[arm_mode] & self.supported_features):
                 _LOGGER.warning("Mode {} is not supported, ignoring.".format(arm_mode))
             else:
                 _LOGGER.warning("Cannot go to state {} from state {}.".format(arm_mode, self._state))
