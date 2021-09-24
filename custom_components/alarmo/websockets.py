@@ -381,6 +381,24 @@ def websocket_get_automations(hass, connection, msg):
     connection.send_result(msg["id"], automations)
 
 
+@callback
+def websocket_get_alarm_entities(hass, connection, msg):
+    """Publish alarm entity data."""
+    result = [
+        {
+            "entity_id": entity.entity_id,
+            "area_id": area_id
+        }
+        for (area_id, entity) in hass.data[const.DOMAIN]["areas"].items()
+    ]
+    if hass.data[const.DOMAIN]["master"]:
+        result.append({
+            "entity_id": hass.data[const.DOMAIN]["master"].entity_id,
+            "area_id": 0
+        })
+    connection.send_result(msg["id"], result)
+
+
 async def async_register_websockets(hass):
 
     hass.http.register_view(AlarmoConfigView)
@@ -432,5 +450,13 @@ async def async_register_websockets(hass):
         websocket_get_automations,
         websocket_api.BASE_COMMAND_MESSAGE_SCHEMA.extend(
             {vol.Required("type"): "alarmo/automations"}
+        ),
+    )
+    async_register_command(
+        hass,
+        "alarmo/entities",
+        websocket_get_alarm_entities,
+        websocket_api.BASE_COMMAND_MESSAGE_SCHEMA.extend(
+            {vol.Required("type"): "alarmo/entities"}
         ),
     )
