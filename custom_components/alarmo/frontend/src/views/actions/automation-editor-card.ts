@@ -106,7 +106,7 @@ export class AutomationEditorCard extends LitElement {
 
           ${Object.keys(this.areas).length > 1
         ? html`
-          <settings-row .narrow=${this.narrow}>
+          <settings-row .narrow=${this.narrow} .large=${true}>
             <span slot="heading">
               ${localize('panels.actions.cards.new_action.fields.area.heading', this.hass.language)}
             </span>
@@ -126,7 +126,7 @@ export class AutomationEditorCard extends LitElement {
           </settings-row>
           ` : ''}
 
-          <settings-row .narrow=${this.narrow}>
+          <settings-row .narrow=${this.narrow} .large=${true} last>
             <span slot="heading">
               ${localize('panels.actions.cards.new_notification.fields.mode.heading', this.hass.language)}
             </span>
