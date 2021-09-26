@@ -74,7 +74,7 @@
             },
             "trigger_time": {
               "heading": "Trigger time",
-              "description": "Time during which the siren will sound"
+              "description": "Time during which the alarm will remain in the triggered state after activation."
             }
           }
         },
@@ -477,8 +477,7 @@
             "action": {
               "heading": "Action",
               "description": "Action to perform on the entity",
-              "turn_on": "Turn on",
-              "turn_off": "Turn off"
+              "no_common_actions": "Actions can only be assigned in YAML mode for the selected entities."
             },
             "name": {
               "heading": "Name",

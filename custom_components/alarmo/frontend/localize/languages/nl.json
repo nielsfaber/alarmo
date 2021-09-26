@@ -74,7 +74,7 @@
             },
             "trigger_time": {
               "heading": "Activeer tijd",
-              "description": "Tijd waarin de sirene af gaat."
+              "description": "Tijd waarin het alarm in de geactiveerde toestand blijft na activatie."
             }
           }
         },
@@ -477,19 +477,18 @@
             "action": {
               "heading": "Actie",
               "description": "Actie die op de entiteit moet worden uitgevoerd",
-              "turn_on": "Zet aan",
-              "turn_off": "Zet uit"
+              "no_common_actions": "Acties kunnen alleen worden toegewezen in de YAML modus voor de geselecteerde entiteiten."
             },
             "name": {
               "heading": "Naam",
               "description": "Beschrijving voor deze actie",
               "placeholders": {
-                "armed": "Schakel {target} naar {state} bij inschakelen",
-                "disarmed": "Schakel {target} naar {state} bij uitschakelen",
-                "triggered": "Schakel {target} naar {state} bij alarm",
-                "arm_failure": "Schakel {target} naar {state} bij fout",
-                "arming": "Schakel {target} naar {state} bij vertrek",
-                "pending": "Schakel {target} naar {state} bij binnenkomst"
+                "armed": "Schakel {entity} naar {state} bij inschakelen",
+                "disarmed": "Schakel {entity} naar {state} bij uitschakelen",
+                "triggered": "Schakel {entity} naar {state} bij alarm",
+                "arm_failure": "Schakel {entity} naar {state} bij fout",
+                "arming": "Schakel {entity} naar {state} bij vertrek",
+                "pending": "Schakel {entity} naar {state} bij binnenkomst"
               }
             }
           }

@@ -4,6 +4,7 @@ import { EArmModeIcons } from "../const";
 
 import { computeDomain, computeEntity, HomeAssistant, computeStateDisplay, stateIcon, domainIcon } from "custom-card-helpers";
 import { Unique, flatten, isDefined, sortAlphabetically } from "../helpers";
+import { HassEntity } from "home-assistant-js-websocket";
 
 export const computeArmModeDisplay = (val: EArmModes, hass: HomeAssistant) => {
   switch (val) {
@@ -185,26 +186,16 @@ export const getNotifyServices = (hass: HomeAssistant) => [
   ...Object.keys(hass.services.notify).map(service => `notify.${service}`)
 ];
 
-export const getAutomationEntities = (hass: HomeAssistant, customEntities?: string[]) => {
-  const isValidDomain = (domain: string) => ['light', 'switch', 'input_boolean', 'script', 'siren'].includes(domain);
-
+export const getAutomationEntities = (hass: HomeAssistant, additionalEntities?: string[]) => {
   let entities = [
     ...Object.keys(hass.states)
-      .filter(e => {
-        const domain = computeDomain(e);
-        if (domain == 'group') {
-          const entities = hass.states[e].attributes.entity_id || [];
-          if (!entities || !Array.isArray(entities) || !entities.length) return false;
-          else return entities.map(v => computeDomain(v)).every(isValidDomain);
-        }
-        else return isValidDomain(domain);
-      })
+      .filter(e => computeActions(e, hass).length)
   ];
 
-  if (customEntities && customEntities.length) {
+  if (additionalEntities && additionalEntities.length) {
     entities = [
       ...entities,
-      ...customEntities.filter(e => !entities.includes(e))
+      ...additionalEntities.filter(e => !entities.includes(e))
     ];
   }
 
@@ -278,3 +269,84 @@ export const isArray = (input: any) => (
 export const isString = (input: any) => (
   typeof input === "string"
 );
+
+export const computeActions = (entity_id: string | undefined | (string | undefined)[], hass: HomeAssistant): string[] => {
+
+  if (Array.isArray(entity_id)) {
+    let actionLists = entity_id.map(e => computeActions(e, hass));
+    return computeMergedActions(...actionLists);
+  }
+  else if (!isDefined(entity_id)) return [];
+
+  const domain = computeDomain(entity_id);
+  switch (domain) {
+    case 'light':
+    case 'switch':
+    case 'input_boolean':
+    case 'siren':
+      return [
+        `${domain}.turn_on`,
+        `${domain}.turn_off`
+      ];
+    case 'script':
+      return [
+        entity_id
+      ];
+    case 'lock':
+      return [
+        'lock.lock',
+        'lock.unlock'
+      ];
+    case 'group':
+      let groupObj = entity_id in hass.states ? hass.states[entity_id] : undefined;
+      const entities: string[] = groupObj?.attributes.entity_id || [];
+      return computeActions(entities, hass);
+    default:
+      return [];
+  }
+}
+
+export const computeMergedActions = (...actionLists: string[][]) => {
+  if (actionLists.length == 1 && actionLists[0].length > 1 && Unique(actionLists[0].map(computeDomain)).length > 1) return computeMergedActions(...actionLists[0].map(e => Array(e)));
+  let intersection = [...actionLists[0]];
+  actionLists.forEach(list => {
+    intersection = intersection.map(e => {
+      if (list.includes(e)) return e;
+      else if (computeDomain(e) == 'script' && list.map(computeDomain).includes('script')) return `script.script`;
+      else if (list.map(computeEntity).includes(computeEntity(e))) return `homeassistant.${computeEntity(e)}`;
+      else return null;
+    }).filter(isDefined);
+  });
+  return intersection;
+};
+
+export const computeActionDisplay = (action: string, hass: HomeAssistant) => {
+  let service = computeEntity(action);
+  if (computeDomain(action) == 'script') service = 'run';
+
+  switch (service) {
+    case 'turn_on':
+      return hass.localize('ui.card.media_player.turn_on');
+    case 'turn_off':
+      return hass.localize('ui.card.media_player.turn_off');
+    case 'lock':
+      return hass.localize('ui.card.lock.lock');
+    case 'unlock':
+      return hass.localize('ui.card.lock.unlock');
+    case 'run':
+      return hass.localize('ui.card.script.run');
+    default:
+      return service;
+  }
+}
+
+export const findMatchingAction = (actionList: string[], matchedAction: string) => {
+  return actionList.find(action => {
+    return (
+      action == matchedAction ||
+      (computeEntity(matchedAction) == 'turn_on' && computeEntity(action) == 'turn_on') ||
+      (computeEntity(matchedAction) == 'turn_off' && computeEntity(action) == 'turn_off') ||
+      (computeDomain(matchedAction) == 'script' && computeDomain(action) == 'script')
+    )
+  });
+}

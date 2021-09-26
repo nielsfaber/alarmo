@@ -477,8 +477,7 @@
             "action": {
               "heading": "Acción",
               "description": "Acción a realizar en la entidad.",
-              "turn_on": "Activar",
-              "turn_off": "Desactivar"
+              "no_common_actions": "Actions can only be assigned in YAML mode for the selected entities."
             },
             "name": {
               "heading": "Nombre",

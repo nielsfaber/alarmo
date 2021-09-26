@@ -74,7 +74,7 @@ export const sensorConfigByType = (modeList: EArmModes[]): Dictionary<Partial<Al
       modes: filterModes([EArmModes.ArmedAway, EArmModes.ArmedHome, EArmModes.ArmedNight]),
       always_on: false,
       allow_open: false,
-      arm_on_close: true,
+      arm_on_close: false,
       use_entry_delay: true,
       use_exit_delay: false,
     },

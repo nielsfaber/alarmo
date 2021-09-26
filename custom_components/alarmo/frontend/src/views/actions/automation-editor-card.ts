@@ -6,7 +6,7 @@ import { AlarmoAutomation, EAlarmEvent, EArmModes, AlarmoArea, Dictionary, Autom
 import { handleError, isDefined, Unique, omit, showErrorDialog } from '../../helpers';
 import { saveAutomation, fetchAreas, fetchConfig, deleteAutomation } from '../../data/websockets';
 import { localize } from '../../../localize/localize';
-import { computeEventDisplay, computeAreaDisplay, computeArmModeDisplay, getAreaOptions, getArmModeOptions, getAutomationEntities, computeEntityDisplay, isValidString, isValidEntity, isValidService, isObject, isString, isArray } from '../../data/actions';
+import { computeEventDisplay, computeAreaDisplay, computeArmModeDisplay, getAreaOptions, getArmModeOptions, getAutomationEntities, computeEntityDisplay, isValidString, isValidEntity, isValidService, isObject, isString, isArray, computeActions, computeActionDisplay, computeMergedActions, findMatchingAction } from '../../data/actions';
 
 
 import '../../components/alarmo-selector';
@@ -170,7 +170,7 @@ export class AutomationEditorCard extends LitElement {
             ></alarmo-selector>
           </settings-row>
 
-        ${!this.config.actions.map(e => e.entity_id).length || this.config.actions.map(e => computeDomain(e.entity_id || '')).some(e => e != 'script')
+        ${this.config.actions.map(e => e.entity_id).length
             ? html`        
           <settings-row .narrow=${this.narrow}>
             <span slot="heading">
@@ -181,22 +181,8 @@ export class AutomationEditorCard extends LitElement {
             </span>
             
             <div>
-              <mwc-button
-                class="${this._selectedAction() == 'turn_on' ? 'active' : ''}"
-                @click=${() => this._setAction('turn_on')}
-                ?invalid=${this.errors.service}
-              >
-                ${localize('panels.actions.cards.new_action.fields.action.turn_on', this.hass.language)}
-              </mwc-button>
-              <mwc-button
-                class="${this._selectedAction() == 'turn_off' ? 'active' : ''}"
-                @click=${() => this._setAction('turn_off')}
-                ?invalid=${this.errors.service}
-              >
-                ${localize('panels.actions.cards.new_action.fields.action.turn_off', this.hass.language)}
-              </mwc-button>
+              ${this.renderActions()}
             </div>
-
           </settings-row>
           `
             : ''}
@@ -282,6 +268,41 @@ export class AutomationEditorCard extends LitElement {
     `;
   }
 
+  private renderActions() {
+    let selectedEntities = this.config.actions.map(e => e.entity_id);
+    let actions = computeActions(selectedEntities, this.hass);
+
+    if (!actions.length) {
+      return localize('panels.actions.cards.new_action.fields.action.no_common_actions', this.hass.language);
+    }
+
+    const isMatchingAction = (...actions: (string | null)[]) => {
+      if (!actions.every(isDefined)) return false;
+      return Unique(computeMergedActions(actions.filter(isDefined))).length == 1;
+    }
+
+    return actions.map(action => {
+      return html`
+      <mwc-button
+        class="${isMatchingAction(this._selectedAction(), action) ? 'active' : ''}"
+        @click=${() => this._setAction(action)}
+        ?invalid=${this.errors.service}
+        ?disabled=${actions.length == 1}
+      >
+        ${computeActionDisplay(action, this.hass)}
+      </mwc-button>
+      `;
+    });
+  }
+
+  private _selectedAction() {
+    let selectedActions = this.config.actions.map(e => e.service);
+    if (!selectedActions.every(isDefined)) return null;
+    selectedActions = Unique(computeMergedActions(selectedActions.filter(isDefined)));
+    if (selectedActions.length == 1) return selectedActions[0]!;
+    else return null;
+  }
+
   private _setEvent(ev: CustomEvent) {
     ev.stopPropagation();
     const value = ev.detail.value as EAlarmEvent;
@@ -313,32 +334,26 @@ export class AutomationEditorCard extends LitElement {
     if (Object.keys(this.errors).includes('service')) this._validateConfig();
   }
 
-
-  private _selectedAction() {
-    let actions = this.config.actions.filter(e => !e.entity_id || computeDomain(e.entity_id) != 'script').map(e => e.service).filter(isDefined);
-    if (actions.length && actions.every(e => e.includes('turn_on'))) return 'turn_on';
-    else if (actions.length && actions.every(e => e.includes('turn_off'))) return 'turn_off';
-    return null;
-  }
-
   private _setEntity(ev: CustomEvent) {
     ev.stopPropagation();
-    const value = ev.detail.value as string[];
+    const selectedEntities = ev.detail.value as string[];
     let actionConfig = this.config.actions;
 
     //assign service for added entity if it is in common
     let serviceSetting: string | null = null;
-    if (value.length > actionConfig.length && this._selectedAction()) serviceSetting = this._selectedAction();
+    if (selectedEntities.length > actionConfig.length && this._selectedAction()) serviceSetting = this._selectedAction();
 
-    if (actionConfig.length > value.length)
-      actionConfig = [actionConfig[0], ...actionConfig.slice(1, value.length)];
+    if (actionConfig.length > selectedEntities.length) {
+      let removedAction = actionConfig.findIndex(e => !selectedEntities.includes(e.entity_id || ""));
+      if (removedAction < 0) removedAction = actionConfig.length - 1;
+      actionConfig.splice(removedAction, 1);
+    }
 
-    if (!value.length) Object.assign(actionConfig, { [0]: omit(actionConfig[0], 'entity_id') });
+    if (!selectedEntities.length) Object.assign(actionConfig, { [0]: omit(actionConfig[0], 'entity_id') });
 
-    value.forEach((entity, i) => {
+    selectedEntities.forEach((entity, i) => {
       let action = actionConfig.length > i ? { ...actionConfig[i] } : {};
-      action = { ...action, entity_id: entity };
-      if (computeDomain(entity) == 'script') action = { ...action, service: entity };
+      action = action.entity_id == entity ? { ...action } : { entity_id: entity };
       Object.assign(actionConfig, { [i]: action });
     });
 
@@ -347,13 +362,17 @@ export class AutomationEditorCard extends LitElement {
     if (Object.keys(this.errors).includes('entity_id')) this._validateConfig();
   }
 
-  private _setAction(action: string) {
+  private _setAction(selectedAction: string) {
     let actionConfig = this.config.actions;
 
+    let selectedEntities = this.config.actions.map(e => e.entity_id);
+    let availableActions = computeActions(selectedEntities, this.hass);
+    if (!availableActions.length) return;
+
     actionConfig.forEach((e, i) => {
-      const domain = e.entity_id ? computeDomain(e.entity_id) : 'homeassistant';
-      if (domain != 'script')
-        Object.assign(actionConfig, { [i]: { service: `${domain}.${action}`, ...omit(e, 'service') } });
+      let actions = computeActions(e.entity_id, this.hass);
+      let service = findMatchingAction(actions, selectedAction);
+      Object.assign(actionConfig, { [i]: { service: service, ...omit(e, 'service') } });
     });
     this.config = { ...this.config, actions: actionConfig };
   }
@@ -400,14 +419,17 @@ export class AutomationEditorCard extends LitElement {
     if (!triggerConfig.modes?.every(e => getArmModeOptions(triggerConfig.area, this.areas!).includes(e)))
       this.errors = { ...this.errors, modes: true };
 
-    const services = data.actions.map(e => e.service);
-    if (!services.length || !services.every(e => isValidService(e, this.hass)))
-      this.errors = { ...this.errors, service: true };
-
     let entities = data.actions.map(e => e.entity_id);
     if (this.viewMode == ViewMode.Yaml) entities = entities.filter(isDefined);
     if (!data.actions.length || !entities.every(e => isValidEntity(e, this.hass)))
       this.errors = { ...this.errors, entity_id: true };
+
+    const services = data.actions.map(e => e.service);
+    if (!services.length || !services.every(e => isValidService(e, this.hass))) {
+      this.errors = { ...this.errors, service: true };
+      let availableActions = computeActions(entities, this.hass);
+      if (!availableActions.length) this.viewMode = ViewMode.Yaml;
+    }
 
     if (!isValidString(data.name))
       this.errors = { ...this.errors, name: true };
@@ -458,6 +480,8 @@ export class AutomationEditorCard extends LitElement {
     let state: string | undefined = undefined;
     if (services.length == 1 && services[0]?.includes("turn_on")) state = this.hass.localize("state.default.on");
     if (services.length == 1 && services[0]?.includes("turn_off")) state = this.hass.localize("state.default.off");
+    if (services.length == 1 && services[0]?.includes("lock")) state = this.hass.localize("component.lock.state._.locked");
+    if (services.length == 1 && services[0]?.includes("unlock")) state = this.hass.localize("component.lock.state._.unlocked");
     if (!event || !entity || !state) return "";
     else return localize(`panels.actions.cards.new_action.fields.name.placeholders.${event}`, this.hass.language, ['{entity}', '{state}'], [entity, state]);
   }
@@ -588,6 +612,10 @@ export class AutomationEditorCard extends LitElement {
         background: var(--primary-color);
         --mdc-theme-primary: var(--text-primary-color);
         border-radius: 4px;
+      }
+      mwc-button[disabled].active {
+        background: var(--disabled-text-color);
+        --mdc-button-disabled-ink-color: var(--text-primary-color);
       }
       div.heading {
         display: grid;

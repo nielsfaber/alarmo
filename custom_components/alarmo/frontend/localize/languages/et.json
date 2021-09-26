@@ -477,8 +477,7 @@
             "action": {
               "heading": "Toiming",
               "description": "Olemi toiming",
-              "turn_on": "Lülita sisse",
-              "turn_off": "Lülita välja"
+              "no_common_actions": "Actions can only be assigned in YAML mode for the selected entities."
             },
             "name": {
               "heading": "Nimi",

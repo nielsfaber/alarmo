@@ -477,8 +477,7 @@
             "action": {
               "heading": "Azione",
               "description": "Azione che deve eseguire l'entità",
-              "turn_on": "Accendi",
-              "turn_off": "Spegni"
+              "no_common_actions": "Actions can only be assigned in YAML mode for the selected entities."
             },
             "name": {
               "heading": "Nome",
