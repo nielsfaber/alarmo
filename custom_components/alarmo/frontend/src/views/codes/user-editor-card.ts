@@ -6,6 +6,7 @@ import { AlarmoConfig, AlarmoUser, Dictionary } from '../../types';
 import { fetchUsers, saveUser, deleteUser } from '../../data/websockets';
 import { localize } from '../../../localize/localize';
 import { omit, pick, showErrorDialog, handleError } from '../../helpers';
+import { ConfirmDeleteDialog } from '../../dialogs/confirm-delete-dialog';
 
 @customElement('user-editor-card')
 export class UserEditorCard extends LitElement {
@@ -244,30 +245,36 @@ export class UserEditorCard extends LitElement {
 
   private saveClick(ev: Event) {
     if (!this.data) return;
-    if (!this.data.name.length)
+    let data = {
+      ...this.data,
+      code: this.data.code.trim(),
+      confirm_code: this.data.confirm_code.trim()
+    }
+
+    if (!data.name.length)
       showErrorDialog(ev, localize('panels.codes.cards.new_user.errors.no_name', this.hass.language));
-    else if (this.data.code.length < 4 && (!this.item || this.data.old_code.length))
+    else if (data.code.length < 4 && (!this.item || data.old_code.length))
       showErrorDialog(ev, localize('panels.codes.cards.new_user.errors.no_code', this.hass.language));
-    else if (this.data.code !== this.data.confirm_code)
+    else if (data.code !== data.confirm_code)
       showErrorDialog(ev, localize('panels.codes.cards.new_user.errors.code_mismatch', this.hass.language));
     else {
-      if (this.data.is_admin) this.data = { ...this.data, can_arm: true, can_disarm: true };
+      if (data.is_admin) data = { ...data, can_arm: true, can_disarm: true };
 
       if (!this.item) {
-        saveUser(this.hass, omit(this.data, 'confirm_code', 'old_code'))
+        saveUser(this.hass, omit(data, 'confirm_code', 'old_code'))
           .catch(e => handleError(e, ev))
           .then(() => {
             this.cancelClick();
           });
       } else {
-        let data: Partial<AlarmoUser> = {
-          ...pick(this.data, ['name', 'is_admin', 'can_arm', 'can_disarm']),
+        let saveData: Partial<AlarmoUser> = {
+          ...pick(data, ['name', 'is_admin', 'can_arm', 'can_disarm']),
           user_id: this.item,
         };
-        if (this.data.old_code.length) {
-          data = { ...data, old_code: this.data.old_code, code: this.data.code };
+        if (data.old_code.length) {
+          saveData = { ...data, old_code: this.data.old_code, code: this.data.code };
         }
-        saveUser(this.hass, data)
+        saveUser(this.hass, saveData)
           .catch(e => handleError(e, ev))
           .then(() => {
             this.cancelClick();

@@ -217,6 +217,8 @@ class AlarmoCoordinator(DataUpdateCoordinator):
             return
 
         if ATTR_CODE in data and data[ATTR_CODE]:
+            data[const.ATTR_CODE_FORMAT] = "number" if data[ATTR_CODE].isdigit() else "text"
+            data[const.ATTR_CODE_LENGTH] = len(data[ATTR_CODE])
             hashed = bcrypt.hashpw(
                 data[ATTR_CODE].encode("utf-8"), bcrypt.gensalt(rounds=12)
             )

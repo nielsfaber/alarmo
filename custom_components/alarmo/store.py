@@ -122,6 +122,8 @@ class UserEntry:
     can_arm = attr.ib(type=bool, default=False)
     can_disarm = attr.ib(type=bool, default=False)
     is_override_code = attr.ib(type=bool, default=False)
+    code_format = attr.ib(type=str, default="")
+    code_length = attr.ib(type=int, default=0)
 
 
 @attr.s(slots=True, frozen=True)
