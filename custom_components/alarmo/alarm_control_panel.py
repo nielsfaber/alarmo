@@ -187,16 +187,16 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
     @property
     def code_arm_required(self):
         """Whether the code is required for arm actions."""
-        if not self._config or not ATTR_CODE_ARM_REQUIRED in self._config:
-            return True # assume code is needed (conservative approach)
+        if not self._config or ATTR_CODE_ARM_REQUIRED not in self._config:
+            return True  # assume code is needed (conservative approach)
         else:
             return self._config[ATTR_CODE_ARM_REQUIRED]
 
     @property
     def code_disarm_required(self):
         """Whether the code is required for disarm actions."""
-        if not self._config or not const.ATTR_CODE_DISARM_REQUIRED in self._config:
-            return True # assume code is needed (conservative approach)
+        if not self._config or const.ATTR_CODE_DISARM_REQUIRED not in self._config:
+            return True  # assume code is needed (conservative approach)
         else:
             return self._config[const.ATTR_CODE_DISARM_REQUIRED]
 
