@@ -115,6 +115,9 @@ export class AlarmoSelect extends LitElement {
               flex: 0 0 40px;
               color: var(--state-icon-color);
           }
+          :host([selected]) paper-icon-item {
+            margin-left: 24px;
+          }
         </style>
         <paper-icon-item>
           <ha-icon icon="" slot="item-icon"></ha-icon>
@@ -130,6 +133,9 @@ export class AlarmoSelect extends LitElement {
           paper-item {
               margin: -10px;
               padding: 0;
+          }
+          :host([selected]) paper-item {
+            margin-left: 24px;
           }
         </style>
         <paper-item>

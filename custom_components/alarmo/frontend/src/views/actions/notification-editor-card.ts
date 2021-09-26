@@ -41,7 +41,7 @@ export class NotificationEditorCard extends LitElement {
   areas!: Dictionary<AlarmoArea>;
 
   @property()
-  alarmoConfig!: AlarmoConfig;
+  alarmoConfig?: AlarmoConfig;
 
   @property()
   viewMode = ViewMode.UI;
@@ -57,9 +57,11 @@ export class NotificationEditorCard extends LitElement {
       let actions = this.item.actions.map(e => omit(e, 'entity_id'));
       this.config = { ...this.item, actions: [actions[0], ...actions.slice(1)] };
       if (this.config.triggers.length > 1) this.config = { ...this.config, triggers: [this.config.triggers[0]] };
-      let areaConfig = this.config.triggers[0].area;
-      if (!getAreaOptions(this.areas, this.alarmoConfig).includes(areaConfig || 0)) this._setArea(new CustomEvent('value-changed', { detail: { value: undefined } }));
-      else if (areaConfig === null) this._setArea(new CustomEvent('value-changed', { detail: { value: 0 } }));
+
+      let area = this.config.triggers[0].area;
+      if (isDefined(area) && !getAreaOptions(this.areas, this.alarmoConfig).includes(area)) area = undefined;
+      else if (area === null) area = 0;
+      this._setArea(new CustomEvent('value-changed', { detail: { value: area } }));
     }
 
     //automatically set area if there is only 1 option
@@ -71,7 +73,7 @@ export class NotificationEditorCard extends LitElement {
   }
 
   protected render(): TemplateResult {
-    if (!this.hass || !this.areas) return html``;
+    if (!this.hass || !this.areas || !this.alarmoConfig) return html``;
     return html`
       <div class="heading">
         <ha-icon-button icon="hass:close" @click=${this._cancelClick} class="icon"></ha-icon-button>
@@ -112,7 +114,7 @@ export class NotificationEditorCard extends LitElement {
             
             <alarmo-select
               .hass=${this.hass}
-              .items=${getAreaOptions(this.areas, this.alarmoConfig).map(e => computeAreaDisplay(e, this.areas, this.alarmoConfig))}
+              .items=${getAreaOptions(this.areas, this.alarmoConfig!).map(e => computeAreaDisplay(e, this.areas, this.alarmoConfig!))}
               clearable=${true}
               label=${localize('panels.actions.cards.new_action.fields.area.heading', this.hass.language)}
               .value=${this.config.triggers[0].area}
@@ -391,7 +393,7 @@ export class NotificationEditorCard extends LitElement {
     const triggerConfig = data.triggers[0];
     if (!triggerConfig.event || !Object.values(EAlarmEvent).includes(triggerConfig.event))
       this.errors = { ...this.errors, event: true };
-    if (!isDefined(triggerConfig.area) || !getAreaOptions(this.areas, this.alarmoConfig).includes(triggerConfig.area))
+    if (!isDefined(triggerConfig.area) || !getAreaOptions(this.areas, this.alarmoConfig!).includes(triggerConfig.area))
       this.errors = { ...this.errors, area: true };
     if (!triggerConfig.modes?.every(e => getArmModeOptions(triggerConfig.area, this.areas!).includes(e)))
       this.errors = { ...this.errors, modes: true };
