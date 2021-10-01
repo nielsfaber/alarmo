@@ -116,7 +116,7 @@
             "remarks": "Remarque",
             "summary": "Cette zone contient des {summary_sensors} et {summary_automations}.",
             "summary_sensors": "{number} capteurs",
-            "summary_automations": "{number} automations"
+            "summary_automations": "{number} automatisations"
           },
           "actions": {
             "add": "Ajouter"
@@ -127,7 +127,7 @@
         "create_area": {
           "title": "Nouvelle zone",
           "fields": {
-            "copy_from": "Copy settings from"
+            "copy_from": "Copier les paramètres"
           }
         },
         "edit_area": {
@@ -225,12 +225,12 @@
               "description": "Après la désactivation de ce capteur, le délai de sortie restant sera automatiquement ignoré."
             },
             "use_exit_delay": {
-              "heading": "Use exit delay",
-              "description": "Sensor is allowed to be active when the exit delay starts."
+              "heading": "Utiliser le délai de sortie",
+              "description": "Le capteur est autorisé à être actif lorsque le délai de sortie commence."
             },
             "use_entry_delay": {
-              "heading": "Use entry delay",
-              "description": "Sensor activation triggers the alarm after the entry delay rather than directly."
+              "heading": "Utiliser le délai d'entrée",
+              "description": "L'activation du capteur déclenche l'alarme après le délai d'entrée plutôt qu'instantanément."
             },
             "allow_open": {
               "heading": "Autoriser l'ouverture lors de l'activation",
@@ -239,7 +239,7 @@
             "auto_bypass": {
               "heading": "Bypass automatique",
               "description": "Exclut ce capteur de l'alarme s'il est ouvert lors de l'armement.",
-              "modes": "Modes in which sensor may be bypassed"
+              "modes": "Modes dans lesquels le capteur peut être  ignoré"
             },
             "trigger_unavailable": {
               "heading": "Déclenchement lorsqu'il n'est pas disponible",
@@ -254,7 +254,7 @@
             "description": "Veuillez corriger les erreurs suivantes:",
             "no_area": "Aucune zone n'est sélectionnée",
             "no_modes": "Aucun mode sélectionné pour lequel le capteur doit être actif",
-            "no_auto_bypass_modes": "No modes are selected for the sensor may be automatically bypassed"
+            "no_auto_bypass_modes": "Aucun mode n'est sélectionné car le capteur peut être automatiquement ignoré"
           }
         }
       }
@@ -477,7 +477,7 @@
             "action": {
               "heading": "Action",
               "description": "Action à exécuter sur l'entité",
-              "no_common_actions": "Actions can only be assigned in YAML mode for the selected entities."
+              "no_common_actions": "Les actions ne peuvent être affectées qu'en mode YAML pour les entités sélectionnées."
             },
             "name": {
               "heading": "Nom",
