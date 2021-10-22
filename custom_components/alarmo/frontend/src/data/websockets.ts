@@ -8,6 +8,7 @@ import {
   EArmModes,
   AlarmoAutomation,
   AlarmoArea,
+  SensorGroup,
 } from '../types';
 
 export const fetchConfig = (hass: HomeAssistant): Promise<AlarmoConfig> =>
@@ -28,6 +29,11 @@ export const fetchUsers = (hass: HomeAssistant): Promise<Dictionary<AlarmoUser>>
 export const fetchAutomations = (hass: HomeAssistant): Promise<Dictionary<AlarmoAutomation>> =>
   hass.callWS({
     type: 'alarmo/automations',
+  });
+
+export const fetchSensorGroups = (hass: HomeAssistant): Promise<Dictionary<SensorGroup>> =>
+  hass.callWS({
+    type: 'alarmo/sensor_groups',
   });
 
 export const saveConfig = (hass: HomeAssistant, config: Partial<AlarmoConfig>): Promise<boolean> => {
@@ -89,6 +95,17 @@ export const saveArea = (hass: HomeAssistant, config: Partial<AlarmoArea>): Prom
 export const deleteArea = (hass: HomeAssistant, area_id: string): Promise<boolean> => {
   return hass.callApi('POST', 'alarmo/area', {
     area_id: area_id,
+    remove: true,
+  });
+};
+
+export const saveSensorGroup = (hass: HomeAssistant, config: Partial<SensorGroup>): Promise<boolean> => {
+  return hass.callApi('POST', 'alarmo/sensor_groups', config);
+};
+
+export const deleteSensorGroup = (hass: HomeAssistant, group_id: string): Promise<boolean> => {
+  return hass.callApi('POST', 'alarmo/sensor_groups', {
+    group_id: group_id,
     remove: true,
   });
 };

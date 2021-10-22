@@ -51,7 +51,7 @@ export class AlarmoTable extends LitElement {
                   class="table-cell ${e.text ? 'text' : ''} ${e.grow ? 'grow' : ''} ${e.align ? e.align : ''}"
                   style="${e.grow ? '' : `width: ${e.width}`}"
                 >
-                  ${e.title || ''}
+                  <span>${e.title || ''}</span>
                 </div>
               `
     )}
@@ -143,6 +143,12 @@ export class AlarmoTable extends LitElement {
 
     div.table-cell > ha-icon-button {
       color: var(--secondary-text-color);
+    }
+    div.table .header div.table-cell span {
+      white-space: nowrap; 
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
     }
 
     div.table-row.selectable {

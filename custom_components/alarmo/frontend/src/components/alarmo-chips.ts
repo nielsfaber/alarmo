@@ -1,6 +1,7 @@
 import { LitElement, html, TemplateResult, css, CSSResultGroup } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 import { fireEvent } from 'custom-card-helpers';
+import { isDefined, Without } from '../helpers';
 
 export type AlarmoChip = {
   name: string;
@@ -16,10 +17,13 @@ export class AlarmoChips extends LitElement {
   items: AlarmoChip[] = [];
 
   @property()
-  value: string | null = null;
+  value: string | null | string[] = null;
 
   @property({ type: Boolean })
-  selectable = false;
+  selectable = false; 
+
+  @property({ type: Boolean })
+  multiple = false;
 
   protected render(): TemplateResult {
     return html`
@@ -27,7 +31,7 @@ export class AlarmoChips extends LitElement {
       this.items.map(e =>
         html`
           <div
-            class="chip ${this.value == e.value ? 'selected' : ''}"
+            class="chip ${Array.isArray(this.value) && this.value.includes(e.value) || this.value == e.value ? 'selected' : ''}"
             @click=${() => this.selectItem(e.value)}
           >
             ${this.renderBadge(e)}
@@ -45,7 +49,9 @@ export class AlarmoChips extends LitElement {
     ${
       item.count !== undefined
         ? html`<span class="count">${item.count > 99 ? 99 : item.count}</span>`
-        : ''
+        : item.icon !== undefined
+         ? html`<ha-icon icon="${item.icon}"></ha-icon>`
+         : ''
       }
     `;
   }
@@ -56,9 +62,18 @@ export class AlarmoChips extends LitElement {
   }
 
   selectItem(value: string) {
-    if (this.selectable) this.value = this.value == value ? null : value;
+    let retval: string | null | string[] = value;
+    if (this.selectable) {
+      if (this.multiple) {
+        let list = Array.isArray(this.value) ? [...this.value] : isDefined(this.value) ? [this.value] : [];
+        this.value = list.includes(value) ? Without(list, value) : [...list, value];
+      } else {
+        this.value = this.value == value ? null : value;
+      }
+      retval = this.value;
+    }
 
-    fireEvent(this, 'value-changed', { value: value });
+    fireEvent(this, 'value-changed', { value: retval });
   }
 
   static get styles(): CSSResultGroup {
@@ -95,6 +110,16 @@ export class AlarmoChips extends LitElement {
         align-items: flex-start;
         font-size: 0.8rem;
         line-height: 20px;
+      }
+      .chip ha-icon {
+        height: 24px;
+        display: flex;
+        width: 24px;
+        justify-content: center;
+        align-items: flex-start;
+        font-size: 0.8rem;
+        line-height: 24px;
+        padding-left: 4px;
       }
       .chip:hover {
         background: rgba(var(--rgb-primary-text-color), 0.12);

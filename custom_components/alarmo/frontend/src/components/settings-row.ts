@@ -16,6 +16,9 @@ export class SettingsRow extends LitElement {
   @property({ type: Boolean })
   nested?: boolean;
 
+  @property({ type: Boolean })
+  dialog?: boolean;
+
   protected render(): TemplateResult {
     return html`
       <div class="info">
@@ -64,6 +67,10 @@ export class SettingsRow extends LitElement {
       :host([last]) {
         border-bottom: none;
       }
+      :host([dialog]) {
+        border: none;
+        padding: 12px 0px;
+      }
       ::slotted(ha-switch) {
         padding: 16px 0;
       }
@@ -77,10 +84,14 @@ export class SettingsRow extends LitElement {
       :host([nested]) .info {
         flex: 1 0 26px;
       }
+      :host([dialog]) .info {
+        flex: 1 0 40px;
+        padding-bottom: 8px;
+      }
       .secondary {
         color: var(--secondary-text-color);
       }
-      :host(:not([large]):not([narrow])) ::slotted(*) {
+      :host(:not([large]):not([narrow])):not([dialog])) ::slotted(*) {
         max-width: 66%;
       }
     `;

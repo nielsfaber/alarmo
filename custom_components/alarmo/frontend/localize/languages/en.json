@@ -166,6 +166,9 @@
           "title": "Add Sensors",
           "description": "Add more sensors. Make sure that your sensors have a friendly_name, so you can identify them.",
           "no_items": "There are no available HA entities that can be configured for the alarm. Make sure to include entities of the type binary_sensor.",
+          "table": {
+            "type": "Detected type"
+          },
           "actions": {
             "add_to_alarm": "add to alarm",
             "show_all": "Show all"
@@ -182,6 +185,10 @@
             "area": {
               "heading": "Area",
               "description": "Select an area which contains this sensor."
+            },
+            "group": {
+              "heading": "Group",
+              "description": "Group with other sensors for combined triggering."
             },
             "device_type": {
               "heading": "Device Type",
@@ -248,7 +255,8 @@
           },
           "actions": {
             "toggle_advanced": "Advanced settings",
-            "remove": "Remove"
+            "remove": "Remove",
+            "setup_groups": "Setup groups"
           },
           "errors": {
             "description": "Please correct the following errors:",
@@ -256,6 +264,40 @@
             "no_modes": "No modes are selected for which the sensor should be active",
             "no_auto_bypass_modes": "No modes are selected for the sensor may be automatically bypassed"
           }
+        }
+      },
+      "dialogs": {
+        "manage_groups": {
+          "title": "Manage sensor groups",
+          "description": "In a sensor group multiple sensors must be activated within a time period before the alarm is triggered.",
+          "no_items": "No groups yet",
+          "actions": {
+            "new_group": "New group"
+          }
+        },
+        "create_group": {
+          "title": "New sensor group",
+          "fields": {
+            "name": {
+              "heading": "Name",
+              "description": "Name for sensor group"
+            },
+            "timeout": {
+              "heading": "Time-out",
+              "description": "Time period during which consecutive sensor activations triggers the alarm."
+            },
+            "sensors": {
+              "heading": "Sensors",
+              "description": "Select the sensors which are contained by this group."
+            }
+          },
+          "errors": {
+            "invalid_name": "Invalid name provided.",
+            "insufficient_sensors": "At least 2 sensors need to be selected."
+          }
+        },
+        "edit_group": {
+          "title": "Edit sensor group '{name}'"
         }
       }
     },

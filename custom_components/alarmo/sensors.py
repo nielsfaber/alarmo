@@ -12,7 +12,6 @@ from homeassistant.helpers.event import (
     async_track_point_in_time,
 )
 
-
 from homeassistant.helpers.dispatcher import (
     async_dispatcher_connect,
 )
@@ -29,6 +28,9 @@ from homeassistant.const import (
     STATE_ALARM_DISARMED,
     STATE_ALARM_PENDING,
     STATE_ALARM_ARMING,
+    ATTR_STATE,
+    ATTR_LAST_TRIP_TIME,
+    ATTR_NAME,
 )
 
 from . import const
@@ -41,6 +43,11 @@ ATTR_ALLOW_OPEN = "allow_open"
 ATTR_TRIGGER_UNAVAILABLE = "trigger_unavailable"
 ATTR_AUTO_BYPASS = "auto_bypass"
 ATTR_AUTO_BYPASS_MODES = "auto_bypass_modes"
+ATTR_GROUP = "group"
+ATTR_GROUP_ID = "group_id"
+ATTR_TIMEOUT = "timeout"
+ATTR_EVENT_COUNT = "event_count"
+ATTR_ENTITIES = "entities"
 
 SENSOR_STATES_OPEN = [STATE_ON, STATE_OPEN, STATE_UNLOCKED]
 SENSOR_STATES_CLOSED = [STATE_OFF, STATE_CLOSED, STATE_LOCKED]
@@ -84,8 +91,10 @@ class SensorHandler:
         self._state_listener = None
         self._subscriptions = []
         self._arm_timers = {}
+        self._groups = {}
+        self._group_events = {}
 
-        def async_reload_sensor_listener(area_id: str = None, old_state: str = None, state: str = None):
+        def async_alarm_state_updated(area_id: str = None, old_state: str = None, state: str = None):
             """watch sensors based on the state of the alarm entities."""
             sensors_list = []
             for area in self.hass.data[const.DOMAIN]["areas"].keys():
@@ -101,13 +110,22 @@ class SensorHandler:
             else:
                 self._state_listener = None
 
+            # clear previous sensor group events which are not active for current alarm state
+            for group_id in self._group_events.keys():
+                self._group_events[group_id] = dict(filter(
+                    lambda el: el[0] in sensors_list,
+                    self._group_events[group_id].items()
+                ))
+
         def async_update_sensor_config():
             """sensor config updated, reload the configuration."""
             self._config = self.hass.data[const.DOMAIN]["coordinator"].store.async_get_sensors()
-            async_reload_sensor_listener()
+            self._groups = self.hass.data[const.DOMAIN]["coordinator"].store.async_get_sensor_groups()
+            self._group_events = {}
+            async_alarm_state_updated()
 
         self._subscriptions.append(
-            async_dispatcher_connect(hass, "alarmo_state_updated", async_reload_sensor_listener)
+            async_dispatcher_connect(hass, "alarmo_state_updated", async_alarm_state_updated)
         )
         self._subscriptions.append(
             async_dispatcher_connect(hass, "alarmo_sensors_updated", async_update_sensor_config)
@@ -195,12 +213,19 @@ class SensorHandler:
 
         alarm_entity = self.hass.data[const.DOMAIN]["areas"][sensor_config["area"]]
 
+        open_sensors = {
+            entity: new_state
+        }
+
         # immediate trigger due to always on sensor
         if sensor_config[ATTR_ALWAYS_ON] and new_state in [STATE_OPEN, STATE_UNKNOWN, STATE_UNAVAILABLE]:
+            open_sensors = self.process_group_event(entity, new_state, open_sensors)
+            if not open_sensors:
+                return
             _LOGGER.info("Alarm is triggered due to an always-on sensor: {}".format(entity))
             await alarm_entity.async_trigger(
                 skip_delay=True,
-                open_sensors={entity: new_state}
+                open_sensors=open_sensors
             )
 
         # initializing -> check if all sensors have a known state
@@ -219,7 +244,10 @@ class SensorHandler:
                 and not sensor_config[ATTR_ALLOW_OPEN]
                 and not self._bypass_mode
             ):
-                await alarm_entity.async_arm_failure({entity: new_state})
+                open_sensors = self.process_group_event(entity, new_state, open_sensors)
+                if not open_sensors:
+                    return
+                await alarm_entity.async_arm_failure(open_sensors)
             elif sensor_config[ATTR_ARM_ON_CLOSE]:
                 if new_state == STATE_CLOSED:
                     self.start_arm_timer(entity)
@@ -231,19 +259,24 @@ class SensorHandler:
         # alarm is armed -> check if need to be triggered
         elif alarm_entity.state in const.ARM_MODES:
             if new_state in [STATE_OPEN, STATE_UNKNOWN, STATE_UNAVAILABLE]:
+                open_sensors = self.process_group_event(entity, new_state, open_sensors)
+                if not open_sensors:
+                    return
                 _LOGGER.info("Alarm is triggered due to sensor: {}".format(entity))
                 await alarm_entity.async_trigger(
                     skip_delay=(not sensor_config[ATTR_USE_ENTRY_DELAY]),
-                    open_sensors={entity: new_state}
+                    open_sensors=open_sensors
                 )
 
         # alarm is in pending -> check if pending time needs to be aborted
         elif alarm_entity.state == STATE_ALARM_PENDING:
-            if new_state in [STATE_OPEN, STATE_UNKNOWN, STATE_UNAVAILABLE] and not sensor_config[ATTR_USE_ENTRY_DELAY]:
-                await alarm_entity.async_trigger(
-                    skip_delay=True,
-                    open_sensors={entity: new_state}
-                )
+            open_sensors = self.process_group_event(entity, new_state, open_sensors)
+            if not open_sensors:
+                return
+            await alarm_entity.async_trigger(
+                skip_delay=True,
+                open_sensors=open_sensors
+            )
 
     def all_sensors_available_for_alarm(self, area_id: str, state: str = None):
         sensors_list = self.active_sensors_for_alarm_state(area_id, state)
@@ -286,3 +319,35 @@ class SensorHandler:
         elif not entity:
             for entity in self._arm_timers.keys():
                 self._arm_timers[entity]()
+
+    def process_group_event(self, entity: str, state: str, open_sensors: dict) -> dict:
+        """check if sensor entity is member of a group and compare with previous events to evaluate trigger"""
+        group_id = None
+        for group in self._groups.values():
+            if entity in group[ATTR_ENTITIES]:
+                group_id = group[ATTR_GROUP_ID]
+                break
+        if group_id is None:
+            return open_sensors
+
+        group = self._groups[group_id]
+        group_events = self._group_events[group_id] if group_id in self._group_events.keys() else {}
+        now = dt_util.now()
+        group_events[entity] = {
+            ATTR_STATE: state,
+            ATTR_LAST_TRIP_TIME: now
+        }
+        self._group_events[group_id] = group_events
+        recent_events = {
+            entity: (now - event[ATTR_LAST_TRIP_TIME]).total_seconds()
+            for (entity, event) in group_events.items()
+        }
+        recent_events = dict(filter(lambda el: el[1] <= group[ATTR_TIMEOUT], recent_events.items()))
+        if len(recent_events.keys()) < group[ATTR_EVENT_COUNT]:
+            _LOGGER.debug("tripped sensor {} was ignored since it belongs to group {}".format(entity, group[ATTR_NAME]))
+            return {}
+        else:
+            for entity in recent_events.keys():
+                open_sensors[entity] = group_events[entity][ATTR_STATE]
+            _LOGGER.debug("tripped sensor {} caused the triggering of group {}".format(entity, group[ATTR_NAME]))
+            return open_sensors

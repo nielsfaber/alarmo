@@ -1,6 +1,6 @@
 import { HassEntity } from 'home-assistant-js-websocket';
 import { AlarmoSensor, EArmModes, Dictionary } from '../types';
-import { getDomain } from '../helpers';
+import { computeIcon, computeName, getDomain, sortAlphabetically } from '../helpers';
 import { computeDomain, HomeAssistant } from 'custom-card-helpers';
 import { ESensorTypes, ESensorIcons } from '../const';
 import { localize } from '../../localize/localize';
@@ -157,3 +157,22 @@ export const getSensorTypeOptions = (hass: HomeAssistant) =>
         icon: ESensorIcons[k],
       })
     );
+
+
+
+    
+export const getConfigurableSensors = (hass: HomeAssistant, includedSensors: string[], showAllBinarySensors = false) => {
+  let list = Object.values(hass.states)
+    .filter(e => isValidSensor(e, showAllBinarySensors))
+    .filter(e => !includedSensors.includes(e.entity_id))
+    .map(e =>
+      Object({
+        id: e.entity_id,
+        name: computeName(e),
+        icon: computeIcon(e),
+      })
+    ) as { id: string, name: string, icon: string }[];
+
+    list.sort(sortAlphabetically);
+  return list;
+}

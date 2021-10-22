@@ -59,6 +59,7 @@ export type AlarmoSensor = {
   auto_bypass_modes: EArmModes[];
   area?: string;
   enabled: boolean;
+  group?: string | null;
 };
 
 export type AlarmoUser = {
@@ -122,4 +123,11 @@ export type AlarmoArea = {
   name: string;
   enabled: boolean;
   modes: Record<EArmModes, AlarmoModeConfig>;
+};
+
+export type SensorGroup = {
+  group_id?: string;
+  name: string;
+  entities: string[];
+  timeout: number
 };

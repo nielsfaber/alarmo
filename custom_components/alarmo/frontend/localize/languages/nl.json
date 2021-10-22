@@ -1,13 +1,13 @@
 {
   "common": {
     "modes_long": {
-      "armed_away": "Ingeschakeld Weg",
+      "armed_away": "Ingeschakeld Afwezig",
       "armed_home": "Ingeschakeld Thuis",
       "armed_night": "Ingeschakeld Nacht",
       "armed_custom_bypass": "Ingeschakeld Aangepast"
     },
     "modes_short": {
-      "armed_away": "Weg",
+      "armed_away": "Afwezig",
       "armed_home": "Thuis",
       "armed_night": "Nacht",
       "armed_custom_bypass": "Aangepast"
@@ -166,6 +166,9 @@
           "title": "Voeg sensoren toe",
           "description": "Voeg meer sensoren toe. Zorg ervoor dat uw sensoren een friendly_name hebben, zodat u ze kunt identificeren.",
           "no_items": "Er zijn geen beschikbare HA-entiteiten die voor het alarm kunnen worden geconfigureerd. Zorg ervoor dat u entiteiten van het type binary_sensor opneemt.",
+          "table": {
+            "type": "Gedetecteerd type"
+          },
           "actions": {
             "add_to_alarm": "Voeg aan alarm toe",
             "show_all": "Toon alle"
@@ -182,6 +185,10 @@
             "area": {
               "heading": "Gebied",
               "description": "Selecteer een gebied dat deze sensor bevat."
+            },
+            "group": {
+              "heading": "Groep",
+              "description": "Groepeer met andere sensors voor gecombineerde triggers."
             },
             "device_type": {
               "heading": "Apparaat Type",
@@ -204,8 +211,8 @@
                   "description": "Detector van verwijdering van sensorkap, glasbreuksensor, enz."
                 },
                 "environmental": {
-                  "name": "Omgeving",
-                  "description": "Rook/gassensor, lekdetector, etc. (niet gerelateerd aan inbraakbeveiliging)."
+                  "name": "Klimaat",
+                  "description": "Rook/gassensor, lekkage detector, etc. (niet gerelateerd aan inbraakbeveiliging)."
                 },
                 "other": {
                   "name": "Algemeen"
@@ -248,7 +255,8 @@
           },
           "actions": {
             "toggle_advanced": "Geavanceerde instellingen",
-            "remove": "Verwijder"
+            "remove": "Verwijder",
+            "setup_groups": "Configureer groepen"
           },
           "errors": {
             "description": "Corrigeer de volgende fouten:",
@@ -256,6 +264,40 @@
             "no_modes": "Er zijn geen modi geselecteerd waarvoor de sensor actief zou moeten zijn",
             "no_auto_bypass_modes": "Er zijn geen modi geselecteerd waarin de sensor automatisch omzeild mag worden"
           }
+        }
+      },
+      "dialogs": {
+        "manage_groups": {
+          "title": "Manage sensor groups",
+          "description": "In a sensor group multiple sensors must be activated within a time period before the alarm is triggered.",
+          "no_items": "No groups yet",
+          "actions": {
+            "new_group": "New group"
+          }
+        },
+        "create_group": {
+          "title": "Nieuwe sensorgroep",
+          "fields": {
+            "name": {
+              "heading": "Naam",
+              "description": "Naam voor sensorgroep."
+            },
+            "timeout": {
+              "heading": "Time-out",
+              "description": "Tijdsperiode waarin meerdere sensoren moeten worden geactiveerd om het alarm te activeren."
+            },
+            "sensors": {
+              "heading": "Sensoren",
+              "description": "Selecteer de sensoren die deel moeten uitmaken van deze groep."
+            }
+          },
+          "errors": {
+            "invalid_name": "Verkeerde naam opgegeven.",
+            "insufficient_sensors": "Tenminste 2 sensoren moeten worden geselecteerd."
+          }
+        },
+        "edit_group": {
+          "title": "Bewerk sensorgroep '{name}'"
         }
       }
     },
@@ -351,7 +393,7 @@
           "title": "Meldingen",
           "description": "Met dit paneel kunt u meldingen beheren die moeten worden verzonden tijdens een bepaalde alarmgebeurtenis",
           "table": {
-            "enabled": "Ingeschakeld",
+            "enabled": "Actief",
             "no_items": "Er zijn nog geen notificaties aangemaakt."
           },
           "actions": {
