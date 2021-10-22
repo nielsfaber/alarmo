@@ -26,7 +26,7 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
 
   public hassSubscribe(): Promise<UnsubscribeFunc>[] {
     this._fetchData();
-    return [this.hass!.connection.subscribeEvents(() => this._fetchData(), 'alarmo_config_updated')];
+    return [this.hass!.connection.subscribeMessage(() => this._fetchData(), { type: 'alarmo_config_updated' } )];
   }
 
   private async _fetchData(): Promise<void> {

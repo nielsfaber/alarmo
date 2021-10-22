@@ -1,34 +1,57 @@
 import { LitElement, html } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
-import { HomeAssistant, navigate } from 'custom-card-helpers';
+import { fireEvent, HomeAssistant, navigate } from 'custom-card-helpers';
 import { commonStyle } from '../../styles';
-import { AlarmoSensor, EArmModes, Dictionary, AlarmoArea } from '../../types';
-import { fetchSensors, saveSensor, deleteSensor, fetchAreas } from '../../data/websockets';
+import { AlarmoSensor, EArmModes, Dictionary, AlarmoArea, SensorGroup } from '../../types';
+import { fetchSensors, saveSensor, deleteSensor, fetchAreas, fetchSensorGroups } from '../../data/websockets';
 import { localize } from '../../../localize/localize';
 import { Unique, Without, handleError, showErrorDialog } from '../../helpers';
-
-import '../../dialogs/error-dialog';
-import '../../components/alarmo-select';
-import { HassEntity } from 'home-assistant-js-websocket';
+import { HassEntity, UnsubscribeFunc } from 'home-assistant-js-websocket';
 import { sensorConfigByType, getSensorTypeOptions } from '../../data/sensors';
 import { EArmModeIcons, ESensorTypes } from '../../const';
+import { Option } from '../../components/alarmo-select';
+import { SubscribeMixin } from '../../subscribe-mixin';
 
+
+import '../../dialogs/error-dialog';
+import '../../dialogs/manage-sensor-groups-dialog';
+import '../../components/alarmo-select';
 @customElement('sensor-editor-card')
-export class SensorEditorCard extends LitElement {
-  @property() hass!: HomeAssistant;
-  @property() narrow!: boolean;
+export class SensorEditorCard extends SubscribeMixin(LitElement) {
 
-  @property() item!: string;
-  @property() data!: AlarmoSensor;
+  @property()
+  hass!: HomeAssistant;
 
-  @property() showBypassModes: boolean = false;
+  @property() 
+  narrow!: boolean;
+
+  @property()
+  item!: string;
+
+  @property()
+  data!: AlarmoSensor;
+
+  @property()
+  showBypassModes: boolean = false;
 
   areas!: Dictionary<AlarmoArea>;
+  sensorGroups!: Dictionary<SensorGroup>;
 
-  async firstUpdated() {
+  public hassSubscribe(): Promise<UnsubscribeFunc>[] {
+    this._fetchData();
+    return [this.hass!.connection.subscribeMessage(() => this._fetchData(), { type: 'alarmo_config_updated' })];
+  }
+
+  private async _fetchData(): Promise<void> {
+    if (!this.hass) return;
     const areas = await fetchAreas(this.hass);
     this.areas = areas;
+
+    const sensorGroups = await fetchSensorGroups(this.hass);
+    this.sensorGroups = sensorGroups;
+
     const sensors = await fetchSensors(this.hass);
+
     this.data = sensors[this.item];
     if (!this.data.area && Object.keys(areas).length == 1)
       this.data = { ...this.data, area: Object.keys(this.areas)[0] };
@@ -108,6 +131,31 @@ export class SensorEditorCard extends LitElement {
               `
         )}
           </div>
+        </settings-row>
+
+        <settings-row .narrow=${this.narrow}>
+          <span slot="heading">${localize('panels.sensors.cards.editor.fields.group.heading', this.hass.language)}</span>
+          <span slot="description">${localize('panels.sensors.cards.editor.fields.group.description', this.hass.language)}</span>
+
+          <div>
+           ${Object.keys(this.sensorGroups).length
+            ? html`
+            <alarmo-select
+              .clearable=${true}
+              .items=${this.getSensorGroups()}
+              value=${this.data.group}
+              label="${localize('panels.sensors.cards.editor.fields.group.heading', this.hass.language)}"
+              @value-changed=${(ev: CustomEvent) => { this.data = {...this.data, group: ev.detail.value }}}
+            >
+            </alarmo-select>
+            ` : ''}
+            <mwc-button
+              @click=${this.manageGroupsClick}
+            >
+              ${localize('panels.sensors.cards.editor.actions.setup_groups', this.hass.language)}
+            </mwc-button>
+          </div>
+
         </settings-row>
 
         <collapsible-section
@@ -367,6 +415,24 @@ export class SensorEditorCard extends LitElement {
 
   private cancelClick() {
     navigate(this, '/alarmo/sensors', true);
+  }
+
+  
+  manageGroupsClick(ev: Event) {
+    const element = ev.target as HTMLElement;
+    fireEvent(element, 'show-dialog', {
+      dialogTag: 'manage-sensor-groups-dialog',
+      dialogImport: () => import('../../dialogs/manage-sensor-groups-dialog'),
+      dialogParams: { },
+    });
+  }
+
+  private getSensorGroups(): Option[] {
+    return Object.keys(this.sensorGroups)
+    .map(e => Object({
+      value: e,
+      name: this.sensorGroups[e].name,
+    }))
   }
 
   static styles = commonStyle;

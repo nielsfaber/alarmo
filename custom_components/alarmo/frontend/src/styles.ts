@@ -151,3 +151,58 @@ export const commonStyle = css`
     align-items: flex-start;
   }
 `;
+
+export const dialogStyle = css`
+  @media all and (min-width: 450px) and (min-height: 500px) {
+    ha-paper-dialog {
+      min-width: 400px;
+    }
+  }
+  @media all and (max-width: 450px), all and (max-height: 500px) {
+    paper-dialog,
+    ha-paper-dialog {
+      margin: 0;
+      width: calc(
+        100% - env(safe-area-inset-right) - env(safe-area-inset-left)
+      ) !important;
+      min-width: calc(
+        100% - env(safe-area-inset-right) - env(safe-area-inset-left)
+      ) !important;
+      max-width: calc(
+        100% - env(safe-area-inset-right) - env(safe-area-inset-left)
+      ) !important;
+      max-height: calc(100% - var(--header-height));
+      position: fixed !important;
+      bottom: 0px;
+      left: env(safe-area-inset-left);
+      right: env(safe-area-inset-right);
+      overflow: scroll;
+      border-bottom-left-radius: 0px;
+      border-bottom-right-radius: 0px;
+    }
+  }
+  /* mwc-dialog (ha-dialog) styles */
+  ha-dialog {
+    --mdc-dialog-min-width: 400px;
+    --mdc-dialog-max-width: 600px;
+    --mdc-dialog-heading-ink-color: var(--primary-text-color);
+    --mdc-dialog-content-ink-color: var(--primary-text-color);
+    --justify-action-buttons: space-between;
+  }
+
+  @media all and (max-width: 450px), all and (max-height: 500px) {
+    /* overrule the ha-style-dialog max-height on small screens */
+    ha-dialog {
+      --mdc-dialog-max-height: 100%;
+      height: 100%;
+    }
+  }
+  @media all and (min-width: 850px) {
+    ha-dialog {
+      --mdc-dialog-min-width: 550px;
+    }
+  }
+  ha-dialog div.description {
+    margin-bottom: 10px;
+  }
+`;

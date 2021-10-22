@@ -155,7 +155,7 @@ class MqttHandler:
             async_dispatcher_connect(self.hass, "alarmo_event", async_handle_event)
         )
 
-    async def __del__(self):
+    def __del__(self):
         """prepare for removal"""
         while len(self._subscribed_topics):
             self._subscribed_topics.pop()()

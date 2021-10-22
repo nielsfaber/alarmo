@@ -58,6 +58,11 @@ from .sensors import (
     ATTR_TRIGGER_UNAVAILABLE,
     ATTR_AUTO_BYPASS,
     ATTR_AUTO_BYPASS_MODES,
+    ATTR_GROUP,
+    ATTR_GROUP_ID,
+    ATTR_TIMEOUT,
+    ATTR_EVENT_COUNT,
+    ATTR_ENTITIES,
     SENSOR_TYPES,
 )
 
@@ -228,7 +233,8 @@ class AlarmoSensorView(HomeAssistantView):
                     [vol.In(const.ARM_MODES)]
                 ),
                 vol.Optional(const.ATTR_AREA): cv.string,
-                vol.Optional(const.ATTR_ENABLED): cv.boolean
+                vol.Optional(const.ATTR_ENABLED): cv.boolean,
+                vol.Optional(ATTR_GROUP): cv.string,
             }
         )
     )
@@ -341,6 +347,40 @@ class AlarmoAutomationView(HomeAssistantView):
         return self.json({"success": True})
 
 
+class AlarmoSensorGroupView(HomeAssistantView):
+    """Login to Home Assistant cloud."""
+
+    url = "/api/alarmo/sensor_groups"
+    name = "api:alarmo:sensor_groups"
+
+    @RequestDataValidator(
+        vol.Schema(
+            {
+                vol.Optional(ATTR_GROUP_ID): cv.string,
+                vol.Optional(ATTR_NAME): cv.string,
+                vol.Optional(ATTR_ENTITIES): vol.All(
+                    cv.ensure_list,
+                    [cv.string]
+                ),
+                vol.Optional(ATTR_TIMEOUT): cv.positive_int,
+                vol.Optional(ATTR_EVENT_COUNT): cv.positive_int,
+                vol.Optional(const.ATTR_REMOVE): cv.boolean,
+            }
+        )
+    )
+    async def post(self, request, data):
+        """Handle config update request."""
+        hass = request.app["hass"]
+        coordinator = hass.data[const.DOMAIN]["coordinator"]
+        group_id = None
+        if ATTR_GROUP_ID in data:
+            group_id = data[ATTR_GROUP_ID]
+            del data[ATTR_GROUP_ID]
+        coordinator.async_update_sensor_group_config(group_id, data)
+        async_dispatcher_send(hass, "alarmo_update_frontend")
+        return self.json({"success": True})
+
+
 @callback
 def websocket_get_config(hass, connection, msg):
     """Publish config data."""
@@ -362,6 +402,9 @@ def websocket_get_sensors(hass, connection, msg):
     """Publish sensor data."""
     coordinator = hass.data[const.DOMAIN]["coordinator"]
     sensors = coordinator.store.async_get_sensors()
+    for entity_id in sensors.keys():
+        group = coordinator.async_get_group_for_sensor(entity_id)
+        sensors[entity_id]["group"] = group
     connection.send_result(msg["id"], sensors)
 
 
@@ -399,6 +442,14 @@ def websocket_get_alarm_entities(hass, connection, msg):
     connection.send_result(msg["id"], result)
 
 
+@callback
+def websocket_get_sensor_groups(hass, connection, msg):
+    """Publish sensor_group data."""
+    coordinator = hass.data[const.DOMAIN]["coordinator"]
+    groups = coordinator.store.async_get_sensor_groups()
+    connection.send_result(msg["id"], groups)
+
+
 async def async_register_websockets(hass):
 
     hass.http.register_view(AlarmoConfigView)
@@ -406,6 +457,7 @@ async def async_register_websockets(hass):
     hass.http.register_view(AlarmoUserView)
     hass.http.register_view(AlarmoAutomationView)
     hass.http.register_view(AlarmoAreaView)
+    hass.http.register_view(AlarmoSensorGroupView)
 
     async_register_command(
         hass,
@@ -458,5 +510,13 @@ async def async_register_websockets(hass):
         websocket_get_alarm_entities,
         websocket_api.BASE_COMMAND_MESSAGE_SCHEMA.extend(
             {vol.Required("type"): "alarmo/entities"}
+        ),
+    )
+    async_register_command(
+        hass,
+        "alarmo/sensor_groups",
+        websocket_get_sensor_groups,
+        websocket_api.BASE_COMMAND_MESSAGE_SCHEMA.extend(
+            {vol.Required("type"): "alarmo/sensor_groups"}
         ),
     )

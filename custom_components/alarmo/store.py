@@ -164,6 +164,17 @@ class AutomationEntry:
     enabled = attr.ib(type=bool, default=True)
 
 
+@attr.s(slots=True, frozen=True)
+class SensorGroupEntry:
+    """Sensor group storage Entry."""
+
+    group_id = attr.ib(type=str, default=None)
+    name = attr.ib(type=str, default="")
+    entities = attr.ib(type=list, default=[])
+    timeout = attr.ib(type=int, default=0)
+    event_count = attr.ib(type=int, default=2)
+
+
 def parse_automation_entry(data: dict):
     def create_trigger_entity(config: dict):
         if "event" in config:
@@ -262,6 +273,7 @@ class AlarmoStorage:
         self.sensors: MutableMapping[str, SensorEntry] = {}
         self.users: MutableMapping[str, UserEntry] = {}
         self.automations: MutableMapping[str, AutomationEntry] = {}
+        self.sensor_groups: MutableMapping[str, SensorGroupEntry] = {}
         self._store = MigratableStore(hass, STORAGE_VERSION, STORAGE_KEY)
 
     async def async_load(self) -> None:
@@ -272,6 +284,7 @@ class AlarmoStorage:
         sensors: "OrderedDict[str, SensorEntry]" = OrderedDict()
         users: "OrderedDict[str, UserEntry]" = OrderedDict()
         automations: "OrderedDict[str, AutomationEntry]" = OrderedDict()
+        sensor_groups: "OrderedDict[str, SensorGroupEntry]" = OrderedDict()
 
         if data is not None:
             config = Config(
@@ -320,11 +333,16 @@ class AlarmoStorage:
                 for automation in data["automations"]:
                     automations[automation["automation_id"]] = AutomationEntry(**parse_automation_entry(automation))
 
+            if "sensor_groups" in data:
+                for group in data["sensor_groups"]:
+                    sensor_groups[group["group_id"]] = SensorGroupEntry(**group)
+
         self.config = config
         self.areas = areas
         self.sensors = sensors
         self.automations = automations
         self.users = users
+        self.sensor_groups = sensor_groups
 
         if not areas:
             await self.async_factory_default()
@@ -384,6 +402,9 @@ class AlarmoStorage:
         store_data["automations"] = [
             attr.asdict(entry) for entry in self.automations.values()
         ]
+        store_data["sensor_groups"] = [
+            attr.asdict(entry) for entry in self.sensor_groups.values()
+        ]
 
         return store_data
 
@@ -396,6 +417,7 @@ class AlarmoStorage:
         self.sensors = {}
         self.users = {}
         self.automations = {}
+        self.sensor_groups = {}
         await self.async_factory_default()
 
     @callback
@@ -579,6 +601,46 @@ class AlarmoStorage:
         """Update existing AutomationEntry."""
         old = self.automations[automation_id]
         new = self.automations[automation_id] = attr.evolve(old, **parse_automation_entry(changes))
+        self.async_schedule_save()
+        return new
+
+    @callback
+    def async_get_sensor_group(self, group_id) -> SensorGroupEntry:
+        """Get an existing SensorGroupEntry by id."""
+        res = self.sensor_groups.get(group_id)
+        return attr.asdict(res) if res else None
+
+    @callback
+    def async_get_sensor_groups(self):
+        """Get an existing SensorGroupEntry by id."""
+        res = {}
+        for (key, val) in self.sensor_groups.items():
+            res[key] = attr.asdict(val)
+        return res
+
+    @callback
+    def async_create_sensor_group(self, data: dict) -> SensorGroupEntry:
+        """Create a new SensorGroupEntry."""
+        group_id = str(int(time.time()))
+        new_group = SensorGroupEntry(**data, group_id=group_id)
+        self.sensor_groups[group_id] = new_group
+        self.async_schedule_save()
+        return group_id
+
+    @callback
+    def async_delete_sensor_group(self, group_id: str) -> None:
+        """Delete SensorGroupEntry."""
+        if group_id in self.sensor_groups:
+            del self.sensor_groups[group_id]
+            self.async_schedule_save()
+            return True
+        return False
+
+    @callback
+    def async_update_sensor_group(self, group_id: str, changes: dict) -> SensorGroupEntry:
+        """Update existing SensorGroupEntry."""
+        old = self.sensor_groups[group_id]
+        new = self.sensor_groups[group_id] = attr.evolve(old, **changes)
         self.async_schedule_save()
         return new
 

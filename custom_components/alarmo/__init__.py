@@ -27,7 +27,11 @@ from .panel import (
 )
 from .card import async_register_card
 from .websockets import async_register_websockets
-from .sensors import SensorHandler
+from .sensors import (
+    SensorHandler,
+    ATTR_GROUP,
+    ATTR_ENTITIES
+)
 from .automations import AutomationHandler
 from .mqtt import MqttHandler
 
@@ -201,12 +205,19 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                 async_dispatcher_send(self.hass, "alarmo_register_master", config["master"])
 
     def async_update_sensor_config(self, entity_id: str, data: dict):
+        group = None
+        if ATTR_GROUP in data:
+            group = data[ATTR_GROUP]
+            del data[ATTR_GROUP]
         if const.ATTR_REMOVE in data:
             self.store.async_delete_sensor(entity_id)
+            self.assign_sensor_to_group(entity_id, None)
         elif self.store.async_get_sensor(entity_id):
             self.store.async_update_sensor(entity_id, data)
+            self.assign_sensor_to_group(entity_id, group)
         else:
             self.store.async_create_sensor(entity_id, data)
+            self.assign_sensor_to_group(entity_id, group)
 
         async_dispatcher_send(self.hass, "alarmo_sensors_updated")
 
@@ -359,6 +370,49 @@ class AlarmoCoordinator(DataUpdateCoordinator):
             entity = self.hass.data[const.DOMAIN]["areas"][area_id]
             entity_registry.async_remove(entity.entity_id)
             self.hass.data[const.DOMAIN]["areas"].pop(area_id, None)
+
+    def async_get_sensor_groups(self):
+        """fetch a list of sensor groups (websocket API hook)"""
+        groups = self.store.async_get_sensor_groups()
+        return list(groups.values())
+
+    def async_get_group_for_sensor(self, entity_id: str):
+        groups = self.async_get_sensor_groups()
+        result = next((el for el in groups if entity_id in el[ATTR_ENTITIES]), None)
+        return result["group_id"] if result else None
+
+    def assign_sensor_to_group(self, entity_id: str, group_id: str):
+        old_group = self.async_get_group_for_sensor(entity_id)
+        if old_group and group_id != old_group:
+            # remove sensor from group
+            el = self.store.async_get_sensor_group(old_group)
+            if len(el[ATTR_ENTITIES]) > 2:
+                self.store.async_update_sensor_group(old_group, {
+                    ATTR_ENTITIES: [x for x in el[ATTR_ENTITIES] if x != entity_id]
+                })
+            else:
+                self.store.async_delete_sensor_group(old_group)
+        if group_id:
+            # add sensor to group
+            el = self.store.async_get_sensor_group(group_id)
+            if not el:
+                _LOGGER.error("Failed to assign entity {} to group {}".format(entity_id, group_id))
+                return
+            self.store.async_update_sensor_group(group_id, {
+                ATTR_ENTITIES: el[ATTR_ENTITIES] + [entity_id]
+            })
+
+        async_dispatcher_send(self.hass, "alarmo_sensors_updated")
+
+    def async_update_sensor_group_config(self, group_id: str = None, data: dict = {}):
+        if const.ATTR_REMOVE in data:
+            self.store.async_delete_sensor_group(group_id)
+        elif not group_id:
+            self.store.async_create_sensor_group(data)
+        else:
+            self.store.async_update_sensor_group(group_id, data)
+
+        async_dispatcher_send(self.hass, "alarmo_sensors_updated")
 
     async def async_unload(self):
         """remove all alarmo objects"""
