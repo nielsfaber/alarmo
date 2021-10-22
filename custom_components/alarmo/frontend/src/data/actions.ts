@@ -307,6 +307,7 @@ export const computeActions = (entity_id: string | undefined | (string | undefin
 }
 
 export const computeMergedActions = (...actionLists: string[][]) => {
+  if(!actionLists.length || !actionLists.every(e => e.length)) return [];
   if (actionLists.length == 1 && actionLists[0].length > 1 && Unique(actionLists[0].map(computeDomain)).length > 1) return computeMergedActions(...actionLists[0].map(e => Array(e)));
   let intersection = [...actionLists[0]];
   actionLists.forEach(list => {

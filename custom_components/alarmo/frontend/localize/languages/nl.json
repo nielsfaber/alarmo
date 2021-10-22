@@ -268,11 +268,11 @@
       },
       "dialogs": {
         "manage_groups": {
-          "title": "Manage sensor groups",
-          "description": "In a sensor group multiple sensors must be activated within a time period before the alarm is triggered.",
-          "no_items": "No groups yet",
+          "title": "Beheer sensorgroepen",
+          "description": "In een sensorgroep moeten twee of meer sensoren worden geactiveerd binnen een tijdsperiode voordat het alarm wordt geactiveerd.",
+          "no_items": "Nog geen groepen ingesteld.",
           "actions": {
-            "new_group": "New group"
+            "new_group": "Nieuwe groep"
           }
         },
         "create_group": {
