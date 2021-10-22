@@ -24,6 +24,7 @@ This is an alarm system integration for Home Assistant. It provides a user inter
     - [Sensor configuration](#sensor-configuration)
       - [Sensor types](#sensor-types)
       - [Configuration options](#configuration-options)
+      - [Sensor groups](#sensor-groups)
     - [Codes and users](#codes-and-users)
       - [Codes](#codes)
       - [Administrator](#administrator)
@@ -304,6 +305,16 @@ This is done for your convenience, if this is undesired you can clear the sensor
 | `Bypass automatically`     | If the sensor is still active when the alarm is armed, the sensor will be excluded from the alarm (instead of causing the arming to fail) until the alarm is disarmed again.<br>This setting can be defined per arm mode.                                                                                                                                               | Windows that may be left open (e.g. when going to sleep).                                                |
 | `Trigger when unavailable` | If the sensor state becomes *unavailable* this is treated the same as the sensor being activated.<br>HA defines the *unavailable* state for sensors for which the state is undeterminate (can be either open or closed). This usually occurs when a battery-powered sensor loses connection to the gateway, but it could also be the result of tampering of the sensor. | Sensors for which reliability is important.                                                              |
 
+#### Sensor groups
+This functionality is aimed to reduce the risk of false triggers in your house, which are (unfortunately) a reality - especially with PIR motion sensors.
+
+In a group, the triggering of a single sensor is ignored, but consecutive events (of 2 different sensors) will trigger the alarm. 
+
+Any sensor can be added to a group, but a sensor can only be member of 1 group. The amount of groups is unlimited, though it is recommended to minimize this (e.g. one group per room or floor).
+
+A sensor group needs to have at least 2 sensors to function correctly (else it would never be triggered), and needs to be configured with a time-out time, after which consecutive sensor events are not longer considered related.
+
+Clicking the 'setup groups' button while editing a sensor brings you to an overview of existing groups and allows you to create new ones and edit existing ones.
 
 ### Codes and users
 
