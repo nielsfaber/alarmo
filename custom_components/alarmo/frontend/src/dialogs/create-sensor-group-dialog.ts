@@ -7,7 +7,7 @@ import { dialogStyle } from '../styles';
 import { localize } from '../../localize/localize';
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
 import { SubscribeMixin } from '../subscribe-mixin';
-import { computeName, handleError, isDefined, showErrorDialog, sortAlphabetically } from '../helpers';
+import { computeName, handleError, isDefined, prettyPrint, showErrorDialog, sortAlphabetically } from '../helpers';
 import { ESensorIcons, ESensorTypes } from '../const';
 
 import '../components/alarmo-chips.ts';
@@ -146,7 +146,7 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
         const type = Object.entries(ESensorTypes).find(([, v]) => v == this.sensors[e].type)![0];
         return {
           value: e,
-          name: computeName(stateObj),
+          name: this.sensors[e].name || prettyPrint(computeName(stateObj)),
           icon: ESensorIcons[type],
         };
       });
