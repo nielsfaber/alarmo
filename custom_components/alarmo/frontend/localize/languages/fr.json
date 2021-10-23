@@ -26,7 +26,7 @@
       "edit_in_yaml": "Editer en YAML"
     }
   },
-  "title": "Gestion de L'alarme",
+  "title": "Configuration de l' alarme",
   "panels": {
     "general": {
       "title": "Généraux",
