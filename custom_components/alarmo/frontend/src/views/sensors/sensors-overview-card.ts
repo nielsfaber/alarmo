@@ -35,7 +35,9 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
 
   @property()
   areaFilterOptions: AlarmoChip[] = [];
-
+  
+  @property()
+  path!: string[] | null;
 
   public hassSubscribe(): Promise<UnsubscribeFunc>[] {
     this._fetchData();
@@ -47,11 +49,30 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
       return;
     }
     this.areas = await fetchAreas(this.hass);
+    this.sensors = await fetchSensors(this.hass);
+
+
+    this.areaFilterOptions = Object.values(this.areas)
+      .map(e =>
+        Object({
+          value: e.area_id,
+          name: e.name,
+          count: Object.values(this.sensors).filter(el => el.area == e.area_id).length
+        })
+      )
+      .sort(sortAlphabetically)
+
+    if (Object.values(this.sensors).filter(e => !e.area).length)
+      this.areaFilterOptions = [{
+        value: 'no_area',
+        name: localize('panels.sensors.cards.sensors.filter.no_area', this.hass.language),
+        count: Object.values(this.sensors).filter(e => !e.area).length
+      }, ...this.areaFilterOptions];
+
   }
 
   async firstUpdated() {
-    this.areas = await fetchAreas(this.hass);
-    this.sensors = await fetchSensors(this.hass);
+    if (this.path && this.path.length == 2 && this.path[0] == 'filter') this.selectedArea = this.path[1];
   }
 
   render() {
