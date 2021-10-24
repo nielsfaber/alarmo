@@ -167,7 +167,7 @@
           "description": "Ajoutez plus de capteurs. Assurez-vous que vos capteurs ont un nom personnalisé afin de pouvoir les identifier.",
           "no_items": "Aucune entité HA disponible ne peut être configurée pour l'alarme. Assurez-vous d'inclure les entités de type binary_sensor.",
           "table": {
-            "type": "Detected type"
+            "type": "Type de détection"
           },
           "actions": {
             "add_to_alarm": "Ajouter à l'alarme",
