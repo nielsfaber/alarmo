@@ -234,7 +234,10 @@ class AlarmoSensorView(HomeAssistantView):
                 ),
                 vol.Optional(const.ATTR_AREA): cv.string,
                 vol.Optional(const.ATTR_ENABLED): cv.boolean,
-                vol.Optional(ATTR_GROUP): cv.string,
+                vol.Optional(ATTR_GROUP): vol.Any(
+                    cv.string,
+                    None
+                )
             }
         )
     )
@@ -364,6 +367,7 @@ class AlarmoSensorGroupView(HomeAssistantView):
                 vol.Optional(ATTR_NAME): cv.string,
                 vol.Optional(ATTR_ENTITIES): vol.All(
                     cv.ensure_list,
+                    vol.Unique(),
                     [cv.string]
                 ),
                 vol.Optional(ATTR_TIMEOUT): cv.positive_int,
