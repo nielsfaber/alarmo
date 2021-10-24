@@ -22,14 +22,14 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
   @property()
   hass!: HomeAssistant;
 
-  @property() 
+  @property()
   narrow!: boolean;
 
   @property()
   item!: string;
 
   @property()
-  data!: AlarmoSensor;
+  data?: AlarmoSensor;
 
   @property()
   showBypassModes: boolean = false;
@@ -52,8 +52,8 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
 
     const sensors = await fetchSensors(this.hass);
 
-    this.data = sensors[this.item];
-    if (!this.data.area && Object.keys(areas).length == 1)
+    this.data = Object.keys(sensors).includes(this.item) ? sensors[this.item] : undefined;
+    if (this.data && !this.data?.area && Object.keys(areas).length == 1)
       this.data = { ...this.data, area: Object.keys(this.areas)[0] };
   }
 
@@ -78,7 +78,7 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
             label="${localize('panels.sensors.cards.editor.fields.name.heading', this.hass.language)}"
             placeholder=${stateObj?.attributes.friendly_name || ''}
             value=${this.data.name}
-            @change=${(ev: Event) => (this.data = { ...this.data, name: (ev.target as HTMLInputElement).value })}
+            @change=${(ev: Event) => (this.data = { ...this.data!, name: (ev.target as HTMLInputElement).value })}
           >
           </paper-input>
         </settings-row>
@@ -93,7 +93,7 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
             .items=${Object.values(this.areas).map(e => Object({ value: e.area_id, name: e.name }))}
             value=${this.data.area}
             label=${localize('panels.sensors.cards.editor.fields.area.heading', this.hass.language)}
-            @value-changed=${(ev: Event) => (this.data = { ...this.data, area: (ev.target as HTMLInputElement).value })}
+            @value-changed=${(ev: Event) => (this.data = { ...this.data!, area: (ev.target as HTMLInputElement).value })}
           </alarmo-select>
         </settings-row>`
         : ''}
@@ -122,7 +122,7 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
             ${this.modesByArea(this.data.area).map(
           el => html`
                 <mwc-button
-                  class="${this.data.modes.includes(el) ? 'active' : ''}"
+                  class="${this.data!.modes.includes(el) ? 'active' : ''}"
                   @click=${() => { this.setMode(el) }}
                 >
                   <ha-icon icon="${EArmModeIcons[Object.entries(EArmModes).find(([, v]) => v == el)![0]]}"></ha-icon>
@@ -139,13 +139,13 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
 
           <div>
            ${Object.keys(this.sensorGroups).length
-            ? html`
+        ? html`
             <alarmo-select
               .clearable=${true}
               .items=${this.getSensorGroups()}
               value=${this.data.group}
               label="${localize('panels.sensors.cards.editor.fields.group.heading', this.hass.language)}"
-              @value-changed=${(ev: CustomEvent) => { this.data = {...this.data, group: ev.detail.value }}}
+              @value-changed=${(ev: CustomEvent) => { this.data = { ...this.data!, group: ev.detail.value } }}
             >
             </alarmo-select>
             ` : ''}
@@ -260,8 +260,8 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
               ${this.modesByArea(this.data.area).map(
               el => html`
                 <mwc-button
-                  class="${this.data.auto_bypass_modes.includes(el) && this.data.modes.includes(el) ? 'active' : ''}"
-                  ?disabled=${!this.data.modes.includes(el)}
+                  class="${this.data!.auto_bypass_modes.includes(el) && this.data!.modes.includes(el) ? 'active' : ''}"
+                  ?disabled=${!this.data!.modes.includes(el)}
                   @click=${() => { this.setBypassMode(el) }}
                 >
                   <ha-icon icon="${EArmModeIcons[Object.entries(EArmModes).find(([, v]) => v == el)![0]]}"></ha-icon>
@@ -314,6 +314,7 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
   }
 
   private _SetData(data: Partial<AlarmoSensor>) {
+    if (!this.data) return;
     for (const [key, val] of Object.entries(data)) {
       switch (key) {
         case 'always_on':
@@ -347,6 +348,7 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
   }
 
   private setMode(mode: EArmModes) {
+    if (!this.data) return;
     this.data = {
       ...this.data,
       modes: this.data.modes.includes(mode)
@@ -356,6 +358,7 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
   };
 
   private setBypassMode(mode: EArmModes) {
+    if (!this.data) return;
     this.data = {
       ...this.data,
       auto_bypass_modes: this.data.auto_bypass_modes.includes(mode)
@@ -365,6 +368,7 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
   };
 
   private setType(type: ESensorTypes) {
+    if (!this.data) return;
     const settings = type != ESensorTypes.Other ? sensorConfigByType(this.modesByArea(this.data.area))[type] : {};
 
     this.data = {
@@ -383,11 +387,12 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
   }
 
   private saveClick(ev: Event) {
+    if (!this.data) return;
     const errors: string[] = [];
 
     this.data = {
       ...this.data,
-      auto_bypass_modes: this.data.auto_bypass_modes.filter(e => this.data.modes.includes(e))
+      auto_bypass_modes: this.data.auto_bypass_modes.filter(e => this.data!.modes.includes(e))
     };
 
     if (!this.data.area) errors.push(localize('panels.sensors.cards.editor.errors.no_area', this.hass.language));
@@ -417,22 +422,22 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
     navigate(this, '/alarmo/sensors', true);
   }
 
-  
+
   manageGroupsClick(ev: Event) {
     const element = ev.target as HTMLElement;
     fireEvent(element, 'show-dialog', {
       dialogTag: 'manage-sensor-groups-dialog',
       dialogImport: () => import('../../dialogs/manage-sensor-groups-dialog'),
-      dialogParams: { },
+      dialogParams: {},
     });
   }
 
   private getSensorGroups(): Option[] {
     return Object.keys(this.sensorGroups)
-    .map(e => Object({
-      value: e,
-      name: this.sensorGroups[e].name,
-    }))
+      .map(e => Object({
+        value: e,
+        name: this.sensorGroups[e].name,
+      }))
   }
 
   static styles = commonStyle;

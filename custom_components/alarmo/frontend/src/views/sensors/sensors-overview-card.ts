@@ -35,7 +35,7 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
 
   @property()
   areaFilterOptions: AlarmoChip[] = [];
-  
+
   @property()
   path!: string[] | null;
 
@@ -112,27 +112,27 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
 
   private tableColumns(): Dictionary<TableColumn> {
     return {
-        icon: {
-          width: '40px',
-        },
-        name: {
-          title: this.hass.localize('ui.components.entity.entity-picker.entity'),
-          width: '60%',
-          grow: true,
-          text: true,
-        },
-        modes: {
-          title: localize('panels.sensors.cards.sensors.table.arm_modes', this.hass.language),
-          width: '25%',
-          hide: this.narrow,
-          text: true,
-        },
-        enabled: {
-          title: localize('panels.actions.cards.notifications.table.enabled', this.hass.language),
-          width: '68px',
-          align: 'center',
-        },
-      };
+      icon: {
+        width: '40px',
+      },
+      name: {
+        title: this.hass.localize('ui.components.entity.entity-picker.entity'),
+        width: '60%',
+        grow: true,
+        text: true,
+      },
+      modes: {
+        title: localize('panels.sensors.cards.sensors.table.arm_modes', this.hass.language),
+        width: '25%',
+        hide: this.narrow,
+        text: true,
+      },
+      enabled: {
+        title: localize('panels.actions.cards.notifications.table.enabled', this.hass.language),
+        width: '68px',
+        align: 'center',
+      },
+    };
   }
 
   private renderTableData(): TableData[] {
@@ -159,17 +159,24 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
     return sensorsList.map(e => this.renderTableDataRow(e));
   }
 
-  private renderTableDataRow(item: {id: string, name: string, icon: string}): TableData {
+  private renderTableDataRow(item: { id: string, name: string, icon: string }): TableData {
     const type = Object.entries(ESensorTypes).find(([, v]) => v == this.sensors[item.id].type)![0];
+    const stateObj = this.hass.states[item.id];
     const output: TableData = {
       icon: html`
         <paper-tooltip animation-delay="0">
-          ${localize( `panels.sensors.cards.editor.fields.device_type.choose.${ESensorTypes[type]}.name`, this.hass!.language )}
+          ${stateObj
+          ? localize(`panels.sensors.cards.editor.fields.device_type.choose.${ESensorTypes[type]}.name`, this.hass!.language)
+          : this.hass.localize("state_badge.default.entity_not_found")
+        }
         </paper-tooltip>
-        <ha-icon icon="${ESensorIcons[type]}"> </ha-icon>
+        <ha-icon icon="${stateObj ? ESensorIcons[type] : "hass:help-circle-outline"}"> </ha-icon>
       `,
       name: html`
-        ${this.sensors[item.id].name || prettyPrint(item.name)}
+        ${stateObj
+          ? this.sensors[item.id].name || prettyPrint(item.name)
+          : prettyPrint(item.name)
+        }
         <span class="secondary">${item.id}</span>
       `,
       id: item.id,
@@ -192,7 +199,7 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
     };
     return output;
   }
-  
+
   toggleEnabled(ev: Event, id: string) {
     const enabled = (ev.target as HTMLInputElement).checked;
     saveSensor(this.hass!, { entity_id: id, enabled: enabled })
