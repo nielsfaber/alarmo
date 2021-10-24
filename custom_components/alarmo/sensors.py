@@ -132,7 +132,7 @@ class SensorHandler:
         )
         async_update_sensor_config()
 
-    async def __del__(self):
+    def __del__(self):
         """prepare for removal"""
         if self._state_listener:
             self._state_listener()
@@ -269,7 +269,10 @@ class SensorHandler:
                 )
 
         # alarm is in pending -> check if pending time needs to be aborted
-        elif alarm_entity.state == STATE_ALARM_PENDING:
+        elif (
+            alarm_entity.state == STATE_ALARM_PENDING and
+            not(sensor_config[ATTR_USE_ENTRY_DELAY])
+        ):
             open_sensors = self.process_group_event(entity, new_state, open_sensors)
             if not open_sensors:
                 return
