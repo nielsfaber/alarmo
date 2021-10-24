@@ -124,6 +124,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
         self._bypassed_sensors = []
         self._delay = None
         self._expiration = None
+        self.area_id = None
 
     @property
     def device_info(self) -> dict:
@@ -291,11 +292,20 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
 
         res = self.hass.data[const.DOMAIN]["coordinator"].async_authenticate_user(code)
         if not res:
+            # wrong code was entered
+            return (False, const.EVENT_INVALID_CODE_PROVIDED)
+        elif (
+            res[const.ATTR_AREA_LIMIT] and
+            not
+            all(area in res[const.ATTR_AREA_LIMIT]
+                for area in ([self.area_id] if self.area_id else list(self.hass.data[const.DOMAIN]["areas"].keys())))
+        ):
+            # user is not allowed to operate this area
+            _LOGGER.debug("User {} has no permission to arm/disarm this area.".format(res[ATTR_NAME]))
             return (False, const.EVENT_INVALID_CODE_PROVIDED)
         else:
             self._changed_by = res[ATTR_NAME]
-
-        return (True, res)
+            return (True, res)
 
     async def async_service_disarm_handler(self, code):
         """handle external disarm request from alarmo.disarm service"""

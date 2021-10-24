@@ -71,6 +71,9 @@ export type AlarmoUser = {
   can_arm: boolean;
   can_disarm: boolean;
   is_override_code: boolean;
+  area_limit: string[],
+  code_format?: string,
+  code_length?: number
 };
 
 export type AutomationTrigger = {

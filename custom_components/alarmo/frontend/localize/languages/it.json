@@ -366,6 +366,10 @@
             "is_override_code": {
               "heading": "E' un codice di forzatura",
               "description": "Inserendo questo codice forzerai lo stato di attivazione dell'allarme"
+            },
+            "area_limit": {
+              "heading": "Restricted areas",
+              "description": "Limit user to control only the selected areas"
             }
           },
           "errors": {

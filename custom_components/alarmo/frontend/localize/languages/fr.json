@@ -366,6 +366,10 @@
             "is_override_code": {
               "heading": "Code de sécurité",
               "description": "La saisie de ce code forcera l'activation l'alarme."
+            },
+            "area_limit": {
+              "heading": "Restricted areas",
+              "description": "Limit user to control only the selected areas"
             }
           },
           "errors": {

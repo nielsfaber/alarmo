@@ -267,6 +267,10 @@ class AlarmoUserView(HomeAssistantView):
                 vol.Optional(const.ATTR_CAN_ARM): cv.boolean,
                 vol.Optional(const.ATTR_CAN_DISARM): cv.boolean,
                 vol.Optional(const.ATTR_IS_OVERRIDE_CODE): cv.boolean,
+                vol.Optional(const.ATTR_AREA_LIMIT): vol.All(
+                    cv.ensure_list,
+                    [cv.string]
+                )
             }
         )
     )
