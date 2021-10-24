@@ -26,7 +26,7 @@
       "edit_in_yaml": "Editer en YAML"
     }
   },
-  "title": "Gestion de L'alarme",
+  "title": "Configuration de l' alarme",
   "panels": {
     "general": {
       "title": "Généraux",
@@ -187,8 +187,8 @@
               "description": "Selectionner une zone contenant ce capteur."
             },
             "group": {
-              "heading": "Group",
-              "description": "Group with other sensors for combined triggering."
+              "heading": "Groupe",
+              "description": "Grouper avec d'autres capteurs pour un déclenchement combiné."
             },
             "device_type": {
               "heading": "Type de détection",
@@ -256,7 +256,7 @@
           "actions": {
             "toggle_advanced": "Paramètres avancées",
             "remove": "Supprimer",
-            "setup_groups": "Setup groups"
+            "setup_groups": "Configuration de Groupe"
           },
           "errors": {
             "description": "Veuillez corriger les erreurs suivantes:",
@@ -268,36 +268,36 @@
       },
       "dialogs": {
         "manage_groups": {
-          "title": "Manage sensor groups",
-          "description": "In a sensor group multiple sensors must be activated within a time period before the alarm is triggered.",
-          "no_items": "No groups yet",
+          "title": "Gérer les groupes de capteurs",
+          "description": "Dans un groupe de capteurs, plusieurs capteurs doivent être activés dans un laps de temps avant que l'alarme ne se déclenche.",
+          "no_items": "Aucun groupe",
           "actions": {
-            "new_group": "New group"
+            "new_group": "Nouveau groupe"
           }
         },
         "create_group": {
-          "title": "New sensor group",
+          "title": "Nouveau groupe de capteurs",
           "fields": {
             "name": {
-              "heading": "Name",
-              "description": "Name for sensor group"
+              "heading": "Nom",
+              "description": "Nom du nouveau groupe de capteurs"
             },
             "timeout": {
-              "heading": "Time-out",
-              "description": "Time period during which consecutive sensor activations triggers the alarm."
+              "heading": "Laps de temps",
+              "description": "Période de temps pendant laquelle les activations consécutives du capteur déclenchent l'alarme."
             },
             "sensors": {
-              "heading": "Sensors",
-              "description": "Select the sensors which are contained by this group."
+              "heading": "Capteurs",
+              "description": "Sélectionnez les capteurs qui sont contenus dans ce groupe."
             }
           },
           "errors": {
-            "invalid_name": "Invalid name provided.",
-            "insufficient_sensors": "At least 2 sensors need to be selected."
+            "invalid_name": "Nom fourni non valide.",
+            "insufficient_sensors": "Au moins 2 capteurs doivent être sélectionnés."
           }
         },
         "edit_group": {
-          "title": "Edit sensor group '{name}'"
+          "title": "Editer le groupe de capteurs '{name}'"
         }
       }
     },
