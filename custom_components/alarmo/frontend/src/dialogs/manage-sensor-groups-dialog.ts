@@ -12,7 +12,6 @@ import { localize } from '../../localize/localize';
 
 @customElement('manage-sensor-groups-dialog')
 export class ManageSensorGroupsDialog extends SubscribeMixin(LitElement) {
-
   @property({ attribute: false })
   public hass!: HomeAssistant;
 
@@ -49,21 +48,15 @@ export class ManageSensorGroupsDialog extends SubscribeMixin(LitElement) {
   render() {
     if (!this._params) return html``;
     return html`
-      <ha-dialog
-        open
-        .heading=${this.renderHeader()}
-        @closed=${this.closeDialog}
-        @close-dialog=${this.closeDialog}
-      >
+      <ha-dialog open .heading=${this.renderHeader()} @closed=${this.closeDialog} @close-dialog=${this.closeDialog}>
         <div class="wrapper">
           <div class="description">
             ${localize('panels.sensors.dialogs.manage_groups.description', this.hass.language)}
           </div>
           <div class="container">
             ${Object.keys(this.sensorGroups).length
-        ? Object.values(this.sensorGroups).map(e => this.renderGroup(e))
-        : localize('panels.sensors.dialogs.manage_groups.no_items', this.hass.language)
-      }
+              ? Object.values(this.sensorGroups).map(e => this.renderGroup(e))
+              : localize('panels.sensors.dialogs.manage_groups.no_items', this.hass.language)}
           </div>
         </div>
         <mwc-button slot="secondaryAction" @click=${this.createGroupClick}>
@@ -76,13 +69,16 @@ export class ManageSensorGroupsDialog extends SubscribeMixin(LitElement) {
 
   renderHeader() {
     return html`
-    <span class="header_title">${localize('panels.sensors.dialogs.manage_groups.title', this.hass.language)}</span>
-    <ha-icon-button
-      .label=${this.hass.localize("ui.dialogs.generic.close")}
-      icon="mdi:close"
-      dialogAction="close"
-      class="header_button"
-    ></ha-icon-button>`;
+      <span class="header_title">${localize('panels.sensors.dialogs.manage_groups.title', this.hass.language)}</span>
+      <ha-icon-button
+        .label=${this.hass.localize('ui.dialogs.generic.close')}
+        icon="mdi:close"
+        dialogAction="close"
+        class="header_button"
+      >
+        <ha-icon icon="mdi:close"></ha-icon>
+      </ha-icon-button>
+    `;
   }
 
   renderGroup(item: SensorGroup) {
@@ -94,9 +90,15 @@ export class ManageSensorGroupsDialog extends SubscribeMixin(LitElement) {
       <ha-icon icon="hass:folder-outline"></ha-icon>
       <div>
         <span class="name">${item.name}</span>
-        <span class="description">${localize('panels.general.cards.areas.table.summary_sensors', this.hass!.language, '{number}', String(item.entities.length))}
+        <span class="description">${localize(
+          'panels.general.cards.areas.table.summary_sensors',
+          this.hass!.language,
+          '{number}',
+          String(item.entities.length)
+        )}
       </div>
       <ha-icon-button icon="hass:chevron-right">
+        <ha-icon icon="hass:chevron-right"></ha-icon>
       </ha-icon-button>
     </ha-card>
     `;
@@ -176,7 +178,6 @@ export class ManageSensorGroupsDialog extends SubscribeMixin(LitElement) {
       mwc-button ha-icon {
         padding-right: 11px;
       }
-
     `;
   }
 }

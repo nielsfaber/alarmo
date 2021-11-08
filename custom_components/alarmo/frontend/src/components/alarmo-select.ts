@@ -22,7 +22,7 @@ export class AlarmoSelect extends LitElement {
   @property({ type: Boolean }) disabled = false;
   @state() private _opened?: boolean;
 
-  @property({ attribute: "allow-custom-value", type: Boolean })
+  @property({ attribute: 'allow-custom-value', type: Boolean })
   public allowCustomValue?: boolean;
 
   @property({ type: Boolean })
@@ -77,25 +77,27 @@ export class AlarmoSelect extends LitElement {
           ?invalid=${this.invalid}
         >
           ${isDefined(this._value) && this.items.find(e => e.value == this._value)
-        ? html`
-                ${this.icons
             ? html`
+                ${this.icons
+                  ? html`
                       <ha-icon slot="prefix" icon="${this.items.find(e => e.value == this._value)!.icon}"> </ha-icon>
                     `
-            : ''}
+                  : ''}
                 ${this.clearable
-            ? html`
+                  ? html`
                       <ha-icon-button slot="suffix" class="clear-button" @click=${this._clearValue} icon="hass:close">
+                        <ha-icon icon="hass:close"></ha-icon>
                       </ha-icon-button>
                     `
-            : ''}
+                  : ''}
               `
-        : ''}
+            : ''}
           <ha-icon-button
             slot="suffix"
             class="toggle-button"
             icon="${this._opened ? 'hass:menu-up' : 'hass:menu-down'}"
           >
+            <ha-icon icon="${this._opened ? 'hass:menu-up' : 'hass:menu-down'}"></ha-icon>
           </ha-icon-button>
         </paper-input>
       </vaadin-combo-box-light>
@@ -147,7 +149,7 @@ export class AlarmoSelect extends LitElement {
         `;
     }
     root.querySelector('.name')!.textContent = entry.item.name;
-    root.querySelector('[secondary]')!.textContent = entry.item.description || "";
+    root.querySelector('[secondary]')!.textContent = entry.item.description || '';
     if (this.icons) (root.querySelector('ha-icon')! as any).icon = entry.item.icon;
   };
 

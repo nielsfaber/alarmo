@@ -7,12 +7,11 @@ export type AlarmoChip = {
   name: string;
   value: string;
   icon?: string;
-  count?: Number;
-}
+  count?: number;
+};
 
 @customElement('alarmo-chips')
 export class AlarmoChips extends LitElement {
-
   @property()
   items: AlarmoChip[] = [];
 
@@ -20,44 +19,43 @@ export class AlarmoChips extends LitElement {
   value: string | null | string[] = null;
 
   @property({ type: Boolean })
-  selectable = false; 
+  selectable = false;
 
   @property({ type: Boolean })
   multiple = false;
 
   protected render(): TemplateResult {
     return html`
-      ${
-      this.items.map(e =>
-        html`
-          <div
-            class="chip ${Array.isArray(this.value) && this.value.includes(e.value) || this.value == e.value ? 'selected' : ''}"
-            @click=${() => this.selectItem(e.value)}
-          >
-            ${this.renderBadge(e)}
-            <span class="label">
-              ${e.name}
-            </span>
-          </div>
-        `)
-      }
+      ${this.items.map(
+        e =>
+          html`
+            <div
+              class="chip ${(Array.isArray(this.value) && this.value.includes(e.value)) || this.value == e.value
+                ? 'selected'
+                : ''}"
+              @click=${() => this.selectItem(e.value)}
+            >
+              ${this.renderBadge(e)}
+              <span class="label">
+                ${e.name}
+              </span>
+            </div>
+          `
+      )}
     `;
   }
 
   private renderBadge(item: AlarmoChip) {
     return html`
-    ${
-      item.count !== undefined
-        ? html`<span class="count">${item.count > 99 ? 99 : item.count}</span>`
+      ${item.count !== undefined
+        ? html`
+            <span class="count">${item.count > 99 ? 99 : item.count}</span>
+          `
         : item.icon !== undefined
-         ? html`<ha-icon icon="${item.icon}"></ha-icon>`
-         : ''
-      }
-    `;
-  }
-
-  private renderIcon(_item: AlarmoChip) {
-    return html`
+        ? html`
+            <ha-icon icon="${item.icon}"></ha-icon>
+          `
+        : ''}
     `;
   }
 
@@ -65,7 +63,7 @@ export class AlarmoChips extends LitElement {
     let retval: string | null | string[] = value;
     if (this.selectable) {
       if (this.multiple) {
-        let list = Array.isArray(this.value) ? [...this.value] : isDefined(this.value) ? [this.value] : [];
+        const list = Array.isArray(this.value) ? [...this.value] : isDefined(this.value) ? [this.value] : [];
         this.value = list.includes(value) ? Without(list, value) : [...list, value];
       } else {
         this.value = this.value == value ? null : value;

@@ -130,7 +130,7 @@ export function defaultSensorConfig(stateObj: HassEntity | undefined, modeList: 
     auto_bypass_modes: [],
     trigger_unavailable: false,
     type: ESensorTypes.Other,
-    enabled: true
+    enabled: true,
   };
 
   if (domain == 'binary_sensor') {
@@ -158,11 +158,12 @@ export const getSensorTypeOptions = (hass: HomeAssistant) =>
       })
     );
 
-
-
-    
-export const getConfigurableSensors = (hass: HomeAssistant, includedSensors: string[], showAllBinarySensors = false) => {
-  let list = Object.values(hass.states)
+export const getConfigurableSensors = (
+  hass: HomeAssistant,
+  includedSensors: string[],
+  showAllBinarySensors = false
+) => {
+  const list = Object.values(hass.states)
     .filter(e => isValidSensor(e, showAllBinarySensors))
     .filter(e => !includedSensors.includes(e.entity_id))
     .map(e =>
@@ -171,8 +172,8 @@ export const getConfigurableSensors = (hass: HomeAssistant, includedSensors: str
         name: computeName(e),
         icon: computeIcon(e),
       })
-    ) as { id: string, name: string, icon: string }[];
+    ) as { id: string; name: string; icon: string }[];
 
-    list.sort(sortAlphabetically);
+  list.sort(sortAlphabetically);
   return list;
-}
+};

@@ -27,8 +27,8 @@ export class AlarmoTable extends LitElement {
       <div class="table">
         ${this.renderHeaderRow()}
         ${this.data.length
-        ? this.data.map(e => this.renderDataRow(e))
-        : html`
+          ? this.data.map(e => this.renderDataRow(e))
+          : html`
               <div class="table-row">
                 <div class="table-cell text grow">
                   <slot></slot>
@@ -44,9 +44,9 @@ export class AlarmoTable extends LitElement {
     return html`
       <div class="table-row header">
         ${Object.values(this.columns).map(e =>
-      e.hide
-        ? ''
-        : html`
+          e.hide
+            ? ''
+            : html`
                 <div
                   class="table-cell ${e.text ? 'text' : ''} ${e.grow ? 'grow' : ''} ${e.align ? e.align : ''}"
                   style="${e.grow ? '' : `width: ${e.width}`}"
@@ -54,7 +54,7 @@ export class AlarmoTable extends LitElement {
                   <span>${e.title || ''}</span>
                 </div>
               `
-    )}
+        )}
       </div>
     `;
   }
@@ -64,9 +64,9 @@ export class AlarmoTable extends LitElement {
     return html`
       <div class="table-row ${this.selectable ? 'selectable' : ''}" @click=${() => this.handleClick(String(data.id))}>
         ${Object.entries(this.columns).map(([col, e]) =>
-      e.hide
-        ? ''
-        : html`
+          e.hide
+            ? ''
+            : html`
                 <div
                   class="table-cell ${e.text ? 'text' : ''} ${e.grow ? 'grow' : ''} ${e.align ? e.align : ''}"
                   style="${e.grow ? '' : `width: ${e.width}`}"
@@ -74,7 +74,7 @@ export class AlarmoTable extends LitElement {
                   ${data[col]}
                 </div>
               `
-    )}
+        )}
       </div>
     `;
   }
@@ -145,7 +145,7 @@ export class AlarmoTable extends LitElement {
       color: var(--secondary-text-color);
     }
     div.table .header div.table-cell span {
-      white-space: nowrap; 
+      white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       min-width: 0;

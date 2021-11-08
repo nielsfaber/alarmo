@@ -23,7 +23,9 @@ export class ErrorDialog extends LitElement {
       <ha-dialog open .heading=${true} @closed=${this.closeDialog} @close-dialog=${this.closeDialog}>
         <div slot="heading">
           <ha-header-bar>
-            <ha-icon-button slot="navigationIcon" dialogAction="cancel" icon="mdi:close"> </ha-icon-button>
+            <ha-icon-button slot="navigationIcon" dialogAction="cancel" icon="mdi:close">
+              <ha-icon icon="mdi:close"></ha-icon>
+            </ha-icon-button>
             <span slot="title">
               ${this.hass.localize('state_badge.default.error')}
             </span>
