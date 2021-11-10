@@ -76,7 +76,9 @@ export class NotificationEditorCard extends LitElement {
     if (!this.hass || !this.areas || !this.alarmoConfig) return html``;
     return html`
       <div class="heading">
-        <ha-icon-button icon="hass:close" @click=${this._cancelClick} class="icon"></ha-icon-button>
+        <ha-icon-button icon="hass:close" @click=${this._cancelClick} class="icon">
+          <ha-icon icon="hass:close"></ha-icon>
+        </ha-icon-button>
         <div class="header">${localize('panels.actions.cards.new_notification.title', this.hass.language)}</div>
         <div class="description">${localize('panels.actions.cards.new_notification.description', this.hass.language)}</div>
       </div>
@@ -498,7 +500,7 @@ export class NotificationEditorCard extends LitElement {
     if (!this._validateConfig()) return;
     let data = this._parseAutomation();
 
-    //keep modes array empty if all modes are selected 
+    //keep modes array empty if all modes are selected
     if (getArmModeOptions(data.triggers[0].area, this.areas!).every(e => data.triggers[0].modes?.includes(e))) {
       data = { ...data, triggers: Object.assign(data.triggers, { [0]: { ...data.triggers[0], modes: [] } }) };
     }

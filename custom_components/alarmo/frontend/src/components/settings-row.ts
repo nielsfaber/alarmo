@@ -3,7 +3,6 @@ import { property, customElement } from 'lit/decorators.js';
 
 @customElement('settings-row')
 export class SettingsRow extends LitElement {
-
   @property({ type: Boolean, reflect: true })
   public narrow!: boolean;
 

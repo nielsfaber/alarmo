@@ -62,7 +62,9 @@ export class UserEditorCard extends LitElement {
         : localize('panels.codes.cards.new_user.title', this.hass.language)
       }
           </div>
-          <ha-icon-button icon="hass:close" @click=${this.cancelClick}> </ha-icon-button>
+          <ha-icon-button icon="hass:close" @click=${this.cancelClick}>
+            <ha-icon icon="hass:close"></ha-icon>
+          </ha-icon-button>
         </div>
         <div class="card-content">
           ${this.item

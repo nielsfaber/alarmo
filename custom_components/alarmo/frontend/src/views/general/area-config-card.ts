@@ -85,7 +85,9 @@ export class AreaConfigCard extends SubscribeMixin(LitElement) {
       const output: TableData = {
         id: item.area_id,
         actions: html`
-          <ha-icon-button @click=${(ev: Event) => this.editClick(ev, item.area_id)} icon="hass:pencil"></ha-icon-button>
+          <ha-icon-button @click=${(ev: Event) => this.editClick(ev, item.area_id)} icon="hass:pencil">
+            <ha-icon icon="hass:pencil"></ha-icon>
+          </ha-icon-button>
         `,
         name: prettyPrint(item.name),
         remarks: (unsafeHTML(

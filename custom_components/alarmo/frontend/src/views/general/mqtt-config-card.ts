@@ -50,7 +50,9 @@ export class MqttConfigCard extends SubscribeMixin(LitElement) {
       <ha-card>
         <div class="card-header">
           <div class="name">${localize('panels.general.cards.mqtt.title', this.hass.language)}</div>
-          <ha-icon-button icon="hass:close" @click=${this.cancelClick}> </ha-icon-button>
+          <ha-icon-button icon="hass:close" @click=${this.cancelClick}>
+            <ha-icon icon="hass:close"></ha-icon>
+          </ha-icon-button>
         </div>
         <div class="card-content">${localize('panels.general.cards.mqtt.description', this.hass.language)}</div>
 

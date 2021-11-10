@@ -40,8 +40,8 @@ export class AlarmoMultiEntitySelect extends LitElement {
         <div class="dropdown-holder">
           <ha-entity-picker
             @change=${(ev: Event) => {
-        this.selectedChange(ev, index);
-      }}
+              this.selectedChange(ev, index);
+            }}
             .includeDomains=${this.includeDomains}
             .hass=${this.hass}
             value=${this.getValue(index)}
