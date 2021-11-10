@@ -368,8 +368,8 @@
               "description": "La saisie de ce code forcera l'activation l'alarme."
             },
             "area_limit": {
-              "heading": "Restricted areas",
-              "description": "Limit user to control only the selected areas"
+              "heading": "Zones Restreintes",
+              "description": "L'utilisateur ne peut contrôler uniquement les zones sélectionnées"
             }
           },
           "errors": {
