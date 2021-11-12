@@ -475,6 +475,14 @@
                 "pending": "Larmet kommer snart triggas, inaktivera larmet snarast!"
               }
             },
+            "open_sensors_format": {
+              "heading": "Format for open_sensors wildcard",
+              "description": "Choose which sensor information in inserted in the message",
+              "options": {
+                "default": "Names and states",
+                "short": "Names only"
+              }
+            },
             "target": {
               "heading": "Mål",
               "description": "Enhet att skicka push-meddelandet till"

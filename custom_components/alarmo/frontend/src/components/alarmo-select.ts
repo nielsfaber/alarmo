@@ -12,8 +12,6 @@ export type Option = {
 
 @customElement('alarmo-select')
 export class AlarmoSelect extends LitElement {
-  @property({ attribute: false }) public hass!: HomeAssistant;
-
   @property() public label = '';
   @property() public value?: string;
   @property() items: Option[] = [];

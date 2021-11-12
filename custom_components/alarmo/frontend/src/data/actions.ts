@@ -145,10 +145,10 @@ export const computeServiceDisplay = (hass: HomeAssistant, ...services: (string 
           const stateObj = hass.states[`device_tracker.${domainService.replace('mobile_app_', '')}`];
           data = stateObj
             ? {
-                ...data,
-                name: stateObj.attributes.friendly_name || computeEntity(stateObj.entity_id),
-                icon: stateObj.attributes.icon || 'hass:cellphone-text',
-              }
+              ...data,
+              name: stateObj.attributes.friendly_name || computeEntity(stateObj.entity_id),
+              icon: stateObj.attributes.icon || 'hass:cellphone-text',
+            }
             : { ...data, icon: 'hass:comment-alert' };
           break;
         case 'tts':
@@ -315,6 +315,41 @@ export const getWildcardOptions = (event?: EAlarmEvent) => {
 
   return options;
 };
+
+export const getOpenSensorsWildCardOptions = (hass: HomeAssistant) => {
+  let options: { value: string, name: string }[] = [];
+
+  if (hass.language != 'en')
+    options = [
+      ...options,
+      {
+        value: '{{open_sensors}}',
+        name: `${localize('panels.actions.cards.new_notification.fields.open_sensors_format.options.default', hass.language)} (${hass.translationMetadata.translations['en'].nativeName})`
+      },
+      {
+        value: `{{open_sensors|lang=${hass.language}}}`,
+        name: `${localize('panels.actions.cards.new_notification.fields.open_sensors_format.options.default', hass.language)} (${hass.translationMetadata.translations[hass.language].nativeName})`
+      }
+    ];
+  else
+    options = [
+      ...options,
+      {
+        value: '{{open_sensors}}',
+        name: localize('panels.actions.cards.new_notification.fields.open_sensors_format.options.default', hass.language)
+      }
+    ];
+
+  options = [
+    ...options,
+    {
+      value: '{{open_sensors|format=short}}',
+      name: localize('panels.actions.cards.new_notification.fields.open_sensors_format.options.short', hass.language)
+    }
+  ];
+
+  return options;
+}
 
 export const isValidString = (input: any) => {
   return typeof input == 'string' && input.trim().length;

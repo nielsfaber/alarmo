@@ -475,6 +475,14 @@
                 "pending": "The alarm is about to trigger, disarm it quickly!"
               }
             },
+            "open_sensors_format": {
+              "heading": "Format for open_sensors wildcard",
+              "description": "Choose which sensor information in inserted in the message",
+              "options": {
+                "default": "Names and states",
+                "short": "Names only"
+              }
+            },
             "target": {
               "heading": "Saaja",
               "description": "Seade millele edastada teavitus"

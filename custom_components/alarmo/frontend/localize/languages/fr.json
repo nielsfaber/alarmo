@@ -475,6 +475,14 @@
                 "pending": "L'alarme est sur le point de se déclencher, désarmez-la rapidement!"
               }
             },
+            "open_sensors_format": {
+              "heading": "Format for open_sensors wildcard",
+              "description": "Choose which sensor information in inserted in the message",
+              "options": {
+                "default": "Names and states",
+                "short": "Names only"
+              }
+            },
             "target": {
               "heading": "Cible",
               "description": "Appareil recevant le message"

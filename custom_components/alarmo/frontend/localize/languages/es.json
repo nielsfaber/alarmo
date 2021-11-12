@@ -475,6 +475,14 @@
                 "pending": "¡La alarma está a punto de dispararse, desarme rápidamente!"
               }
             },
+            "open_sensors_format": {
+              "heading": "Format for open_sensors wildcard",
+              "description": "Choose which sensor information in inserted in the message",
+              "options": {
+                "default": "Names and states",
+                "short": "Names only"
+              }
+            },
             "target": {
               "heading": "Objetivo",
               "description": "Dispositivo al que enviar el mensaje push."

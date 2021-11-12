@@ -475,6 +475,14 @@
                 "pending": "Het alarm moet nu worden uitgeschakeld, anders wordt deze geactiveerd."
               }
             },
+            "open_sensors_format": {
+              "heading": "Opmaak voor open_sensors wildcard",
+              "description": "Kies welke sensor informatie wordt weergegeven in het bericht",
+              "options": {
+                "default": "Naam en status",
+                "short": "Alleen naam"
+              }
+            },
             "target": {
               "heading": "Doel",
               "description": "Apparaat om het push-bericht naar te sturen"

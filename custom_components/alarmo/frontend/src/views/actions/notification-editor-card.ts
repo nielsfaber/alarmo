@@ -6,8 +6,7 @@ import { AlarmoAutomation, EAlarmEvent, EArmModes, AlarmoArea, Dictionary, Autom
 import { handleError, omit, showErrorDialog, isDefined } from '../../helpers';
 import { saveAutomation, fetchAreas, fetchConfig, deleteAutomation } from '../../data/websockets';
 import { localize } from '../../../localize/localize';
-import { computeEventDisplay, computeAreaDisplay, computeArmModeDisplay, getAreaOptions, getArmModeOptions, computeServiceDisplay, getNotifyServices, getWildcardOptions, isValidString, isString, isObject } from '../../data/actions';
-
+import { computeEventDisplay, computeAreaDisplay, computeArmModeDisplay, getAreaOptions, getArmModeOptions, computeServiceDisplay, getNotifyServices, getWildcardOptions, isValidString, isString, isObject, getOpenSensorsWildCardOptions } from '../../data/actions';
 
 import '../../components/alarmo-selector';
 import '../../components/alarmo-select';
@@ -217,8 +216,30 @@ export class NotificationEditorCard extends LitElement {
               ></alarmo-chips>
             </div>`
             : ''}
-    
-          </settings-row>`
+
+          </settings-row>
+
+            ${this._getOpenSensorsFormat() !== null ? html`
+
+            <settings-row .narrow=${this.narrow} .large=${true}>
+              <span slot="heading">
+                ${localize('panels.actions.cards.new_notification.fields.open_sensors_format.heading', this.hass.language)}
+              </span>
+
+              <span slot="description">
+                ${localize('panels.actions.cards.new_notification.fields.open_sensors_format.description', this.hass.language)}
+              </span>
+
+              <alarmo-select
+                .items=${getOpenSensorsWildCardOptions(this.hass)}
+                .value=${this._getOpenSensorsFormat(true)}
+                @value-changed=${this._setOpenSensorsFormat}
+              >
+
+              </alarmo-select>
+            </settings-row>
+            ` : ''}
+        `
         : html`
           <h2>${localize('components.editor.edit_in_yaml', this.hass.language)}</h2>
   
@@ -496,11 +517,29 @@ export class NotificationEditorCard extends LitElement {
     return data;
   }
 
+  private _getOpenSensorsFormat(forceResult = false): null | string {
+    const message = this.config.actions[0].service_data?.message || '';
+    const res = message.match(/{{open_sensors(\|[^}]+)?}}/);
+    if (res !== null) return res[0];
+    else return forceResult ? '{{open_sensors}}' : null;
+  }
+
+  private _setOpenSensorsFormat(ev: CustomEvent) {
+    ev.stopPropagation();
+    const value = String(ev.detail.value);
+    let message = this.config.actions[0].service_data?.message || '';
+    message = message.replace(/{{open_sensors(\|[^}]+)?}}/, value);
+
+    let actionConfig = this.config.actions;
+    Object.assign(actionConfig, { [0]: { ...actionConfig[0], service: actionConfig[0].service || '', service_data: { ...actionConfig[0].service_data || {}, message: message } } });
+    this.config = { ...this.config, actions: actionConfig };
+  }
+
   private _saveClick(ev: Event) {
     if (!this._validateConfig()) return;
     let data = this._parseAutomation();
 
-    //keep modes array empty if all modes are selected
+    //keep modes array empty if all modes are selected 
     if (getArmModeOptions(data.triggers[0].area, this.areas!).every(e => data.triggers[0].modes?.includes(e))) {
       data = { ...data, triggers: Object.assign(data.triggers, { [0]: { ...data.triggers[0], modes: [] } }) };
     }
@@ -525,7 +564,8 @@ export class NotificationEditorCard extends LitElement {
     const [domain, service] = action.service!.split('.');
 
     let message = action.service_data!.message;
-    message = message.replace('{{open_sensors}}', 'Some Example Sensor is open');
+    message = message.replace('{{open_sensors|format=short}}', 'Some Example Sensor');
+    message = message.replace(/{{open_sensors(\|[^}]+)?}}/, 'Some Example Sensor is open');
     message = message.replace('{{bypassed_sensors}}', 'Some Bypassed Sensor');
     message = message.replace('{{arm_mode}}', 'Armed away');
     message = message.replace('{{changed_by}}', 'Some Example User');
