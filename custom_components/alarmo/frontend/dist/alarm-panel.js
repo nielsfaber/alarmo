@@ -28,59 +28,59 @@
      * Copyright 2019 Google LLC
      * SPDX-License-Identifier: BSD-3-Clause
      */
-    const t=window.ShadowRoot&&(void 0===window.ShadyCSS||window.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,e=Symbol();class s{constructor(t,s){if(s!==e)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=t;}get styleSheet(){return t&&void 0===this.t&&(this.t=new CSSStyleSheet,this.t.replaceSync(this.cssText)),this.t}toString(){return this.cssText}}const n=new Map,o=t=>{let o=n.get(t);return void 0===o&&n.set(t,o=new s(t,e)),o},r=t=>o("string"==typeof t?t:t+""),i=(t,...e)=>{const n=1===t.length?t[0]:e.reduce(((e,n,o)=>e+(t=>{if(t instanceof s)return t.cssText;if("number"==typeof t)return t;throw Error("Value passed to 'css' function must be a 'css' function result: "+t+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(n)+t[o+1]),t[0]);return o(n)},S=(e,s)=>{t?e.adoptedStyleSheets=s.map((t=>t instanceof CSSStyleSheet?t:t.styleSheet)):s.forEach((t=>{const s=document.createElement("style");s.textContent=t.cssText,e.appendChild(s);}));},u=t?t=>t:t=>t instanceof CSSStyleSheet?(t=>{let e="";for(const s of t.cssRules)e+=s.cssText;return r(e)})(t):t;//# sourceMappingURL=css-tag.js.map
+    const t=window.ShadowRoot&&(void 0===window.ShadyCSS||window.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,e=Symbol();class s{constructor(t,s){if(s!==e)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=t;}get styleSheet(){return t&&void 0===this.t&&(this.t=new CSSStyleSheet,this.t.replaceSync(this.cssText)),this.t}toString(){return this.cssText}}const n=new Map,o=t=>{let o=n.get(t);return void 0===o&&n.set(t,o=new s(t,e)),o},r=t=>o("string"==typeof t?t:t+""),i=(t,...e)=>{const n=1===t.length?t[0]:e.reduce(((e,n,o)=>e+(t=>{if(t instanceof s)return t.cssText;if("number"==typeof t)return t;throw Error("Value passed to 'css' function must be a 'css' function result: "+t+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(n)+t[o+1]),t[0]);return o(n)},S=(e,s)=>{t?e.adoptedStyleSheets=s.map((t=>t instanceof CSSStyleSheet?t:t.styleSheet)):s.forEach((t=>{const s=document.createElement("style");s.textContent=t.cssText,e.appendChild(s);}));},u=t?t=>t:t=>t instanceof CSSStyleSheet?(t=>{let e="";for(const s of t.cssRules)e+=s.cssText;return r(e)})(t):t;
 
     /**
      * @license
      * Copyright 2017 Google LLC
      * SPDX-License-Identifier: BSD-3-Clause
-     */var s$1,e$1,h,r$1;const o$1={toAttribute(t,i){switch(i){case Boolean:t=t?"":null;break;case Object:case Array:t=null==t?t:JSON.stringify(t);}return t},fromAttribute(t,i){let s=t;switch(i){case Boolean:s=null!==t;break;case Number:s=null===t?null:Number(t);break;case Object:case Array:try{s=JSON.parse(t);}catch(t){s=null;}}return s}},n$1=(t,i)=>i!==t&&(i==i||t==t),l={attribute:!0,type:String,converter:o$1,reflect:!1,hasChanged:n$1};class a extends HTMLElement{constructor(){super(),this.Πi=new Map,this.Πo=void 0,this.Πl=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this.Πh=null,this.u();}static addInitializer(t){var i;null!==(i=this.v)&&void 0!==i||(this.v=[]),this.v.push(t);}static get observedAttributes(){this.finalize();const t=[];return this.elementProperties.forEach(((i,s)=>{const e=this.Πp(s,i);void 0!==e&&(this.Πm.set(e,s),t.push(e));})),t}static createProperty(t,i=l){if(i.state&&(i.attribute=!1),this.finalize(),this.elementProperties.set(t,i),!i.noAccessor&&!this.prototype.hasOwnProperty(t)){const s="symbol"==typeof t?Symbol():"__"+t,e=this.getPropertyDescriptor(t,s,i);void 0!==e&&Object.defineProperty(this.prototype,t,e);}}static getPropertyDescriptor(t,i,s){return {get(){return this[i]},set(e){const h=this[t];this[i]=e,this.requestUpdate(t,h,s);},configurable:!0,enumerable:!0}}static getPropertyOptions(t){return this.elementProperties.get(t)||l}static finalize(){if(this.hasOwnProperty("finalized"))return !1;this.finalized=!0;const t=Object.getPrototypeOf(this);if(t.finalize(),this.elementProperties=new Map(t.elementProperties),this.Πm=new Map,this.hasOwnProperty("properties")){const t=this.properties,i=[...Object.getOwnPropertyNames(t),...Object.getOwnPropertySymbols(t)];for(const s of i)this.createProperty(s,t[s]);}return this.elementStyles=this.finalizeStyles(this.styles),!0}static finalizeStyles(i){const s=[];if(Array.isArray(i)){const e=new Set(i.flat(1/0).reverse());for(const i of e)s.unshift(u(i));}else void 0!==i&&s.push(u(i));return s}static Πp(t,i){const s=i.attribute;return !1===s?void 0:"string"==typeof s?s:"string"==typeof t?t.toLowerCase():void 0}u(){var t;this.Πg=new Promise((t=>this.enableUpdating=t)),this.L=new Map,this.Π_(),this.requestUpdate(),null===(t=this.constructor.v)||void 0===t||t.forEach((t=>t(this)));}addController(t){var i,s;(null!==(i=this.ΠU)&&void 0!==i?i:this.ΠU=[]).push(t),void 0!==this.renderRoot&&this.isConnected&&(null===(s=t.hostConnected)||void 0===s||s.call(t));}removeController(t){var i;null===(i=this.ΠU)||void 0===i||i.splice(this.ΠU.indexOf(t)>>>0,1);}Π_(){this.constructor.elementProperties.forEach(((t,i)=>{this.hasOwnProperty(i)&&(this.Πi.set(i,this[i]),delete this[i]);}));}createRenderRoot(){var t;const s=null!==(t=this.shadowRoot)&&void 0!==t?t:this.attachShadow(this.constructor.shadowRootOptions);return S(s,this.constructor.elementStyles),s}connectedCallback(){var t;void 0===this.renderRoot&&(this.renderRoot=this.createRenderRoot()),this.enableUpdating(!0),null===(t=this.ΠU)||void 0===t||t.forEach((t=>{var i;return null===(i=t.hostConnected)||void 0===i?void 0:i.call(t)})),this.Πl&&(this.Πl(),this.Πo=this.Πl=void 0);}enableUpdating(t){}disconnectedCallback(){var t;null===(t=this.ΠU)||void 0===t||t.forEach((t=>{var i;return null===(i=t.hostDisconnected)||void 0===i?void 0:i.call(t)})),this.Πo=new Promise((t=>this.Πl=t));}attributeChangedCallback(t,i,s){this.K(t,s);}Πj(t,i,s=l){var e,h;const r=this.constructor.Πp(t,s);if(void 0!==r&&!0===s.reflect){const n=(null!==(h=null===(e=s.converter)||void 0===e?void 0:e.toAttribute)&&void 0!==h?h:o$1.toAttribute)(i,s.type);this.Πh=t,null==n?this.removeAttribute(r):this.setAttribute(r,n),this.Πh=null;}}K(t,i){var s,e,h;const r=this.constructor,n=r.Πm.get(t);if(void 0!==n&&this.Πh!==n){const t=r.getPropertyOptions(n),l=t.converter,a=null!==(h=null!==(e=null===(s=l)||void 0===s?void 0:s.fromAttribute)&&void 0!==e?e:"function"==typeof l?l:null)&&void 0!==h?h:o$1.fromAttribute;this.Πh=n,this[n]=a(i,t.type),this.Πh=null;}}requestUpdate(t,i,s){let e=!0;void 0!==t&&(((s=s||this.constructor.getPropertyOptions(t)).hasChanged||n$1)(this[t],i)?(this.L.has(t)||this.L.set(t,i),!0===s.reflect&&this.Πh!==t&&(void 0===this.Πk&&(this.Πk=new Map),this.Πk.set(t,s))):e=!1),!this.isUpdatePending&&e&&(this.Πg=this.Πq());}async Πq(){this.isUpdatePending=!0;try{for(await this.Πg;this.Πo;)await this.Πo;}catch(t){Promise.reject(t);}const t=this.performUpdate();return null!=t&&await t,!this.isUpdatePending}performUpdate(){var t;if(!this.isUpdatePending)return;this.hasUpdated,this.Πi&&(this.Πi.forEach(((t,i)=>this[i]=t)),this.Πi=void 0);let i=!1;const s=this.L;try{i=this.shouldUpdate(s),i?(this.willUpdate(s),null===(t=this.ΠU)||void 0===t||t.forEach((t=>{var i;return null===(i=t.hostUpdate)||void 0===i?void 0:i.call(t)})),this.update(s)):this.Π$();}catch(t){throw i=!1,this.Π$(),t}i&&this.E(s);}willUpdate(t){}E(t){var i;null===(i=this.ΠU)||void 0===i||i.forEach((t=>{var i;return null===(i=t.hostUpdated)||void 0===i?void 0:i.call(t)})),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(t)),this.updated(t);}Π$(){this.L=new Map,this.isUpdatePending=!1;}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this.Πg}shouldUpdate(t){return !0}update(t){void 0!==this.Πk&&(this.Πk.forEach(((t,i)=>this.Πj(i,this[i],t))),this.Πk=void 0),this.Π$();}updated(t){}firstUpdated(t){}}a.finalized=!0,a.elementProperties=new Map,a.elementStyles=[],a.shadowRootOptions={mode:"open"},null===(e$1=(s$1=globalThis).reactiveElementPlatformSupport)||void 0===e$1||e$1.call(s$1,{ReactiveElement:a}),(null!==(h=(r$1=globalThis).reactiveElementVersions)&&void 0!==h?h:r$1.reactiveElementVersions=[]).push("1.0.0-rc.2");//# sourceMappingURL=reactive-element.js.map
-
-    /**
-     * @license
-     * Copyright 2017 Google LLC
-     * SPDX-License-Identifier: BSD-3-Clause
-     */
-    var t$1,i$1,s$2,e$2;const o$2=globalThis.trustedTypes,l$1=o$2?o$2.createPolicy("lit-html",{createHTML:t=>t}):void 0,n$2=`lit$${(Math.random()+"").slice(9)}$`,h$1="?"+n$2,r$2=`<${h$1}>`,u$1=document,c=(t="")=>u$1.createComment(t),d=t=>null===t||"object"!=typeof t&&"function"!=typeof t,v=Array.isArray,a$1=t=>{var i;return v(t)||"function"==typeof(null===(i=t)||void 0===i?void 0:i[Symbol.iterator])},f=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,_=/-->/g,m=/>/g,p=/>|[ 	\n\r](?:([^\s"'>=/]+)([ 	\n\r]*=[ 	\n\r]*(?:[^ 	\n\r"'`<>=]|("|')|))|$)/g,$=/'/g,g=/"/g,y=/^(?:script|style|textarea)$/i,b=t=>(i,...s)=>({_$litType$:t,strings:i,values:s}),T=b(1),w=Symbol.for("lit-noChange"),A=Symbol.for("lit-nothing"),P=new WeakMap,V=(t,i,s)=>{var e,o;const l=null!==(e=null==s?void 0:s.renderBefore)&&void 0!==e?e:i;let n=l._$litPart$;if(void 0===n){const t=null!==(o=null==s?void 0:s.renderBefore)&&void 0!==o?o:null;l._$litPart$=n=new C(i.insertBefore(c(),t),t,void 0,s);}return n.I(t),n},E=u$1.createTreeWalker(u$1,129,null,!1),M=(t,i)=>{const s=t.length-1,e=[];let o,h=2===i?"<svg>":"",u=f;for(let i=0;i<s;i++){const s=t[i];let l,c,d=-1,v=0;for(;v<s.length&&(u.lastIndex=v,c=u.exec(s),null!==c);)v=u.lastIndex,u===f?"!--"===c[1]?u=_:void 0!==c[1]?u=m:void 0!==c[2]?(y.test(c[2])&&(o=RegExp("</"+c[2],"g")),u=p):void 0!==c[3]&&(u=p):u===p?">"===c[0]?(u=null!=o?o:f,d=-1):void 0===c[1]?d=-2:(d=u.lastIndex-c[2].length,l=c[1],u=void 0===c[3]?p:'"'===c[3]?g:$):u===g||u===$?u=p:u===_||u===m?u=f:(u=p,o=void 0);const a=u===p&&t[i+1].startsWith("/>")?" ":"";h+=u===f?s+r$2:d>=0?(e.push(l),s.slice(0,d)+"$lit$"+s.slice(d)+n$2+a):s+n$2+(-2===d?(e.push(void 0),i):a);}const c=h+(t[s]||"<?>")+(2===i?"</svg>":"");return [void 0!==l$1?l$1.createHTML(c):c,e]};class N{constructor({strings:t,_$litType$:i},s){let e;this.parts=[];let l=0,r=0;const u=t.length-1,d=this.parts,[v,a]=M(t,i);if(this.el=N.createElement(v,s),E.currentNode=this.el.content,2===i){const t=this.el.content,i=t.firstChild;i.remove(),t.append(...i.childNodes);}for(;null!==(e=E.nextNode())&&d.length<u;){if(1===e.nodeType){if(e.hasAttributes()){const t=[];for(const i of e.getAttributeNames())if(i.endsWith("$lit$")||i.startsWith(n$2)){const s=a[r++];if(t.push(i),void 0!==s){const t=e.getAttribute(s.toLowerCase()+"$lit$").split(n$2),i=/([.?@])?(.*)/.exec(s);d.push({type:1,index:l,name:i[2],strings:t,ctor:"."===i[1]?I:"?"===i[1]?L:"@"===i[1]?R:H});}else d.push({type:6,index:l});}for(const i of t)e.removeAttribute(i);}if(y.test(e.tagName)){const t=e.textContent.split(n$2),i=t.length-1;if(i>0){e.textContent=o$2?o$2.emptyScript:"";for(let s=0;s<i;s++)e.append(t[s],c()),E.nextNode(),d.push({type:2,index:++l});e.append(t[i],c());}}}else if(8===e.nodeType)if(e.data===h$1)d.push({type:2,index:l});else {let t=-1;for(;-1!==(t=e.data.indexOf(n$2,t+1));)d.push({type:7,index:l}),t+=n$2.length-1;}l++;}}static createElement(t,i){const s=u$1.createElement("template");return s.innerHTML=t,s}}function S$1(t,i,s=t,e){var o,l,n,h;if(i===w)return i;let r=void 0!==e?null===(o=s.Σi)||void 0===o?void 0:o[e]:s.Σo;const u=d(i)?void 0:i._$litDirective$;return (null==r?void 0:r.constructor)!==u&&(null===(l=null==r?void 0:r.O)||void 0===l||l.call(r,!1),void 0===u?r=void 0:(r=new u(t),r.T(t,s,e)),void 0!==e?(null!==(n=(h=s).Σi)&&void 0!==n?n:h.Σi=[])[e]=r:s.Σo=r),void 0!==r&&(i=S$1(t,r.S(t,i.values),r,e)),i}class k{constructor(t,i){this.l=[],this.N=void 0,this.D=t,this.M=i;}u(t){var i;const{el:{content:s},parts:e}=this.D,o=(null!==(i=null==t?void 0:t.creationScope)&&void 0!==i?i:u$1).importNode(s,!0);E.currentNode=o;let l=E.nextNode(),n=0,h=0,r=e[0];for(;void 0!==r;){if(n===r.index){let i;2===r.type?i=new C(l,l.nextSibling,this,t):1===r.type?i=new r.ctor(l,r.name,r.strings,this,t):6===r.type&&(i=new z(l,this,t)),this.l.push(i),r=e[++h];}n!==(null==r?void 0:r.index)&&(l=E.nextNode(),n++);}return o}v(t){let i=0;for(const s of this.l)void 0!==s&&(void 0!==s.strings?(s.I(t,s,i),i+=s.strings.length-2):s.I(t[i])),i++;}}class C{constructor(t,i,s,e){this.type=2,this.N=void 0,this.A=t,this.B=i,this.M=s,this.options=e;}setConnected(t){var i;null===(i=this.P)||void 0===i||i.call(this,t);}get parentNode(){return this.A.parentNode}get startNode(){return this.A}get endNode(){return this.B}I(t,i=this){t=S$1(this,t,i),d(t)?t===A||null==t||""===t?(this.H!==A&&this.R(),this.H=A):t!==this.H&&t!==w&&this.m(t):void 0!==t._$litType$?this._(t):void 0!==t.nodeType?this.$(t):a$1(t)?this.g(t):this.m(t);}k(t,i=this.B){return this.A.parentNode.insertBefore(t,i)}$(t){this.H!==t&&(this.R(),this.H=this.k(t));}m(t){const i=this.A.nextSibling;null!==i&&3===i.nodeType&&(null===this.B?null===i.nextSibling:i===this.B.previousSibling)?i.data=t:this.$(u$1.createTextNode(t)),this.H=t;}_(t){var i;const{values:s,_$litType$:e}=t,o="number"==typeof e?this.C(t):(void 0===e.el&&(e.el=N.createElement(e.h,this.options)),e);if((null===(i=this.H)||void 0===i?void 0:i.D)===o)this.H.v(s);else {const t=new k(o,this),i=t.u(this.options);t.v(s),this.$(i),this.H=t;}}C(t){let i=P.get(t.strings);return void 0===i&&P.set(t.strings,i=new N(t)),i}g(t){v(this.H)||(this.H=[],this.R());const i=this.H;let s,e=0;for(const o of t)e===i.length?i.push(s=new C(this.k(c()),this.k(c()),this,this.options)):s=i[e],s.I(o),e++;e<i.length&&(this.R(s&&s.B.nextSibling,e),i.length=e);}R(t=this.A.nextSibling,i){var s;for(null===(s=this.P)||void 0===s||s.call(this,!1,!0,i);t&&t!==this.B;){const i=t.nextSibling;t.remove(),t=i;}}}class H{constructor(t,i,s,e,o){this.type=1,this.H=A,this.N=void 0,this.V=void 0,this.element=t,this.name=i,this.M=e,this.options=o,s.length>2||""!==s[0]||""!==s[1]?(this.H=Array(s.length-1).fill(A),this.strings=s):this.H=A;}get tagName(){return this.element.tagName}I(t,i=this,s,e){const o=this.strings;let l=!1;if(void 0===o)t=S$1(this,t,i,0),l=!d(t)||t!==this.H&&t!==w,l&&(this.H=t);else {const e=t;let n,h;for(t=o[0],n=0;n<o.length-1;n++)h=S$1(this,e[s+n],i,n),h===w&&(h=this.H[n]),l||(l=!d(h)||h!==this.H[n]),h===A?t=A:t!==A&&(t+=(null!=h?h:"")+o[n+1]),this.H[n]=h;}l&&!e&&this.W(t);}W(t){t===A?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,null!=t?t:"");}}class I extends H{constructor(){super(...arguments),this.type=3;}W(t){this.element[this.name]=t===A?void 0:t;}}class L extends H{constructor(){super(...arguments),this.type=4;}W(t){t&&t!==A?this.element.setAttribute(this.name,""):this.element.removeAttribute(this.name);}}class R extends H{constructor(){super(...arguments),this.type=5;}I(t,i=this){var s;if((t=null!==(s=S$1(this,t,i,0))&&void 0!==s?s:A)===w)return;const e=this.H,o=t===A&&e!==A||t.capture!==e.capture||t.once!==e.once||t.passive!==e.passive,l=t!==A&&(e===A||o);o&&this.element.removeEventListener(this.name,this,e),l&&this.element.addEventListener(this.name,this,t),this.H=t;}handleEvent(t){var i,s;"function"==typeof this.H?this.H.call(null!==(s=null===(i=this.options)||void 0===i?void 0:i.host)&&void 0!==s?s:this.element,t):this.H.handleEvent(t);}}class z{constructor(t,i,s){this.element=t,this.type=6,this.N=void 0,this.V=void 0,this.M=i,this.options=s;}I(t){S$1(this,t);}}null===(i$1=(t$1=globalThis).litHtmlPlatformSupport)||void 0===i$1||i$1.call(t$1,N,C),(null!==(s$2=(e$2=globalThis).litHtmlVersions)&&void 0!==s$2?s$2:e$2.litHtmlVersions=[]).push("2.0.0-rc.3");//# sourceMappingURL=lit-html.js.map
-
-    /**
-     * @license
-     * Copyright 2017 Google LLC
-     * SPDX-License-Identifier: BSD-3-Clause
-     */var i$2,l$2,o$3,s$3,n$3,a$2;(null!==(i$2=(a$2=globalThis).litElementVersions)&&void 0!==i$2?i$2:a$2.litElementVersions=[]).push("3.0.0-rc.2");class h$2 extends a{constructor(){super(...arguments),this.renderOptions={host:this},this.Φt=void 0;}createRenderRoot(){var t,e;const r=super.createRenderRoot();return null!==(t=(e=this.renderOptions).renderBefore)&&void 0!==t||(e.renderBefore=r.firstChild),r}update(t){const r=this.render();super.update(t),this.Φt=V(r,this.renderRoot,this.renderOptions);}connectedCallback(){var t;super.connectedCallback(),null===(t=this.Φt)||void 0===t||t.setConnected(!0);}disconnectedCallback(){var t;super.disconnectedCallback(),null===(t=this.Φt)||void 0===t||t.setConnected(!1);}render(){return w}}h$2.finalized=!0,h$2._$litElement$=!0,null===(o$3=(l$2=globalThis).litElementHydrateSupport)||void 0===o$3||o$3.call(l$2,{LitElement:h$2}),null===(n$3=(s$3=globalThis).litElementPlatformSupport)||void 0===n$3||n$3.call(s$3,{LitElement:h$2});//# sourceMappingURL=lit-element.js.map
+     */var s$1,e$1,h,r$1;const o$1={toAttribute(t,i){switch(i){case Boolean:t=t?"":null;break;case Object:case Array:t=null==t?t:JSON.stringify(t);}return t},fromAttribute(t,i){let s=t;switch(i){case Boolean:s=null!==t;break;case Number:s=null===t?null:Number(t);break;case Object:case Array:try{s=JSON.parse(t);}catch(t){s=null;}}return s}},n$1=(t,i)=>i!==t&&(i==i||t==t),l={attribute:!0,type:String,converter:o$1,reflect:!1,hasChanged:n$1};class a extends HTMLElement{constructor(){super(),this.Πi=new Map,this.Πo=void 0,this.Πl=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this.Πh=null,this.u();}static addInitializer(t){var i;null!==(i=this.v)&&void 0!==i||(this.v=[]),this.v.push(t);}static get observedAttributes(){this.finalize();const t=[];return this.elementProperties.forEach(((i,s)=>{const e=this.Πp(s,i);void 0!==e&&(this.Πm.set(e,s),t.push(e));})),t}static createProperty(t,i=l){if(i.state&&(i.attribute=!1),this.finalize(),this.elementProperties.set(t,i),!i.noAccessor&&!this.prototype.hasOwnProperty(t)){const s="symbol"==typeof t?Symbol():"__"+t,e=this.getPropertyDescriptor(t,s,i);void 0!==e&&Object.defineProperty(this.prototype,t,e);}}static getPropertyDescriptor(t,i,s){return {get(){return this[i]},set(e){const h=this[t];this[i]=e,this.requestUpdate(t,h,s);},configurable:!0,enumerable:!0}}static getPropertyOptions(t){return this.elementProperties.get(t)||l}static finalize(){if(this.hasOwnProperty("finalized"))return !1;this.finalized=!0;const t=Object.getPrototypeOf(this);if(t.finalize(),this.elementProperties=new Map(t.elementProperties),this.Πm=new Map,this.hasOwnProperty("properties")){const t=this.properties,i=[...Object.getOwnPropertyNames(t),...Object.getOwnPropertySymbols(t)];for(const s of i)this.createProperty(s,t[s]);}return this.elementStyles=this.finalizeStyles(this.styles),!0}static finalizeStyles(i){const s=[];if(Array.isArray(i)){const e=new Set(i.flat(1/0).reverse());for(const i of e)s.unshift(u(i));}else void 0!==i&&s.push(u(i));return s}static Πp(t,i){const s=i.attribute;return !1===s?void 0:"string"==typeof s?s:"string"==typeof t?t.toLowerCase():void 0}u(){var t;this.Πg=new Promise((t=>this.enableUpdating=t)),this.L=new Map,this.Π_(),this.requestUpdate(),null===(t=this.constructor.v)||void 0===t||t.forEach((t=>t(this)));}addController(t){var i,s;(null!==(i=this.ΠU)&&void 0!==i?i:this.ΠU=[]).push(t),void 0!==this.renderRoot&&this.isConnected&&(null===(s=t.hostConnected)||void 0===s||s.call(t));}removeController(t){var i;null===(i=this.ΠU)||void 0===i||i.splice(this.ΠU.indexOf(t)>>>0,1);}Π_(){this.constructor.elementProperties.forEach(((t,i)=>{this.hasOwnProperty(i)&&(this.Πi.set(i,this[i]),delete this[i]);}));}createRenderRoot(){var t;const s=null!==(t=this.shadowRoot)&&void 0!==t?t:this.attachShadow(this.constructor.shadowRootOptions);return S(s,this.constructor.elementStyles),s}connectedCallback(){var t;void 0===this.renderRoot&&(this.renderRoot=this.createRenderRoot()),this.enableUpdating(!0),null===(t=this.ΠU)||void 0===t||t.forEach((t=>{var i;return null===(i=t.hostConnected)||void 0===i?void 0:i.call(t)})),this.Πl&&(this.Πl(),this.Πo=this.Πl=void 0);}enableUpdating(t){}disconnectedCallback(){var t;null===(t=this.ΠU)||void 0===t||t.forEach((t=>{var i;return null===(i=t.hostDisconnected)||void 0===i?void 0:i.call(t)})),this.Πo=new Promise((t=>this.Πl=t));}attributeChangedCallback(t,i,s){this.K(t,s);}Πj(t,i,s=l){var e,h;const r=this.constructor.Πp(t,s);if(void 0!==r&&!0===s.reflect){const n=(null!==(h=null===(e=s.converter)||void 0===e?void 0:e.toAttribute)&&void 0!==h?h:o$1.toAttribute)(i,s.type);this.Πh=t,null==n?this.removeAttribute(r):this.setAttribute(r,n),this.Πh=null;}}K(t,i){var s,e,h;const r=this.constructor,n=r.Πm.get(t);if(void 0!==n&&this.Πh!==n){const t=r.getPropertyOptions(n),l=t.converter,a=null!==(h=null!==(e=null===(s=l)||void 0===s?void 0:s.fromAttribute)&&void 0!==e?e:"function"==typeof l?l:null)&&void 0!==h?h:o$1.fromAttribute;this.Πh=n,this[n]=a(i,t.type),this.Πh=null;}}requestUpdate(t,i,s){let e=!0;void 0!==t&&(((s=s||this.constructor.getPropertyOptions(t)).hasChanged||n$1)(this[t],i)?(this.L.has(t)||this.L.set(t,i),!0===s.reflect&&this.Πh!==t&&(void 0===this.Πk&&(this.Πk=new Map),this.Πk.set(t,s))):e=!1),!this.isUpdatePending&&e&&(this.Πg=this.Πq());}async Πq(){this.isUpdatePending=!0;try{for(await this.Πg;this.Πo;)await this.Πo;}catch(t){Promise.reject(t);}const t=this.performUpdate();return null!=t&&await t,!this.isUpdatePending}performUpdate(){var t;if(!this.isUpdatePending)return;this.hasUpdated,this.Πi&&(this.Πi.forEach(((t,i)=>this[i]=t)),this.Πi=void 0);let i=!1;const s=this.L;try{i=this.shouldUpdate(s),i?(this.willUpdate(s),null===(t=this.ΠU)||void 0===t||t.forEach((t=>{var i;return null===(i=t.hostUpdate)||void 0===i?void 0:i.call(t)})),this.update(s)):this.Π$();}catch(t){throw i=!1,this.Π$(),t}i&&this.E(s);}willUpdate(t){}E(t){var i;null===(i=this.ΠU)||void 0===i||i.forEach((t=>{var i;return null===(i=t.hostUpdated)||void 0===i?void 0:i.call(t)})),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(t)),this.updated(t);}Π$(){this.L=new Map,this.isUpdatePending=!1;}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this.Πg}shouldUpdate(t){return !0}update(t){void 0!==this.Πk&&(this.Πk.forEach(((t,i)=>this.Πj(i,this[i],t))),this.Πk=void 0),this.Π$();}updated(t){}firstUpdated(t){}}a.finalized=!0,a.elementProperties=new Map,a.elementStyles=[],a.shadowRootOptions={mode:"open"},null===(e$1=(s$1=globalThis).reactiveElementPlatformSupport)||void 0===e$1||e$1.call(s$1,{ReactiveElement:a}),(null!==(h=(r$1=globalThis).reactiveElementVersions)&&void 0!==h?h:r$1.reactiveElementVersions=[]).push("1.0.0-rc.2");
 
     /**
      * @license
      * Copyright 2017 Google LLC
      * SPDX-License-Identifier: BSD-3-Clause
      */
-    const n$4=n=>e=>"function"==typeof e?((n,e)=>(window.customElements.define(n,e),e))(n,e):((n,e)=>{const{kind:t,elements:i}=e;return {kind:t,elements:i,finisher(e){window.customElements.define(n,e);}}})(n,e);//# sourceMappingURL=custom-element.js.map
+    var t$1,i$1,s$2,e$2;const o$2=globalThis.trustedTypes,l$1=o$2?o$2.createPolicy("lit-html",{createHTML:t=>t}):void 0,n$2=`lit$${(Math.random()+"").slice(9)}$`,h$1="?"+n$2,r$2=`<${h$1}>`,u$1=document,c=(t="")=>u$1.createComment(t),d=t=>null===t||"object"!=typeof t&&"function"!=typeof t,v=Array.isArray,a$1=t=>{var i;return v(t)||"function"==typeof(null===(i=t)||void 0===i?void 0:i[Symbol.iterator])},f=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,_=/-->/g,m=/>/g,p=/>|[ 	\n\r](?:([^\s"'>=/]+)([ 	\n\r]*=[ 	\n\r]*(?:[^ 	\n\r"'`<>=]|("|')|))|$)/g,$=/'/g,g=/"/g,y=/^(?:script|style|textarea)$/i,b=t=>(i,...s)=>({_$litType$:t,strings:i,values:s}),T=b(1),w=Symbol.for("lit-noChange"),A=Symbol.for("lit-nothing"),P=new WeakMap,V=(t,i,s)=>{var e,o;const l=null!==(e=null==s?void 0:s.renderBefore)&&void 0!==e?e:i;let n=l._$litPart$;if(void 0===n){const t=null!==(o=null==s?void 0:s.renderBefore)&&void 0!==o?o:null;l._$litPart$=n=new C(i.insertBefore(c(),t),t,void 0,s);}return n.I(t),n},E=u$1.createTreeWalker(u$1,129,null,!1),M=(t,i)=>{const s=t.length-1,e=[];let o,h=2===i?"<svg>":"",u=f;for(let i=0;i<s;i++){const s=t[i];let l,c,d=-1,v=0;for(;v<s.length&&(u.lastIndex=v,c=u.exec(s),null!==c);)v=u.lastIndex,u===f?"!--"===c[1]?u=_:void 0!==c[1]?u=m:void 0!==c[2]?(y.test(c[2])&&(o=RegExp("</"+c[2],"g")),u=p):void 0!==c[3]&&(u=p):u===p?">"===c[0]?(u=null!=o?o:f,d=-1):void 0===c[1]?d=-2:(d=u.lastIndex-c[2].length,l=c[1],u=void 0===c[3]?p:'"'===c[3]?g:$):u===g||u===$?u=p:u===_||u===m?u=f:(u=p,o=void 0);const a=u===p&&t[i+1].startsWith("/>")?" ":"";h+=u===f?s+r$2:d>=0?(e.push(l),s.slice(0,d)+"$lit$"+s.slice(d)+n$2+a):s+n$2+(-2===d?(e.push(void 0),i):a);}const c=h+(t[s]||"<?>")+(2===i?"</svg>":"");return [void 0!==l$1?l$1.createHTML(c):c,e]};class N{constructor({strings:t,_$litType$:i},s){let e;this.parts=[];let l=0,r=0;const u=t.length-1,d=this.parts,[v,a]=M(t,i);if(this.el=N.createElement(v,s),E.currentNode=this.el.content,2===i){const t=this.el.content,i=t.firstChild;i.remove(),t.append(...i.childNodes);}for(;null!==(e=E.nextNode())&&d.length<u;){if(1===e.nodeType){if(e.hasAttributes()){const t=[];for(const i of e.getAttributeNames())if(i.endsWith("$lit$")||i.startsWith(n$2)){const s=a[r++];if(t.push(i),void 0!==s){const t=e.getAttribute(s.toLowerCase()+"$lit$").split(n$2),i=/([.?@])?(.*)/.exec(s);d.push({type:1,index:l,name:i[2],strings:t,ctor:"."===i[1]?I:"?"===i[1]?L:"@"===i[1]?R:H});}else d.push({type:6,index:l});}for(const i of t)e.removeAttribute(i);}if(y.test(e.tagName)){const t=e.textContent.split(n$2),i=t.length-1;if(i>0){e.textContent=o$2?o$2.emptyScript:"";for(let s=0;s<i;s++)e.append(t[s],c()),E.nextNode(),d.push({type:2,index:++l});e.append(t[i],c());}}}else if(8===e.nodeType)if(e.data===h$1)d.push({type:2,index:l});else {let t=-1;for(;-1!==(t=e.data.indexOf(n$2,t+1));)d.push({type:7,index:l}),t+=n$2.length-1;}l++;}}static createElement(t,i){const s=u$1.createElement("template");return s.innerHTML=t,s}}function S$1(t,i,s=t,e){var o,l,n,h;if(i===w)return i;let r=void 0!==e?null===(o=s.Σi)||void 0===o?void 0:o[e]:s.Σo;const u=d(i)?void 0:i._$litDirective$;return (null==r?void 0:r.constructor)!==u&&(null===(l=null==r?void 0:r.O)||void 0===l||l.call(r,!1),void 0===u?r=void 0:(r=new u(t),r.T(t,s,e)),void 0!==e?(null!==(n=(h=s).Σi)&&void 0!==n?n:h.Σi=[])[e]=r:s.Σo=r),void 0!==r&&(i=S$1(t,r.S(t,i.values),r,e)),i}class k{constructor(t,i){this.l=[],this.N=void 0,this.D=t,this.M=i;}u(t){var i;const{el:{content:s},parts:e}=this.D,o=(null!==(i=null==t?void 0:t.creationScope)&&void 0!==i?i:u$1).importNode(s,!0);E.currentNode=o;let l=E.nextNode(),n=0,h=0,r=e[0];for(;void 0!==r;){if(n===r.index){let i;2===r.type?i=new C(l,l.nextSibling,this,t):1===r.type?i=new r.ctor(l,r.name,r.strings,this,t):6===r.type&&(i=new z(l,this,t)),this.l.push(i),r=e[++h];}n!==(null==r?void 0:r.index)&&(l=E.nextNode(),n++);}return o}v(t){let i=0;for(const s of this.l)void 0!==s&&(void 0!==s.strings?(s.I(t,s,i),i+=s.strings.length-2):s.I(t[i])),i++;}}class C{constructor(t,i,s,e){this.type=2,this.N=void 0,this.A=t,this.B=i,this.M=s,this.options=e;}setConnected(t){var i;null===(i=this.P)||void 0===i||i.call(this,t);}get parentNode(){return this.A.parentNode}get startNode(){return this.A}get endNode(){return this.B}I(t,i=this){t=S$1(this,t,i),d(t)?t===A||null==t||""===t?(this.H!==A&&this.R(),this.H=A):t!==this.H&&t!==w&&this.m(t):void 0!==t._$litType$?this._(t):void 0!==t.nodeType?this.$(t):a$1(t)?this.g(t):this.m(t);}k(t,i=this.B){return this.A.parentNode.insertBefore(t,i)}$(t){this.H!==t&&(this.R(),this.H=this.k(t));}m(t){const i=this.A.nextSibling;null!==i&&3===i.nodeType&&(null===this.B?null===i.nextSibling:i===this.B.previousSibling)?i.data=t:this.$(u$1.createTextNode(t)),this.H=t;}_(t){var i;const{values:s,_$litType$:e}=t,o="number"==typeof e?this.C(t):(void 0===e.el&&(e.el=N.createElement(e.h,this.options)),e);if((null===(i=this.H)||void 0===i?void 0:i.D)===o)this.H.v(s);else {const t=new k(o,this),i=t.u(this.options);t.v(s),this.$(i),this.H=t;}}C(t){let i=P.get(t.strings);return void 0===i&&P.set(t.strings,i=new N(t)),i}g(t){v(this.H)||(this.H=[],this.R());const i=this.H;let s,e=0;for(const o of t)e===i.length?i.push(s=new C(this.k(c()),this.k(c()),this,this.options)):s=i[e],s.I(o),e++;e<i.length&&(this.R(s&&s.B.nextSibling,e),i.length=e);}R(t=this.A.nextSibling,i){var s;for(null===(s=this.P)||void 0===s||s.call(this,!1,!0,i);t&&t!==this.B;){const i=t.nextSibling;t.remove(),t=i;}}}class H{constructor(t,i,s,e,o){this.type=1,this.H=A,this.N=void 0,this.V=void 0,this.element=t,this.name=i,this.M=e,this.options=o,s.length>2||""!==s[0]||""!==s[1]?(this.H=Array(s.length-1).fill(A),this.strings=s):this.H=A;}get tagName(){return this.element.tagName}I(t,i=this,s,e){const o=this.strings;let l=!1;if(void 0===o)t=S$1(this,t,i,0),l=!d(t)||t!==this.H&&t!==w,l&&(this.H=t);else {const e=t;let n,h;for(t=o[0],n=0;n<o.length-1;n++)h=S$1(this,e[s+n],i,n),h===w&&(h=this.H[n]),l||(l=!d(h)||h!==this.H[n]),h===A?t=A:t!==A&&(t+=(null!=h?h:"")+o[n+1]),this.H[n]=h;}l&&!e&&this.W(t);}W(t){t===A?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,null!=t?t:"");}}class I extends H{constructor(){super(...arguments),this.type=3;}W(t){this.element[this.name]=t===A?void 0:t;}}class L extends H{constructor(){super(...arguments),this.type=4;}W(t){t&&t!==A?this.element.setAttribute(this.name,""):this.element.removeAttribute(this.name);}}class R extends H{constructor(){super(...arguments),this.type=5;}I(t,i=this){var s;if((t=null!==(s=S$1(this,t,i,0))&&void 0!==s?s:A)===w)return;const e=this.H,o=t===A&&e!==A||t.capture!==e.capture||t.once!==e.once||t.passive!==e.passive,l=t!==A&&(e===A||o);o&&this.element.removeEventListener(this.name,this,e),l&&this.element.addEventListener(this.name,this,t),this.H=t;}handleEvent(t){var i,s;"function"==typeof this.H?this.H.call(null!==(s=null===(i=this.options)||void 0===i?void 0:i.host)&&void 0!==s?s:this.element,t):this.H.handleEvent(t);}}class z{constructor(t,i,s){this.element=t,this.type=6,this.N=void 0,this.V=void 0,this.M=i,this.options=s;}I(t){S$1(this,t);}}null===(i$1=(t$1=globalThis).litHtmlPlatformSupport)||void 0===i$1||i$1.call(t$1,N,C),(null!==(s$2=(e$2=globalThis).litHtmlVersions)&&void 0!==s$2?s$2:e$2.litHtmlVersions=[]).push("2.0.0-rc.3");
+
+    /**
+     * @license
+     * Copyright 2017 Google LLC
+     * SPDX-License-Identifier: BSD-3-Clause
+     */var i$2,l$2,o$3,s$3,n$3,a$2;(null!==(i$2=(a$2=globalThis).litElementVersions)&&void 0!==i$2?i$2:a$2.litElementVersions=[]).push("3.0.0-rc.2");class h$2 extends a{constructor(){super(...arguments),this.renderOptions={host:this},this.Φt=void 0;}createRenderRoot(){var t,e;const r=super.createRenderRoot();return null!==(t=(e=this.renderOptions).renderBefore)&&void 0!==t||(e.renderBefore=r.firstChild),r}update(t){const r=this.render();super.update(t),this.Φt=V(r,this.renderRoot,this.renderOptions);}connectedCallback(){var t;super.connectedCallback(),null===(t=this.Φt)||void 0===t||t.setConnected(!0);}disconnectedCallback(){var t;super.disconnectedCallback(),null===(t=this.Φt)||void 0===t||t.setConnected(!1);}render(){return w}}h$2.finalized=!0,h$2._$litElement$=!0,null===(o$3=(l$2=globalThis).litElementHydrateSupport)||void 0===o$3||o$3.call(l$2,{LitElement:h$2}),null===(n$3=(s$3=globalThis).litElementPlatformSupport)||void 0===n$3||n$3.call(s$3,{LitElement:h$2});
 
     /**
      * @license
      * Copyright 2017 Google LLC
      * SPDX-License-Identifier: BSD-3-Clause
      */
-    const i$3=(i,e)=>"method"===e.kind&&e.descriptor&&!("value"in e.descriptor)?{...e,finisher(n){n.createProperty(e.key,i);}}:{kind:"field",key:Symbol(),placement:"own",descriptor:{},originalKey:e.key,initializer(){"function"==typeof e.initializer&&(this[e.key]=e.initializer.call(this));},finisher(n){n.createProperty(e.key,i);}};function e$3(e){return (n,t)=>void 0!==t?((i,e,n)=>{e.constructor.createProperty(n,i);})(e,n,t):i$3(e,n)}//# sourceMappingURL=property.js.map
-
-    /**
-     * @license
-     * Copyright 2017 Google LLC
-     * SPDX-License-Identifier: BSD-3-Clause
-     */function r$3(r){return e$3({...r,state:!0,attribute:!1})}//# sourceMappingURL=state.js.map
+    const n$4=n=>e=>"function"==typeof e?((n,e)=>(window.customElements.define(n,e),e))(n,e):((n,e)=>{const{kind:t,elements:i}=e;return {kind:t,elements:i,finisher(e){window.customElements.define(n,e);}}})(n,e);
 
     /**
      * @license
      * Copyright 2017 Google LLC
      * SPDX-License-Identifier: BSD-3-Clause
      */
-    const o$4=({finisher:e,descriptor:t})=>(o,n)=>{var r;if(void 0===n){const n=null!==(r=o.originalKey)&&void 0!==r?r:o.key,i=null!=t?{kind:"method",placement:"prototype",key:n,descriptor:t(o.key)}:{...o,key:n};return null!=e&&(i.finisher=function(t){e(t,n);}),i}{const r=o.constructor;void 0!==t&&Object.defineProperty(o,n,t(n)),null==e||e(r,n);}};//# sourceMappingURL=base.js.map
+    const i$3=(i,e)=>"method"===e.kind&&e.descriptor&&!("value"in e.descriptor)?{...e,finisher(n){n.createProperty(e.key,i);}}:{kind:"field",key:Symbol(),placement:"own",descriptor:{},originalKey:e.key,initializer(){"function"==typeof e.initializer&&(this[e.key]=e.initializer.call(this));},finisher(n){n.createProperty(e.key,i);}};function e$3(e){return (n,t)=>void 0!==t?((i,e,n)=>{e.constructor.createProperty(n,i);})(e,n,t):i$3(e,n)}
 
     /**
      * @license
      * Copyright 2017 Google LLC
      * SPDX-License-Identifier: BSD-3-Clause
-     */function o$5(o,r){return o$4({descriptor:t=>{const i={get(){var t;return null===(t=this.renderRoot)||void 0===t?void 0:t.querySelector(o)},enumerable:!0,configurable:!0};if(r){const r="symbol"==typeof t?Symbol():"__"+t;i.get=function(){var t;return void 0===this[r]&&(this[r]=null===(t=this.renderRoot)||void 0===t?void 0:t.querySelector(o)),this[r]};}return i}})}//# sourceMappingURL=query.js.map
+     */function r$3(r){return e$3({...r,state:!0,attribute:!1})}
+
+    /**
+     * @license
+     * Copyright 2017 Google LLC
+     * SPDX-License-Identifier: BSD-3-Clause
+     */
+    const o$4=({finisher:e,descriptor:t})=>(o,n)=>{var r;if(void 0===n){const n=null!==(r=o.originalKey)&&void 0!==r?r:o.key,i=null!=t?{kind:"method",placement:"prototype",key:n,descriptor:t(o.key)}:{...o,key:n};return null!=e&&(i.finisher=function(t){e(t,n);}),i}{const r=o.constructor;void 0!==t&&Object.defineProperty(o,n,t(n)),null==e||e(r,n);}};
+
+    /**
+     * @license
+     * Copyright 2017 Google LLC
+     * SPDX-License-Identifier: BSD-3-Clause
+     */function o$5(o,r){return o$4({descriptor:t=>{const i={get(){var t;return null===(t=this.renderRoot)||void 0===t?void 0:t.querySelector(o)},enumerable:!0,configurable:!0};if(r){const r="symbol"==typeof t?Symbol():"__"+t;i.get=function(){var t;return void 0===this[r]&&(this[r]=null===(t=this.renderRoot)||void 0===t?void 0:t.querySelector(o)),this[r]};}return i}})}
 
     var token = /d{1,4}|M{1,4}|YY(?:YY)?|S{1,3}|Do|ZZ|Z|([HhMsDm])\1?|[aA]|"[^"]*"|'[^']*'/g;
     var twoDigitsOptional = "[1-9]\\d?";
@@ -464,9 +464,8 @@
         setGlobalDateI18n: setGlobalDateI18n,
         setGlobalDateMasks: setGlobalDateMasks
     };
-    //# sourceMappingURL=fecha.js.map
 
-    var a$3=function(){try{(new Date).toLocaleDateString("i");}catch(e){return "RangeError"===e.name}return !1}()?function(e,t){return e.toLocaleDateString(t,{year:"numeric",month:"long",day:"numeric"})}:function(t){return fecha.format(t,"mediumDate")},r$4=function(){try{(new Date).toLocaleString("i");}catch(e){return "RangeError"===e.name}return !1}()?function(e,t){return e.toLocaleString(t,{year:"numeric",month:"long",day:"numeric",hour:"numeric",minute:"2-digit"})}:function(t){return fecha.format(t,"haDateTime")},n$5=function(){try{(new Date).toLocaleTimeString("i");}catch(e){return "RangeError"===e.name}return !1}()?function(e,t){return e.toLocaleTimeString(t,{hour:"numeric",minute:"2-digit"})}:function(t){return fecha.format(t,"shortTime")};function d$1(e){return e.substr(0,e.indexOf("."))}function f$1(e){return e.substr(e.indexOf(".")+1)}var _$1="hass:bookmark",C$1=function(e,t,a,r){r=r||{},a=null==a?{}:a;var n=new Event(t,{bubbles:void 0===r.bubbles||r.bubbles,cancelable:Boolean(r.cancelable),composed:void 0===r.composed||r.composed});return n.detail=a,e.dispatchEvent(n),n},N$1={alert:"hass:alert",automation:"hass:playlist-play",calendar:"hass:calendar",camera:"hass:video",climate:"hass:thermostat",configurator:"hass:settings",conversation:"hass:text-to-speech",device_tracker:"hass:account",fan:"hass:fan",group:"hass:google-circles-communities",history_graph:"hass:chart-line",homeassistant:"hass:home-assistant",homekit:"hass:home-automation",image_processing:"hass:image-filter-frames",input_boolean:"hass:drawing",input_datetime:"hass:calendar-clock",input_number:"hass:ray-vertex",input_select:"hass:format-list-bulleted",input_text:"hass:textbox",light:"hass:lightbulb",mailbox:"hass:mailbox",notify:"hass:comment-alert",person:"hass:account",plant:"hass:flower",proximity:"hass:apple-safari",remote:"hass:remote",scene:"hass:google-pages",script:"hass:file-document",sensor:"hass:eye",simple_alarm:"hass:bell",sun:"hass:white-balance-sunny",switch:"hass:flash",timer:"hass:timer",updater:"hass:cloud-upload",vacuum:"hass:robot-vacuum",water_heater:"hass:thermometer",weblink:"hass:open-in-new"};function O(e,t){if(e in N$1)return N$1[e];switch(e){case"alarm_control_panel":switch(t){case"armed_home":return "hass:bell-plus";case"armed_night":return "hass:bell-sleep";case"disarmed":return "hass:bell-outline";case"triggered":return "hass:bell-ring";default:return "hass:bell"}case"binary_sensor":return t&&"off"===t?"hass:radiobox-blank":"hass:checkbox-marked-circle";case"cover":return "closed"===t?"hass:window-closed":"hass:window-open";case"lock":return t&&"unlocked"===t?"hass:lock-open":"hass:lock";case"media_player":return t&&"off"!==t&&"idle"!==t?"hass:cast-connected":"hass:cast";case"zwave":switch(t){case"dead":return "hass:emoticon-dead";case"sleeping":return "hass:sleep";case"initializing":return "hass:timer-sand";default:return "hass:z-wave"}default:return console.warn("Unable to find icon for domain "+e+" ("+t+")"),_$1}}var F=function(e,t,a){void 0===a&&(a=!1),a?history.replaceState(null,"",t):history.pushState(null,"",t),C$1(window,"location-changed",{replace:a});};var K={humidity:"hass:water-percent",illuminance:"hass:brightness-5",temperature:"hass:thermometer",pressure:"hass:gauge",power:"hass:flash",signal_strength:"hass:wifi"},P$1={binary_sensor:function(e){var t=e.state&&"off"===e.state;switch(e.attributes.device_class){case"battery":return t?"hass:battery":"hass:battery-outline";case"cold":return t?"hass:thermometer":"hass:snowflake";case"connectivity":return t?"hass:server-network-off":"hass:server-network";case"door":return t?"hass:door-closed":"hass:door-open";case"garage_door":return t?"hass:garage":"hass:garage-open";case"gas":case"power":case"problem":case"safety":case"smoke":return t?"hass:shield-check":"hass:alert";case"heat":return t?"hass:thermometer":"hass:fire";case"light":return t?"hass:brightness-5":"hass:brightness-7";case"lock":return t?"hass:lock":"hass:lock-open";case"moisture":return t?"hass:water-off":"hass:water";case"motion":return t?"hass:walk":"hass:run";case"occupancy":return t?"hass:home-outline":"hass:home";case"opening":return t?"hass:square":"hass:square-outline";case"plug":return t?"hass:power-plug-off":"hass:power-plug";case"presence":return t?"hass:home-outline":"hass:home";case"sound":return t?"hass:music-note-off":"hass:music-note";case"vibration":return t?"hass:crop-portrait":"hass:vibrate";case"window":return t?"hass:window-closed":"hass:window-open";default:return t?"hass:radiobox-blank":"hass:checkbox-marked-circle"}},cover:function(e){var t="closed"!==e.state;switch(e.attributes.device_class){case"garage":return t?"hass:garage-open":"hass:garage";case"door":return t?"hass:door-open":"hass:door-closed";case"shutter":return t?"hass:window-shutter-open":"hass:window-shutter";case"blind":return t?"hass:blinds-open":"hass:blinds";case"window":return t?"hass:window-open":"hass:window-closed";default:return O("cover",e.state)}},sensor:function(e){var t=e.attributes.device_class;if(t&&t in K)return K[t];if("battery"===t){var a=Number(e.state);if(isNaN(a))return "hass:battery-unknown";var r=10*Math.round(a/10);return r>=100?"hass:battery":r<=0?"hass:battery-alert":"hass:battery-"+r}var n=e.attributes.unit_of_measurement;return "°C"===n||"°F"===n?"hass:thermometer":O("sensor")},input_datetime:function(e){return e.attributes.has_date?e.attributes.has_time?O("input_datetime"):"hass:calendar":"hass:clock"}},Q=function(e){if(!e)return _$1;if(e.attributes.icon)return e.attributes.icon;var t=d$1(e.entity_id);return t in P$1?P$1[t](e):O(t,e.state)};//# sourceMappingURL=index.m.js.map
+    var a$3=function(){try{(new Date).toLocaleDateString("i");}catch(e){return "RangeError"===e.name}return !1}()?function(e,t){return e.toLocaleDateString(t,{year:"numeric",month:"long",day:"numeric"})}:function(t){return fecha.format(t,"mediumDate")},r$4=function(){try{(new Date).toLocaleString("i");}catch(e){return "RangeError"===e.name}return !1}()?function(e,t){return e.toLocaleString(t,{year:"numeric",month:"long",day:"numeric",hour:"numeric",minute:"2-digit"})}:function(t){return fecha.format(t,"haDateTime")},n$5=function(){try{(new Date).toLocaleTimeString("i");}catch(e){return "RangeError"===e.name}return !1}()?function(e,t){return e.toLocaleTimeString(t,{hour:"numeric",minute:"2-digit"})}:function(t){return fecha.format(t,"shortTime")};function d$1(e){return e.substr(0,e.indexOf("."))}function f$1(e){return e.substr(e.indexOf(".")+1)}var _$1="hass:bookmark",C$1=function(e,t,a,r){r=r||{},a=null==a?{}:a;var n=new Event(t,{bubbles:void 0===r.bubbles||r.bubbles,cancelable:Boolean(r.cancelable),composed:void 0===r.composed||r.composed});return n.detail=a,e.dispatchEvent(n),n},N$1={alert:"hass:alert",automation:"hass:playlist-play",calendar:"hass:calendar",camera:"hass:video",climate:"hass:thermostat",configurator:"hass:settings",conversation:"hass:text-to-speech",device_tracker:"hass:account",fan:"hass:fan",group:"hass:google-circles-communities",history_graph:"hass:chart-line",homeassistant:"hass:home-assistant",homekit:"hass:home-automation",image_processing:"hass:image-filter-frames",input_boolean:"hass:drawing",input_datetime:"hass:calendar-clock",input_number:"hass:ray-vertex",input_select:"hass:format-list-bulleted",input_text:"hass:textbox",light:"hass:lightbulb",mailbox:"hass:mailbox",notify:"hass:comment-alert",person:"hass:account",plant:"hass:flower",proximity:"hass:apple-safari",remote:"hass:remote",scene:"hass:google-pages",script:"hass:file-document",sensor:"hass:eye",simple_alarm:"hass:bell",sun:"hass:white-balance-sunny",switch:"hass:flash",timer:"hass:timer",updater:"hass:cloud-upload",vacuum:"hass:robot-vacuum",water_heater:"hass:thermometer",weblink:"hass:open-in-new"};function O(e,t){if(e in N$1)return N$1[e];switch(e){case"alarm_control_panel":switch(t){case"armed_home":return "hass:bell-plus";case"armed_night":return "hass:bell-sleep";case"disarmed":return "hass:bell-outline";case"triggered":return "hass:bell-ring";default:return "hass:bell"}case"binary_sensor":return t&&"off"===t?"hass:radiobox-blank":"hass:checkbox-marked-circle";case"cover":return "closed"===t?"hass:window-closed":"hass:window-open";case"lock":return t&&"unlocked"===t?"hass:lock-open":"hass:lock";case"media_player":return t&&"off"!==t&&"idle"!==t?"hass:cast-connected":"hass:cast";case"zwave":switch(t){case"dead":return "hass:emoticon-dead";case"sleeping":return "hass:sleep";case"initializing":return "hass:timer-sand";default:return "hass:z-wave"}default:return console.warn("Unable to find icon for domain "+e+" ("+t+")"),_$1}}var F=function(e,t,a){void 0===a&&(a=!1),a?history.replaceState(null,"",t):history.pushState(null,"",t),C$1(window,"location-changed",{replace:a});};var K={humidity:"hass:water-percent",illuminance:"hass:brightness-5",temperature:"hass:thermometer",pressure:"hass:gauge",power:"hass:flash",signal_strength:"hass:wifi"},P$1={binary_sensor:function(e){var t=e.state&&"off"===e.state;switch(e.attributes.device_class){case"battery":return t?"hass:battery":"hass:battery-outline";case"cold":return t?"hass:thermometer":"hass:snowflake";case"connectivity":return t?"hass:server-network-off":"hass:server-network";case"door":return t?"hass:door-closed":"hass:door-open";case"garage_door":return t?"hass:garage":"hass:garage-open";case"gas":case"power":case"problem":case"safety":case"smoke":return t?"hass:shield-check":"hass:alert";case"heat":return t?"hass:thermometer":"hass:fire";case"light":return t?"hass:brightness-5":"hass:brightness-7";case"lock":return t?"hass:lock":"hass:lock-open";case"moisture":return t?"hass:water-off":"hass:water";case"motion":return t?"hass:walk":"hass:run";case"occupancy":return t?"hass:home-outline":"hass:home";case"opening":return t?"hass:square":"hass:square-outline";case"plug":return t?"hass:power-plug-off":"hass:power-plug";case"presence":return t?"hass:home-outline":"hass:home";case"sound":return t?"hass:music-note-off":"hass:music-note";case"vibration":return t?"hass:crop-portrait":"hass:vibrate";case"window":return t?"hass:window-closed":"hass:window-open";default:return t?"hass:radiobox-blank":"hass:checkbox-marked-circle"}},cover:function(e){var t="closed"!==e.state;switch(e.attributes.device_class){case"garage":return t?"hass:garage-open":"hass:garage";case"door":return t?"hass:door-open":"hass:door-closed";case"shutter":return t?"hass:window-shutter-open":"hass:window-shutter";case"blind":return t?"hass:blinds-open":"hass:blinds";case"window":return t?"hass:window-open":"hass:window-closed";default:return O("cover",e.state)}},sensor:function(e){var t=e.attributes.device_class;if(t&&t in K)return K[t];if("battery"===t){var a=Number(e.state);if(isNaN(a))return "hass:battery-unknown";var r=10*Math.round(a/10);return r>=100?"hass:battery":r<=0?"hass:battery-alert":"hass:battery-"+r}var n=e.attributes.unit_of_measurement;return "°C"===n||"°F"===n?"hass:thermometer":O("sensor")},input_datetime:function(e){return e.attributes.has_date?e.attributes.has_time?O("input_datetime"):"hass:calendar":"hass:clock"}},Q=function(e){if(!e)return _$1;if(e.attributes.icon)return e.attributes.icon;var t=d$1(e.entity_id);return t in P$1?P$1[t](e):O(t,e.state)};
 
     const loadHaForm = async () => {
       if (customElements.get("ha-checkbox") && customElements.get("ha-slider")) return;
@@ -1178,6 +1177,14 @@
     							arm_failure: "The alarm could not be armed right now, due to: {{open_sensors}}.",
     							arming: "The alarm will be armed soon, please leave the house.",
     							pending: "The alarm is about to trigger, disarm it quickly!"
+    						}
+    					},
+    					open_sensors_format: {
+    						heading: "Format for open_sensors wildcard",
+    						description: "Choose which sensor information in inserted in the message",
+    						options: {
+    							"default": "Names and states",
+    							short: "Names only"
     						}
     					},
     					target: {
@@ -2306,6 +2313,14 @@
     							pending: "¡La alarma está a punto de dispararse, desarme rápidamente!"
     						}
     					},
+    					open_sensors_format: {
+    						heading: "Format for open_sensors wildcard",
+    						description: "Choose which sensor information in inserted in the message",
+    						options: {
+    							"default": "Names and states",
+    							short: "Names only"
+    						}
+    					},
     					target: {
     						heading: "Objetivo",
     						description: "Dispositivo al que enviar el mensaje push."
@@ -2863,6 +2878,14 @@
     							arm_failure: "The alarm could not be armed right now, due to: {{open_sensors}}.",
     							arming: "The alarm will be armed soon, please leave the house.",
     							pending: "The alarm is about to trigger, disarm it quickly!"
+    						}
+    					},
+    					open_sensors_format: {
+    						heading: "Format for open_sensors wildcard",
+    						description: "Choose which sensor information in inserted in the message",
+    						options: {
+    							"default": "Names and states",
+    							short: "Names only"
     						}
     					},
     					target: {
@@ -3424,6 +3447,14 @@
     							pending: "L'alarme est sur le point de se déclencher, désarmez-la rapidement!"
     						}
     					},
+    					open_sensors_format: {
+    						heading: "Format for open_sensors wildcard",
+    						description: "Choose which sensor information in inserted in the message",
+    						options: {
+    							"default": "Names and states",
+    							short: "Names only"
+    						}
+    					},
     					target: {
     						heading: "Cible",
     						description: "Appareil recevant le message"
@@ -3981,6 +4012,14 @@
     							arm_failure: "The alarm could not be armed right now, due to: {{open_sensors}}.",
     							arming: "The alarm will be armed soon, please leave the house.",
     							pending: "The alarm is about to trigger, disarm it quickly!"
+    						}
+    					},
+    					open_sensors_format: {
+    						heading: "Format for open_sensors wildcard",
+    						description: "Choose which sensor information in inserted in the message",
+    						options: {
+    							"default": "Names and states",
+    							short: "Names only"
     						}
     					},
     					target: {
@@ -4542,6 +4581,14 @@
     							pending: "Het alarm moet nu worden uitgeschakeld, anders wordt deze geactiveerd."
     						}
     					},
+    					open_sensors_format: {
+    						heading: "Opmaak voor open_sensors wildcard",
+    						description: "Kies welke sensor informatie wordt weergegeven in het bericht",
+    						options: {
+    							"default": "Naam en status",
+    							short: "Alleen naam"
+    						}
+    					},
     					target: {
     						heading: "Doel",
     						description: "Apparaat om het push-bericht naar te sturen"
@@ -4625,6 +4672,573 @@
         'default': nl
     });
 
+    var common$7 = {
+    	modes_long: {
+    		armed_away: "Larmat borta",
+    		armed_home: "Larmat hemma",
+    		armed_night: "Larmat natt",
+    		armed_custom_bypass: "Larmat anpassad"
+    	},
+    	modes_short: {
+    		armed_away: "Borta",
+    		armed_home: "Hemma",
+    		armed_night: "Natt",
+    		armed_custom_bypass: "Anpassad"
+    	}
+    };
+    var components$7 = {
+    	time_slider: {
+    		seconds: "sek",
+    		minutes: "min",
+    		infinite: "oändligt",
+    		none: "inget"
+    	},
+    	editor: {
+    		ui_mode: "Till UI",
+    		yaml_mode: "Till YAML",
+    		edit_in_yaml: "Redigera i YAML"
+    	}
+    };
+    var title$7 = "Alarm panel";
+    var panels$7 = {
+    	general: {
+    		title: "Generellt",
+    		cards: {
+    			general: {
+    				description: "Denna panel definierar några globala inställningar för larmet.",
+    				fields: {
+    					disarm_after_trigger: {
+    						heading: "Larma av efter trigger",
+    						description: "Efter trigger tiden har gått ut, larma av larmet istället för att återgå till larmat läge."
+    					},
+    					enable_mqtt: {
+    						heading: "Aktivera MQTT",
+    						description: "Tillåt alarm panelen att kontrolleras via MQTT."
+    					},
+    					enable_master: {
+    						heading: "Aktivera alarm master",
+    						description: "Skapar en entity för att kontrollera alla areor samtidigt."
+    					}
+    				},
+    				actions: {
+    					setup_mqtt: "MQTT konfiguration",
+    					setup_master: "Master konfiguration"
+    				}
+    			},
+    			modes: {
+    				title: "Lägen",
+    				description: "Denna panel kan användas för att konfiguera larmets olika larmlägen.",
+    				fields: {
+    					mode: {
+    						armed_away: "Larmat borta användas när alla personer lämnat huset. Alla dörrar och fönster som tillåter tillgång till huset kommer att larmas, det samma gäller rörelsesensorer inne i huset.",
+    						armed_home: "Larmat hemma används när det finns personer kvar i huset. Alla dörrar och fönster som tillåter tillgång till huset kommer att larmas, dock inga rörelsesensorer inne i huset.",
+    						armed_night: "Larmat natt används när du aktiverar larmen innan du lägger dig. Alla dörrar och fönster som tillåter tillgång till huset kommer att larmas, det samma gäller utvalda rörelsesensorer inne i huset.",
+    						armed_custom_bypass: "Ett extra läge för för att definiera sin egen säkerhetsperimeter.",
+    						enabled: "Aktiverat",
+    						disabled: "Inaktiverat"
+    					},
+    					exit_delay: {
+    						heading: "Lämna fördröjning",
+    						description: "Efter att du har aktiverat larmet kommer dina sensorer inte trigga ditt larm inom denna tid."
+    					},
+    					entry_delay: {
+    						heading: "Ankomst fördröjning",
+    						description: "Fördröjning i tid tills att ditt larm triggas efter att en av dina sensorer har aktiverats."
+    					},
+    					trigger_time: {
+    						heading: "Trigger tid",
+    						description: "Tid som ditt larm kommer vara i triggat läge efter att ett larm har triggats."
+    					}
+    				}
+    			},
+    			mqtt: {
+    				title: "MQTT konfiguration",
+    				description: "Denna panel kan användas för att anpassa konfigurationen av MQTT.",
+    				fields: {
+    					state_topic: {
+    						heading: "Status topic",
+    						description: "Topic på vilket status uppdateringar publiceras till."
+    					},
+    					event_topic: {
+    						heading: "Event topic",
+    						description: "Topic på vilket alarm events publiceras till."
+    					},
+    					command_topic: {
+    						heading: "Kommando topic",
+    						description: "Topic på vilket Alarmo lyssnar på för larma/larma av kommandon."
+    					},
+    					require_code: {
+    						heading: "Kräv kod",
+    						description: "Kräv att koden ska skickas med kommandot."
+    					},
+    					state_payload: {
+    						heading: "Konfiguera payload per state",
+    						item: "Definiera en payload för state '{state}'"
+    					},
+    					command_payload: {
+    						heading: "Konfiguera payload per kommando",
+    						item: "Definiera en payload för kommando '{command}'"
+    					}
+    				}
+    			},
+    			areas: {
+    				title: "Areor",
+    				description: "Areor kan användas för att dela upp ditt larm till flera delar.",
+    				no_items: "Det är inga areor definierade än.",
+    				table: {
+    					remarks: "Anmärkningar",
+    					summary: "Denna area innehåller {summary_sensors} och {summary_automations}.",
+    					summary_sensors: "{number} sensorer",
+    					summary_automations: "{number} automationer"
+    				},
+    				actions: {
+    					add: "Lägg till"
+    				}
+    			}
+    		},
+    		dialogs: {
+    			create_area: {
+    				title: "Ny area",
+    				fields: {
+    					copy_from: "Kopiera inställningarna från"
+    				}
+    			},
+    			edit_area: {
+    				title: "Redigera area '{area}'",
+    				name_warning: "OBS: Ändrar du namn kommer entity ID att ändras"
+    			},
+    			remove_area: {
+    				title: "Ta bort area?",
+    				description: "Är du säker att du vill ta bort denna area? Denna area innehåller {sensors} sensorer och {automations} automationer, som också kommer att tas bort."
+    			},
+    			edit_master: {
+    				title: "Master konfiguration"
+    			},
+    			disable_master: {
+    				title: "Inaktivera master?",
+    				description: "Är du säker att du vill ta bort master alarm? Denna area innehåller {automations} automationer, som kommer att tas bort med detta val."
+    			}
+    		}
+    	},
+    	sensors: {
+    		title: "Sensorer",
+    		cards: {
+    			sensors: {
+    				description: "Nuvarande konfiguerade sensorer. Klicka på ett entity för att göra förändringar.",
+    				no_items: "Det finns inga sensorer att visa här.",
+    				table: {
+    					arm_modes: "Larmläge",
+    					always_on: "(Alltid)"
+    				},
+    				filter: {
+    					label: "Filtrera per area",
+    					no_area: "(Ingen area)"
+    				}
+    			},
+    			add_sensors: {
+    				title: "Lägg till sensorer",
+    				description: "Lägg till mer sensorer. Säkerhetsställ att dina sensorer har ett friendly_name, så du kan identifiera dem.",
+    				no_items: "Det finns inga tillgängliga HA entities som kan konfigueras för larmet. Säkerhetsställ att inkludera entities av type binary_sensor.",
+    				table: {
+    					type: "Detekteringstyp"
+    				},
+    				actions: {
+    					add_to_alarm: "Addera till larmet",
+    					show_all: "Visa alla"
+    				}
+    			},
+    			editor: {
+    				title: "Justera Sensor",
+    				description: "Justera inställningarna för sensor '{entity}'.",
+    				fields: {
+    					name: {
+    						heading: "Namn",
+    						description: "Skriv över friendly name."
+    					},
+    					area: {
+    						heading: "Area",
+    						description: "Välj en area som innehåller denna sensor."
+    					},
+    					group: {
+    						heading: "Grupp",
+    						description: "Gruppera med andra sensorer för kombinerad trigger."
+    					},
+    					device_type: {
+    						heading: "Enhetstyp",
+    						description: "Välj en enhetstyp att automatiskt applicera rekomenderade inställningar på.",
+    						choose: {
+    							door: {
+    								name: "Dörr",
+    								description: "En dörr, grind eller annan entre som används för att gå in/lämna hemmet."
+    							},
+    							window: {
+    								name: "Fönster",
+    								description: "Ett fönster eller en dörr som inte används för att gå in/lämna huset, t.ex. en balkongdörr."
+    							},
+    							motion: {
+    								name: "Rörelse",
+    								description: "Närvarosensor eller liknande som har fördröjning mellan sina aktiveringar."
+    							},
+    							tamper: {
+    								name: "Manipulering",
+    								description: "Detektor av sensorskydd, glaskross sensor etc."
+    							},
+    							environmental: {
+    								name: "Miljö",
+    								description: "Rök/gas sensor eller läckage sensor etc. (Inte relaterat till inbrottsskydd)."
+    							},
+    							other: {
+    								name: "Generell"
+    							}
+    						}
+    					},
+    					always_on: {
+    						heading: "Larma alltid",
+    						description: "Sensorn ska alltid trigga larmet."
+    					},
+    					modes: {
+    						heading: "Aktiverat läge",
+    						description: "Larmläge när sensorn ska vara aktiv."
+    					},
+    					arm_on_close: {
+    						heading: "Larma efter stängning",
+    						description: "Resternade lämna fördröjning skippas automatiskt när denna sensor inaktiveras."
+    					},
+    					use_exit_delay: {
+    						heading: "Anväld lämna fördröjning",
+    						description: "Sensorn är tillåten att vara aktiv när lämna fördröjningen startar."
+    					},
+    					use_entry_delay: {
+    						heading: "Använd ankomst fördröjning",
+    						description: "Sensor aktivering triggar larmet after ankomst fördröjningen istället för direkt."
+    					},
+    					allow_open: {
+    						heading: "Tillåt öppnad efter larmning.",
+    						description: "Om sensorn fortfarande är aktiv efter lämna fördröjningen kommer det inte misslyckas att larma."
+    					},
+    					auto_bypass: {
+    						heading: "Exkludera automatiskt",
+    						description: "Exkludera denna sensor fr¨ån larmet open den är öppen vid pålarmning.",
+    						modes: "Lägen där sensor kan bli exkluderad"
+    					},
+    					trigger_unavailable: {
+    						heading: "Trigga vid otillgänglig",
+    						description: "Detta kommer aktiveras när sensorns status blir 'unavailable'."
+    					}
+    				},
+    				actions: {
+    					toggle_advanced: "Avancerade inställningar",
+    					remove: "Ta bort",
+    					setup_groups: "Hantera grupper"
+    				},
+    				errors: {
+    					description: "Var vänlig att justera följande fel:",
+    					no_area: "Ingen area är vald",
+    					no_modes: "Inga lägen är valda när sensorn ska vara aktiv",
+    					no_auto_bypass_modes: "Inga lägen är valda när sensorn eventuellt automatiskt ska förbikopplas"
+    				}
+    			}
+    		},
+    		dialogs: {
+    			manage_groups: {
+    				title: "Hantera sensor grupper",
+    				description: "I en sensor grupp måste flera sensorer bli aktiverade inom en tidsperiod för att larmet ska triggas.",
+    				no_items: "Inga grupper ännu",
+    				actions: {
+    					new_group: "Ny grupp"
+    				}
+    			},
+    			create_group: {
+    				title: "Ny sensor grupp",
+    				fields: {
+    					name: {
+    						heading: "Namn",
+    						description: "Namn för sensor gruppen"
+    					},
+    					timeout: {
+    						heading: "Time-out",
+    						description: "Tidsperiod för de sammankopplade sensorernas aktivitet ska trigga larmet."
+    					},
+    					sensors: {
+    						heading: "Sensorer",
+    						description: "Välj sensorer som tillhöra gruppen."
+    					}
+    				},
+    				errors: {
+    					invalid_name: "Ogiltigt namn specificerat.",
+    					insufficient_sensors: "Minst två sensorer behöver väljas."
+    				}
+    			},
+    			edit_group: {
+    				title: "Justera sensor grupp '{name}'"
+    			}
+    		}
+    	},
+    	codes: {
+    		title: "Koder",
+    		cards: {
+    			codes: {
+    				description: "Ändra inställningar för kod.",
+    				fields: {
+    					code_arm_required: {
+    						heading: "Använd pålarmningskod",
+    						description: "Kräv en kod för att aktivera larmet"
+    					},
+    					code_disarm_required: {
+    						heading: "Använd avlarmningskod",
+    						description: "Kräv en kod för att inaktivera larmet"
+    					},
+    					code_format: {
+    						heading: "Kodformat",
+    						description: "Ändra inmatningstyp för Lovelace alarm kortet.",
+    						code_format_number: "pinkod",
+    						code_format_text: "lösenord"
+    					}
+    				}
+    			},
+    			user_management: {
+    				title: "Användarhantering",
+    				description: "Varje användare har sin egen kod för aktivera/inaktivera larmet.",
+    				no_items: "Det finns inga användae än",
+    				table: {
+    					remarks: "Anteckningar",
+    					administrator: "Administratör"
+    				},
+    				actions: {
+    					new_user: "ny användare"
+    				}
+    			},
+    			new_user: {
+    				title: "Skapa en ny användare",
+    				description: "Users can be created for providing access to operating the alarm.",
+    				fields: {
+    					name: {
+    						heading: "Namn",
+    						description: "Namn på användaren"
+    					},
+    					code: {
+    						heading: "Kod",
+    						description: "Koden för användaren."
+    					},
+    					confirm_code: {
+    						heading: "Repetra koden",
+    						description: "Repetra koden."
+    					},
+    					is_admin: {
+    						heading: "Användaren är administratör",
+    						description: "Tillåt användaren att göra förändringar"
+    					},
+    					can_arm: {
+    						heading: "Tillåt kod för pålarming",
+    						description: "Denna kod aktiverar larmet"
+    					},
+    					can_disarm: {
+    						heading: "Tillåt kod för avlarming",
+    						description: "Denna kod inaktiverar larmet"
+    					},
+    					is_override_code: {
+    						heading: "Tvingande kod",
+    						description: "Denna kod tvingar aktivering av larmet"
+    					},
+    					area_limit: {
+    						heading: "Begränsade areor",
+    						description: "Begränsa användare att hantera utvalda areor"
+    					}
+    				},
+    				errors: {
+    					no_name: "Ingen namn angivet.",
+    					no_code: "Koden ska vara minst 4 tecken eller siffror.",
+    					code_mismatch: "Koderna matchar inte."
+    				}
+    			},
+    			edit_user: {
+    				title: "Justera användare",
+    				description: "Ändra inställningar för användare '{name}'.",
+    				fields: {
+    					old_code: {
+    						heading: "Nuvarande kod",
+    						description: "Nuvarande kod, lämna tomt för att inte ändra."
+    					}
+    				}
+    			}
+    		}
+    	},
+    	actions: {
+    		title: "Actions",
+    		cards: {
+    			notifications: {
+    				title: "Notifikationer",
+    				description: "Du använder denna panel för att hantera notifikationer som ska sändas vid utvalda larmevents.",
+    				table: {
+    					enabled: "Aktiverad",
+    					no_items: "Det är inga notifikationer skapade än."
+    				},
+    				actions: {
+    					new_notification: "ny notifikation"
+    				},
+    				filter: {
+    					label: "Filtrera after area",
+    					no_area: "(Ingen area)"
+    				}
+    			},
+    			actions: {
+    				description: "I denna panel kan du trigga olika beteende på enheter baserat på oliak events från ditt larm.",
+    				table: {
+    					no_items: "Det finns inga actions skapade ännu."
+    				},
+    				actions: {
+    					new_action: "ny action"
+    				}
+    			},
+    			new_notification: {
+    				title: "Konfiguera notifikationer",
+    				description: "Ta emot en notifikation när ditt larm aktivera/inaktiveras eller om en sensor aktiveras eller liknande.",
+    				trigger: "Villkor",
+    				action: "Task",
+    				options: "Inställningar",
+    				fields: {
+    					event: {
+    						heading: "Event",
+    						description: "När ska notifikationen skickas",
+    						choose: {
+    							armed: {
+    								name: "Larmet är aktiverat",
+    								description: "Larmet aktiveras framgångsrikt"
+    							},
+    							disarmed: {
+    								name: "Larmet är inaktiverat",
+    								description: "Larmet är inaktiverat"
+    							},
+    							triggered: {
+    								name: "Larmet har triggats",
+    								description: "Larmet har triggats"
+    							},
+    							arm_failure: {
+    								name: "Misslyckas att aktivera larm",
+    								description: "Larmet misslyckas att kativeras på grund av någon sensor"
+    							},
+    							arming: {
+    								name: "Lämna fördröjning startas",
+    								description: "Lämna fördröjning startas, redo att lämna huset."
+    							},
+    							pending: {
+    								name: "Ankomst fördröjning startas",
+    								description: "Ankomst fördröjning startas, larmet kommer triggas snart."
+    							}
+    						}
+    					},
+    					mode: {
+    						heading: "Läge",
+    						description: "Begräns action till specifikt larmläge (valfritt)"
+    					},
+    					title: {
+    						heading: "Titel",
+    						description: "Titel för notifikationsmeddelandet"
+    					},
+    					message: {
+    						heading: "Meddelande",
+    						description: "Innehåll av notifikationsmeddelandet",
+    						insert_wildcard: "Lägg in wildcard",
+    						placeholders: {
+    							armed: "Larmet har bytt status till {{arm_mode}}",
+    							disarmed: "Larmet är nu AVSTÄNGT",
+    							triggered: "Larmet har triggats! Anledning: {{open_sensors}}.",
+    							arm_failure: "Larmet kunde inte aktiveras nu, detta på grund av: {{open_sensors}}.",
+    							arming: "Larmet kommer aktiveras snart, lämna huset.",
+    							pending: "Larmet kommer snart triggas, inaktivera larmet snarast!"
+    						}
+    					},
+    					open_sensors_format: {
+    						heading: "Format for open_sensors wildcard",
+    						description: "Choose which sensor information in inserted in the message",
+    						options: {
+    							"default": "Names and states",
+    							short: "Names only"
+    						}
+    					},
+    					target: {
+    						heading: "Mål",
+    						description: "Enhet att skicka push-meddelandet till"
+    					},
+    					name: {
+    						heading: "Namn",
+    						description: "Beskrivning av notifikationen",
+    						placeholders: {
+    							armed: "Notifiera {target} vid aktivering av larm",
+    							disarmed: "Notifiera {target} vid inaktivering av larm",
+    							triggered: "Notifiera {target} vid triggning av larm",
+    							arm_failure: "Notifiera {target} vid fel av larm",
+    							arming: "Notifiera {target} vid utpassering",
+    							pending: "Notifiera {target} vid ankomst"
+    						}
+    					},
+    					"delete": {
+    						heading: "Ta bort automation",
+    						description: "Ta bort automation permanent"
+    					}
+    				},
+    				actions: {
+    					test: "Testa"
+    				}
+    			},
+    			new_action: {
+    				title: "Konfiguera action",
+    				description: "Aktivera lampor eller andra enheter som sirener eller högatalare vid aktivering/inaktivering av larmet, triggning av larmet osv.",
+    				fields: {
+    					event: {
+    						heading: "Event",
+    						description: "När ska denna action aktiveras"
+    					},
+    					area: {
+    						heading: "Area",
+    						description: "Area som etta event ska appliceras på, lämna tomt om det ska gälla globalt."
+    					},
+    					mode: {
+    						heading: "Läge",
+    						description: "Begränsa action till specifika larmläge (frivilligt)"
+    					},
+    					entity: {
+    						heading: "Entity",
+    						description: "Entity att utföra action på"
+    					},
+    					action: {
+    						heading: "Action",
+    						description: "Action att utföra på entity",
+    						no_common_actions: "Actions kan enbart bli applicerade i YAML läge för utvalda entities."
+    					},
+    					name: {
+    						heading: "Namn",
+    						description: "Beskrivning av denna action",
+    						placeholders: {
+    							armed: "Sätt {entity} till {state} vid aktivering av larmet",
+    							disarmed: "Sätt {entity} till {state} vid inaktivering av larmet",
+    							triggered: "Sätt {entity} till {state} när larmet triggas",
+    							arm_failure: "Sätt {entity} till {state} vid fel av larmet",
+    							arming: "Sätt {entity} till {state} vid utpassering",
+    							pending: "Sätt {entity} till {state} vid ankomst"
+    						}
+    					}
+    				}
+    			}
+    		}
+    	}
+    };
+    var se = {
+    	common: common$7,
+    	components: components$7,
+    	title: title$7,
+    	panels: panels$7
+    };
+
+    var se$1 = /*#__PURE__*/Object.freeze({
+        __proto__: null,
+        common: common$7,
+        components: components$7,
+        title: title$7,
+        panels: panels$7,
+        'default': se
+    });
+
     var languages = {
         ca: ca$1,
         en: en$1,
@@ -4633,6 +5247,7 @@
         fr: fr$1,
         it: it$1,
         nl: nl$1,
+        se: se$1
     };
     function localize(string, language, search = '', replace = '') {
         const lang = language.replace(/['"]+/g, '').replace('-', '_');
@@ -4741,7 +5356,7 @@
         });
     };
 
-    const VERSION = '1.7.5';
+    const VERSION = '1.7.6';
     var EArmModeIcons;
     (function (EArmModeIcons) {
         EArmModeIcons["ArmedAway"] = "hass:car-traction-control";
@@ -5944,13 +6559,13 @@
      * Copyright 2017 Google LLC
      * SPDX-License-Identifier: BSD-3-Clause
      */
-    const t$2={ATTRIBUTE:1,CHILD:2,PROPERTY:3,BOOLEAN_ATTRIBUTE:4,EVENT:5,ELEMENT:6},i$4=t=>(...i)=>({_$litDirective$:t,values:i});class s$4{constructor(t){}T(t,i,s){this.Σdt=t,this.M=i,this.Σct=s;}S(t,i){return this.update(t,i)}update(t,i){return this.render(...i)}}//# sourceMappingURL=directive.js.map
+    const t$2={ATTRIBUTE:1,CHILD:2,PROPERTY:3,BOOLEAN_ATTRIBUTE:4,EVENT:5,ELEMENT:6},i$4=t=>(...i)=>({_$litDirective$:t,values:i});class s$4{constructor(t){}T(t,i,s){this.Σdt=t,this.M=i,this.Σct=s;}S(t,i){return this.update(t,i)}update(t,i){return this.render(...i)}}
 
     /**
      * @license
      * Copyright 2017 Google LLC
      * SPDX-License-Identifier: BSD-3-Clause
-     */class n$6 extends s$4{constructor(i){if(super(i),this.vt=A,i.type!==t$2.CHILD)throw Error(this.constructor.directiveName+"() can only be used in child bindings")}render(r){if(r===A)return this.Vt=void 0,this.vt=r;if(r===w)return r;if("string"!=typeof r)throw Error(this.constructor.directiveName+"() called with a non-string value");if(r===this.vt)return this.Vt;this.vt=r;const s=[r];return s.raw=s,this.Vt={_$litType$:this.constructor.resultType,strings:s,values:[]}}}n$6.directiveName="unsafeHTML",n$6.resultType=1;const o$6=i$4(n$6);//# sourceMappingURL=unsafe-html.js.map
+     */class n$6 extends s$4{constructor(i){if(super(i),this.vt=A,i.type!==t$2.CHILD)throw Error(this.constructor.directiveName+"() can only be used in child bindings")}render(r){if(r===A)return this.Vt=void 0,this.vt=r;if(r===w)return r;if("string"!=typeof r)throw Error(this.constructor.directiveName+"() called with a non-string value");if(r===this.vt)return this.Vt;this.vt=r;const s=[r];return s.raw=s,this.Vt={_$litType$:this.constructor.resultType,strings:s,values:[]}}}n$6.directiveName="unsafeHTML",n$6.resultType=1;const o$6=i$4(n$6);
 
     let AlarmoTable = class AlarmoTable extends h$2 {
         render() {
