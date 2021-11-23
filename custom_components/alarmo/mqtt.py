@@ -79,7 +79,7 @@ class MqttHandler:
             else:
                 message = new_state
 
-            mqtt.async_publish(self.hass, topic, message, retain=True)
+            hass.async_create_task(mqtt.async_publish(self.hass, topic, message, retain=True))
             _LOGGER.debug("Published state '{}' on topic '{}'".format(message, topic))
 
         self._subscriptions.append(
@@ -149,7 +149,7 @@ class MqttHandler:
                 return
 
             payload = json.dumps(payload, cls=JSONEncoder)
-            mqtt.async_publish(self.hass, topic, payload)
+            hass.async_create_task(mqtt.async_publish(self.hass, topic, payload))
 
         self._subscriptions.append(
             async_dispatcher_connect(self.hass, "alarmo_event", async_handle_event)
