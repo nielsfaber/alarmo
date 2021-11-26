@@ -152,14 +152,22 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
 
     @property
     def code_format(self):
-        """Return one or more digits/characters."""
+        """Return whether code consists of digits or characters."""
+
         if (
-            self._config and (
-                self.code_arm_required or
-                self.code_disarm_required
-            )
+            self._state == STATE_ALARM_DISARMED and
+            self.code_arm_required
         ):
             return self._config[ATTR_CODE_FORMAT]
+
+        elif (
+            self._state != STATE_ALARM_DISARMED and
+            self._config and
+            const.ATTR_CODE_DISARM_REQUIRED in self._config and
+            self._config[const.ATTR_CODE_DISARM_REQUIRED]
+        ):
+            return self._config[ATTR_CODE_FORMAT]
+
         else:
             return None
 
@@ -185,14 +193,6 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             return True  # assume code is needed (conservative approach)
         else:
             return self._config[ATTR_CODE_ARM_REQUIRED]
-
-    @property
-    def code_disarm_required(self):
-        """Whether the code is required for disarm actions."""
-        if not self._config or const.ATTR_CODE_DISARM_REQUIRED not in self._config:
-            return True  # assume code is needed (conservative approach)
-        else:
-            return self._config[const.ATTR_CODE_DISARM_REQUIRED]
 
     @property
     def arm_mode(self):
@@ -263,7 +263,6 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
         return {
             "changed_by": self.changed_by,
             "code_arm_required": self.code_arm_required,
-            "code_disarm_required": self.code_disarm_required,
             "arm_mode": self.arm_mode,
             "open_sensors": self.open_sensors,
             "bypassed_sensors": self.bypassed_sensors,
@@ -274,10 +273,10 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
     def _validate_code(self, code, state):
         """Validate given code."""
 
-        if state == STATE_ALARM_DISARMED and not self.code_disarm_required:
+        if state == STATE_ALARM_DISARMED and not self._config[const.ATTR_CODE_DISARM_REQUIRED]:
             self._changed_by = None
             return (True, None)
-        elif state != STATE_ALARM_DISARMED and not self.code_arm_required:
+        elif state != STATE_ALARM_DISARMED and not self._config[ATTR_CODE_ARM_REQUIRED]:
             self._changed_by = None
             return (True, None)
         elif not code or len(code) < 1:
