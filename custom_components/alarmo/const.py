@@ -130,10 +130,6 @@ ATTR_COMMAND_PAYLOAD = "command_payload"
 
 ATTR_FORCE = "force"
 ATTR_SKIP_DELAY = "skip_delay"
-ARM_MODE_AWAY = "away"
-ARM_MODE_HOME = "home"
-ARM_MODE_NIGHT = "night"
-ARM_MODE_CUSTOM = "custom"
 
 PUSH_EVENTS = [
     "ios.notification_action_fired",
@@ -160,11 +156,15 @@ SERVICE_ARM_SCHEMA = vol.Schema(
     {
         vol.Required(ATTR_ENTITY_ID): cv.entity_id,
         vol.Optional(CONF_CODE, default=""): cv.string,
-        vol.Optional(CONF_MODE, default=ARM_MODE_AWAY): vol.In([
-            ARM_MODE_AWAY,
-            ARM_MODE_HOME,
-            ARM_MODE_NIGHT,
-            ARM_MODE_CUSTOM
+        vol.Optional(CONF_MODE, default=STATE_ALARM_ARMED_AWAY): vol.In([
+            "away",
+            "home",
+            "night",
+            "custom",
+            STATE_ALARM_ARMED_AWAY,
+            STATE_ALARM_ARMED_HOME,
+            STATE_ALARM_ARMED_NIGHT,
+            STATE_ALARM_ARMED_CUSTOM_BYPASS
         ]),
         vol.Optional(ATTR_SKIP_DELAY, default=False): cv.boolean,
         vol.Optional(ATTR_FORCE, default=False): cv.boolean,
@@ -177,10 +177,3 @@ SERVICE_DISARM_SCHEMA = vol.Schema(
         vol.Optional(CONF_CODE, default=""): cv.string,
     }
 )
-
-ARM_MODE_TO_STATE = {
-    ARM_MODE_AWAY: STATE_ALARM_ARMED_AWAY,
-    ARM_MODE_HOME: STATE_ALARM_ARMED_HOME,
-    ARM_MODE_NIGHT: STATE_ALARM_ARMED_NIGHT,
-    ARM_MODE_CUSTOM: STATE_ALARM_ARMED_CUSTOM_BYPASS,
-}
