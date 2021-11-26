@@ -302,6 +302,8 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
 
     async def async_service_disarm_handler(self, code):
         """handle external disarm request from alarmo.disarm service"""
+        _LOGGER.debug("Service alarmo.disarm was called")
+
         await self.async_alarm_disarm(
             code=code,
         )
@@ -343,6 +345,8 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
 
     async def async_service_arm_handler(self, code, mode, skip_delay, force):
         """handle external arm request from alarmo.arm service"""
+        _LOGGER.debug("Service alarmo.arm was called")
+
         if "armed_" not in mode:
             mode = "armed_{}".format(mode)
         await self.async_handle_arm_request(
@@ -384,8 +388,22 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             _LOGGER.debug("Alarm is already set to {}, ignoring command.".format(arm_mode))
             return False
 
+        if not skip_code:
+            (res, info) = self._validate_code(code, arm_mode)
+            if not res:
+                async_dispatcher_send(self.hass, "alarmo_event", info, self.area_id)
+                _LOGGER.warning("Wrong code provided.")
+                if self.open_sensors:
+                    self.open_sensors = None
+                    self.async_write_ha_state()
+                return False
+            elif info and info[const.ATTR_IS_OVERRIDE_CODE]:
+                bypass_open_sensors = True
+        else:
+            self._changed_by = None
+
         if self._state in const.ARM_MODES:
-            # no code is required when switching between arm modes
+            # we are switching between arm modes
             await self.async_arm(
                 arm_mode,
                 skip_delay=skip_delay,
@@ -393,20 +411,6 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
                 revert_state=self._state
             )
         else:
-            if not skip_code:
-                (res, info) = self._validate_code(code, arm_mode)
-                if not res:
-                    async_dispatcher_send(self.hass, "alarmo_event", info, self.area_id)
-                    _LOGGER.warning("Wrong code provided.")
-                    if self.open_sensors:
-                        self.open_sensors = None
-                        self.async_write_ha_state()
-                    return False
-                elif info and info[const.ATTR_IS_OVERRIDE_CODE]:
-                    bypass_open_sensors = True
-            else:
-                self._changed_by = None
-
             self.open_sensors = None
             self.bypassed_sensors = None
             return await self.async_arm(
@@ -571,6 +575,9 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
             await self.async_update_state(revert_state)
         else:
             # when disarmed, only update the attributes
+            if revert_state in const.ARM_MODES:
+                self._arm_mode = revert_state
+
             self.async_write_ha_state()
 
         async_dispatcher_send(
@@ -944,7 +951,7 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
                     open_sensors.update(item.open_sensors)
 
         if open_sensors:
-            await self.async_arm_failure(open_sensors)
+            await self.async_arm_failure(open_sensors, revert_state)
         else:
             delay = 0
             area_config = self.hass.data[const.DOMAIN]["coordinator"].store.async_get_areas()
