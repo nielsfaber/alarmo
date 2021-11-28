@@ -7,7 +7,7 @@ import { AlarmoChip } from "../../components/alarmo-chips";
 import { TableColumn, TableData } from "../../components/alarmo-table";
 import { ESensorIcons, ESensorTypes } from "../../const";
 import { fetchAreas, fetchSensors, saveSensor } from "../../data/websockets";
-import { computeIcon, computeName, handleError, prettyPrint, sortAlphabetically } from "../../helpers";
+import { computeIcon, computeName, handleError, isDefined, prettyPrint, sortAlphabetically } from "../../helpers";
 import { commonStyle } from "../../styles";
 import { SubscribeMixin } from "../../subscribe-mixin";
 import { AlarmoArea, AlarmoSensor, Dictionary, EArmModes } from "../../types";
@@ -78,11 +78,36 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
   render() {
     if (!this.hass) return html``;
 
+    const namedSensors = Object.keys(this.sensors).filter(e => {
+      const stateObj = this.hass.states[e];
+      return stateObj && this.sensors[e].name?.length
+        ? prettyPrint(computeName(stateObj)) != this.sensors[e].name
+        : false;
+    });
+
     return html`
       <ha-card header="${localize('panels.sensors.title', this.hass.language)}">
         <div class="card-content">
           ${localize('panels.sensors.cards.sensors.description', this.hass.language)}
         </div>
+
+        ${namedSensors.length
+        ? html`
+        <ha-alert
+          .alertType=${"warning"}
+        >
+          You have sensors assigned with a custom name, a feature which will be removed in an upcoming update. The following sensors are affected:
+          <ul>
+            ${namedSensors.map(e => html`
+                <li>
+                  '${this.sensors[e].name}' will be renamed to '${prettyPrint(computeName(this.hass.states[e]))}'
+                  (<a href="#" @click=${() => { this.removeCustomName(e) }}>approve change</a>)
+                </li>`
+        )}
+          </ul>
+          If you want to maintain the current sensor names, please assign appropriate names in HA instead (see <a href="${String(window.location).replace("alarmo/sensors", "config/entities")}">here</a>).
+        </ha-alert>
+        `: ''}
 
         ${this.areaFilterOptions.length > 1
         ? html`
@@ -205,6 +230,14 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
     saveSensor(this.hass!, { entity_id: id, enabled: enabled })
       .catch(e => handleError(e, ev))
       .then();
+  }
+
+  removeCustomName(id: string) {
+    let data = {
+      entity_id: id,
+      name: ''
+    };
+    saveSensor(this.hass, data);
   }
 
   static styles = commonStyle;

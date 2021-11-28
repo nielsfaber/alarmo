@@ -5,7 +5,7 @@ import { commonStyle } from '../../styles';
 import { AlarmoSensor, EArmModes, Dictionary, AlarmoArea, SensorGroup } from '../../types';
 import { fetchSensors, saveSensor, deleteSensor, fetchAreas, fetchSensorGroups } from '../../data/websockets';
 import { localize } from '../../../localize/localize';
-import { Unique, Without, handleError, showErrorDialog } from '../../helpers';
+import { Unique, Without, handleError, showErrorDialog, prettyPrint, computeName } from '../../helpers';
 import { HassEntity, UnsubscribeFunc } from 'home-assistant-js-websocket';
 import { sensorConfigByType, getSensorTypeOptions } from '../../data/sensors';
 import { EArmModeIcons, ESensorTypes } from '../../const';
@@ -76,13 +76,26 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
           <span slot="heading">${localize('panels.sensors.cards.editor.fields.name.heading', this.hass.language)}</span>
           <span slot="description">${localize('panels.sensors.cards.editor.fields.name.description', this.hass.language)}</span>
 
-          <paper-input
-            label="${localize('panels.sensors.cards.editor.fields.name.heading', this.hass.language)}"
-            placeholder=${stateObj?.attributes.friendly_name || ''}
-            value=${this.data.name}
-            @change=${(ev: Event) => (this.data = { ...this.data!, name: (ev.target as HTMLInputElement).value })}
-          >
-          </paper-input>
+          <div>
+            <paper-input
+              label="${localize('panels.sensors.cards.editor.fields.name.heading', this.hass.language)}"
+              placeholder=${stateObj?.attributes.friendly_name || ''}
+              value=${this.data.name}
+              @change=${(ev: Event) => (this.data = { ...this.data!, name: (ev.target as HTMLInputElement).value })}
+            >
+            </paper-input>
+
+            ${stateObj && this.data.name?.length && prettyPrint(computeName(stateObj)) != this.data.name
+        ? html`
+            <ha-alert
+              .alertType=${"warning"}
+            >
+              This feature will be removed soon.<br>
+              Please leave the field empty.
+            </ha-alert>
+            `: ''}
+          </div>
+
         </settings-row>
 
         ${Object.keys(this.areas).length > 1
