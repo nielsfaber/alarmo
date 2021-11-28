@@ -27,7 +27,6 @@ This is an alarm system integration for Home Assistant. It provides a user inter
       - [Sensor groups](#sensor-groups)
     - [Codes and users](#codes-and-users)
       - [Codes](#codes)
-      - [Administrator](#administrator)
     - [MQTT](#mqtt)
       - [State topic](#state-topic)
       - [Event topic](#event-topic)
@@ -334,16 +333,6 @@ This setting is detected by the alarm panel card, and will automatically show ei
 Your code is stored completely secure. It is encrypted in the same way as your login credentials, and stored in the HA storage registry. When you enter a code, this will be encrypted too, and the encrypted values will be compared for a match.
 So it is impossible to recover your pin code.
 This also means that if you lose your pincode, you cannot unlock the alarm (there is no backup code!)
-
-#### Administrator
-The administrator setting grants access to the Alarmo configuration panel.
-
-For using this feature, the user names in Alarmo should be matched to the account names in HA.
-
-When a user is trying to access the Alarmo configuration panel, access is only allowed if any of the following requirements are met:
-1. The user is administrator in HA (i.e. this user can access the HA configuration)
-2. The user is not a HA administrator, but a matching user exists in Alarmo, which has the *administator* setting activated.
-
 
 ### MQTT
 Alarmo supports MQTT for external control of the alarm. This function is intended for third-party alarm panels (such as a touch screen in the hallway).

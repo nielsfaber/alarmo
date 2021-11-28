@@ -15,7 +15,7 @@ const plugins = [
   babel({
     exclude: 'node_modules/**',
   }),
-  //terser()
+  terser()
 ];
 
 export default [
