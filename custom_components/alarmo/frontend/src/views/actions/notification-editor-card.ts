@@ -211,7 +211,7 @@ export class NotificationEditorCard extends LitElement {
                 ${localize('panels.actions.cards.new_notification.fields.message.insert_wildcard', this.hass.language)}:
               </span>
               <alarmo-chips
-                .items=${getWildcardOptions(this.config.triggers[0].event)}
+                .items=${getWildcardOptions(this.config.triggers[0].event, this.alarmoConfig)}
                 @value-changed=${(ev: CustomEvent) => this._insertWildCard(ev.detail.value)}
               ></alarmo-chips>
             </div>`
@@ -240,10 +240,10 @@ export class NotificationEditorCard extends LitElement {
             </settings-row>
             ` : ''}
 
-            ${this._getArmModeFormat() !== null &&
+            ${this._getArmModeFormat() !== null && (
             getArmModeWildCardOptions(this.hass).length > 1 ||
             (getArmModeWildCardOptions(this.hass).length == 1 && getArmModeWildCardOptions(this.hass)[0].value != this._getArmModeFormat())
-            ? html`
+          ) ? html`
 
             <settings-row .narrow=${this.narrow} .large=${true}>
               <span slot="heading">

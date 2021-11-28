@@ -263,7 +263,7 @@ export const getAutomationEntities = (hass: HomeAssistant, additionalEntities?: 
   return entities;
 };
 
-export const getWildcardOptions = (event?: EAlarmEvent) => {
+export const getWildcardOptions = (event?: EAlarmEvent, alarmoConfig?: AlarmoConfig) => {
   let options: { name: string; value: string }[] = [];
 
   options = [];
@@ -286,7 +286,10 @@ export const getWildcardOptions = (event?: EAlarmEvent) => {
       },
     ];
 
-  if (!event || [EAlarmEvent.Armed, EAlarmEvent.Arming, EAlarmEvent.Disarmed].includes(event))
+  if (!event ||
+    (alarmoConfig?.code_arm_required && [EAlarmEvent.Armed, EAlarmEvent.Arming, EAlarmEvent.ArmFailure].includes(event)) ||
+    (alarmoConfig?.code_disarm_required && [EAlarmEvent.Disarmed].includes(event))
+  )
     options = [
       ...options,
       {
