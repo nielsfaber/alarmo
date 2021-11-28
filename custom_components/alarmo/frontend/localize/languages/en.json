@@ -483,6 +483,10 @@
                 "short": "Names only"
               }
             },
+            "arm_mode_format": {
+              "heading": "Translation for arm_mode wildcard",
+              "description": "Choose in which language the arm mode is inserted in the message"
+            },
             "target": {
               "heading": "Target",
               "description": "Device to send the push message to"

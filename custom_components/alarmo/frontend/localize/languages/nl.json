@@ -483,6 +483,10 @@
                 "short": "Alleen naam"
               }
             },
+            "arm_mode_format": {
+              "heading": "Vertaling voor arm_mode wildcard",
+              "description": "Kies in welke taal de inschakelmodus wordt weergegeven in het bericht"
+            },
             "target": {
               "heading": "Doel",
               "description": "Apparaat om het push-bericht naar te sturen"

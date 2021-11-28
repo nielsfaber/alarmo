@@ -6,7 +6,7 @@ import { AlarmoAutomation, EAlarmEvent, EArmModes, AlarmoArea, Dictionary, Autom
 import { handleError, omit, showErrorDialog, isDefined } from '../../helpers';
 import { saveAutomation, fetchAreas, fetchConfig, deleteAutomation } from '../../data/websockets';
 import { localize } from '../../../localize/localize';
-import { computeEventDisplay, computeAreaDisplay, computeArmModeDisplay, getAreaOptions, getArmModeOptions, computeServiceDisplay, getNotifyServices, getWildcardOptions, isValidString, isString, isObject, getOpenSensorsWildCardOptions } from '../../data/actions';
+import { computeEventDisplay, computeAreaDisplay, computeArmModeDisplay, getAreaOptions, getArmModeOptions, computeServiceDisplay, getNotifyServices, getWildcardOptions, isValidString, isString, isObject, getOpenSensorsWildCardOptions, getArmModeWildCardOptions } from '../../data/actions';
 
 import '../../components/alarmo-selector';
 import '../../components/alarmo-select';
@@ -234,6 +234,30 @@ export class NotificationEditorCard extends LitElement {
                 .items=${getOpenSensorsWildCardOptions(this.hass)}
                 .value=${this._getOpenSensorsFormat(true)}
                 @value-changed=${this._setOpenSensorsFormat}
+              >
+
+              </alarmo-select>
+            </settings-row>
+            ` : ''}
+
+            ${this._getArmModeFormat() !== null &&
+            getArmModeWildCardOptions(this.hass).length > 1 ||
+            (getArmModeWildCardOptions(this.hass).length == 1 && getArmModeWildCardOptions(this.hass)[0].value != this._getArmModeFormat())
+            ? html`
+
+            <settings-row .narrow=${this.narrow} .large=${true}>
+              <span slot="heading">
+                ${localize('panels.actions.cards.new_notification.fields.arm_mode_format.heading', this.hass.language)}
+              </span>
+
+              <span slot="description">
+                ${localize('panels.actions.cards.new_notification.fields.arm_mode_format.description', this.hass.language)}
+              </span>
+
+              <alarmo-select
+                .items=${getArmModeWildCardOptions(this.hass)}
+                .value=${this._getArmModeFormat(true)}
+                @value-changed=${this._setArmModeFormat}
               >
 
               </alarmo-select>
@@ -535,6 +559,24 @@ export class NotificationEditorCard extends LitElement {
     this.config = { ...this.config, actions: actionConfig };
   }
 
+  private _getArmModeFormat(forceResult = false): null | string {
+    const message = this.config.actions[0].service_data?.message || '';
+    const res = message.match(/{{arm_mode(\|[^}]+)?}}/);
+    if (res !== null) return res[0];
+    else return forceResult ? '{{arm_mode}}' : null;
+  }
+
+  private _setArmModeFormat(ev: CustomEvent) {
+    ev.stopPropagation();
+    const value = String(ev.detail.value);
+    let message = this.config.actions[0].service_data?.message || '';
+    message = message.replace(/{{arm_mode(\|[^}]+)?}}/, value);
+
+    let actionConfig = this.config.actions;
+    Object.assign(actionConfig, { [0]: { ...actionConfig[0], service: actionConfig[0].service || '', service_data: { ...actionConfig[0].service_data || {}, message: message } } });
+    this.config = { ...this.config, actions: actionConfig };
+  }
+
   private _saveClick(ev: Event) {
     if (!this._validateConfig()) return;
     let data = this._parseAutomation();
@@ -567,7 +609,7 @@ export class NotificationEditorCard extends LitElement {
     message = message.replace('{{open_sensors|format=short}}', 'Some Example Sensor');
     message = message.replace(/{{open_sensors(\|[^}]+)?}}/, 'Some Example Sensor is open');
     message = message.replace('{{bypassed_sensors}}', 'Some Bypassed Sensor');
-    message = message.replace('{{arm_mode}}', 'Armed away');
+    message = message.replace(/{{arm_mode(\|[^}]+)?}}/, 'Armed away');
     message = message.replace('{{changed_by}}', 'Some Example User');
 
     this.hass

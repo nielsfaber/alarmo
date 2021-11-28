@@ -351,6 +351,25 @@ export const getOpenSensorsWildCardOptions = (hass: HomeAssistant) => {
   return options;
 }
 
+export const getArmModeWildCardOptions = (hass: HomeAssistant) => {
+  let options: { value: string, name: string }[] = [
+    {
+      value: '{{arm_mode}}',
+      name: hass.translationMetadata.translations['en'].nativeName
+    }
+  ];
+
+  if (hass.language != 'en')
+    options = [
+      ...options,
+      {
+        value: `{{arm_mode|lang=${hass.language}}}`,
+        name: hass.translationMetadata.translations[hass.language].nativeName
+      }
+    ];
+  return options;
+}
+
 export const isValidString = (input: any) => {
   return typeof input == 'string' && input.trim().length;
 };

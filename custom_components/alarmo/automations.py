@@ -64,8 +64,10 @@ class AutomationHandler:
         self.hass = hass
         self._config = None
         self._subscriptions = []
-        self._translationCache = {}
-        self._translationLang = None
+        self._sensorTranslationCache = {}
+        self._alarmTranslationCache = {}
+        self._sensorTranslationLang = None
+        self._alarmTranslationLang = None
 
         def async_update_config():
             """automation config updated, reload the configuration."""
@@ -191,10 +193,12 @@ class AutomationHandler:
 
                     data[ATTR_MESSAGE] = data[ATTR_MESSAGE].replace("{{bypassed_sensors}}", bypassed_sensors)
 
-                if "{{arm_mode}}" in data[ATTR_MESSAGE]:
-                    arm_mode = alarm_entity.arm_mode if alarm_entity.arm_mode else ""
-                    arm_mode = " ".join(w.capitalize() for w in arm_mode.split("_"))
-                    data[ATTR_MESSAGE] = data[ATTR_MESSAGE].replace("{{arm_mode}}", arm_mode)
+                res = re.search(r'{{arm_mode(\|lang=([^}]+))?}}', data[ATTR_MESSAGE])
+                if res:
+                    lang = res.group(2) if res.group(2) else "en"
+                    arm_mode = await self.async_get_arm_mode_string(alarm_entity.arm_mode, lang)
+
+                    data[ATTR_MESSAGE] = data[ATTR_MESSAGE].replace(res.group(0), arm_mode)
 
                 if "{{changed_by}}" in data[ATTR_MESSAGE]:
                     changed_by = alarm_entity.changed_by if alarm_entity.changed_by else ""
@@ -219,12 +223,13 @@ class AutomationHandler:
         return result
 
     async def async_get_open_sensor_string(self, entity_id: str, state: str, language: str):
+        """get translation for sensor states"""
 
         if (
-            self._translationCache and
-            self._translationLang == language
+            self._sensorTranslationCache and
+            self._sensorTranslationLang == language
         ):
-            translations = self._translationCache
+            translations = self._sensorTranslationCache
         else:
             translations = await self.hass.helpers.translation.async_get_translations(
                 language,
@@ -232,8 +237,8 @@ class AutomationHandler:
                 "binary_sensor"
             )
 
-            self._translationCache = translations
-            self._translationLang = language
+            self._sensorTranslationCache = translations
+            self._sensorTranslationLang = language
 
         entity = self.hass.states.get(entity_id)
 
@@ -266,3 +271,28 @@ class AutomationHandler:
         string = string.replace("{entity_name}", name)
 
         return string
+
+    async def async_get_arm_mode_string(self, arm_mode: str, language: str):
+        """get translation for alarm arm mode"""
+        if (
+            self._alarmTranslationCache and
+            self._alarmTranslationLang == language
+        ):
+            translations = self._alarmTranslationCache
+        else:
+            translations = await self.hass.helpers.translation.async_get_translations(
+                language,
+                "state",
+                "alarm_control_panel"
+            )
+
+            self._alarmTranslationCache = translations
+            self._alarmTranslationLang = language
+
+        translation_key = "component.alarm_control_panel.state._.{}".format(arm_mode) if arm_mode else None
+        if translation_key and translation_key in translations:
+            return translations[translation_key]
+        elif arm_mode:
+            return " ".join(w.capitalize() for w in arm_mode.split("_"))
+        else:
+            return ""
