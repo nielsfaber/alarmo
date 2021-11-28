@@ -327,10 +327,6 @@
           "title": "Gestione utente",
           "description": "Ogni utente ha il suo codice per attivare/disattivare l'allarme.",
           "no_items": "Non è stato creato nessun utente per ora",
-          "table": {
-            "remarks": "Ruolo",
-            "administrator": "Amministratore"
-          },
           "actions": {
             "new_user": "nuovo utente"
           }
@@ -350,10 +346,6 @@
             "confirm_code": {
               "heading": "Ripeti codice operativo",
               "description": "Ripeti il codice operativo scelto."
-            },
-            "is_admin": {
-              "heading": "L'utente è un amministratore",
-              "description": "Ciò consente al utente di effettuare modifiche al sistema di allarme"
             },
             "can_arm": {
               "heading": "Utilizza codice per attivare l'allarme",

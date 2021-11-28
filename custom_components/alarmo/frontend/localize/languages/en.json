@@ -327,10 +327,6 @@
           "title": "User management",
           "description": "Each user has its own code to arm/disarm the alarm.",
           "no_items": "There are no users yet",
-          "table": {
-            "remarks": "Remarks",
-            "administrator": "Administrator"
-          },
           "actions": {
             "new_user": "new user"
           }
@@ -350,10 +346,6 @@
             "confirm_code": {
               "heading": "Confirm code",
               "description": "Repeat the code."
-            },
-            "is_admin": {
-              "heading": "User is administrator",
-              "description": "Allow user to make changes"
             },
             "can_arm": {
               "heading": "Allow code for arming",

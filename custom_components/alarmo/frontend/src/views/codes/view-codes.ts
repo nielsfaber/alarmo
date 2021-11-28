@@ -18,15 +18,30 @@ import { TableData, TableColumn } from '../../components/alarmo-table';
 
 @customElement('alarm-view-codes')
 export class AlarmViewCodes extends SubscribeMixin(LitElement) {
-  hass?: HomeAssistant;
-  @property() narrow!: boolean;
-  @property() path!: string[] | null;
 
-  @property() config?: AlarmoConfig;
-  @property() users: Dictionary<AlarmoUser> = {};
-  @property() code_arm_required = false;
-  @property() code_disarm_required = false;
-  @property() code_format: 'number' | 'text' = 'number';
+  @property()
+  hass?: HomeAssistant;
+
+  @property()
+  narrow!: boolean;
+
+  @property()
+  path!: string[] | null;
+
+  @property()
+  config?: AlarmoConfig;
+
+  @property()
+  users: Dictionary<AlarmoUser> = {};
+
+  @property()
+  code_arm_required = false;
+
+  @property()
+  code_disarm_required = false;
+
+  @property()
+  code_format: 'number' | 'text' = 'number';
 
   public hassSubscribe(): Promise<UnsubscribeFunc>[] {
     this._fetchData();
@@ -61,78 +76,45 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
     } else {
       return html`
         <ha-card header="${localize('panels.codes.title', this.hass.language)}">
-          <div class="card-content">
-            ${localize('panels.codes.cards.codes.description', this.hass.language)}
-          </div>
+          <div class="card-content">${localize('panels.codes.cards.codes.description', this.hass.language)}</div>
 
           <settings-row .narrow=${this.narrow}>
-            <span slot="heading"
-              >${localize('panels.codes.cards.codes.fields.code_arm_required.heading', this.hass.language)}</span
-            >
-            <span slot="description"
-              >${localize('panels.codes.cards.codes.fields.code_arm_required.description', this.hass.language)}</span
-            >
+            <span slot="heading">${localize('panels.codes.cards.codes.fields.code_arm_required.heading', this.hass.language)}</span>
+            <span slot="description">${localize('panels.codes.cards.codes.fields.code_arm_required.description', this.hass.language)}</span>
             <ha-switch
               ?checked=${this.code_arm_required}
-              @change=${(ev: Event) => {
-          this.code_arm_required = (ev.target as HTMLInputElement).checked;
-        }}
+              @change=${(ev: Event) => { this.code_arm_required = (ev.target as HTMLInputElement).checked; }}
             >
             </ha-switch>
           </settings-row>
 
           <settings-row .narrow=${this.narrow}>
-            <span slot="heading"
-              >${localize('panels.codes.cards.codes.fields.code_disarm_required.heading', this.hass.language)}</span
-            >
-            <span slot="description"
-              >${localize('panels.codes.cards.codes.fields.code_disarm_required.description', this.hass.language)}</span
-            >
+            <span slot="heading">${localize('panels.codes.cards.codes.fields.code_disarm_required.heading', this.hass.language)}</span>
+            <span slot="description">${localize('panels.codes.cards.codes.fields.code_disarm_required.description', this.hass.language)}</span>
             <ha-switch
               ?checked=${this.code_disarm_required}
-              @change=${(ev: Event) => {
-          this.code_disarm_required = (ev.target as HTMLInputElement).checked;
-        }}
+              @change=${(ev: Event) => { this.code_disarm_required = (ev.target as HTMLInputElement).checked; }}
             >
             </ha-switch>
           </settings-row>
 
           <settings-row .narrow=${this.narrow}>
-            <span slot="heading"
-              >${localize('panels.codes.cards.codes.fields.code_format.heading', this.hass.language)}</span
-            >
-            <span slot="description"
-              >${localize('panels.codes.cards.codes.fields.code_format.description', this.hass.language)}</span
-            >
+            <span slot="heading">${localize('panels.codes.cards.codes.fields.code_format.heading', this.hass.language)}</span>
+            <span slot="description">${localize('panels.codes.cards.codes.fields.code_format.description', this.hass.language)}</span>
             <mwc-button
-              class="${this.code_format == 'number' ? 'active' : ''} ${!this.code_arm_required &&
-          !this.code_disarm_required
-          ? 'disabled'
-          : ''}"
-              @click=${() => {
-          this.code_format = 'number';
-        }}
-              ?disabled=${!this.code_arm_required && !this.code_disarm_required}
-              >${localize(
-          'panels.codes.cards.codes.fields.code_format.code_format_number',
-          this.hass.language
-        )}</mwc-button
-            >
-            <mwc-button
-              class="${this.code_format == 'text' ? 'active' : ''} ${!this.code_arm_required &&
-          !this.code_disarm_required
-          ? 'disabled'
-          : ''}"
-              @click=${() => {
-          this.code_format = 'text';
-        }}
+              class="${this.code_format == 'number' ? 'active' : ''} ${!this.code_arm_required && !this.code_disarm_required ? 'disabled' : ''}"
+              @click=${() => { this.code_format = 'number'; }}
               ?disabled=${!this.code_arm_required && !this.code_disarm_required}
             >
-              ${localize(
-          'panels.codes.cards.codes.fields.code_format.code_format_text',
-          this.hass.language
-        )}</mwc-button
+              ${localize('panels.codes.cards.codes.fields.code_format.code_format_number', this.hass.language)}
+            </mwc-button>
+            <mwc-button
+              class="${this.code_format == 'text' ? 'active' : ''} ${!this.code_arm_required && !this.code_disarm_required ? 'disabled' : ''}"
+              @click=${() => { this.code_format = 'text'; }}
+              ?disabled=${!this.code_arm_required && !this.code_disarm_required}
             >
+              ${localize('panels.codes.cards.codes.fields.code_format.code_format_text', this.hass.language)}
+            </mwc-button>
           </settings-row>
 
           <div class="card-actions">
@@ -163,8 +145,8 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
         grow: true,
         text: true,
       },
-      remarks: {
-        title: localize('panels.codes.cards.user_management.table.remarks', this.hass.language),
+      code_format: {
+        title: localize('panels.codes.cards.codes.fields.code_format.heading', this.hass.language),
         width: '40%',
         hide: this.narrow,
         text: true,
@@ -183,9 +165,11 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
           <ha-icon icon="mdi:account-outline"></ha-icon>
         `,
         name: prettyPrint(item.name),
-        remarks: item.is_admin
-          ? localize('panels.codes.cards.user_management.table.administrator', this.hass!.language)
-          : '',
+        code_format: item.code_format == 'number'
+          ? prettyPrint(localize('panels.codes.cards.codes.fields.code_format.code_format_number', this.hass!.language))
+          : item.code_format == 'text'
+            ? prettyPrint(localize('panels.codes.cards.codes.fields.code_format.code_format_text', this.hass!.language))
+            : this.hass!.localize('state.default.unknown'),
         enabled: html`
           <ha-switch
             @click=${(ev: Event) => { ev.stopPropagation() }}

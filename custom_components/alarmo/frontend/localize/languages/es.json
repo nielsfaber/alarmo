@@ -327,10 +327,6 @@
           "title": "Gestión de usuarios",
           "description": "Cada usuario tiene su propio código para armar / desarmar la alarma.",
           "no_items": "Aún no hay usuarios",
-          "table": {
-            "remarks": "Comentarios",
-            "administrator": "Administrador"
-          },
           "actions": {
             "new_user": "nuevo usuario"
           }
@@ -350,10 +346,6 @@
             "confirm_code": {
               "heading": "Confirmar código",
               "description": "Repite el código."
-            },
-            "is_admin": {
-              "heading": "El usuario es administrador",
-              "description": "Permitir al usuario realizar cambios."
             },
             "can_arm": {
               "heading": "Permitir código para armar",

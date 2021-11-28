@@ -119,7 +119,6 @@ class UserEntry:
     name = attr.ib(type=str, default="")
     enabled = attr.ib(type=bool, default=True)
     code = attr.ib(type=str, default="")
-    is_admin = attr.ib(type=bool, default=False)
     can_arm = attr.ib(type=bool, default=False)
     can_disarm = attr.ib(type=bool, default=False)
     is_override_code = attr.ib(type=bool, default=False)
@@ -329,7 +328,7 @@ class AlarmoStorage:
 
             if "users" in data:
                 for user in data["users"]:
-                    users[user["user_id"]] = UserEntry(**user)
+                    users[user["user_id"]] = UserEntry(**omit(user, ["is_admin"]))
 
             if "automations" in data:
                 for automation in data["automations"]:

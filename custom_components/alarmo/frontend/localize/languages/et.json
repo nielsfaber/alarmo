@@ -327,10 +327,6 @@
           "title": "Kasutajate haldus",
           "description": "Igal kasutajal on oma juhtkood.",
           "no_items": "Kasutajaid pole määratud",
-          "table": {
-            "remarks": "Märkused",
-            "administrator": "Haldaja"
-          },
           "actions": {
             "new_user": "Uus kasutaja"
           }
@@ -350,10 +346,6 @@
             "confirm_code": {
               "heading": "Koodi kinnitamine",
               "description": "Sisesta sama kood uuesti."
-            },
-            "is_admin": {
-              "heading": "Kasutajal on haldusõigused",
-              "description": "Kasutaja saab teha muudatusi."
             },
             "can_arm": {
               "heading": "Tohib valvestada",

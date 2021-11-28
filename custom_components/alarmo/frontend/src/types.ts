@@ -68,7 +68,6 @@ export type AlarmoUser = {
   enabled: boolean;
   code: string;
   old_code?: string;
-  is_admin: boolean;
   can_arm: boolean;
   can_disarm: boolean;
   is_override_code: boolean;

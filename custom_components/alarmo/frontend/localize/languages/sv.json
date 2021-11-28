@@ -327,10 +327,6 @@
           "title": "Användarhantering",
           "description": "Varje användare har sin egen kod för aktivera/inaktivera larmet.",
           "no_items": "Det finns inga användae än",
-          "table": {
-            "remarks": "Anteckningar",
-            "administrator": "Administratör"
-          },
           "actions": {
             "new_user": "ny användare"
           }
@@ -350,10 +346,6 @@
             "confirm_code": {
               "heading": "Repetra koden",
               "description": "Repetra koden."
-            },
-            "is_admin": {
-              "heading": "Användaren är administratör",
-              "description": "Tillåt användaren att göra förändringar"
             },
             "can_arm": {
               "heading": "Tillåt kod för pålarming",

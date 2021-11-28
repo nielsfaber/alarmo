@@ -267,7 +267,6 @@ class AlarmoUserView(HomeAssistantView):
                 vol.Optional(const.ATTR_ENABLED): cv.boolean,
                 vol.Optional(ATTR_CODE): cv.string,
                 vol.Optional(const.ATTR_OLD_CODE): cv.string,
-                vol.Optional(const.ATTR_IS_ADMIN): cv.boolean,
                 vol.Optional(const.ATTR_CAN_ARM): cv.boolean,
                 vol.Optional(const.ATTR_CAN_DISARM): cv.boolean,
                 vol.Optional(const.ATTR_IS_OVERRIDE_CODE): cv.boolean,

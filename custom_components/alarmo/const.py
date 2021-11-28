@@ -107,7 +107,6 @@ ATTR_CAN_DISARM = "can_disarm"
 ATTR_DISARM_AFTER_TRIGGER = "disarm_after_trigger"
 
 ATTR_REMOVE = "remove"
-ATTR_IS_ADMIN = "is_admin"
 ATTR_IS_OVERRIDE_CODE = "is_override_code"
 ATTR_AREA_LIMIT = "area_limit"
 ATTR_CODE_FORMAT = "code_format"

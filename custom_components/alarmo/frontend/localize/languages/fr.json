@@ -327,10 +327,6 @@
           "title": "Gestion des utilisateurs",
           "description": "Chaque utilisateur a son propre code pour activer / désactiver l'alarme.",
           "no_items": "Il n'y a aucun utilisateur de défini",
-          "table": {
-            "remarks": "Remarque",
-            "administrator": "Administrateur"
-          },
           "actions": {
             "new_user": "Nouvel utilisateur"
           }
@@ -350,10 +346,6 @@
             "confirm_code": {
               "heading": "Confirmation du code",
               "description": "Répèter le  code."
-            },
-            "is_admin": {
-              "heading": "L'utilisateur est aussi administrateur",
-              "description": "Autorise l'utilisateur à effectuer des changements."
             },
             "can_arm": {
               "heading": "Demande de code pour l'activation",

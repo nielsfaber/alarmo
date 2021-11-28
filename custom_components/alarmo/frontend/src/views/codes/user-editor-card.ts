@@ -23,7 +23,6 @@ export class UserEditorCard extends LitElement {
 
   @property()
   data: Partial<AlarmoUser> = {
-    is_admin: false,
     can_arm: true,
     can_disarm: true,
     is_override_code: false,
@@ -136,23 +135,11 @@ export class UserEditorCard extends LitElement {
             `}
 
         <settings-row .narrow=${this.narrow}>
-          <span slot="heading">${localize('panels.codes.cards.new_user.fields.is_admin.heading', this.hass.language)}</span>
-          <span slot="description">${localize('panels.codes.cards.new_user.fields.is_admin.description', this.hass.language)}</span>
-
-          <ha-switch
-            ?checked=${this.data.is_admin}
-            @change=${(ev: Event) => (this.data = { ...this.data!, is_admin: (ev.target as HTMLInputElement).checked })}
-          >
-          </ha-switch>
-        </settings-row>
-
-        <settings-row .narrow=${this.narrow}>
           <span slot="heading">${localize('panels.codes.cards.new_user.fields.can_arm.heading', this.hass.language)}</span>
           <span slot="description">${localize('panels.codes.cards.new_user.fields.can_arm.description', this.hass.language)}</span>
 
           <ha-switch
-            ?checked=${this.data.can_arm || this.data.is_admin}
-            ?disabled=${this.data.is_admin}
+            ?checked=${this.data.can_arm}
             @change=${(ev: Event) => (this.data = { ...this.data!, can_arm: (ev.target as HTMLInputElement).checked })}
           >
           </ha-switch>
@@ -163,8 +150,7 @@ export class UserEditorCard extends LitElement {
           <span slot="description">${localize('panels.codes.cards.new_user.fields.can_disarm.description', this.hass.language)}</span>
 
           <ha-switch
-            ?checked=${this.data.can_disarm || this.data.is_admin}
-            ?disabled=${this.data.is_admin}
+            ?checked=${this.data.can_disarm}
             @change=${(ev: Event) => (this.data = { ...this.data!, can_disarm: (ev.target as HTMLInputElement).checked })}
           >
           </ha-switch>
@@ -178,12 +164,12 @@ export class UserEditorCard extends LitElement {
 
           <div class="checkbox-list">
             ${this.getAreaOptions().map(e => {
-          const checked = (this.data.area_limit || []).includes(e.value) || !this.data.area_limit?.length || this.data.is_admin;
+          const checked = (this.data.area_limit || []).includes(e.value) || !this.data.area_limit?.length;
           return html`
               <div>
                 <ha-checkbox
                   @change=${(ev: Event) => this.toggleSelectArea(e.value, (ev.target as HTMLInputElement).checked)}
-                  ?disabled=${this.data.is_admin || (checked && (this.data.area_limit || []).length <= 1)}
+                  ?disabled=${checked && (this.data.area_limit || []).length <= 1}
                   ?checked=${checked}
                 >
                 </ha-checkbox>
@@ -239,7 +225,7 @@ export class UserEditorCard extends LitElement {
   }
 
   private toggleSelectArea(id: string, checked: boolean) {
-    if (this.data.is_admin || ((this.data.area_limit || []).length <= 1 && !checked)) return;
+    if ((this.data.area_limit || []).length <= 1 && !checked) return;
     let areaLimit = this.data.area_limit || [];
     areaLimit = checked
       ? areaLimit.includes(id)
@@ -273,8 +259,6 @@ export class UserEditorCard extends LitElement {
       this.repeatCode = '';
     }
     else {
-      if (data.is_admin) data = { ...data, can_arm: true, can_disarm: true, area_limit: [] };
-
       if (this.item) {
         if ((data.old_code || '').length < 4) omit(data, 'old_code', 'code');
       }

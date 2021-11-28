@@ -327,10 +327,6 @@
           "title": "Gebruikersbeheer",
           "description": "Elke gebruiker heeft zijn eigen code om het alarm in/uit te schakelen.",
           "no_items": "Er zijn nog geen gebruikers",
-          "table": {
-            "remarks": "Opmerkingen",
-            "administrator": "Beheerder"
-          },
           "actions": {
             "new_user": "nieuwe gebruiker"
           }
@@ -350,10 +346,6 @@
             "confirm_code": {
               "heading": "Bevestig de code",
               "description": "Herhaal de code."
-            },
-            "is_admin": {
-              "heading": "Gebruiker is beheerder",
-              "description": "Sta de gebruiker toe om wijzigingen aan te brengen"
             },
             "can_arm": {
               "heading": "Code toestaan voor inschakeling",

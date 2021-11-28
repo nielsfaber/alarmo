@@ -327,10 +327,6 @@
           "title": "Gestió d'usuaris",
           "description": "Cada usuari té el seu propi codi per activar/desactivar l'alarma.",
           "no_items": "Encara no hi ha usuaris",
-          "table": {
-            "remarks": "Observacions",
-            "administrator": "Administrador"
-          },
           "actions": {
             "new_user": "usuari nou"
           }
@@ -350,10 +346,6 @@
             "confirm_code": {
               "heading": "Confirmeu el codi",
               "description": "Repetiu el codi."
-            },
-            "is_admin": {
-              "heading": "L'usuari és administrador",
-              "description": "Permetre a l'usuari fer canvis"
             },
             "can_arm": {
               "heading": "Permetre que el codi active l'alarma",
