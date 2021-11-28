@@ -264,6 +264,7 @@ class AlarmoUserView(HomeAssistantView):
                 vol.Optional(const.ATTR_USER_ID): cv.string,
                 vol.Optional(const.ATTR_REMOVE): cv.boolean,
                 vol.Optional(ATTR_NAME): cv.string,
+                vol.Optional(const.ATTR_ENABLED): cv.boolean,
                 vol.Optional(ATTR_CODE): cv.string,
                 vol.Optional(const.ATTR_OLD_CODE): cv.string,
                 vol.Optional(const.ATTR_IS_ADMIN): cv.boolean,

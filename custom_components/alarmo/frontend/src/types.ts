@@ -65,6 +65,7 @@ export type AlarmoSensor = {
 export type AlarmoUser = {
   user_id?: string;
   name: string;
+  enabled: boolean;
   code: string;
   old_code?: string;
   is_admin: boolean;

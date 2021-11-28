@@ -68,3 +68,25 @@ disarm:
       required: false
       selector:
         text:
+enable_user:
+  name: Enable User
+  description: "Allow a user to arm/disarm alarmo."
+  fields:
+    name:
+      name: Name
+      description: Name of the user to enable.
+      example: "Frank"
+      required: true
+      selector:
+        text:
+disable_user:
+  name: Disable User
+  description: "Block a user from arming/disarming alarmo."
+  fields:
+    name:
+      name: Name
+      description: Name of the user to disable.
+      example: "Frank"
+      required: true
+      selector:
+        text:

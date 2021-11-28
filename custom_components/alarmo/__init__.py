@@ -10,6 +10,7 @@ from homeassistant.components.alarm_control_panel import DOMAIN as PLATFORM
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     ATTR_CODE,
+    ATTR_NAME,
 )
 from homeassistant.core import HomeAssistant, asyncio
 from homeassistant.helpers import device_registry as dr
@@ -18,6 +19,9 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.helpers.dispatcher import (
     async_dispatcher_connect,
     async_dispatcher_send,
+)
+from homeassistant.helpers.service import (
+    async_register_admin_service,
 )
 from . import const
 from .store import async_get_registry
@@ -80,6 +84,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     # Websocket support
     await async_register_websockets(hass)
+
+    # Register custom services
+    register_services(hass)
 
     return True
 
@@ -259,7 +266,9 @@ class AlarmoCoordinator(DataUpdateCoordinator):
             }
 
         for (user_id, user) in users.items():
-            if not user[ATTR_CODE] and not code:
+            if not user[const.ATTR_ENABLED]:
+                continue
+            elif not user[ATTR_CODE] and not code:
                 return user
             elif user[ATTR_CODE]:
                 hash = base64.b64decode(user[ATTR_CODE])
@@ -435,3 +444,30 @@ class AlarmoCoordinator(DataUpdateCoordinator):
     async def async_delete_config(self):
         """wipe alarmo storage"""
         await self.store.async_delete()
+
+
+@callback
+def register_services(hass):
+    """Register services used by alarmo component."""
+
+    coordinator = hass.data[const.DOMAIN]["coordinator"]
+
+    async def async_srv_toggle_user(call):
+        """Enable a user by service call"""
+        name = call.data.get(ATTR_NAME)
+        enable = True if call.service == const.SERVICE_ENABLE_USER else False
+        users = coordinator.store.async_get_users()
+        user = next((item for item in list(users.values()) if item[ATTR_NAME] == name), None)
+        if user is None:
+            _LOGGER.warning("Failed to {} user, no match for name '{}'".format("enable" if enable else "disable", name))
+            return
+
+        coordinator.store.async_update_user(user[const.ATTR_USER_ID], {const.ATTR_ENABLED: enable})
+        _LOGGER.debug("User user '{}' was {}".format(name, "enabled" if enable else "disabled"))
+
+    async_register_admin_service(
+        hass, const.DOMAIN, const.SERVICE_ENABLE_USER, async_srv_toggle_user, schema=const.SERVICE_TOGGLE_USER_SCHEMA
+    )
+    async_register_admin_service(
+        hass, const.DOMAIN, const.SERVICE_DISABLE_USER, async_srv_toggle_user, schema=const.SERVICE_TOGGLE_USER_SCHEMA
+    )

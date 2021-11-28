@@ -14,6 +14,7 @@ from homeassistant.const import (
     ATTR_ENTITY_ID,
     CONF_MODE,
     CONF_CODE,
+    ATTR_NAME,
 )
 
 from homeassistant.components.alarm_control_panel import (
@@ -175,5 +176,13 @@ SERVICE_DISARM_SCHEMA = vol.Schema(
     {
         vol.Required(ATTR_ENTITY_ID): cv.entity_id,
         vol.Optional(CONF_CODE, default=""): cv.string,
+    }
+)
+
+SERVICE_ENABLE_USER = "enable_user"
+SERVICE_DISABLE_USER = "disable_user"
+SERVICE_TOGGLE_USER_SCHEMA = vol.Schema(
+    {
+        vol.Required(ATTR_NAME, default=""): cv.string,
     }
 )

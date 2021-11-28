@@ -117,6 +117,7 @@ class UserEntry:
 
     user_id = attr.ib(type=str, default=None)
     name = attr.ib(type=str, default="")
+    enabled = attr.ib(type=bool, default=True)
     code = attr.ib(type=str, default="")
     is_admin = attr.ib(type=bool, default=False)
     can_arm = attr.ib(type=bool, default=False)

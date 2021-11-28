@@ -13,7 +13,7 @@ import { commonStyle } from '../../styles';
 import { localize } from '../../../localize/localize';
 import { SubscribeMixin } from '../../subscribe-mixin';
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
-import { fetchConfig, fetchUsers, saveConfig } from '../../data/websockets';
+import { fetchConfig, fetchUsers, saveConfig, saveUser } from '../../data/websockets';
 import { TableData, TableColumn } from '../../components/alarmo-table';
 
 @customElement('alarm-view-codes')
@@ -169,6 +169,11 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
         hide: this.narrow,
         text: true,
       },
+      enabled: {
+        title: localize('panels.actions.cards.notifications.table.enabled', this.hass.language),
+        width: '68px',
+        align: 'center',
+      }
     };
 
     const data = users.map(item => {
@@ -181,6 +186,14 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
         remarks: item.is_admin
           ? localize('panels.codes.cards.user_management.table.administrator', this.hass!.language)
           : '',
+        enabled: html`
+          <ha-switch
+            @click=${(ev: Event) => { ev.stopPropagation() }}
+            ?checked=${item.enabled}
+            @change=${(ev: Event) => this.toggleEnabled(ev, item.user_id!)}
+          >
+          </ha-switch>
+        `,
       };
       return output;
     });
@@ -223,6 +236,13 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
       code_disarm_required: this.code_disarm_required,
       code_format: this.code_format,
     })
+      .catch(e => handleError(e, ev))
+      .then();
+  }
+
+  toggleEnabled(ev: Event, id: string) {
+    const enabled = (ev.target as HTMLInputElement).checked;
+    saveUser(this.hass!, { user_id: id, enabled: enabled })
       .catch(e => handleError(e, ev))
       .then();
   }
