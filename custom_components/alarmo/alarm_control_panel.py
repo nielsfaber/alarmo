@@ -257,18 +257,17 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
         self._expiration = value
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         """Return the data of the entity."""
 
         return {
-            "changed_by": self.changed_by,
-            "code_arm_required": self.code_arm_required,
             "arm_mode": self.arm_mode,
             "open_sensors": self.open_sensors,
             "bypassed_sensors": self.bypassed_sensors,
             "delay": self.delay,
             "expiration": self.expiration,
         }
+
 
     def _validate_code(self, code, state):
         """Validate given code."""
