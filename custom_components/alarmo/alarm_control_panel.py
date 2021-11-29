@@ -345,8 +345,9 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
         """handle external arm request from alarmo.arm service"""
         _LOGGER.debug("Service alarmo.arm was called")
 
-        if "armed_" not in mode:
-            mode = "armed_{}".format(mode)
+        if mode in const.SHORT_MODE_TO_STATE:
+            mode = const.SHORT_MODE_TO_STATE[mode]
+
         await self.async_handle_arm_request(
             mode,
             code=code,
