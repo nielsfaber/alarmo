@@ -1,6 +1,7 @@
 import { LitElement, html } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 import { fireEvent, HomeAssistant, navigate } from 'custom-card-helpers';
+import { mdiClose } from '@mdi/js';
 import { commonStyle } from '../../styles';
 import { AlarmoSensor, EArmModes, Dictionary, AlarmoArea, SensorGroup } from '../../types';
 import { fetchSensors, saveSensor, deleteSensor, fetchAreas, fetchSensorGroups } from '../../data/websockets';
@@ -64,8 +65,7 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
       <ha-card>
         <div class="card-header">
           <div class="name">${localize('panels.sensors.cards.editor.title', this.hass.language)}</div>
-          <ha-icon-button icon="hass:close" @click=${this.cancelClick}>
-            <ha-icon icon="hass:close"></ha-icon>
+          <ha-icon-button .path=${mdiClose} @click=${this.cancelClick}>
           </ha-icon-button>
         </div>
         <div class="card-content">

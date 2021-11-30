@@ -1,6 +1,7 @@
 import { LitElement, html } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 import { HomeAssistant, navigate } from 'custom-card-helpers';
+import { mdiClose } from '@mdi/js';
 import { loadHaForm } from '../../load-ha-form';
 import { AlarmoConfig, MqttConfig, AlarmoArea, Dictionary } from '../../types';
 import { commonStyle } from '../../styles';
@@ -50,8 +51,7 @@ export class MqttConfigCard extends SubscribeMixin(LitElement) {
       <ha-card>
         <div class="card-header">
           <div class="name">${localize('panels.general.cards.mqtt.title', this.hass.language)}</div>
-          <ha-icon-button icon="hass:close" @click=${this.cancelClick}>
-            <ha-icon icon="hass:close"></ha-icon>
+          <ha-icon-button .path=${mdiClose} @click=${this.cancelClick}>
           </ha-icon-button>
         </div>
         <div class="card-content">${localize('panels.general.cards.mqtt.description', this.hass.language)}</div>

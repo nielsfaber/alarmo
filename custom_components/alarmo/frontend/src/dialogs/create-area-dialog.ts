@@ -1,6 +1,7 @@
 import { LitElement, html, css, CSSResultGroup } from 'lit';
 import { property, customElement, state } from 'lit/decorators.js';
 import { HomeAssistant, fireEvent } from 'custom-card-helpers';
+import { mdiClose } from '@mdi/js';
 import { saveArea, deleteArea, fetchAreas, fetchSensors, fetchAutomations } from '../data/websockets';
 import { AlarmoArea, Dictionary, AlarmoSensor, AlarmoAutomation } from '../types';
 import { commonStyle } from '../styles';
@@ -58,8 +59,7 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
       <ha-dialog open .heading=${true} @closed=${this.closeDialog} @close-dialog=${this.closeDialog}>
         <div slot="heading">
           <ha-header-bar>
-            <ha-icon-button slot="navigationIcon" dialogAction="cancel" icon="mdi:close">
-              <ha-icon icon="mdi:close"></ha-icon>
+            <ha-icon-button slot="navigationIcon" dialogAction="cancel" .path=${mdiClose}>
             </ha-icon-button>
             <span slot="title">
               ${this.area_id

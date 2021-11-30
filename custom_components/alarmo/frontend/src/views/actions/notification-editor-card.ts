@@ -1,6 +1,7 @@
 import { LitElement, html, TemplateResult, CSSResultGroup, css } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 import { HomeAssistant, navigate, computeDomain } from 'custom-card-helpers';
+import { mdiClose } from '@mdi/js';
 import { AlarmoAutomation, EAlarmEvent, EArmModes, AlarmoArea, Dictionary, AutomationAction, AlarmoConfig } from '../../types';
 
 import { handleError, omit, showErrorDialog, isDefined } from '../../helpers';
@@ -75,8 +76,7 @@ export class NotificationEditorCard extends LitElement {
     if (!this.hass || !this.areas || !this.alarmoConfig) return html``;
     return html`
       <div class="heading">
-        <ha-icon-button icon="hass:close" @click=${this._cancelClick} class="icon">
-          <ha-icon icon="hass:close"></ha-icon>
+        <ha-icon-button .path=${mdiClose} @click=${this._cancelClick} class="icon">
         </ha-icon-button>
         <div class="header">${localize('panels.actions.cards.new_notification.title', this.hass.language)}</div>
         <div class="description">${localize('panels.actions.cards.new_notification.description', this.hass.language)}</div>

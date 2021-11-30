@@ -24,6 +24,7 @@
     "@babel/core": "^7.6.4",
     "@babel/plugin-proposal-class-properties": "^7.5.5",
     "@babel/plugin-proposal-decorators": "^7.4.0",
+    "@mdi/js": "^6.5.95",
     "@rollup/plugin-commonjs": "^15.0.0",
     "@rollup/plugin-json": "^4.0.0",
     "@typescript-eslint/eslint-plugin": "^2.6.0",

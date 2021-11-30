@@ -1,6 +1,7 @@
 import { LitElement, html, css, CSSResultGroup } from 'lit';
 import { property, customElement, state } from 'lit/decorators.js';
 import { fireEvent, HomeAssistant } from 'custom-card-helpers';
+import { mdiClose, mdiChevronRight } from '@mdi/js';
 import { fetchSensors, fetchSensorGroups } from '../data/websockets';
 import { Dictionary, AlarmoSensor, SensorGroup } from '../types';
 import { dialogStyle } from '../styles';
@@ -72,11 +73,10 @@ export class ManageSensorGroupsDialog extends SubscribeMixin(LitElement) {
       <span class="header_title">${localize('panels.sensors.dialogs.manage_groups.title', this.hass.language)}</span>
       <ha-icon-button
         .label=${this.hass.localize('ui.dialogs.generic.close')}
-        icon="mdi:close"
+        .path=${mdiClose}
         dialogAction="close"
         class="header_button"
       >
-        <ha-icon icon="mdi:close"></ha-icon>
       </ha-icon-button>
     `;
   }
@@ -97,8 +97,7 @@ export class ManageSensorGroupsDialog extends SubscribeMixin(LitElement) {
           String(item.entities.length)
         )}
       </div>
-      <ha-icon-button icon="hass:chevron-right">
-        <ha-icon icon="hass:chevron-right"></ha-icon>
+      <ha-icon-button .path=${mdiChevronRight}>
       </ha-icon-button>
     </ha-card>
     `;

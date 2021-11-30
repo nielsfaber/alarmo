@@ -1,8 +1,8 @@
 import { LitElement, html, TemplateResult, CSSResultGroup, css } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 import { HomeAssistant, navigate, computeDomain, computeEntity } from 'custom-card-helpers';
+import { mdiClose, mdiChevronRight } from '@mdi/js';
 import { AlarmoAutomation, EAlarmEvent, EArmModes, AlarmoArea, Dictionary, AutomationAction, AlarmoConfig } from '../../types';
-
 import { handleError, isDefined, Unique, omit, showErrorDialog } from '../../helpers';
 import { saveAutomation, fetchAreas, fetchConfig, deleteAutomation } from '../../data/websockets';
 import { localize } from '../../../localize/localize';
@@ -78,8 +78,7 @@ export class AutomationEditorCard extends LitElement {
     if (!this.hass || !this.areas || !this.alarmoConfig) return html``;
     return html`
       <div class="heading">
-        <ha-icon-button icon="hass:close" @click=${this._cancelClick} class="icon">
-          <ha-icon icon="hass:close"></ha-icon>
+        <ha-icon-button .path=${mdiClose} @click=${this._cancelClick} class="icon">
         </ha-icon-button>
         <div class="header">${localize('panels.actions.cards.new_action.title', this.hass.language)}</div>
         <div class="description">${localize('panels.actions.cards.new_action.description', this.hass.language)}</div>

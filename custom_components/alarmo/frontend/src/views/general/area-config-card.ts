@@ -2,6 +2,7 @@ import { LitElement, html } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { HomeAssistant, fireEvent } from 'custom-card-helpers';
+import { mdiPencil } from '@mdi/js';
 
 import { prettyPrint, sortAlphabetically } from '../../helpers';
 import { AlarmoConfig, Dictionary, AlarmoArea, AlarmoSensor, AlarmoAutomation } from '../../types';
@@ -85,8 +86,7 @@ export class AreaConfigCard extends SubscribeMixin(LitElement) {
       const output: TableData = {
         id: item.area_id,
         actions: html`
-          <ha-icon-button @click=${(ev: Event) => this.editClick(ev, item.area_id)} icon="hass:pencil">
-            <ha-icon icon="hass:pencil"></ha-icon>
+          <ha-icon-button @click=${(ev: Event) => this.editClick(ev, item.area_id)} .path=${mdiPencil}>
           </ha-icon-button>
         `,
         name: prettyPrint(item.name),

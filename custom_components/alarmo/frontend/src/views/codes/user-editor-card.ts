@@ -1,6 +1,7 @@
 import { LitElement, html, CSSResultGroup, css } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 import { HomeAssistant, navigate } from 'custom-card-helpers';
+import { mdiClose } from '@mdi/js';
 import { commonStyle } from '../../styles';
 import { AlarmoArea, AlarmoUser, Dictionary } from '../../types';
 import { fetchUsers, saveUser, deleteUser, fetchAreas } from '../../data/websockets';
@@ -61,8 +62,7 @@ export class UserEditorCard extends LitElement {
         : localize('panels.codes.cards.new_user.title', this.hass.language)
       }
           </div>
-          <ha-icon-button icon="hass:close" @click=${this.cancelClick}>
-            <ha-icon icon="hass:close"></ha-icon>
+          <ha-icon-button .path=${mdiClose} @click=${this.cancelClick}>
           </ha-icon-button>
         </div>
         <div class="card-content">

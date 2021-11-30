@@ -1,6 +1,7 @@
 import { LitElement, html, css, CSSResultGroup } from 'lit';
 import { property, customElement, state } from 'lit/decorators.js';
 import { HomeAssistant } from 'custom-card-helpers';
+import { mdiClose } from '@mdi/js';
 import { fetchSensors, fetchSensorGroups, saveSensorGroup, deleteSensorGroup } from '../data/websockets';
 import { Dictionary, AlarmoSensor, SensorGroup } from '../types';
 import { dialogStyle } from '../styles';
@@ -65,12 +66,8 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
       <ha-dialog open @closed=${this.closeDialog} @close-dialog=${this.closeDialog} .heading=${this.renderHeader()}>
         <div class="wrapper">
           <settings-row dialog>
-            <span slot="heading"
-              >${localize('panels.sensors.dialogs.create_group.fields.name.heading', this.hass.language)}</span
-            >
-            <span slot="description"
-              >${localize('panels.sensors.dialogs.create_group.fields.name.description', this.hass.language)}</span
-            >
+            <span slot="heading">${localize('panels.sensors.dialogs.create_group.fields.name.heading', this.hass.language)}</span>
+            <span slot="description">${localize('panels.sensors.dialogs.create_group.fields.name.description', this.hass.language)}</span>
             <paper-input
               label=${this.hass.localize('ui.components.area-picker.add_dialog.name')}
               @value-changed=${(ev: Event) =>
@@ -81,26 +78,16 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
           </settings-row>
 
           <settings-row large dialog>
-            <span slot="heading"
-              >${localize('panels.sensors.dialogs.create_group.fields.sensors.heading', this.hass.language)}</span
-            >
-            <span slot="description"
-              >${localize('panels.sensors.dialogs.create_group.fields.sensors.description', this.hass.language)}</span
-            >
-
+            <span slot="heading">${localize('panels.sensors.dialogs.create_group.fields.sensors.heading', this.hass.language)}</span>
+            <span slot="description">${localize('panels.sensors.dialogs.create_group.fields.sensors.description', this.hass.language)}</span>
             <div>
               ${this.renderSensorOptions()}
             </div>
           </settings-row>
 
           <settings-row dialog>
-            <span slot="heading"
-              >${localize('panels.sensors.dialogs.create_group.fields.timeout.heading', this.hass.language)}</span
-            >
-            <span slot="description"
-              >${localize('panels.sensors.dialogs.create_group.fields.timeout.description', this.hass.language)}</span
-            >
-
+            <span slot="heading">${localize('panels.sensors.dialogs.create_group.fields.timeout.heading', this.hass.language)}</span>
+            <span slot="description">${localize('panels.sensors.dialogs.create_group.fields.timeout.description', this.hass.language)}</span>
             <time-slider
               .hass=${this.hass}
               unit="min"
@@ -140,11 +127,10 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
       </span>
       <ha-icon-button
         .label=${this.hass.localize('ui.dialogs.generic.close')}
-        icon="mdi:close"
+        .path=${mdiClose}
         dialogAction="close"
         class="header_button"
       >
-        <ha-icon icon="mdi:close"></ha-icon>
       </ha-icon-button>
     `;
   }

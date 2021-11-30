@@ -1,6 +1,7 @@
 import { LitElement, html, css, CSSResultGroup } from 'lit';
 import { property, customElement, state } from 'lit/decorators.js';
 import { HomeAssistant } from 'custom-card-helpers';
+import { mdiClose } from '@mdi/js';
 
 @customElement('error-dialog')
 export class ErrorDialog extends LitElement {
@@ -23,8 +24,7 @@ export class ErrorDialog extends LitElement {
       <ha-dialog open .heading=${true} @closed=${this.closeDialog} @close-dialog=${this.closeDialog}>
         <div slot="heading">
           <ha-header-bar>
-            <ha-icon-button slot="navigationIcon" dialogAction="cancel" icon="mdi:close">
-              <ha-icon icon="mdi:close"></ha-icon>
+            <ha-icon-button slot="navigationIcon" dialogAction="cancel" .path=${mdiClose}>
             </ha-icon-button>
             <span slot="title">
               ${this.hass.localize('state_badge.default.error')}

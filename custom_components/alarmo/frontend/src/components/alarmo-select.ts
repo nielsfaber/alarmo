@@ -1,6 +1,7 @@
 import { LitElement, html, TemplateResult, css, PropertyValues, CSSResultGroup } from 'lit';
 import { property, customElement, state, query } from 'lit/decorators.js';
 import { fireEvent, HomeAssistant } from 'custom-card-helpers';
+import { mdiClose, mdiMenuUp, mdiMenuDown } from '@mdi/js';
 import { IsEqual, isDefined } from '../helpers';
 
 export type Option = {
@@ -83,19 +84,13 @@ export class AlarmoSelect extends LitElement {
                   : ''}
                 ${this.clearable
                   ? html`
-                      <ha-icon-button slot="suffix" class="clear-button" @click=${this._clearValue} icon="hass:close">
-                        <ha-icon icon="hass:close"></ha-icon>
+                      <ha-icon-button slot="suffix" class="clear-button" @click=${this._clearValue} .path=${mdiClose}>
                       </ha-icon-button>
                     `
                   : ''}
               `
             : ''}
-          <ha-icon-button
-            slot="suffix"
-            class="toggle-button"
-            icon="${this._opened ? 'hass:menu-up' : 'hass:menu-down'}"
-          >
-            <ha-icon icon="${this._opened ? 'hass:menu-up' : 'hass:menu-down'}"></ha-icon>
+          <ha-icon-button slot="suffix" class="toggle-button" .path=${this._opened ? mdiMenuUp : mdiMenuDown}>
           </ha-icon-button>
         </paper-input>
       </vaadin-combo-box-light>
