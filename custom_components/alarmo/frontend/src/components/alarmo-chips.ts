@@ -80,8 +80,8 @@ export class AlarmoChips extends LitElement {
       }
       .chip {
         display: inline-flex;
-        background: rgba(var(--rgb-primary-text-color), 0.08);
-        color: rgba(var(--rgb-primary-text-color), 0.8);
+        background-color: rgba(var(--rgb-primary-text-color), 0.15);
+        color: var(--primary-text-color);
         align-items: center;
         justify-content: center;
         border-radius: 16px;

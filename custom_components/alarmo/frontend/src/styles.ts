@@ -113,6 +113,10 @@ export const commonStyle = css`
     display: flex;
     margin-left: 50%;
   }
+  mwc-tab {
+    --mdc-tab-color-default: var(--secondary-text-color);
+    --mdc-tab-text-label-color-default: var(--secondary-text-color);
+  }
   mwc-tab ha-icon {
     --mdc-icon-size: 20px;
   }

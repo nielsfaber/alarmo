@@ -1,7 +1,7 @@
 import { LitElement, html, TemplateResult, CSSResultGroup, css } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 import { HomeAssistant, navigate, computeDomain, computeEntity } from 'custom-card-helpers';
-import { mdiClose, mdiChevronRight } from '@mdi/js';
+import { mdiClose } from '@mdi/js';
 import { AlarmoAutomation, EAlarmEvent, EArmModes, AlarmoArea, Dictionary, AutomationAction, AlarmoConfig } from '../../types';
 import { handleError, isDefined, Unique, omit, showErrorDialog } from '../../helpers';
 import { saveAutomation, fetchAreas, fetchConfig, deleteAutomation } from '../../data/websockets';

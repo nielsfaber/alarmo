@@ -194,10 +194,10 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
         .filter(e => e.type == EAutomationTypes.Action)
         .filter(
           e =>
-            !isDefined(this.notificationFilter) ||
+            !isDefined(this.automationFilter) ||
             !this.automationFilterOptions.find(e => e.value == this.automationFilter) ||
-            this.getAreaForAutomation(e) == this.notificationFilter ||
-            (this.notificationFilter === 'no_area' && !isDefined(this.getAreaForAutomation(e)))
+            this.getAreaForAutomation(e) == this.automationFilter ||
+            (this.automationFilter === 'no_area' && !isDefined(this.getAreaForAutomation(e)))
         )
         .map(e =>
           Object({

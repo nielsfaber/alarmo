@@ -82,7 +82,7 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
               placeholder=${stateObj?.attributes.friendly_name || ''}
               value=${this.data.name}
               @change=${(ev: Event) => (this.data = { ...this.data!, name: (ev.target as HTMLInputElement).value })}
-            >
+            > 
             </paper-input>
 
             ${stateObj && this.data.name?.length && prettyPrint(computeName(stateObj)) != this.data.name
