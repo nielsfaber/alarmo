@@ -44,7 +44,7 @@
             },
             "enable_master": {
               "heading": "Activation de commande centralisée",
-              "description": "Créer une entité pour piloter toutes les zone en même temps."
+              "description": "Créer une entité pour piloter toutes les zones en même temps."
             }
           },
           "actions": {
@@ -83,7 +83,7 @@
           "description": "Ce panneau peut être utilisé pour la configuration de l'interface MQTT.",
           "fields": {
             "state_topic": {
-              "heading": "Etat de données",
+              "heading": "Etat des données",
               "description": "Donnée sur laquelle les mises à jour d'état sont publiées"
             },
             "event_topic": {
@@ -91,7 +91,7 @@
               "description": "Donnée sur laquelle les évènements d'état sont publiés"
             },
             "command_topic": {
-              "heading": "Commande de donnée",
+              "heading": "Commande de données",
               "description": "Donnée sur laquelle les commandes d'armement / désarmement sont envoyées."
             },
             "require_code": {
@@ -111,7 +111,7 @@
         "areas": {
           "title": "Zones",
           "description": "Les zones peuvent être utilisées pour diviser votre système d'alarme en plusieurs secteurs.",
-          "no_items": "Il n'y a pas encore de zones définies.",
+          "no_items": "Il n'y a pas encore de zone définie.",
           "table": {
             "remarks": "Remarque",
             "summary": "Cette zone contient des {summary_sensors} et {summary_automations}.",
@@ -229,11 +229,11 @@
             },
             "arm_on_close": {
               "heading": "Activer après fermeture",
-              "description": "Après la désactivation de ce capteur, le délai de sortie restant sera automatiquement ignoré."
+              "description": "Après la désactivation de ce capteur, le délai de sortie sera automatiquement ignoré."
             },
             "use_exit_delay": {
               "heading": "Utiliser le délai de sortie",
-              "description": "Le capteur est autorisé à être actif lorsque le délai de sortie commence."
+              "description": "Le capteur sera actif à la fin du délai de sortie."
             },
             "use_entry_delay": {
               "heading": "Utiliser le délai d'entrée",
@@ -246,11 +246,11 @@
             "auto_bypass": {
               "heading": "Bypass automatique",
               "description": "Exclut ce capteur de l'alarme s'il est ouvert lors de l'armement.",
-              "modes": "Modes dans lesquels le capteur peut être  ignoré"
+              "modes": "Modes dans lesquels le capteur peut être ignoré"
             },
             "trigger_unavailable": {
               "heading": "Déclenchement lorsqu'il n'est pas disponible",
-              "description": "Lorsque l'état du capteur devient `` indisponible '', cela activera le capteur."
+              "description": "Lorsque l'état du capteur devient `` indisponible '', cela activera l'alarme."
             }
           },
           "actions": {
@@ -442,7 +442,7 @@
                 },
                 "pending": {
                   "name": "Délai d'entrée activé",
-                  "description": "Le délai d'entrée est activé, l'alarme va se déclencher."
+                  "description": "Le délai d'entrée est activé, sans action de désarmement,l'alarme va se déclencher."
                 }
               }
             },
@@ -461,23 +461,23 @@
               "placeholders": {
                 "armed": "L'alarme est réglée sur {{arm_mode}}",
                 "disarmed": "L'alarme est maintenant désactivée",
-                "triggered": "L'alarme est déclenchée! Cause: {{open_sensors}}.",
+                "triggered": "L'alarme est déclenchée! En cause: {{open_sensors}}.",
                 "arm_failure": "L'alarme n'a pas pu être armée pour le moment, en cause: {{open_sensors}}.",
                 "arming": "L'alarme sera bientôt armée, veuillez quitter la maison.",
                 "pending": "L'alarme est sur le point de se déclencher, désarmez-la rapidement!"
               }
             },
             "open_sensors_format": {
-              "heading": "Format for open_sensors wildcard",
-              "description": "Choose which sensor information in inserted in the message",
+              "heading": "Format pour les modes d'alarme",
+              "description": "Choisissez les informations du capteur à insérer dans le message",
               "options": {
-                "default": "Names and states",
-                "short": "Names only"
+                "default": "Noms et états",
+                "short": "Noms seulement"
               }
             },
             "arm_mode_format": {
-              "heading": "Translation for arm_mode wildcard",
-              "description": "Choose in which language the arm mode is inserted in the message"
+              "heading": "Traduction pour les modes d'alarme",
+              "description": "Choisissez dans quelle langue le mode d'armement est inséré dans le message"
             },
             "target": {
               "heading": "Cible",
