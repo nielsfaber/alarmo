@@ -304,7 +304,7 @@ class SensorHandler:
             _LOGGER.debug("timer finished")
             sensor_config = self._config[entity]
             alarm_entity = self.hass.data[const.DOMAIN]["areas"][sensor_config["area"]]
-            await alarm_entity.async_arm(alarm_entity.arm_mode)
+            await alarm_entity.async_arm(alarm_entity.arm_mode, skip_delay=True)
         now = dt_util.utcnow()
 
         if entity in self._arm_timers:
