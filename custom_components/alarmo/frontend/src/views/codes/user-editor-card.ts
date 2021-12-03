@@ -8,8 +8,6 @@ import { fetchUsers, saveUser, deleteUser, fetchAreas } from '../../data/websock
 import { localize } from '../../../localize/localize';
 import { omit, showErrorDialog, handleError, sortAlphabetically } from '../../helpers';
 
-import '../../components/alarmo-chips.ts';
-
 @customElement('user-editor-card')
 export class UserEditorCard extends LitElement {
 

@@ -232,9 +232,9 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
                   >
                   <alarmo-chips
                     .items=${this.notificationFilterOptions}
-                    value=${this.notificationFilter}
+                    .value=${this.notificationFilter}
                     selectable
-                    @value-changed=${(ev: Event) => (this.notificationFilter = (ev.target as HTMLInputElement).value)}
+                    @value-changed=${(ev: Event) => {this.notificationFilter = (ev.target as HTMLInputElement).value}}
                   >
                   </alarmo-chips>
                 </div>
@@ -270,9 +270,9 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
                   >
                   <alarmo-chips
                     .items=${this.automationFilterOptions}
-                    value=${this.automationFilter}
+                    .value=${this.automationFilter}
                     selectable
-                    @value-changed=${(ev: Event) => (this.automationFilter = (ev.target as HTMLInputElement).value)}
+                    @value-changed=${(ev: Event) => {this.automationFilter = (ev.target as HTMLInputElement).value}}
                   >
                   </alarmo-chips>
                 </div>
