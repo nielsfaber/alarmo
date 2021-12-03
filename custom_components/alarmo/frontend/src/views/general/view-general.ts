@@ -70,39 +70,21 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
           </div>
 
           <settings-row .narrow=${this.narrow}>
-            <span slot="heading"
-              >${localize('panels.general.cards.general.fields.disarm_after_trigger.heading', this.hass.language)}</span
-            >
-            <span slot="description"
-              >${localize(
-        'panels.general.cards.general.fields.disarm_after_trigger.description',
-        this.hass.language
-      )}</span
-            >
+            <span slot="heading">${localize('panels.general.cards.general.fields.disarm_after_trigger.heading', this.hass.language)}</span>
+            <span slot="description">${localize('panels.general.cards.general.fields.disarm_after_trigger.description', this.hass.language)}</span>
             <ha-switch
               ?checked=${this.data!.disarm_after_trigger}
-              @change=${(ev: Event) =>
-          (this.data = { ...this.data, disarm_after_trigger: (ev.target as HTMLInputElement).checked })}
-              }}
+              @change=${(ev: Event) => { this.saveData({ disarm_after_trigger: (ev.target as HTMLInputElement).checked }) }}
             >
             </ha-switch>
           </settings-row>
 
           <settings-row .narrow=${this.narrow}>
-            <span slot="heading"
-              >${localize('panels.general.cards.general.fields.enable_mqtt.heading', this.hass.language)}</span
-            >
-            <span slot="description"
-              >${localize('panels.general.cards.general.fields.enable_mqtt.description', this.hass.language)}</span
-            >
+            <span slot="heading">${localize('panels.general.cards.general.fields.enable_mqtt.heading', this.hass.language)}</span>
+            <span slot="description">${localize('panels.general.cards.general.fields.enable_mqtt.description', this.hass.language)}</span>
             <ha-switch
               ?checked=${this.data?.mqtt?.enabled}
-              @change=${(ev: Event) => {
-          this.data = {
-            ...this.data!,
-            mqtt: { ...this.data!.mqtt!, enabled: (ev.target as HTMLInputElement).checked },
-          };
-        }}
+              @change=${(ev: Event) => { this.saveData({ mqtt: { ...this.data!.mqtt!, enabled: (ev.target as HTMLInputElement).checked } }) }}
             >
             </ha-switch>
           </settings-row>
@@ -119,15 +101,8 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
           ${Object.keys(this.areas).length >= 2
           ? html`
                 <settings-row .narrow=${this.narrow}>
-                  <span slot="heading"
-                    >${localize('panels.general.cards.general.fields.enable_master.heading', this.hass.language)}</span
-                  >
-                  <span slot="description"
-                    >${localize(
-            'panels.general.cards.general.fields.enable_master.description',
-            this.hass.language
-          )}</span
-                  >
+                  <span slot="heading">${localize('panels.general.cards.general.fields.enable_master.heading', this.hass.language)}</span>
+                  <span slot="description">${localize('panels.general.cards.general.fields.enable_master.description', this.hass.language)}</span>
                   <ha-switch
                     ?checked=${this.data?.master?.enabled && Object.keys(this.areas).length >= 2}
                     ?disabled=${Object.keys(this.areas).length < 2}
@@ -146,12 +121,6 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
                 </div>
               `
           : ''}
-
-          <div class="card-actions">
-            <mwc-button @click=${this.saveClick}>
-              ${this.hass.localize('ui.common.save')}
-            </mwc-button>
-          </div>
         </ha-card>
 
         <alarm-mode-card .hass=${this.hass} .narrow=${this.narrow}> </alarm-mode-card>
@@ -200,19 +169,19 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
       }
     }
 
-    this.data = {
-      ...this.data!,
-      master: {
-        ...this.data!.master!,
-        enabled: enabled,
-      },
-    };
+    this.saveData({ master: { ...this.data!.master!, enabled: enabled } })
   }
 
-  saveClick(ev: Event) {
+  private saveData(changes: Partial<AlarmoConfig>) {
     if (!this.hass || !this.data) return;
+
+    this.data = {
+      ...this.data,
+      ...changes
+    }
+
     saveConfig(this.hass, this.data)
-      .catch(e => handleError(e, ev))
+      .catch(e => handleError(e, this.shadowRoot!.querySelector("ha-card") as HTMLElement))
       .then();
   }
 

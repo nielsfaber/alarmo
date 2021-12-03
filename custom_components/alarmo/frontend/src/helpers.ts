@@ -100,8 +100,8 @@ export function IsEqual(obj1: Record<string, any> | any[], obj2: Record<string, 
   return true;
 }
 
-export function showErrorDialog(ev: Event, error: string | TemplateResult) {
-  const elem = ev.target as HTMLElement;
+export function showErrorDialog(ev: Event | HTMLElement, error: string | TemplateResult) {
+  const elem = ev.hasOwnProperty('target') ? (ev as Event).target as HTMLElement : ev as HTMLElement;
   fireEvent(elem, 'show-dialog', {
     dialogTag: 'error-dialog',
     dialogImport: () => import('./dialogs/error-dialog'),
@@ -109,7 +109,7 @@ export function showErrorDialog(ev: Event, error: string | TemplateResult) {
   });
 }
 
-export function handleError(err: any, ev: Event) {
+export function handleError(err: any, ev: Event | HTMLElement) {
   const errorMessage = html`
     <b>Something went wrong!</b><br />
     ${err.body.message
