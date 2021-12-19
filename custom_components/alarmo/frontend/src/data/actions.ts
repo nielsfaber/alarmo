@@ -145,10 +145,10 @@ export const computeServiceDisplay = (hass: HomeAssistant, ...services: (string 
           const stateObj = hass.states[`device_tracker.${domainService.replace('mobile_app_', '')}`];
           data = stateObj
             ? {
-              ...data,
-              name: stateObj.attributes.friendly_name || computeEntity(stateObj.entity_id),
-              icon: stateObj.attributes.icon || 'hass:cellphone-text',
-            }
+                ...data,
+                name: stateObj.attributes.friendly_name || computeEntity(stateObj.entity_id),
+                icon: stateObj.attributes.icon || 'hass:cellphone-text',
+              }
             : { ...data, icon: 'hass:comment-alert' };
           break;
         case 'tts':
@@ -225,10 +225,12 @@ export const computeMergedActions = (...actionLists: string[][]) => {
 
 export const computeActions = (
   entity_id: string | undefined | (string | undefined)[],
-  hass: HomeAssistant
+  hass: HomeAssistant,
+  recursionDepth: number = 1
 ): string[] => {
+  if (recursionDepth > 10) return [];
   if (Array.isArray(entity_id)) {
-    const actionLists = entity_id.map(e => computeActions(e, hass));
+    const actionLists = entity_id.map(e => computeActions(e, hass, recursionDepth + 1));
     return computeMergedActions(...actionLists);
   } else if (!isDefined(entity_id)) return [];
 
@@ -246,7 +248,7 @@ export const computeActions = (
     case 'group':
       const groupObj = entity_id in hass.states ? hass.states[entity_id] : undefined;
       const entities: string[] = groupObj?.attributes.entity_id || [];
-      return computeActions(entities, hass);
+      return computeActions(entities, hass, recursionDepth + 1);
     default:
       return [];
   }
@@ -286,8 +288,10 @@ export const getWildcardOptions = (event?: EAlarmEvent, alarmoConfig?: AlarmoCon
       },
     ];
 
-  if (!event ||
-    (alarmoConfig?.code_arm_required && [EAlarmEvent.Armed, EAlarmEvent.Arming, EAlarmEvent.ArmFailure].includes(event)) ||
+  if (
+    !event ||
+    (alarmoConfig?.code_arm_required &&
+      [EAlarmEvent.Armed, EAlarmEvent.Arming, EAlarmEvent.ArmFailure].includes(event)) ||
     (alarmoConfig?.code_disarm_required && [EAlarmEvent.Disarmed].includes(event))
   )
     options = [
@@ -320,46 +324,55 @@ export const getWildcardOptions = (event?: EAlarmEvent, alarmoConfig?: AlarmoCon
 };
 
 export const getOpenSensorsWildCardOptions = (hass: HomeAssistant) => {
-  let options: { value: string, name: string }[] = [];
+  let options: { value: string; name: string }[] = [];
 
   if (hass.language != 'en')
     options = [
       ...options,
       {
         value: '{{open_sensors}}',
-        name: `${localize('panels.actions.cards.new_notification.fields.open_sensors_format.options.default', hass.language)} (${hass.translationMetadata.translations['en'].nativeName})`
+        name: `${localize(
+          'panels.actions.cards.new_notification.fields.open_sensors_format.options.default',
+          hass.language
+        )} (${hass.translationMetadata.translations['en'].nativeName})`,
       },
       {
         value: `{{open_sensors|lang=${hass.language}}}`,
-        name: `${localize('panels.actions.cards.new_notification.fields.open_sensors_format.options.default', hass.language)} (${hass.translationMetadata.translations[hass.language].nativeName})`
-      }
+        name: `${localize(
+          'panels.actions.cards.new_notification.fields.open_sensors_format.options.default',
+          hass.language
+        )} (${hass.translationMetadata.translations[hass.language].nativeName})`,
+      },
     ];
   else
     options = [
       ...options,
       {
         value: '{{open_sensors}}',
-        name: localize('panels.actions.cards.new_notification.fields.open_sensors_format.options.default', hass.language)
-      }
+        name: localize(
+          'panels.actions.cards.new_notification.fields.open_sensors_format.options.default',
+          hass.language
+        ),
+      },
     ];
 
   options = [
     ...options,
     {
       value: '{{open_sensors|format=short}}',
-      name: localize('panels.actions.cards.new_notification.fields.open_sensors_format.options.short', hass.language)
-    }
+      name: localize('panels.actions.cards.new_notification.fields.open_sensors_format.options.short', hass.language),
+    },
   ];
 
   return options;
-}
+};
 
 export const getArmModeWildCardOptions = (hass: HomeAssistant) => {
-  let options: { value: string, name: string }[] = [
+  let options: { value: string; name: string }[] = [
     {
       value: '{{arm_mode}}',
-      name: hass.translationMetadata.translations['en'].nativeName
-    }
+      name: hass.translationMetadata.translations['en'].nativeName,
+    },
   ];
 
   if (hass.language != 'en')
@@ -367,11 +380,11 @@ export const getArmModeWildCardOptions = (hass: HomeAssistant) => {
       ...options,
       {
         value: `{{arm_mode|lang=${hass.language}}}`,
-        name: hass.translationMetadata.translations[hass.language].nativeName
-      }
+        name: hass.translationMetadata.translations[hass.language].nativeName,
+      },
     ];
   return options;
-}
+};
 
 export const isValidString = (input: any) => {
   return typeof input == 'string' && input.trim().length;
