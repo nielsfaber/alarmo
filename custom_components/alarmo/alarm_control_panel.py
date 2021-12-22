@@ -24,7 +24,8 @@ import homeassistant.util.dt as dt_util
 from homeassistant.components.alarm_control_panel import (
     AlarmControlPanelEntity,
     ATTR_CODE_ARM_REQUIRED,
-    DOMAIN as PLATFORM
+    DOMAIN as PLATFORM,
+    SUPPORT_ALARM_TRIGGER,
 )
 
 from homeassistant.const import (
@@ -214,7 +215,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
         if type(value) is dict:
             self._open_sensors = value
         else:
-            self._open_sensors = None
+            self._open_sensors = {}
 
     @property
     def bypassed_sensors(self):
@@ -436,6 +437,11 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
         _LOGGER.debug("alarm_arm_custom_bypass")
         await self.async_handle_arm_request(STATE_ALARM_ARMED_CUSTOM_BYPASS, code=code, skip_code=skip_code)
 
+    async def async_alarm_trigger(self, code=None) -> None:
+        """Send alarm trigger command."""
+        _LOGGER.debug("async_alarm_trigger")
+        await self.async_trigger(skip_delay=False)
+
     async def async_added_to_hass(self):
         """Connect to dispatcher listening for entity data notifications."""
         _LOGGER.debug("{} is added to hass".format(self.entity_id))
@@ -451,7 +457,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             if "changed_by" in state.attributes:
                 self._changed_by = state.attributes["changed_by"]
             if "open_sensors" in state.attributes:
-                self._open_sensors = state.attributes["open_sensors"]
+                self.open_sensors = state.attributes["open_sensors"]
             if "bypassed_sensors" in state.attributes:
                 self._bypassed_sensors = state.attributes["bypassed_sensors"]
 
@@ -476,7 +482,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
         if not self._config or const.ATTR_MODES not in self._config:
             return 0
         else:
-            supported_features = 0
+            supported_features = SUPPORT_ALARM_TRIGGER
             for (mode, mode_config) in self._config[const.ATTR_MODES].items():
                 if mode_config[const.ATTR_ENABLED]:
                     supported_features = supported_features | const.MODES_TO_SUPPORTED_FEATURES[mode]
@@ -693,13 +699,15 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
             self.open_sensors = open_sensors
 
         if self._state and self._state != STATE_ALARM_PENDING:
+            _LOGGER.debug(self.entity_id)
+            _LOGGER.debug(self._open_sensors)
             async_dispatcher_send(
                 self.hass,
                 "alarmo_event",
                 const.EVENT_TRIGGER,
                 self.area_id,
                 {
-                    "open_sensors": open_sensors if open_sensors else self.open_sensors,
+                    "open_sensors": open_sensors if open_sensors else self._open_sensors,
                     "delay": entry_delay,
                 }
             )
@@ -984,3 +992,9 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
             }
         )
         self.async_write_ha_state()
+
+    async def async_trigger(self, skip_delay: bool = False):
+        """handle triggering via service call"""
+        for item in self.hass.data[const.DOMAIN]["areas"].values():
+            if item.state != self._revert_state:
+                await item.async_trigger(skip_delay=skip_delay)
