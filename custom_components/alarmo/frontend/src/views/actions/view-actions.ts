@@ -9,18 +9,19 @@ import { UnsubscribeFunc } from 'home-assistant-js-websocket';
 
 import { commonStyle } from '../../styles';
 import { fetchAutomations, saveAutomation, fetchAreas, fetchConfig } from '../../data/websockets';
-import { TableColumn } from '../../components/alarmo-table';
+import { TableColumn, TableFilterConfig } from '../../components/alarmo-table';
 import { handleError, Unique, isDefined, flatten, sortAlphabetically } from '../../helpers';
 import { localize } from '../../../localize/localize';
-import { AlarmoChip } from '../../components/alarmo-chips';
 
 import './notification-editor-card.ts';
 import './automation-editor-card.ts';
-
 import '../../components/settings-row.ts';
-import '../../components/alarmo-chips.ts';
+
 import { EAutomationTypes } from '../../const';
 import { getAreaOptions, computeAreaDisplay } from '../../data/actions';
+import { exportPath, Path } from '../../common/navigation';
+
+const noArea = 'no_area';
 
 @customElement('alarm-view-actions')
 export class AlarmViewActions extends SubscribeMixin(LitElement) {
@@ -31,7 +32,7 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
   narrow!: boolean;
 
   @property()
-  path!: string[] | null;
+  path!: Path;
 
   @property()
   alarmEntity?: AlarmEntity;
@@ -46,16 +47,7 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
   config!: AlarmoConfig;
 
   @property()
-  notificationFilter?: string;
-
-  @property()
-  automationFilter?: string;
-
-  @property()
-  notificationFilterOptions: AlarmoChip[] = [];
-
-  @property()
-  automationFilterOptions: AlarmoChip[] = [];
+  selectedArea?: string;
 
   public hassSubscribe(): Promise<UnsubscribeFunc>[] {
     this._fetchData();
@@ -70,151 +62,109 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
     this.automations = Object.values(automations);
     this.areas = await fetchAreas(this.hass);
     this.config = await fetchConfig(this.hass);
-
-    this.notificationFilterOptions = [
-      ...getAreaOptions(this.areas, this.config)
-        .map(a => Object({
-          ...computeAreaDisplay(a, this.areas, this.config),
-          count: Object.values(automations).filter(e => e.type == EAutomationTypes.Notification).map(this.getAreaForAutomation).filter(e => e == a).length
-        }))
-    ]
-      .sort(sortAlphabetically);
-
-    this.automationFilterOptions = [
-      ...getAreaOptions(this.areas, this.config)
-        .map(a => Object({
-          ...computeAreaDisplay(a, this.areas, this.config),
-          count: Object.values(automations).filter(e => e.type == EAutomationTypes.Action).map(this.getAreaForAutomation).filter(e => e == a).length
-        }))
-    ]
-      .sort(sortAlphabetically);
-
-    if (Object.values(automations).filter(e => e.type == EAutomationTypes.Notification).map(this.getAreaForAutomation).filter(e => !isDefined(e)).length)
-      this.notificationFilterOptions = [{
-        value: 'no_area',
-        name: localize('panels.actions.cards.notifications.filter.no_area', this.hass.language),
-        count: Object.values(automations).filter(e => e.type == EAutomationTypes.Notification).map(this.getAreaForAutomation).filter(e => !isDefined(e)).length
-      }, ...this.notificationFilterOptions];
-
-    if (Object.values(automations).filter(e => e.type == EAutomationTypes.Action).map(this.getAreaForAutomation).filter(e => !isDefined(e)).length)
-      this.automationFilterOptions = [{
-        value: 'no_area',
-        name: localize('panels.actions.cards.notifications.filter.no_area', this.hass.language),
-        count: Object.values(automations).filter(e => e.type == EAutomationTypes.Action).map(this.getAreaForAutomation).filter(e => !isDefined(e)).length
-      }, ...this.automationFilterOptions];
   }
 
   firstUpdated() {
-    if (this.path && this.path.length == 2 && this.path[0] == 'filter') {
-      this.notificationFilter = this.path[1];
-      this.automationFilter = this.path[1];
+    if (this.path.filter) {
+      this.selectedArea = this.path.filter?.area;
     }
     (async () => await loadHaForm())();
   }
 
   render() {
-    if (!this.hass || !this.automations) return html``;
+    if (!this.hass || !this.automations || !this.config) return html``;
 
-    if (
-      this.path?.length &&
-      ['new_notification', 'edit_notification'].includes(this.path[0])
-    ) {
-      const config = this.automations.find(e => this.path!.length > 1 && e.automation_id == this.path![1] && e.type == EAutomationTypes.Notification);
+    if (this.path.subpage == 'new_notification') {
       return html`
-        <notification-editor-card
-          .hass=${this.hass}
-          .narrow=${this.narrow}
-          .item=${config}
-        ></notification-editor-card>
+        <notification-editor-card .hass=${this.hass} .narrow=${this.narrow}></notification-editor-card>
       `;
-    } else if (this.path && this.path.length && this.path[0] == 'new_action') {
+    } else if (this.path.params.edit_notification) {
+      const config = this.automations.find(
+        e => e.automation_id == this.path.params.edit_notification && e.type == EAutomationTypes.Notification
+      );
       return html`
-        <automation-editor-card
-          .hass=${this.hass}
-          .narrow=${this.narrow}>
-        ?</automation-editor-card>
+        <notification-editor-card .hass=${this.hass} .narrow=${this.narrow} .item=${config}></notification-editor-card>
       `;
-    } else if (this.path && this.path.length == 2 && this.path[0] == 'edit_action') {
-      const config = this.automations.find(e => this.path!.length > 1 && e.automation_id == this.path![1] && e.type == EAutomationTypes.Action);
+    } else if (this.path.subpage == 'new_action') {
       return html`
-        <automation-editor-card
-          .hass=${this.hass}
-          .narrow=${this.narrow}
-          .item=${config}
-        >
-        </automation-editor-card>
+        <automation-editor-card .hass=${this.hass} .narrow=${this.narrow}></automation-editor-card>
+      `;
+    } else if (this.path.params.edit_action) {
+      const config = this.automations.find(
+        e => e.automation_id == this.path.params.edit_action && e.type == EAutomationTypes.Action
+      );
+      return html`
+        <automation-editor-card .hass=${this.hass} .narrow=${this.narrow} .item=${config}></automation-editor-card>
       `;
     } else {
+      const warningTooltip = () => html`
+        <paper-tooltip animation-delay="0">
+          ${localize('panels.actions.cards.notifications.table.no_area_warning', this.hass!.language)}
+        </paper-tooltip>
+      `;
+
       const columns: Dictionary<TableColumn> = {
         type: {
           width: '40px',
+          renderer: (item: AlarmoAutomation & { area: string }) =>
+            item.area == noArea && !this.config.master.enabled
+              ? html`
+                  ${warningTooltip()}
+                  <ha-icon icon="mdi:alert" style="color: var(--error-color)"></ha-icon>
+                `
+              : item.type == EAutomationTypes.Notification
+              ? html`
+                  <ha-icon icon="hass:message-text-outline"></ha-icon>
+                `
+              : html`
+                  <ha-icon icon="hass:flash"></ha-icon>
+                `,
         },
         name: {
           title: this.hass.localize('ui.components.area-picker.add_dialog.name'),
+          renderer: (item: AlarmoAutomation & { area: string }) => html`
+            ${item.area == noArea && !this.config.master.enabled ? warningTooltip() : ''}
+            <span>${item.name}</span>
+          `,
           width: '40%',
           grow: true,
           text: true,
         },
         enabled: {
-          title: localize('panels.actions.cards.notifications.table.enabled', this.hass.language),
+          title: localize('common.enabled', this.hass.language),
           width: '68px',
           align: 'center',
+          renderer: (item: AlarmoAutomation) => html`
+            <ha-switch
+              ?checked=${item.enabled}
+              @click=${(ev: Event) => {
+                ev.stopPropagation();
+                this.toggleEnable(ev, item.automation_id!);
+              }}
+            ></ha-switch>
+          `,
         },
       };
 
       const notificationData = this.automations
         .filter(e => e.type == EAutomationTypes.Notification)
-        .filter(
-          e =>
-            !isDefined(this.notificationFilter) ||
-            !this.notificationFilterOptions.find(e => e.value == this.notificationFilter) ||
-            this.getAreaForAutomation(e) == this.notificationFilter ||
-            (this.notificationFilter === 'no_area' && !isDefined(this.getAreaForAutomation(e)))
-        )
         .map(e =>
           Object({
+            ...e,
             id: e.automation_id,
-            type: html`
-              <ha-icon icon="hass:message-text-outline"></ha-icon>
-            `,
-            name: e.name,
-            enabled: html`
-              <ha-switch
-                ?checked=${e.enabled}
-                @click=${(ev: Event) => {
-                ev.stopPropagation();
-                this.toggleEnable(ev, e.automation_id!);
-              }}
-              ></ha-switch>
-            `,
+            warning: !this.config.master.enabled && !this.getAreaForAutomation(e),
+            area: this.getAreaForAutomation(e) || noArea,
           })
         );
 
       const automationData = this.automations
         .filter(e => e.type == EAutomationTypes.Action)
-        .filter(
-          e =>
-            !isDefined(this.automationFilter) ||
-            !this.automationFilterOptions.find(e => e.value == this.automationFilter) ||
-            this.getAreaForAutomation(e) == this.automationFilter ||
-            (this.automationFilter === 'no_area' && !isDefined(this.getAreaForAutomation(e)))
-        )
         .map(e =>
           Object({
+            ...e,
             id: e.automation_id,
-            type: html`
-              <ha-icon icon="hass:flash"></ha-icon>
-            `,
-            name: e.name,
-            enabled: html`
-              <ha-switch
-                ?checked=${e.enabled}
-                @click=${(ev: Event) => {
-                ev.stopPropagation();
-                this.toggleEnable(ev, e.automation_id!);
-              }}
-              ></ha-switch>
-            `,
+            warning: !this.config.master.enabled && !this.getAreaForAutomation(e),
+            area: this.getAreaForAutomation(e) || noArea,
           })
         );
 
@@ -224,30 +174,14 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
             ${localize('panels.actions.cards.notifications.description', this.hass.language)}
           </div>
 
-          ${this.notificationFilterOptions.length > 1
-          ? html`
-                <div class="table-filter" ?narrow=${this.narrow}>
-                  <span class="header"
-                    >${localize('panels.actions.cards.notifications.filter.label', this.hass.language)}:</span
-                  >
-                  <alarmo-chips
-                    .items=${this.notificationFilterOptions}
-                    .value=${this.notificationFilter}
-                    selectable
-                    @value-changed=${(ev: Event) => {this.notificationFilter = (ev.target as HTMLInputElement).value}}
-                  >
-                  </alarmo-chips>
-                </div>
-              `
-          : ''}
           <alarmo-table
+            .hass=${this.hass}
             ?selectable=${true}
             .columns=${columns}
             .data=${notificationData}
-            @row-click=${(ev: CustomEvent) => {
-          const id = String(ev.detail.id);
-          navigate(this, `/alarmo/actions/edit_notification/${id}`, true);
-        }}
+            .filters=${this.getTableFilterOptions()}
+            @row-click=${(ev: CustomEvent) =>
+              navigate(this, exportPath('actions', { params: { edit_notification: ev.detail.id } }), true)}
           >
             ${localize('panels.actions.cards.notifications.table.no_items', this.hass.language)}
           </alarmo-table>
@@ -262,30 +196,14 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
         <ha-card header="${localize('panels.actions.title', this.hass.language)}">
           <div class="card-content">${localize('panels.actions.cards.actions.description', this.hass.language)}</div>
 
-          ${this.automationFilterOptions.length > 1
-          ? html`
-                <div class="table-filter" ?narrow=${this.narrow}>
-                  <span class="header"
-                    >${localize('panels.actions.cards.notifications.filter.label', this.hass.language)}:</span
-                  >
-                  <alarmo-chips
-                    .items=${this.automationFilterOptions}
-                    .value=${this.automationFilter}
-                    selectable
-                    @value-changed=${(ev: Event) => {this.automationFilter = (ev.target as HTMLInputElement).value}}
-                  >
-                  </alarmo-chips>
-                </div>
-              `
-          : ''}
           <alarmo-table
+            .hass=${this.hass}
             ?selectable=${true}
             .columns=${columns}
             .data=${automationData}
-            @row-click=${(ev: CustomEvent) => {
-          const id = String(ev.detail.id);
-          navigate(this, `/alarmo/actions/edit_action/${id}`, true);
-        }}
+            .filters=${this.getTableFilterOptions()}
+            @row-click=${(ev: CustomEvent) =>
+              navigate(this, exportPath('actions', { params: { edit_action: ev.detail.id } }), true)}
           >
             ${localize('panels.actions.cards.actions.table.no_items', this.hass.language)}
           </alarmo-table>
@@ -301,11 +219,10 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
   }
 
   private getAreaForAutomation = (automation: AlarmoAutomation) => {
+    if (!this.config) return;
     const areaOptions = getAreaOptions(this.areas, this.config);
     let area = automation.triggers[0].area;
-    return isDefined(area) && areaOptions.includes(area)
-      ? area
-      : undefined;
+    return isDefined(area) && areaOptions.includes(area) ? area : undefined;
   };
 
   private toggleEnable(ev: Event, item_id: string) {
@@ -314,12 +231,51 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
       .then();
   }
 
+  private getTableFilterOptions() {
+    if (!this.hass) return;
+    let areaFilterOptions = Object.values(this.areas)
+      .map(e =>
+        Object({
+          value: e.area_id,
+          name: e.name,
+          badge: (list: any[]) => list.filter(item => item.area == e.area_id).length,
+        })
+      )
+      .sort(sortAlphabetically);
+
+    if (Object.values(this.automations || []).filter(e => !this.getAreaForAutomation(e)).length)
+      areaFilterOptions = [
+        {
+          value: noArea,
+          name: this.config.master.enabled
+            ? this.config.master.name
+            : this.hass.localize('state_attributes.climate.preset_mode.none'),
+          badge: (list: any[]) => list.filter(item => item.area == noArea).length,
+        },
+        ...areaFilterOptions,
+      ];
+
+    const filterConfig: TableFilterConfig = {
+      area: {
+        name: localize(
+          'components.table.filter.item',
+          this.hass.language,
+          'name',
+          localize('panels.actions.cards.new_action.fields.area.heading', this.hass.language)
+        ),
+        items: areaFilterOptions,
+        value: this.selectedArea ? [this.selectedArea] : [],
+      },
+    };
+    return filterConfig;
+  }
+
   addNotificationClick() {
-    navigate(this, '/alarmo/actions/new_notification', true);
+    navigate(this, exportPath('actions', 'new_notification'), true);
   }
 
   addActionClick() {
-    navigate(this, '/alarmo/actions/new_action', true);
+    navigate(this, exportPath('actions', 'new_action'), true);
   }
 
   static styles = commonStyle;

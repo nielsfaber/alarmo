@@ -13,6 +13,7 @@ import { VERSION } from './const';
 import { fetchUsers } from './data/websockets';
 import { AlarmoUser, Dictionary } from './types';
 import { localize } from '../localize/localize';
+import { exportPath, getPath, Path } from './common/navigation';
 
 @customElement('alarm-panel')
 export class MyAlarmPanel extends LitElement {
@@ -37,11 +38,13 @@ export class MyAlarmPanel extends LitElement {
         loading...
       `;
 
+    const path = getPath();
+
     return html`
       <ha-app-layout>
         <app-header fixed slot="header">
           <app-toolbar>
-            <ha-menu-button .hass=${this.hass} .narrow=${this.narrow}> </ha-menu-button>
+            <ha-menu-button .hass=${this.hass} .narrow=${this.narrow}></ha-menu-button>
             <div main-title>
               ${localize('title', this.hass.language)}
             </div>
@@ -52,7 +55,7 @@ export class MyAlarmPanel extends LitElement {
           <ha-tabs
             scrollable
             attr-for-selected="page-name"
-            .selected=${this.getPath()[2] || "general"}
+            .selected=${path.page}
             @iron-activate=${this.handlePageSelected}
           >
             <paper-tab page-name="general">
@@ -71,60 +74,46 @@ export class MyAlarmPanel extends LitElement {
         </app-header>
       </ha-app-layout>
       <div class="view">
-        ${this.getView()}
+        ${this.getView(path)}
       </div>
-      `;
+    `;
   }
 
-  getPath() {
-    return window.location.pathname.split('/');
-  }
+  getView(path: Path) {
+    const page = path.page;
 
-  getView() {
-    const path = this.getPath();
-    const view = path[2] || 'general';
-    const args = path.slice(3);
-
-    switch (view) {
+    switch (page) {
       case 'general':
         return html`
-          <alarm-view-general
-            .hass=${this.hass}
-            .narrow=${this.narrow}
-            .path=${args.length ? args : null}
-          ></alarm-view-general>
+          <alarm-view-general .hass=${this.hass} .narrow=${this.narrow} .path=${path}></alarm-view-general>
         `;
       case 'sensors':
         return html`
-          <alarm-view-sensors .hass=${this.hass} .narrow=${this.narrow} .path=${args.length ? args : null}>
-          </alarm-view-sensors>
+          <alarm-view-sensors .hass=${this.hass} .narrow=${this.narrow} .path=${path}></alarm-view-sensors>
         `;
       case 'codes':
         return html`
-          <alarm-view-codes .hass=${this.hass} .narrow=${this.narrow} .path=${args.length ? args : null}>
-          </alarm-view-codes>
+          <alarm-view-codes .hass=${this.hass} .narrow=${this.narrow} .path=${path}></alarm-view-codes>
         `;
       case 'actions':
         return html`
-          <alarm-view-actions .hass=${this.hass} .narrow=${this.narrow} .path=${args.length ? args : null}>
-          </alarm-view-actions>
+          <alarm-view-actions .hass=${this.hass} .narrow=${this.narrow} .path=${path}></alarm-view-actions>
         `;
       default:
         return html`
-            <ha-card header="Page not found">
-              <div class="card-content">
-                The page you are trying to reach cannot be found. 
-                Please select a page from the menu above to continue.
-              </div>
-            </ha-card>
+          <ha-card header="Page not found">
+            <div class="card-content">
+              The page you are trying to reach cannot be found. Please select a page from the menu above to continue.
+            </div>
+          </ha-card>
         `;
     }
   }
 
   handlePageSelected(ev) {
     const newPage = ev.detail.item.getAttribute('page-name');
-    if (newPage !== this.getPath()) {
-      navigate(this, `/alarmo/${newPage}`);
+    if (newPage !== getPath()) {
+      navigate(this, exportPath(newPage));
       this.requestUpdate();
     } else {
       scrollTo(0, 0);
@@ -133,9 +122,7 @@ export class MyAlarmPanel extends LitElement {
 
   static get styles(): CSSResultGroup {
     return css`
-      ${commonStyle}
-
-      :host {
+      ${commonStyle} :host {
         color: var(--primary-text-color);
         --paper-card-header-color: var(--primary-text-color);
       }
@@ -162,10 +149,7 @@ export class MyAlarmPanel extends LitElement {
       ha-tabs {
         margin-left: max(env(safe-area-inset-left), 24px);
         margin-right: max(env(safe-area-inset-right), 24px);
-        --paper-tabs-selection-bar-color: var(
-          --app-header-selection-bar-color,
-          var(--app-header-text-color, #fff)
-        );
+        --paper-tabs-selection-bar-color: var(--app-header-selection-bar-color, var(--app-header-text-color, #fff));
         text-transform: uppercase;
       }
 

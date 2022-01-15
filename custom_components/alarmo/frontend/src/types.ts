@@ -25,6 +25,7 @@ export enum EArmModes {
   ArmedAway = 'armed_away',
   ArmedHome = 'armed_home',
   ArmedNight = 'armed_night',
+  ArmedVacation = 'armed_vacation',
   ArmedCustom = 'armed_custom_bypass',
 }
 
@@ -71,22 +72,22 @@ export type AlarmoUser = {
   can_arm: boolean;
   can_disarm: boolean;
   is_override_code: boolean;
-  area_limit: string[],
-  code_format?: string,
-  code_length?: number
+  area_limit: string[];
+  code_format?: string;
+  code_length?: number;
 };
 
 export type AutomationTrigger = {
-  event?: EAlarmEvent,
-  area?: string | number,
-  modes?: EArmModes[]
-}
+  event?: EAlarmEvent;
+  area?: string | number;
+  modes?: EArmModes[];
+};
 
 export type AutomationAction = {
   service?: string;
   entity_id?: string;
-  service_data?: Dictionary<any> & { message?: any, title?: any };
-}
+  service_data?: Dictionary<any> & { message?: any; title?: any };
+};
 
 export interface AlarmoAutomation {
   automation_id?: string;
@@ -104,7 +105,7 @@ export enum EAlarmEvent {
   ArmFailure = 'arm_failure',
   Arming = 'arming',
   Pending = 'pending',
-};
+}
 
 export type MqttConfig = {
   enabled: boolean;
@@ -132,5 +133,5 @@ export type SensorGroup = {
   group_id?: string;
   name: string;
   entities: string[];
-  timeout: number
+  timeout: number;
 };

@@ -1,17 +1,14 @@
 {
   "common": {
-    "modes_long": {
-      "armed_away": "Ingeschakeld Afwezig",
-      "armed_home": "Ingeschakeld Thuis",
-      "armed_night": "Ingeschakeld Nacht",
-      "armed_custom_bypass": "Ingeschakeld Aangepast"
-    },
     "modes_short": {
       "armed_away": "Afwezig",
       "armed_home": "Thuis",
       "armed_night": "Nacht",
-      "armed_custom_bypass": "Aangepast"
-    }
+      "armed_custom_bypass": "Aangepast",
+      "armed_vacation": "Vakantie"
+    },
+    "enabled": "Actief",
+    "disabled": "Inactief"
   },
   "components": {
     "time_slider": {
@@ -24,6 +21,13 @@
       "ui_mode": "Naar UI",
       "yaml_mode": "Naar YAML",
       "edit_in_yaml": "In YAML bewerken"
+    },
+    "table": {
+      "filter": {
+        "label": "Items filteren",
+        "item": "Filter op {name}",
+        "hidden_items": "{number} {number, plural,\n  one {item is}\n  other {items zijn}\n} verborgen"
+      }
     }
   },
   "title": "Alarmpaneel",
@@ -55,14 +59,18 @@
         "modes": {
           "title": "Modi",
           "description": "Dit paneel kan worden gebruikt om de inschakelmodi van het alarm in te stellen.",
+          "modes": {
+            "armed_away": "De afwezigheidsmodus wordt gebruikt als alle mensen het huis hebben verlaten. Alle deuren en ramen die toegang geven tot het huis worden bewaakt, evenals bewegingssensoren in het huis.",
+            "armed_home": "De thuismodus wordt gebruikt bij het instellen van het alarm terwijl er mensen in huis zijn. Alle deuren en ramen die toegang geven tot het huis worden bewaakt, maar bewegingssensoren in het huis worden niet gebruikt.",
+            "armed_night": "De nachtmodus wordt gebruikt bij het instellen van het alarm voordat u gaat slapen. Alle deuren en ramen die toegang geven tot het huis worden bewaakt, en geselecteerde bewegingssensoren (beneden) in het huis.",
+            "armed_vacation": "De vakantiemodus dient voor afwezigheid voor langere duur. Er kunnen desgewenst andere vertragingstijden en acties worden ingesteld die beter passen bij de situatie.",
+            "armed_custom_bypass": "Een extra modus om uw eigen beveiligingsperimeter te definiëren."
+          },
+          "number_sensors_active": "{number} {number, plural,\n  one {sensor}\n  other {sensoren}\n} ingesteld",
           "fields": {
-            "mode": {
-              "armed_away": "Ingeschakeld weg wordt gebruikt als alle mensen het huis hebben verlaten. Alle deuren en ramen die toegang geven tot het huis worden bewaakt, evenals bewegingssensoren in het huis.",
-              "armed_home": "Ingeschakeld thuis (ook wel ingeschakeld thuisblijven genoemd) wordt gebruikt bij het instellen van het alarm terwijl er mensen in huis zijn. Alle deuren en ramen die toegang geven tot het huis worden bewaakt, maar bewegingssensoren in het huis worden niet gebruikt.",
-              "armed_night": "Ingeschakeld nacht wordt gebruikt bij het instellen van het alarm voordat u gaat slapen. Alle deuren en ramen die toegang geven tot het huis worden bewaakt, en geselecteerde bewegingssensoren (beneden) in het huis.",
-              "armed_custom_bypass": "Een extra modus om uw eigen beveiligingsperimeter te definiëren.",
-              "enabled": "Enabled",
-              "disabled": "Disabled"
+            "status": {
+              "heading": "Status",
+              "description": "Stel in of het alarm op deze modus kan worden ingesteld."
             },
             "exit_delay": {
               "heading": "Vertrek vertraging",
@@ -73,7 +81,7 @@
               "description": "Vertragingstijd totdat het alarm afgaat nadat een van de sensoren is geactiveerd."
             },
             "trigger_time": {
-              "heading": "Activeer tijd",
+              "heading": "Activatie tijd",
               "description": "Tijd waarin het alarm in de geactiveerde toestand blijft na activatie."
             }
           }
@@ -100,11 +108,11 @@
             },
             "state_payload": {
               "heading": "Configureer de payload per toestand",
-              "item": "Definieer een payload voor toestand '{state}'"
+              "item": "Definieer een payload voor toestand ''{state}''"
             },
             "command_payload": {
               "heading": "Configureer een payload per commando",
-              "item": "Definieer een payload voor commando '{command}'"
+              "item": "Definieer een payload voor commando ''{command}''"
             }
           }
         },
@@ -115,8 +123,8 @@
           "table": {
             "remarks": "Opmerkingen",
             "summary": "Dit gebied bevat {summary_sensors} en {summary_automations}.",
-            "summary_sensors": "{number} sensoren",
-            "summary_automations": "{number} automatiseringen"
+            "summary_sensors": "{number} {number, plural,\n  one {sensor}\n  other {sensoren}\n}",
+            "summary_automations": "{number} {number, plural,\n  one {automatisering}\n  other {automatiseringen}\n}"
           },
           "actions": {
             "add": "Toevoegen"
@@ -131,7 +139,7 @@
           }
         },
         "edit_area": {
-          "title": "Bewerken van gebied '{area}'",
+          "title": "Bewerken van gebied ''{area}''",
           "name_warning": "Opmerking: als u de naam wijzigt, wordt de entiteits-ID gewijzigd"
         },
         "remove_area": {
@@ -152,31 +160,28 @@
       "cards": {
         "sensors": {
           "description": "Momenteel geconfigureerde sensoren. Klik op een entiteit om wijzigingen aan te brengen.",
-          "no_items": "Er zijn nog geen sensoren aan het alarm toegevoegd. Zorg ervoor dat u ze eerst toevoegt.",
           "table": {
+            "no_items": "Er zijn nog geen sensoren aan het alarm toegevoegd. Zorg ervoor dat u ze eerst toevoegt.",
+            "no_area_warning": "Sensor is niet aan een gebied toegewezen.",
             "arm_modes": "Inschakelmodi",
             "always_on": "(Altijd)"
-          },
-          "filter": {
-            "label": "Filter op gebied",
-            "no_area": "(Geen gebied)"
           }
         },
         "add_sensors": {
           "title": "Voeg sensoren toe",
-          "description": "Voeg meer sensoren toe. Zorg ervoor dat uw sensoren een friendly_name hebben, zodat u ze kunt identificeren.",
+          "description": "Voeg meer sensoren toe. Zorg ervoor dat uw sensoren een duidelijke naam hebben, zodat u ze kunt identificeren.",
           "no_items": "Er zijn geen beschikbare HA-entiteiten die voor het alarm kunnen worden geconfigureerd. Zorg ervoor dat u entiteiten van het type binary_sensor opneemt.",
           "table": {
             "type": "Gedetecteerd type"
           },
           "actions": {
             "add_to_alarm": "Voeg aan alarm toe",
-            "show_all": "Toon alle"
+            "filter_supported": "Verberg items met onbekend type"
           }
         },
         "editor": {
           "title": "Wijzig Sensor",
-          "description": "Configureren van de sensorinstellingen van '{entity}'.",
+          "description": "Configureren van de sensorinstellingen van ''{entity}''.",
           "fields": {
             "name": {
               "heading": "Naam",
@@ -297,7 +302,7 @@
           }
         },
         "edit_group": {
-          "title": "Bewerk sensorgroep '{name}'"
+          "title": "Bewerk sensorgroep ''{name}''"
         }
       }
     },
@@ -372,7 +377,7 @@
         },
         "edit_user": {
           "title": "Wijzig Gebruiker",
-          "description": "Wijzig de configuratie voor gebruiker '{name}'.",
+          "description": "Wijzig de configuratie voor gebruiker ''{name}''.",
           "fields": {
             "old_code": {
               "heading": "Huidige code",
@@ -389,15 +394,11 @@
           "title": "Meldingen",
           "description": "Met dit paneel kunt u meldingen beheren die moeten worden verzonden tijdens een bepaalde alarmgebeurtenis",
           "table": {
-            "enabled": "Actief",
-            "no_items": "Er zijn nog geen notificaties aangemaakt."
+            "no_items": "Er zijn nog geen notificaties aangemaakt.",
+            "no_area_warning": "Actie is niet toegewezen aan een gebied."
           },
           "actions": {
             "new_notification": "nieuwe melding"
-          },
-          "filter": {
-            "label": "Filter op gebied",
-            "no_area": "(Geen gebied)"
           }
         },
         "actions": {

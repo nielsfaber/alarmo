@@ -1,23 +1,25 @@
-import { HomeAssistant, navigate } from "custom-card-helpers";
-import { UnsubscribeFunc } from "home-assistant-js-websocket";
-import { css, CSSResultGroup, html, LitElement } from "lit";
-import { customElement, property } from "lit/decorators";
-import { localize } from "../../../localize/localize";
-import { AlarmoChip } from "../../components/alarmo-chips";
-import { TableColumn, TableData } from "../../components/alarmo-table";
-import { ESensorIcons, ESensorTypes } from "../../const";
-import { fetchAreas, fetchSensors, saveSensor } from "../../data/websockets";
-import { computeIcon, computeName, handleError, isDefined, prettyPrint, sortAlphabetically } from "../../helpers";
-import { commonStyle } from "../../styles";
-import { SubscribeMixin } from "../../subscribe-mixin";
-import { AlarmoArea, AlarmoSensor, Dictionary, EArmModes } from "../../types";
+import { HomeAssistant, navigate } from 'custom-card-helpers';
+import { UnsubscribeFunc } from 'home-assistant-js-websocket';
+import { css, CSSResultGroup, html, LitElement, TemplateResult } from 'lit';
+import { customElement, property } from 'lit/decorators';
+
+import { localize } from '../../../localize/localize';
+import { TableColumn, TableData, TableFilterConfig } from '../../components/alarmo-table';
+import { ESensorIcons, ESensorTypes } from '../../const';
+import { fetchAreas, fetchSensors, saveSensor } from '../../data/websockets';
+import { computeIcon, computeName, handleError, isDefined, prettyPrint, sortAlphabetically } from '../../helpers';
+import { commonStyle } from '../../styles';
+import { SubscribeMixin } from '../../subscribe-mixin';
+import { AlarmoArea, AlarmoSensor, Dictionary, EArmModes } from '../../types';
+import { getModesList, modesByArea } from '../../common/modes';
 
 import '../../components/alarmo-table.ts';
-import '../../components/alarmo-chips.ts';
+import { exportPath } from '../../common/navigation';
+
+const noArea = 'no_area';
 
 @customElement('sensors-overview-card')
 export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
-
   @property()
   hass!: HomeAssistant;
 
@@ -25,16 +27,16 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
   narrow!: boolean;
 
   @property()
-  areas: Dictionary<AlarmoArea> = {};
+  areas!: Dictionary<AlarmoArea>;
 
   @property()
-  sensors: Dictionary<AlarmoSensor> = {};
+  sensors!: Dictionary<AlarmoSensor>;
 
   @property()
   selectedArea?: string;
 
   @property()
-  areaFilterOptions: AlarmoChip[] = [];
+  selectedMode?: EArmModes;
 
   @property()
   path!: string[] | null;
@@ -50,25 +52,6 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
     }
     this.areas = await fetchAreas(this.hass);
     this.sensors = await fetchSensors(this.hass);
-
-
-    this.areaFilterOptions = Object.values(this.areas)
-      .map(e =>
-        Object({
-          value: e.area_id,
-          name: e.name,
-          count: Object.values(this.sensors).filter(el => el.area == e.area_id).length
-        })
-      )
-      .sort(sortAlphabetically)
-
-    if (Object.values(this.sensors).filter(e => !e.area).length)
-      this.areaFilterOptions = [{
-        value: 'no_area',
-        name: localize('panels.sensors.cards.sensors.filter.no_area', this.hass.language),
-        count: Object.values(this.sensors).filter(e => !e.area).length
-      }, ...this.areaFilterOptions];
-
   }
 
   async firstUpdated() {
@@ -76,7 +59,7 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
   }
 
   render() {
-    if (!this.hass) return html``;
+    if (!this.hass || !this.areas || !this.sensors) return html``;
 
     const namedSensors = Object.keys(this.sensors).filter(e => {
       const stateObj = this.hass.states[e];
@@ -92,137 +75,146 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
         </div>
 
         ${namedSensors.length
-        ? html`
-        <ha-alert
-          .alertType=${"warning"}
-        >
-          You have sensors assigned with a custom name, a feature which will be removed in an upcoming update. The following sensors are affected:
-          <ul>
-            ${namedSensors.map(e => html`
-                <li>
-                  '${this.sensors[e].name}' will be renamed to '${prettyPrint(computeName(this.hass.states[e]))}'
-                  (<a href="#" @click=${() => { this.removeCustomName(e) }}>approve change</a>)
-                </li>`
-        )}
-          </ul>
-          If you want to maintain the current sensor names, please assign appropriate names in HA instead (see <a href="${String(window.location).replace("alarmo/sensors", "config/entities")}">here</a>).
-        </ha-alert>
-        `: ''}
-
-        ${this.areaFilterOptions.length > 1
-        ? html`
-            <div class="table-filter" ?narrow=${this.narrow}>
-            <span class="header">${localize('panels.sensors.cards.sensors.filter.label', this.hass.language)}:</span>
-            <alarmo-chips
-              .items=${this.areaFilterOptions}
-              value=${this.selectedArea}
-              selectable
-              @value-changed=${(ev: Event) => (this.selectedArea = (ev.target as HTMLInputElement).value)}
-            >
-            </alarmo-chips>
-            </div>
-        ` : ''}
-
+          ? html`
+              <ha-alert .alertType=${'warning'}>
+                You have sensors assigned with a custom name, a feature which will be removed in an upcoming update. The
+                following sensors are affected:
+                <ul>
+                  ${namedSensors.map(
+                    e => html`
+                      <li>
+                        '${this.sensors[e].name}' will be renamed to '${prettyPrint(computeName(this.hass.states[e]))}'
+                        (
+                        <a
+                          href="#"
+                          @click=${() => {
+                            this.removeCustomName(e);
+                          }}
+                        >
+                          approve change
+                        </a>
+                        )
+                      </li>
+                    `
+                  )}
+                </ul>
+                If you want to maintain the current sensor names, please assign appropriate names in HA instead (see
+                <a href="${String(window.location).replace('alarmo/sensors', 'config/entities')}">here</a>
+                ).
+              </ha-alert>
+            `
+          : ''}
         <alarmo-table
+          .hass=${this.hass}
           ?selectable=${true}
           .columns=${this.tableColumns()}
-          .data=${this.renderTableData()}
-          @row-click=${(ev: CustomEvent) => { navigate(this, `/alarmo/sensors/edit/${String(ev.detail.id)}`, true) }}
+          .data=${this.getTableData()}
+          .filters=${this.getTableFilterOptions()}
+          @row-click=${(ev: CustomEvent) => {
+            navigate(this, exportPath('sensors', { params: { edit: ev.detail.id } }), true);
+          }}
         >
-          ${localize('panels.sensors.cards.sensors.no_items', this.hass.language)}
+          ${localize('panels.sensors.cards.sensors.table.no_items', this.hass.language)}
         </alarmo-table>
       </ha-card>
     `;
   }
 
   private tableColumns(): Dictionary<TableColumn> {
+    const warningTooltip = () => html`
+      <paper-tooltip animation-delay="0">
+        ${localize('panels.sensors.cards.sensors.table.no_area_warning', this.hass.language)}
+      </paper-tooltip>
+    `;
+
     return {
       icon: {
         width: '40px',
+        renderer: (data: AlarmoSensor) => {
+          const stateObj = this.hass.states[data.entity_id];
+          const type = Object.keys(ESensorTypes).find(e => ESensorTypes[e] == data.type) as ESensorTypes;
+          const icon = stateObj ? ESensorIcons[type] : 'hass:help-circle-outline';
+          return data.area == noArea
+            ? html`
+                ${warningTooltip()}
+                <ha-icon icon="mdi:alert" style="color: var(--error-color)"></ha-icon>
+              `
+            : html`
+                <paper-tooltip animation-delay="0">
+                  ${stateObj
+                    ? localize(
+                        `panels.sensors.cards.editor.fields.device_type.choose.${data.type}.name`,
+                        this.hass!.language
+                      )
+                    : this.hass.localize('state_badge.default.entity_not_found')}
+                </paper-tooltip>
+                <ha-icon icon="${icon}" class="${!data.enabled ? 'disabled' : ''}"></ha-icon>
+              `;
+        },
       },
       name: {
         title: this.hass.localize('ui.components.entity.entity-picker.entity'),
         width: '60%',
         grow: true,
         text: true,
+        renderer: (data: AlarmoSensor) => html`
+          ${data.area == noArea ? warningTooltip() : ''}
+          <span class="${!data.enabled ? 'disabled' : ''}">${data.name}</span>
+          <span class="secondary ${!data.enabled ? 'disabled' : ''}">${data.entity_id}</span>
+        `,
       },
       modes: {
         title: localize('panels.sensors.cards.sensors.table.arm_modes', this.hass.language),
         width: '25%',
         hide: this.narrow,
         text: true,
+        renderer: (data: AlarmoSensor) => html`
+          ${data.area == noArea ? warningTooltip() : ''}
+          <span class="${!data.enabled ? 'disabled' : ''}">
+            ${data.always_on
+              ? localize('panels.sensors.cards.sensors.table.always_on', this.hass!.language)
+              : data.modes.length
+              ? data.modes.map(e => localize(`common.modes_short.${e}`, this.hass!.language)).join(', ')
+              : this.hass.localize('state_attributes.climate.preset_mode.none')}
+          </span>
+        `,
       },
       enabled: {
-        title: localize('panels.actions.cards.notifications.table.enabled', this.hass.language),
+        title: localize('common.enabled', this.hass.language),
         width: '68px',
         align: 'center',
+        renderer: (data: AlarmoSensor) => html`
+          <ha-switch
+            @click=${(ev: Event) => {
+              ev.stopPropagation();
+            }}
+            ?checked=${data.enabled}
+            @change=${(ev: Event) => this.toggleEnabled(ev, data.entity_id)}
+          ></ha-switch>
+        `,
       },
     };
   }
 
-  private renderTableData(): TableData[] {
-
-    let sensorsList = Object.keys(this.sensors).map(e => {
-      const stateObj = this.hass!.states[e];
-      return {
-        id: e,
-        name: computeName(stateObj),
-        icon: computeIcon(stateObj),
+  private getTableData(): Record<string, any>[] {
+    let sensorsList = Object.keys(this.sensors).map(id => {
+      const stateObj = this.hass!.states[id];
+      const config = this.sensors[id];
+      let res: TableData & { name: string } = {
+        ...config,
+        id: id,
+        name: stateObj ? config.name || computeName(stateObj) : computeName(stateObj),
+        modes: config.modes.filter(e =>
+          config.area ? modesByArea(this.areas[config.area]).includes(e) : getModesList(this.areas).includes(e)
+        ),
+        warning: !config.area,
+        area: config.area || noArea,
       };
+      //if (!config.area) res = { ...res, warning: localize('panels.sensors.cards.sensors.no_area', this.hass.language) };
+      return res;
     });
     sensorsList.sort(sortAlphabetically);
-
-    sensorsList = sensorsList
-      .filter(
-        e =>
-          !this.selectedArea ||
-          !this.areaFilterOptions.find(e => e.value == this.selectedArea) ||
-          this.sensors[e.id].area == this.selectedArea ||
-          (this.selectedArea === 'no_area' && !this.sensors[e.id].area)
-      );
-
-    return sensorsList.map(e => this.renderTableDataRow(e));
-  }
-
-  private renderTableDataRow(item: { id: string, name: string, icon: string }): TableData {
-    const type = Object.entries(ESensorTypes).find(([, v]) => v == this.sensors[item.id].type)![0];
-    const stateObj = this.hass.states[item.id];
-    const output: TableData = {
-      icon: html`
-        <paper-tooltip animation-delay="0">
-          ${stateObj
-          ? localize(`panels.sensors.cards.editor.fields.device_type.choose.${ESensorTypes[type]}.name`, this.hass!.language)
-          : this.hass.localize("state_badge.default.entity_not_found")
-        }
-        </paper-tooltip>
-        <ha-icon icon="${stateObj ? ESensorIcons[type] : "hass:help-circle-outline"}"> </ha-icon>
-      `,
-      name: html`
-        ${stateObj
-          ? this.sensors[item.id].name || prettyPrint(item.name)
-          : prettyPrint(item.name)
-        }
-        <span class="secondary">${item.id}</span>
-      `,
-      id: item.id,
-      modes: html`
-        ${this.sensors[item.id].always_on
-          ? localize('panels.sensors.cards.sensors.table.always_on', this.hass!.language)
-          : Object.values(EArmModes)
-            .filter(e => this.sensors[item.id].modes.includes(e))
-            .map(e => localize(`common.modes_short.${e}`, this.hass!.language))
-            .join(', ')}
-      `,
-      enabled: html`
-        <ha-switch
-          @click=${(ev: Event) => { ev.stopPropagation() }}
-          ?checked=${this.sensors[item.id].enabled}
-          @change=${(ev: Event) => this.toggleEnabled(ev, item.id)}
-        >
-        </ha-switch>
-      `,
-    };
-    return output;
+    return sensorsList;
   }
 
   toggleEnabled(ev: Event, id: string) {
@@ -235,9 +227,63 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
   removeCustomName(id: string) {
     let data = {
       entity_id: id,
-      name: ''
+      name: '',
     };
     saveSensor(this.hass, data);
+  }
+
+  private getTableFilterOptions() {
+    let areaFilterOptions = Object.values(this.areas)
+      .map(e =>
+        Object({
+          value: e.area_id,
+          name: e.name,
+          badge: (list: AlarmoSensor[]) => list.filter(item => item.area == e.area_id).length,
+        })
+      )
+      .sort(sortAlphabetically);
+
+    if (Object.values(this.sensors).filter(e => !e.area).length)
+      areaFilterOptions = [
+        {
+          value: noArea,
+          name: this.hass.localize('state_attributes.climate.preset_mode.none'),
+          badge: (list: AlarmoSensor[]) => list.filter(item => item.area == noArea).length,
+        },
+        ...areaFilterOptions,
+      ];
+
+    const modeFilterOptions = getModesList(this.areas).map(e =>
+      Object({
+        value: e,
+        name: localize(`common.modes_short.${e}`, this.hass!.language),
+        badge: (list: AlarmoSensor[]) => list.filter(item => item.modes.includes(e)).length,
+      })
+    );
+
+    const filterConfig: TableFilterConfig = {
+      area: {
+        name: localize(
+          'components.table.filter.item',
+          this.hass.language,
+          'name',
+          localize('panels.actions.cards.new_action.fields.area.heading', this.hass.language)
+        ),
+        items: areaFilterOptions,
+        value: this.selectedArea ? [this.selectedArea] : [],
+      },
+      modes: {
+        name: localize(
+          'components.table.filter.item',
+          this.hass.language,
+          'name',
+          localize('panels.actions.cards.new_action.fields.mode.heading', this.hass.language)
+        ),
+        items: modeFilterOptions,
+        value: this.selectedMode ? [this.selectedMode] : [],
+      },
+    };
+    return filterConfig;
   }
 
   static styles = commonStyle;

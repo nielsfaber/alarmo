@@ -36,7 +36,7 @@ export function isEqual(...arr: any[]) {
 export function Unique<TValue>(arr: TValue[]) {
   let res: TValue[] = [];
   arr.forEach(item => {
-    if (!res.find(e => typeof item === "object" ? isEqual(e, item) : e === item)) res.push(item);
+    if (!res.find(e => (typeof item === 'object' ? isEqual(e, item) : e === item))) res.push(item);
   });
   return res;
 }
@@ -53,28 +53,25 @@ export function pick(obj: Dictionary<any> | null | undefined, keys: string[]): D
 }
 
 export function flatten<U>(arr: U[][]): U[] {
-  if ((arr as unknown as U[]).every((val) => !Array.isArray(val))) {
-    return (arr as unknown as U[]).slice();
+  if (((arr as unknown) as U[]).every(val => !Array.isArray(val))) {
+    return ((arr as unknown) as U[]).slice();
   }
-  return arr
-    .reduce((acc, val) => acc
-      .concat(Array.isArray(val) ? flatten((val as unknown as U[][])) : val), []);
+  return arr.reduce((acc, val) => acc.concat(Array.isArray(val) ? flatten((val as unknown) as U[][]) : val), []);
 }
 
 interface Omit {
-  <T extends object, K extends [...(keyof T)[]]>
-    (obj: T, ...keys: K): {
-      [K2 in Exclude<keyof T, K[number]>]: T[K2]
-    }
+  <T extends object, K extends [...(keyof T)[]]>(obj: T, ...keys: K): {
+    [K2 in Exclude<keyof T, K[number]>]: T[K2];
+  };
 }
 
 export const omit: Omit = (obj, ...keys) => {
   const ret = {} as {
-    [K in keyof typeof obj]: (typeof obj)[K]
+    [K in keyof typeof obj]: typeof obj[K];
   };
   let key: keyof typeof obj;
   for (key in obj) {
-    if (!(keys.includes(key))) {
+    if (!keys.includes(key)) {
       ret[key] = obj[key];
     }
   }
@@ -94,14 +91,13 @@ export function IsEqual(obj1: Record<string, any> | any[], obj2: Record<string, 
   for (const key of keys1) {
     if (typeof obj1[key] === 'object' && typeof obj2[key] === 'object') {
       if (!IsEqual(obj1[key], obj2[key])) return false;
-    }
-    else if (obj1[key] !== obj2[key]) return false;
+    } else if (obj1[key] !== obj2[key]) return false;
   }
   return true;
 }
 
 export function showErrorDialog(ev: Event | HTMLElement, error: string | TemplateResult) {
-  const elem = ev.hasOwnProperty('target') ? (ev as Event).target as HTMLElement : ev as HTMLElement;
+  const elem = ev.hasOwnProperty('tagName') ? (ev as HTMLElement) : ((ev as Event).target as HTMLElement);
   fireEvent(elem, 'show-dialog', {
     dialogTag: 'error-dialog',
     dialogImport: () => import('./dialogs/error-dialog'),
@@ -111,14 +107,21 @@ export function showErrorDialog(ev: Event | HTMLElement, error: string | Templat
 
 export function handleError(err: any, ev: Event | HTMLElement) {
   const errorMessage = html`
-    <b>Something went wrong!</b><br />
+    <b>Something went wrong!</b>
+    <br />
     ${err.body.message
       ? html`
-          ${err.body.message}<br /><br />
+          ${err.body.message}
+          <br />
+          <br />
         `
       : ''}
-    ${err.error}<br /><br />
-    Please <a href="https://github.com/nielsfaber/alarmo/issues">report</a> the bug.
+    ${err.error}
+    <br />
+    <br />
+    Please
+    <a href="https://github.com/nielsfaber/alarmo/issues">report</a>
+    the bug.
   `;
   showErrorDialog(ev, errorMessage);
 }
@@ -135,6 +138,8 @@ export const commandToState = (command: string) => {
       return AlarmStates.STATE_ALARM_ARMED_NIGHT;
     case AlarmCommands.COMMAND_ALARM_ARM_CUSTOM_BYPASS:
       return AlarmStates.STATE_ALARM_ARMED_CUSTOM_BYPASS;
+    case AlarmCommands.COMMAND_ALARM_ARM_VACATION:
+      return AlarmStates.STATE_ALARM_ARMED_VACATION;
     default:
       return undefined;
   }
@@ -144,13 +149,15 @@ export const filterState = (state: string, config: Record<EArmModes, AlarmoModeC
   if (!state) return false;
   switch (state) {
     case AlarmStates.STATE_ALARM_ARMED_AWAY:
-      return config[EArmModes.ArmedAway].enabled;
+      return config[EArmModes.ArmedAway]?.enabled;
     case AlarmStates.STATE_ALARM_ARMED_HOME:
-      return config[EArmModes.ArmedHome].enabled;
+      return config[EArmModes.ArmedHome]?.enabled;
     case AlarmStates.STATE_ALARM_ARMED_NIGHT:
-      return config[EArmModes.ArmedNight].enabled;
+      return config[EArmModes.ArmedNight]?.enabled;
     case AlarmStates.STATE_ALARM_ARMED_CUSTOM_BYPASS:
-      return config[EArmModes.ArmedCustom].enabled;
+      return config[EArmModes.ArmedCustom]?.enabled;
+    case AlarmStates.STATE_ALARM_ARMED_VACATION:
+      return config[EArmModes.ArmedVacation]?.enabled;
     default:
       return true;
   }

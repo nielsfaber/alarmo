@@ -1,17 +1,14 @@
 {
   "common": {
-    "modes_long": {
-      "armed_away": "Modalità 'fuori casa' attiva",
-      "armed_home": "Modalità 'in casa' attiva",
-      "armed_night": "Modalità 'notte' attiva",
-      "armed_custom_bypass": "Modalità 'personalizzato' attiva"
-    },
     "modes_short": {
       "armed_away": "Fuori casa",
       "armed_home": "In casa",
       "armed_night": "Notte",
-      "armed_custom_bypass": "Personalizzato"
-    }
+      "armed_custom_bypass": "Personalizzato",
+      "armed_vacation": "Vacation"
+    },
+    "enabled": "Enabled",
+    "disabled": "Disabled"
   },
   "components": {
     "time_slider": {
@@ -24,6 +21,13 @@
       "ui_mode": "Passa a UI",
       "yaml_mode": "Passa a YAML",
       "edit_in_yaml": "Edit in YAML"
+    },
+    "table": {
+      "filter": {
+        "label": "Filter items",
+        "item": "Filter by {name}",
+        "hidden_items": "{number} {number, plural,\n  one {item is}\n  other {items are}\n} hidden"
+      }
     }
   },
   "title": "Alarm panel",
@@ -55,14 +59,18 @@
         "modes": {
           "title": "Modes",
           "description": "This panel can be used to set up the arm modes of the alarm.",
+          "modes": {
+            "armed_away": "Modalità 'fuori casa': da utilizzare quando tutte le persone lasciano la casa. Tutti i sensori di porte e finestre che consentono l'accesso alla casa saranno attivi, così come i sensori di movimento all'interno della casa.",
+            "armed_home": "Modalità 'in casa': da utilizzare quando si attiva l'allarme mentre le persone sono in casa. Tutti i sensori di porte e finestre che consentono l'accesso alla casa saranno attivi, ma non i sensori di movimento all'interno della casa.",
+            "armed_night": "Modalità 'notte': da utilizzare quando si imposta la sveglia prima di andare a dormire. Tutti i sensori di porte e finestre che consentono l'accesso alla casa saranno attivi e sensori di movimento selezionati (ad esempio al piano di sotto) nella casa.",
+            "armed_vacation": "Armed vacation can be used as an extension to the armed away mode in case of absence for longer duration. The delay times and trigger responses can be adapted (as desired) to being distant from home.",
+            "armed_custom_bypass": "Modalità 'personalizzato': da utilizzare per definire una modalità di allarme specifica per le esigenze dell'utilizzatore."
+          },
+          "number_sensors_active": "{number} {number, plural,\n  one {sensor}\n  other {sensors}\n} active",
           "fields": {
-            "mode": {
-              "armed_away": "Modalità 'fuori casa': da utilizzare quando tutte le persone lasciano la casa. Tutti i sensori di porte e finestre che consentono l'accesso alla casa saranno attivi, così come i sensori di movimento all'interno della casa.",
-              "armed_home": "Modalità 'in casa': da utilizzare quando si attiva l'allarme mentre le persone sono in casa. Tutti i sensori di porte e finestre che consentono l'accesso alla casa saranno attivi, ma non i sensori di movimento all'interno della casa.",
-              "armed_night": "Modalità 'notte': da utilizzare quando si imposta la sveglia prima di andare a dormire. Tutti i sensori di porte e finestre che consentono l'accesso alla casa saranno attivi e sensori di movimento selezionati (ad esempio al piano di sotto) nella casa.",
-              "armed_custom_bypass": "Modalità 'personalizzato': da utilizzare per definire una modalità di allarme specifica per le esigenze dell'utilizzatore.",
-              "enabled": "Enabled",
-              "disabled": "Disabled"
+            "status": {
+              "heading": "Status",
+              "description": "Controls whether the alarm can be armed in this mode."
             },
             "exit_delay": {
               "heading": "Tempo di preattivazione",
@@ -100,11 +108,11 @@
             },
             "state_payload": {
               "heading": "Configura payload per stato",
-              "item": "Definisci un payload per lo stato '{state}'"
+              "item": "Definisci un payload per lo stato ''{state}''"
             },
             "command_payload": {
               "heading": "Configura payload per comando",
-              "item": "Definisci un payload per il comando '{command}'"
+              "item": "Definisci un payload per il comando ''{command}''"
             }
           }
         },
@@ -115,8 +123,8 @@
           "table": {
             "remarks": "Remarks",
             "summary": "This area contains {summary_sensors} and {summary_automations}.",
-            "summary_sensors": "{number} sensors",
-            "summary_automations": "{number} automations"
+            "summary_sensors": "{number} {number, plural,\n  one {sensor}\n  other {sensors}\n}",
+            "summary_automations": "{number} {number, plural,\n  one {automation}\n  other {automations}\n}"
           },
           "actions": {
             "add": "Add"
@@ -131,7 +139,7 @@
           }
         },
         "edit_area": {
-          "title": "Editing area '{area}'",
+          "title": "Editing area ''{area}''",
           "name_warning": "Note: changing the name will change the entity ID"
         },
         "remove_area": {
@@ -152,14 +160,11 @@
       "cards": {
         "sensors": {
           "description": "Sensori attualmente configurati. Clicca sull'entità per modificare.",
-          "no_items": "Non ci sono ancora sensori aggiunti a questo allarme. Assicurati di aggiungerli prima.",
           "table": {
+            "no_items": "Non ci sono ancora sensori aggiunti a questo allarme. Assicurati di aggiungerli prima.",
+            "no_area_warning": "Sensor is not assigned to any area.",
             "arm_modes": "Modalità di attivazione",
             "always_on": "(Sempre)"
-          },
-          "filter": {
-            "label": "Filter by area",
-            "no_area": "(No area)"
           }
         },
         "add_sensors": {
@@ -171,12 +176,12 @@
           },
           "actions": {
             "add_to_alarm": "aggiungi all'allarme",
-            "show_all": "Mostra tutti"
+            "filter_supported": "Hide items with unknown type"
           }
         },
         "editor": {
           "title": "Modifica Sensore",
-          "description": "Configura le impostazioni del sensore '{entity}'.",
+          "description": "Configura le impostazioni del sensore ''{entity}''.",
           "fields": {
             "name": {
               "heading": "Nome",
@@ -297,7 +302,7 @@
           }
         },
         "edit_group": {
-          "title": "Edit sensor group '{name}'"
+          "title": "Edit sensor group ''{name}''"
         }
       }
     },
@@ -372,7 +377,7 @@
         },
         "edit_user": {
           "title": "Modifica Utente",
-          "description": "Cambia impostazioni per l'utente '{name}'.",
+          "description": "Cambia impostazioni per l'utente ''{name}''.",
           "fields": {
             "old_code": {
               "heading": "Modifica Codice",
@@ -389,15 +394,11 @@
           "title": "Notifiche",
           "description": "Con questo pannello puoi gestire le notifiche da inviare quanto accade un determinato evento",
           "table": {
-            "enabled": "Abilitato",
-            "no_items": "Non è stata creata nessuna notifica per ora."
+            "no_items": "Non è stata creata nessuna notifica per ora.",
+            "no_area_warning": "Action is not assigned to any area."
           },
           "actions": {
             "new_notification": "nuova notifica"
-          },
-          "filter": {
-            "label": "Filter by area",
-            "no_area": "(No area)"
           }
         },
         "actions": {

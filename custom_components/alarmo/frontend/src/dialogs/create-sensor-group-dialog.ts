@@ -11,7 +11,7 @@ import { SubscribeMixin } from '../subscribe-mixin';
 import { computeName, handleError, isDefined, prettyPrint, showErrorDialog, sortAlphabetically } from '../helpers';
 import { ESensorIcons, ESensorTypes } from '../const';
 
-import '../components/alarmo-chips.ts';
+import '../components/alarmo-chip-set';
 
 @customElement('create-sensor-group-dialog')
 export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
@@ -66,28 +66,39 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
       <ha-dialog open @closed=${this.closeDialog} @close-dialog=${this.closeDialog} .heading=${this.renderHeader()}>
         <div class="wrapper">
           <settings-row dialog>
-            <span slot="heading">${localize('panels.sensors.dialogs.create_group.fields.name.heading', this.hass.language)}</span>
-            <span slot="description">${localize('panels.sensors.dialogs.create_group.fields.name.description', this.hass.language)}</span>
+            <span slot="heading">
+              ${localize('panels.sensors.dialogs.create_group.fields.name.heading', this.hass.language)}
+            </span>
+            <span slot="description">
+              ${localize('panels.sensors.dialogs.create_group.fields.name.description', this.hass.language)}
+            </span>
             <paper-input
               label=${this.hass.localize('ui.components.area-picker.add_dialog.name')}
               @value-changed=${(ev: Event) =>
                 (this.data = { ...this.data, name: String((ev.target as HTMLInputElement).value).trim() })}
               value="${this.data.name}"
-            >
-            </paper-input>
+            ></paper-input>
           </settings-row>
 
           <settings-row large dialog>
-            <span slot="heading">${localize('panels.sensors.dialogs.create_group.fields.sensors.heading', this.hass.language)}</span>
-            <span slot="description">${localize('panels.sensors.dialogs.create_group.fields.sensors.description', this.hass.language)}</span>
+            <span slot="heading">
+              ${localize('panels.sensors.dialogs.create_group.fields.sensors.heading', this.hass.language)}
+            </span>
+            <span slot="description">
+              ${localize('panels.sensors.dialogs.create_group.fields.sensors.description', this.hass.language)}
+            </span>
             <div>
               ${this.renderSensorOptions()}
             </div>
           </settings-row>
 
           <settings-row dialog>
-            <span slot="heading">${localize('panels.sensors.dialogs.create_group.fields.timeout.heading', this.hass.language)}</span>
-            <span slot="description">${localize('panels.sensors.dialogs.create_group.fields.timeout.description', this.hass.language)}</span>
+            <span slot="heading">
+              ${localize('panels.sensors.dialogs.create_group.fields.timeout.heading', this.hass.language)}
+            </span>
+            <span slot="description">
+              ${localize('panels.sensors.dialogs.create_group.fields.timeout.description', this.hass.language)}
+            </span>
             <time-slider
               .hass=${this.hass}
               unit="min"
@@ -95,8 +106,7 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
               .value=${this.data.timeout}
               @change=${(ev: Event) =>
                 (this.data = { ...this.data, timeout: Number((ev.target as HTMLInputElement).value) })}
-            >
-            </time-slider>
+            ></time-slider>
           </settings-row>
         </div>
         <mwc-button slot="secondaryAction" @click=${this.saveClick}>
@@ -130,8 +140,7 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
         .path=${mdiClose}
         dialogAction="close"
         class="header_button"
-      >
-      </ha-icon-button>
+      ></ha-icon-button>
     `;
   }
 
@@ -152,14 +161,12 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
     if (!sensors.length) return localize('panels.sensors.cards.sensors.no_items', this.hass.language);
 
     return html`
-      <alarmo-chips
+      <alarmo-chip-set
         .items=${sensors}
         .value=${this.data.entities}
         ?selectable=${true}
-        ?multiple=${true}
-        @value-changed=${(ev: CustomEvent) => (this.data = { ...this.data, entities: ev.detail.value })}
-      >
-      </alarmo-chips>
+        @value-changed=${(ev: CustomEvent) => (this.data = { ...this.data, entities: ev.detail })}
+      ></alarmo-chip-set>
     `;
   }
 

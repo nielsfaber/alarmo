@@ -8,6 +8,7 @@ export enum EArmModeIcons {
   ArmedHome = 'hass:home-outline',
   ArmedNight = 'hass:weather-night',
   ArmedCustom = 'hass:star-outline',
+  ArmedVacation = 'hass:airplane-takeoff',
 }
 
 export enum AlarmStates {
@@ -16,6 +17,7 @@ export enum AlarmStates {
   STATE_ALARM_ARMED_AWAY = 'armed_away',
   STATE_ALARM_ARMED_NIGHT = 'armed_night',
   STATE_ALARM_ARMED_CUSTOM_BYPASS = 'armed_custom_bypass',
+  STATE_ALARM_ARMED_VACATION = 'armed_vacation',
   STATE_ALARM_PENDING = 'pending',
   STATE_ALARM_ARMING = 'arming',
   STATE_ALARM_DISARMING = 'disarming',
@@ -28,6 +30,7 @@ export enum AlarmCommands {
   COMMAND_ALARM_ARM_AWAY = 'arm_away',
   COMMAND_ALARM_ARM_NIGHT = 'arm_night',
   COMMAND_ALARM_ARM_CUSTOM_BYPASS = 'arm_custom_bypass',
+  COMMAND_ALARM_ARM_VACATION = 'arm_vacation',
 }
 
 export enum ESensorTypes {
@@ -49,6 +52,6 @@ export enum ESensorIcons {
 }
 
 export enum EAutomationTypes {
-  Notification = "notification",
-  Action = "action",
+  Notification = 'notification',
+  Action = 'action',
 }

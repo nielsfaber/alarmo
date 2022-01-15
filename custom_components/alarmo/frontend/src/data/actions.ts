@@ -10,26 +10,32 @@ export const computeArmModeDisplay = (val: EArmModes, hass: HomeAssistant) => {
     case EArmModes.ArmedAway:
       return {
         value: EArmModes.ArmedAway,
-        name: localize('common.modes_long.armed_away', hass.language),
+        name: localize('common.modes_short.armed_away', hass.language),
         icon: EArmModeIcons.ArmedAway,
       };
     case EArmModes.ArmedHome:
       return {
         value: EArmModes.ArmedHome,
-        name: localize('common.modes_long.armed_home', hass.language),
+        name: localize('common.modes_short.armed_home', hass.language),
         icon: EArmModeIcons.ArmedHome,
       };
     case EArmModes.ArmedNight:
       return {
         value: EArmModes.ArmedNight,
-        name: localize('common.modes_long.armed_night', hass.language),
+        name: localize('common.modes_short.armed_night', hass.language),
         icon: EArmModeIcons.ArmedNight,
       };
     case EArmModes.ArmedCustom:
       return {
         value: EArmModes.ArmedCustom,
-        name: localize('common.modes_long.armed_custom_bypass', hass.language),
+        name: localize('common.modes_short.armed_custom_bypass', hass.language),
         icon: EArmModeIcons.ArmedCustom,
+      };
+    case EArmModes.ArmedVacation:
+      return {
+        value: EArmModes.ArmedVacation,
+        name: localize('common.modes_short.armed_vacation', hass.language),
+        icon: EArmModeIcons.ArmedVacation,
       };
   }
 };
@@ -168,7 +174,6 @@ export const getAreaOptions = (areaConfig: Dictionary<AlarmoArea>, alarmoConfig:
   let areas: (string | number)[] = [];
 
   const area_ids = Object.keys(areaConfig).filter(e => Object.values(areaConfig[e].modes).some(v => v.enabled));
-
   if (alarmoConfig.master.enabled && area_ids.length > 1) areas = [...areas, 0];
 
   areas = [...areas, ...area_ids];
