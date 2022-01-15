@@ -5,6 +5,7 @@ export const commonStyle = css`
     display: flex;
     flex-direction: column;
     margin: 5px;
+    max-width: calc(100vw - 10px);
   }
 
   .card-header {
@@ -134,26 +135,6 @@ export const commonStyle = css`
   ha-card > ha-card {
     margin: 10px;
   }
-
-  div.table-filter {
-    display: flex;
-    width: 100%;
-    min-height: 52px;
-    border-top: 1px solid var(--divider-color);
-    box-sizing: border-box;
-    padding: 2px 8px;
-    flex-direction: row;
-    align-items: center;
-  }
-  div.table-filter .header {
-    display: flex;
-    white-space: nowrap;
-    padding: 8px 8px;
-  }
-  div.table-filter[narrow] {
-    flex-direction: column;
-    align-items: flex-start;
-  }
 `;
 
 export const dialogStyle = css`
@@ -166,15 +147,9 @@ export const dialogStyle = css`
     paper-dialog,
     ha-paper-dialog {
       margin: 0;
-      width: calc(
-        100% - env(safe-area-inset-right) - env(safe-area-inset-left)
-      ) !important;
-      min-width: calc(
-        100% - env(safe-area-inset-right) - env(safe-area-inset-left)
-      ) !important;
-      max-width: calc(
-        100% - env(safe-area-inset-right) - env(safe-area-inset-left)
-      ) !important;
+      width: calc(100% - env(safe-area-inset-right) - env(safe-area-inset-left)) !important;
+      min-width: calc(100% - env(safe-area-inset-right) - env(safe-area-inset-left)) !important;
+      max-width: calc(100% - env(safe-area-inset-right) - env(safe-area-inset-left)) !important;
       max-height: calc(100% - var(--header-height));
       position: fixed !important;
       bottom: 0px;

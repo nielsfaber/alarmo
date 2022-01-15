@@ -265,3 +265,5 @@ class MqttHandler:
             await entity.async_alarm_arm_home(code, skip_code)
         elif command == command_payloads[const.COMMAND_ARM_CUSTOM_BYPASS]:
             await entity.async_alarm_arm_custom_bypass(code, skip_code)
+        elif command == command_payloads[const.COMMAND_ARM_VACATION]:
+            await entity.async_alarm_arm_vacation(code, skip_code)

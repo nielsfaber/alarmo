@@ -1,17 +1,14 @@
 {
   "common": {
-    "modes_long": {
-      "armed_away": "Mode fora de casa activat",
-      "armed_home": "Mode a casa activat",
-      "armed_night": "Mode nit activat",
-      "armed_custom_bypass": "Mode personalitzat activat"
-    },
     "modes_short": {
       "armed_away": "Fora",
       "armed_home": "Casa",
       "armed_night": "Nit",
-      "armed_custom_bypass": "Personalitzat"
-    }
+      "armed_custom_bypass": "Personalitzat",
+      "armed_vacation": "Vacation"
+    },
+    "enabled": "Activat",
+    "disabled": "Desactivat"
   },
   "components": {
     "time_slider": {
@@ -24,6 +21,13 @@
       "ui_mode": "Canvia a UI",
       "yaml_mode": "Canvia a YAML",
       "edit_in_yaml": "Edit in YAML"
+    },
+    "table": {
+      "filter": {
+        "label": "Filter items",
+        "item": "Filter by {name}",
+        "hidden_items": "{number} {number, plural,\n  one {item is}\n  other {items are}\n} hidden"
+      }
     }
   },
   "title": "Tauler alarma",
@@ -55,14 +59,18 @@
         "modes": {
           "title": "Modes",
           "description": "Aquest tauler es pot utilitzar per configurar els modes d'activació de l'alarma.",
+          "modes": {
+            "armed_away": "El mode fora de casa s'utilitzarà quan totes les persones surtin de casa. Es controlen totes les portes i finestres que permeten l'accés a la casa, així com els sensors de moviment dins de la casa.",
+            "armed_home": "El mode a casa (també conegut com mode casa) s'utilitzarà quan configureu l'alarma mentre hi hagi persones a la casa. Es controlen totes les portes i finestres que permetin l'accés a la casa, però no els sensors de moviment a l'interior de la casa.",
+            "armed_night": "El mode nit s'utilitzarà quan configureu l'alarma abans d'anar a dormir. Es controlaran totes les portes i finestres que permetin l'accés a la casa i es seleccionaran els sensors de moviment (per exemple, a la planta baixa) de la casa.",
+            "armed_vacation": "Armed vacation can be used as an extension to the armed away mode in case of absence for longer duration. The delay times and trigger responses can be adapted (as desired) to being distant from home.",
+            "armed_custom_bypass": "Un mode addicional per definir el vostre propi perímetre de seguretat."
+          },
+          "number_sensors_active": "{number} {number, plural,\n  one {sensor}\n  other {sensors}\n} activa",
           "fields": {
-            "mode": {
-              "armed_away": "El mode fora de casa s'utilitzarà quan totes les persones surtin de casa. Es controlen totes les portes i finestres que permeten l'accés a la casa, així com els sensors de moviment dins de la casa.",
-              "armed_home": "El mode a casa (també conegut com mode casa) s'utilitzarà quan configureu l'alarma mentre hi hagi persones a la casa. Es controlen totes les portes i finestres que permetin l'accés a la casa, però no els sensors de moviment a l'interior de la casa.",
-              "armed_night": "El mode nit s'utilitzarà quan configureu l'alarma abans d'anar a dormir. Es controlaran totes les portes i finestres que permetin l'accés a la casa i es seleccionaran els sensors de moviment (per exemple, a la planta baixa) de la casa.",
-              "armed_custom_bypass": "Un mode addicional per definir el vostre propi perímetre de seguretat.",
-              "enabled": "Activat",
-              "disabled": "Desactivat"
+            "status": {
+              "heading": "Status",
+              "description": "Controls whether the alarm can be armed in this mode."
             },
             "exit_delay": {
               "heading": "Retard de sortida",
@@ -100,11 +108,11 @@
             },
             "state_payload": {
               "heading": "Configura la càrrega útil per estat",
-              "item": "Definiu una càrrega útil per a l'estat '{state}'"
+              "item": "Definiu una càrrega útil per a l'estat ''{state}''"
             },
             "command_payload": {
               "heading": "Configura la càrrega útil per ordre",
-              "item": "Definiu una càrrega útil per a l'ordre '{command}'"
+              "item": "Definiu una càrrega útil per a l'ordre ''{command}''"
             }
           }
         },
@@ -115,8 +123,8 @@
           "table": {
             "remarks": "Observacions",
             "summary": "Aquesta àrea conté {summary_sensors} i {summary_automations}.",
-            "summary_sensors": "{number} sensors",
-            "summary_automations": "{number} automatismes"
+            "summary_sensors": "{number} {number, plural,\n  one {sensor}\n  other {sensors}\n}",
+            "summary_automations": "{number} {number, plural,\n  one {automatisme}\n  other {automatismes}\n}"
           },
           "actions": {
             "add": "Afegeix"
@@ -131,7 +139,7 @@
           }
         },
         "edit_area": {
-          "title": "Edita l'àrea '{area}'",
+          "title": "Edita l'àrea ''{area}''",
           "name_warning": "Nota: si canvieu el nom, es canviarà l'identificador d'entitat"
         },
         "remove_area": {
@@ -152,14 +160,11 @@
       "cards": {
         "sensors": {
           "description": "Sensors configurats actualment. Feu clic a una entitat per fer canvis.",
-          "no_items": "No hi ha cap sensor per mostrar",
           "table": {
+            "no_items": "No hi ha cap sensor per mostrar",
             "arm_modes": "Modes d'armat",
-            "always_on": "(Sempre)"
-          },
-          "filter": {
-            "label": "Filtra per àrea",
-            "no_area": "(Sense àrea)"
+            "always_on": "(Sempre)",
+            "no_area_warning": "Sensor is not assigned to any area."
           }
         },
         "add_sensors": {
@@ -176,7 +181,7 @@
         },
         "editor": {
           "title": "Edita el sensor",
-          "description": "Edita la configuració del sensor de '{entity}'.",
+          "description": "Edita la configuració del sensor de ''{entity}''.",
           "fields": {
             "name": {
               "heading": "Nom",
@@ -297,7 +302,7 @@
           }
         },
         "edit_group": {
-          "title": "Edit sensor group '{name}'"
+          "title": "Edit sensor group ''{name}''"
         }
       }
     },
@@ -372,7 +377,7 @@
         },
         "edit_user": {
           "title": "Edita l'usuari",
-          "description": "Canvia la configuració de l'usuari '{name}'.",
+          "description": "Canvia la configuració de l'usuari ''{name}''.",
           "fields": {
             "old_code": {
               "heading": "Codi actual",
@@ -389,15 +394,11 @@
           "title": "Notificacions",
           "description": "Utilitzant aquest tauler, podeu gestionar les notificacions que s'envien quan es produeix un determinat esdeveniment d'alarma.",
           "table": {
-            "enabled": "Activat",
-            "no_items": "Encara no s'han creat notificacions."
+            "no_items": "Encara no s'han creat notificacions.",
+            "no_area_warning": "Action is not assigned to any area."
           },
           "actions": {
             "new_notification": "nova notificació"
-          },
-          "filter": {
-            "label": "Filtra per àrea",
-            "no_area": "(Sense àrea)"
           }
         },
         "actions": {

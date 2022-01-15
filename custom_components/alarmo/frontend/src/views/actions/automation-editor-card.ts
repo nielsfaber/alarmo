@@ -2,16 +2,42 @@ import { LitElement, html, TemplateResult, CSSResultGroup, css } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 import { HomeAssistant, navigate, computeDomain, computeEntity } from 'custom-card-helpers';
 import { mdiClose } from '@mdi/js';
-import { AlarmoAutomation, EAlarmEvent, EArmModes, AlarmoArea, Dictionary, AutomationAction, AlarmoConfig } from '../../types';
+import {
+  AlarmoAutomation,
+  EAlarmEvent,
+  EArmModes,
+  AlarmoArea,
+  Dictionary,
+  AutomationAction,
+  AlarmoConfig,
+} from '../../types';
 import { handleError, isDefined, Unique, omit, showErrorDialog } from '../../helpers';
 import { saveAutomation, fetchAreas, fetchConfig, deleteAutomation } from '../../data/websockets';
 import { localize } from '../../../localize/localize';
-import { computeEventDisplay, computeAreaDisplay, computeArmModeDisplay, getAreaOptions, getArmModeOptions, getAutomationEntities, computeEntityDisplay, isValidString, isValidEntity, isValidService, isObject, isString, isArray, computeActions, computeActionDisplay, computeMergedActions, findMatchingAction } from '../../data/actions';
-
+import {
+  computeEventDisplay,
+  computeAreaDisplay,
+  computeArmModeDisplay,
+  getAreaOptions,
+  getArmModeOptions,
+  getAutomationEntities,
+  computeEntityDisplay,
+  isValidString,
+  isValidEntity,
+  isValidService,
+  isObject,
+  isString,
+  isArray,
+  computeActions,
+  computeActionDisplay,
+  computeMergedActions,
+  findMatchingAction,
+} from '../../data/actions';
 
 import '../../components/alarmo-selector';
 import '../../components/alarmo-select';
 import { EAutomationTypes } from '../../const';
+import { exportPath } from '../../common/navigation';
 
 enum ViewMode {
   Yaml,
@@ -20,7 +46,6 @@ enum ViewMode {
 
 @customElement('automation-editor-card')
 export class AutomationEditorCard extends LitElement {
-
   @property({ attribute: false })
   public hass!: HomeAssistant;
 
@@ -54,7 +79,7 @@ export class AutomationEditorCard extends LitElement {
     this.alarmoConfig = await fetchConfig(this.hass);
 
     if (this.item) {
-      let actions = this.item.actions.map(e => e.entity_id ? e : omit(e, 'entity_id'));
+      let actions = this.item.actions.map(e => (e.entity_id ? e : omit(e, 'entity_id')));
       this.config = { ...this.item, actions: [actions[0], ...actions.slice(1)] };
       if (this.config.triggers.length > 1) this.config = { ...this.config, triggers: [this.config.triggers[0]] };
 
@@ -69,7 +94,8 @@ export class AutomationEditorCard extends LitElement {
     //automatically set area if there is only 1 option
     if (!isDefined(this.config.triggers[0].area)) {
       const areaOptions = getAreaOptions(this.areas, this.alarmoConfig);
-      if (areaOptions.length == 1) this._setArea(new CustomEvent('value-changed', { detail: { value: areaOptions[0] } }));
+      if (areaOptions.length == 1)
+        this._setArea(new CustomEvent('value-changed', { detail: { value: areaOptions[0] } }));
       else if (areaOptions.includes(0)) this._setArea(new CustomEvent('value-changed', { detail: { value: 0 } }));
     }
   }
@@ -78,8 +104,7 @@ export class AutomationEditorCard extends LitElement {
     if (!this.hass || !this.areas || !this.alarmoConfig) return html``;
     return html`
       <div class="heading">
-        <ha-icon-button .path=${mdiClose} @click=${this._cancelClick} class="icon">
-        </ha-icon-button>
+        <ha-icon-button .path=${mdiClose} @click=${this._cancelClick} class="icon"></ha-icon-button>
         <div class="header">${localize('panels.actions.cards.new_action.title', this.hass.language)}</div>
         <div class="description">${localize('panels.actions.cards.new_action.description', this.hass.language)}</div>
       </div>
@@ -106,26 +131,29 @@ export class AutomationEditorCard extends LitElement {
           </settings-row>
 
           ${Object.keys(this.areas).length > 1
-        ? html`
-          <settings-row .narrow=${this.narrow} .large=${true}>
-            <span slot="heading">
-              ${localize('panels.actions.cards.new_action.fields.area.heading', this.hass.language)}
-            </span>
-            <span slot="description">
-              ${localize('panels.actions.cards.new_action.fields.area.description', this.hass.language)}
-            </span>
-            
-            <alarmo-select
-              .hass=${this.hass}
-              .items=${getAreaOptions(this.areas, this.alarmoConfig!).map(e => computeAreaDisplay(e, this.areas, this.alarmoConfig!))}
-              clearable=${true}
-              label=${localize('panels.actions.cards.new_action.fields.area.heading', this.hass.language)}
-              .value=${this.config.triggers[0].area}
-              @value-changed=${this._setArea}
-              ?invalid=${this.errors.area}
-            ></alarmo-select>
-          </settings-row>
-          ` : ''}
+            ? html`
+                <settings-row .narrow=${this.narrow} .large=${true}>
+                  <span slot="heading">
+                    ${localize('panels.actions.cards.new_action.fields.area.heading', this.hass.language)}
+                  </span>
+                  <span slot="description">
+                    ${localize('panels.actions.cards.new_action.fields.area.description', this.hass.language)}
+                  </span>
+
+                  <alarmo-select
+                    .hass=${this.hass}
+                    .items=${getAreaOptions(this.areas, this.alarmoConfig!).map(e =>
+                      computeAreaDisplay(e, this.areas, this.alarmoConfig!)
+                    )}
+                    clearable=${true}
+                    label=${localize('panels.actions.cards.new_action.fields.area.heading', this.hass.language)}
+                    .value=${this.config.triggers[0].area}
+                    @value-changed=${this._setArea}
+                    ?invalid=${this.errors.area || (!this.config.triggers[0].area && !this.alarmoConfig.master.enabled)}
+                  ></alarmo-select>
+                </settings-row>
+              `
+            : ''}
 
           <settings-row .narrow=${this.narrow} .large=${true} last>
             <span slot="heading">
@@ -137,7 +165,9 @@ export class AutomationEditorCard extends LitElement {
 
             <alarmo-selector
               .hass=${this.hass}
-              .items=${getArmModeOptions(this.config.triggers[0].area, this.areas).map(e => computeArmModeDisplay(e, this.hass))}
+              .items=${getArmModeOptions(this.config.triggers[0].area, this.areas).map(e =>
+                computeArmModeDisplay(e, this.hass)
+              )}
               label=${localize('panels.actions.cards.new_action.fields.mode.heading', this.hass.language)}
               .value=${this.config.triggers[0].modes || []}
               @value-changed=${this._setModes}
@@ -146,69 +176,76 @@ export class AutomationEditorCard extends LitElement {
           </settings-row>
         </div>
       </ha-card>
-  
+
       <div class="section-header">${localize('panels.actions.cards.new_notification.action', this.hass.language)}</div>
       <ha-card>
         <div class="card-content">
           ${this.viewMode == ViewMode.UI
-        ? html`
-          <settings-row .narrow=${this.narrow} .large=${true} first>
-            <span slot="heading">
-              ${localize('panels.actions.cards.new_action.fields.entity.heading', this.hass.language)}
-            </span>
-            <span slot="description">
-              ${localize('panels.actions.cards.new_action.fields.entity.description', this.hass.language)}
-            </span>
-    
-            <alarmo-selector
-              .hass=${this.hass}
-              .items=${computeEntityDisplay(getAutomationEntities(this.hass, this._getEntities()), this.hass)}
-              ?disabled=${!getAutomationEntities(this.hass, this._getEntities()).length}
-              label=${localize('panels.actions.cards.new_action.fields.entity.heading', this.hass.language)}
-              .value=${this._getEntities()}
-              @value-changed=${this._setEntity}
-              ?invalid=${this.errors.entity_id}
-            ></alarmo-selector>
-          </settings-row>
-
-        ${this.config.actions.map(e => e.entity_id).length
-            ? html`        
-          <settings-row .narrow=${this.narrow}>
-            <span slot="heading">
-              ${localize('panels.actions.cards.new_action.fields.action.heading', this.hass.language)}
-            </span>
-            <span slot="description">
-              ${localize('panels.actions.cards.new_action.fields.action.description', this.hass.language)}
-            </span>
-            
-            <div>
-              ${this.renderActions()}
-            </div>
-          </settings-row>
-          `
-            : ''}
-        `
-        : html`
-          <h2>${localize('components.editor.edit_in_yaml', this.hass.language)}</h2>
-  
-          <ha-yaml-editor
-            .defaultValue=${this.config.actions || ""}
-            @value-changed=${this._setYaml}
-          ></ha-yaml-editor>
-
-        ${this.errors.service || this.errors.entity_id
             ? html`
-          <span class="error-message">
-            ${this.hass.localize('ui.errors.config.key_missing', 'key', Object.entries(this.errors).find(([k, v]) => v && ['service', 'entity_id'].includes(k))![0])}
-          </span>
-        ` : ''}
-          `}
+                <settings-row .narrow=${this.narrow} .large=${true} first>
+                  <span slot="heading">
+                    ${localize('panels.actions.cards.new_action.fields.entity.heading', this.hass.language)}
+                  </span>
+                  <span slot="description">
+                    ${localize('panels.actions.cards.new_action.fields.entity.description', this.hass.language)}
+                  </span>
+
+                  <alarmo-selector
+                    .hass=${this.hass}
+                    .items=${computeEntityDisplay(getAutomationEntities(this.hass, this._getEntities()), this.hass)}
+                    ?disabled=${!getAutomationEntities(this.hass, this._getEntities()).length}
+                    label=${localize('panels.actions.cards.new_action.fields.entity.heading', this.hass.language)}
+                    .value=${this._getEntities()}
+                    @value-changed=${this._setEntity}
+                    ?invalid=${this.errors.entity_id}
+                  ></alarmo-selector>
+                </settings-row>
+
+                ${this.config.actions.map(e => e.entity_id).length
+                  ? html`
+                      <settings-row .narrow=${this.narrow}>
+                        <span slot="heading">
+                          ${localize('panels.actions.cards.new_action.fields.action.heading', this.hass.language)}
+                        </span>
+                        <span slot="description">
+                          ${localize('panels.actions.cards.new_action.fields.action.description', this.hass.language)}
+                        </span>
+
+                        <div>
+                          ${this.renderActions()}
+                        </div>
+                      </settings-row>
+                    `
+                  : ''}
+              `
+            : html`
+                <h2>${localize('components.editor.edit_in_yaml', this.hass.language)}</h2>
+
+                <ha-yaml-editor
+                  .defaultValue=${this.config.actions || ''}
+                  @value-changed=${this._setYaml}
+                ></ha-yaml-editor>
+
+                ${this.errors.service || this.errors.entity_id
+                  ? html`
+                      <span class="error-message">
+                        ${this.hass.localize(
+                          'ui.errors.config.key_missing',
+                          'key',
+                          Object.entries(this.errors).find(([k, v]) => v && ['service', 'entity_id'].includes(k))![0]
+                        )}
+                      </span>
+                    `
+                  : ''}
+              `}
         </div>
 
         <div class="toggle-button">
           <mwc-button @click=${this._toggleYamlMode}>
             <ha-icon icon="hass:shuffle-variant"></ha-icon>
-            ${this.viewMode == ViewMode.Yaml ? localize('components.editor.ui_mode', this.hass.language) : localize('components.editor.yaml_mode', this.hass.language)}
+            ${this.viewMode == ViewMode.Yaml
+              ? localize('components.editor.ui_mode', this.hass.language)
+              : localize('components.editor.yaml_mode', this.hass.language)}
           </mwc-button>
         </div>
 
@@ -240,23 +277,24 @@ export class AutomationEditorCard extends LitElement {
             ></paper-input>
           </settings-row>
 
-        ${this.item?.automation_id
-        ? html`
-          <settings-row .narrow=${this.narrow}>
-          <span slot="heading">
-            ${localize('panels.actions.cards.new_notification.fields.delete.heading', this.hass.language)}
-          </span>
-          <span slot="description">
-            ${localize('panels.actions.cards.new_notification.fields.delete.description', this.hass.language)}
-          </span>
-          <div>
-            <mwc-button class="warning" outlined @click=${this._deleteClick}>
-              <ha-icon icon="hass:trash-can-outline"></ha-icon>
-              ${this.hass.localize('ui.common.delete')}
-            </mwc-button>
-          </div>
-          </settings-row>
-        ` : ''}
+          ${this.item?.automation_id
+            ? html`
+                <settings-row .narrow=${this.narrow}>
+                  <span slot="heading">
+                    ${localize('panels.actions.cards.new_notification.fields.delete.heading', this.hass.language)}
+                  </span>
+                  <span slot="description">
+                    ${localize('panels.actions.cards.new_notification.fields.delete.description', this.hass.language)}
+                  </span>
+                  <div>
+                    <mwc-button class="warning" outlined @click=${this._deleteClick}>
+                      <ha-icon icon="hass:trash-can-outline"></ha-icon>
+                      ${this.hass.localize('ui.common.delete')}
+                    </mwc-button>
+                  </div>
+                </settings-row>
+              `
+            : ''}
         </div>
       </ha-card>
 
@@ -280,18 +318,18 @@ export class AutomationEditorCard extends LitElement {
     const isMatchingAction = (...actions: (string | null)[]) => {
       if (!actions.every(isDefined)) return false;
       return Unique(computeMergedActions(actions.filter(isDefined))).length == 1;
-    }
+    };
 
     return actions.map(action => {
       return html`
-      <mwc-button
-        class="${isMatchingAction(this._selectedAction(), action) ? 'active' : ''}"
-        @click=${() => this._setAction(action)}
-        ?invalid=${this.errors.service}
-        ?disabled=${actions.length == 1}
-      >
-        ${computeActionDisplay(action, this.hass)}
-      </mwc-button>
+        <mwc-button
+          class="${isMatchingAction(this._selectedAction(), action) ? 'active' : ''}"
+          @click=${() => this._setAction(action)}
+          ?invalid=${this.errors.service}
+          ?disabled=${actions.length == 1}
+        >
+          ${computeActionDisplay(action, this.hass)}
+        </mwc-button>
       `;
     });
   }
@@ -342,10 +380,11 @@ export class AutomationEditorCard extends LitElement {
 
     //assign service for added entity if it is in common
     let serviceSetting: string | null = null;
-    if (selectedEntities.length > actionConfig.length && this._selectedAction()) serviceSetting = this._selectedAction();
+    if (selectedEntities.length > actionConfig.length && this._selectedAction())
+      serviceSetting = this._selectedAction();
 
     if (actionConfig.length > selectedEntities.length) {
-      let removedAction = actionConfig.findIndex(e => !selectedEntities.includes(e.entity_id || ""));
+      let removedAction = actionConfig.findIndex(e => !selectedEntities.includes(e.entity_id || ''));
       if (removedAction < 0) removedAction = actionConfig.length - 1;
       actionConfig.splice(removedAction, 1);
     }
@@ -395,12 +434,9 @@ export class AutomationEditorCard extends LitElement {
       value.forEach((entry, i) => {
         let output: Partial<AutomationAction> = {};
 
-        if (isObject(entry) && isString(entry.service))
-          output = { ...output, service: entry.service };
-        if (isObject(entry) && isString(entry.entity_id))
-          output = { ...output, entity_id: entry.entity_id };
-        if (isObject(entry) && isObject(entry.service_data))
-          output = { ...output, service_data: entry.service_data };
+        if (isObject(entry) && isString(entry.service)) output = { ...output, service: entry.service };
+        if (isObject(entry) && isString(entry.entity_id)) output = { ...output, entity_id: entry.entity_id };
+        if (isObject(entry) && isObject(entry.service_data)) output = { ...output, service_data: entry.service_data };
 
         Object.assign(actionConfig, { [i]: output });
       });
@@ -432,8 +468,7 @@ export class AutomationEditorCard extends LitElement {
       if (!availableActions.length) this.viewMode = ViewMode.Yaml;
     }
 
-    if (!isValidString(data.name))
-      this.errors = { ...this.errors, name: true };
+    if (!isValidString(data.name)) this.errors = { ...this.errors, name: true };
 
     return !Object.values(this.errors).length;
   }
@@ -452,47 +487,55 @@ export class AutomationEditorCard extends LitElement {
   }
 
   private _toggleYamlMode() {
-    this.viewMode = this.viewMode == ViewMode.UI
-      ? ViewMode.Yaml
-      : ViewMode.UI;
+    this.viewMode = this.viewMode == ViewMode.UI ? ViewMode.Yaml : ViewMode.UI;
 
     if (this.viewMode == ViewMode.Yaml)
       this.config = {
-        ...this.config, actions: Object.assign(this.config.actions,
-          {
-            [0]: {
-              ...this.config.actions[0],
-              service: this.config.actions[0].service || '',
-              service_data: {
-                ...this.config.actions[0].service_data || {},
-              }
-            }
-          }
-        )
+        ...this.config,
+        actions: Object.assign(this.config.actions, {
+          [0]: {
+            ...this.config.actions[0],
+            service: this.config.actions[0].service || '',
+            service_data: {
+              ...(this.config.actions[0].service_data || {}),
+            },
+          },
+        }),
       };
   }
 
   private _namePlaceholder() {
-    if (!this._validAction) return "";
+    if (!this._validAction) return '';
     const event = this.config.triggers[0].event;
     const entities = this.config.actions.map(e => e.entity_id).filter(isDefined) as string[];
-    const entity = computeEntityDisplay(entities, this.hass).map(e => e.name).join(", ");
-    const services = Unique(this.config.actions.map(e => e.service).filter(isDefined).map(e => computeEntity(e)));
+    const entity = computeEntityDisplay(entities, this.hass)
+      .map(e => e.name)
+      .join(', ');
+    const services = Unique(
+      this.config.actions
+        .map(e => e.service)
+        .filter(isDefined)
+        .map(e => computeEntity(e))
+    );
     let state: string | undefined = undefined;
-    if (services.length == 1 && services[0]?.includes("turn_on")) state = this.hass.localize("state.default.on");
-    if (services.length == 1 && services[0]?.includes("turn_off")) state = this.hass.localize("state.default.off");
-    if (services.length == 1 && services[0]?.includes("lock")) state = this.hass.localize("component.lock.state._.locked");
-    if (services.length == 1 && services[0]?.includes("unlock")) state = this.hass.localize("component.lock.state._.unlocked");
-    if (!event || !entity || !state) return "";
-    else return localize(`panels.actions.cards.new_action.fields.name.placeholders.${event}`, this.hass.language, ['{entity}', '{state}'], [entity, state]);
+    if (services.length == 1 && services[0]?.includes('turn_on')) state = this.hass.localize('state.default.on');
+    if (services.length == 1 && services[0]?.includes('turn_off')) state = this.hass.localize('state.default.off');
+    if (services.length == 1 && services[0]?.includes('lock'))
+      state = this.hass.localize('component.lock.state._.locked');
+    if (services.length == 1 && services[0]?.includes('unlock'))
+      state = this.hass.localize('component.lock.state._.unlocked');
+    if (!event || !entity || !state) return '';
+    else
+      return localize(
+        `panels.actions.cards.new_action.fields.name.placeholders.${event}`,
+        this.hass.language,
+        ['{entity}', '{state}'],
+        [entity, state]
+      );
   }
 
   private _getEntities() {
-    return Unique(
-      this.config.actions
-        .map(e => e.entity_id)
-        .filter(isDefined)
-    ) || [];
+    return Unique(this.config.actions.map(e => e.entity_id).filter(isDefined)) || [];
   }
 
   private _hasCustomEntities() {
@@ -503,8 +546,7 @@ export class AutomationEditorCard extends LitElement {
     let data = { ...this.config };
 
     //fill in name placeholder
-    if (!isValidString(data.name) && this._namePlaceholder())
-      data = { ...data, name: this._namePlaceholder() };
+    if (!isValidString(data.name) && this._namePlaceholder()) data = { ...data, name: this._namePlaceholder() };
 
     return data;
   }
@@ -547,7 +589,7 @@ export class AutomationEditorCard extends LitElement {
   }
 
   private _cancelClick() {
-    navigate(this, '/alarmo/actions', true);
+    navigate(this, exportPath('actions'), true);
   }
 
   static get styles(): CSSResultGroup {
@@ -558,12 +600,10 @@ export class AutomationEditorCard extends LitElement {
         margin: 0 auto;
         display: flex;
         flex-direction: column;
-      } 
+      }
       div.header {
         font-family: var(--paper-font-headline_-_font-family);
-        -webkit-font-smoothing: var(
-          --paper-font-headline_-_-webkit-font-smoothing
-        );
+        -webkit-font-smoothing: var(--paper-font-headline_-_-webkit-font-smoothing);
         font-size: var(--paper-font-headline_-_font-size);
         font-weight: var(--paper-font-headline_-_font-weight);
         letter-spacing: var(--paper-font-headline_-_letter-spacing);
@@ -572,9 +612,7 @@ export class AutomationEditorCard extends LitElement {
       }
       div.section-header {
         font-family: var(--paper-font-headline_-_font-family);
-        -webkit-font-smoothing: var(
-          --paper-font-headline_-_-webkit-font-smoothing
-        );
+        -webkit-font-smoothing: var(--paper-font-headline_-_-webkit-font-smoothing);
         font-size: 18px;
         font-weight: var(--paper-font-headline_-_font-weight);
         letter-spacing: var(--paper-font-headline_-_letter-spacing);
@@ -620,8 +658,9 @@ export class AutomationEditorCard extends LitElement {
       }
       div.heading {
         display: grid;
-        grid-template-areas: 'header icon'
-                             'description icon';
+        grid-template-areas:
+          'header icon'
+          'description icon';
         grid-template-rows: 1fr 1fr;
         grid-template-columns: 1fr 48px;
         margin: 20px 0px 10px 10px;

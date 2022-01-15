@@ -18,6 +18,7 @@ from homeassistant.const import (
     STATE_ALARM_ARMED_HOME,
     STATE_ALARM_ARMED_NIGHT,
     STATE_ALARM_ARMED_CUSTOM_BYPASS,
+    STATE_ALARM_ARMED_VACATION,
     STATE_ALARM_DISARMED,
     STATE_ALARM_TRIGGERED,
     STATE_ALARM_PENDING,
@@ -117,6 +118,7 @@ class AlarmoConfigView(HomeAssistantView):
                         vol.Optional(STATE_ALARM_ARMED_AWAY): cv.string,
                         vol.Optional(STATE_ALARM_ARMED_NIGHT): cv.string,
                         vol.Optional(STATE_ALARM_ARMED_CUSTOM_BYPASS): cv.string,
+                        vol.Optional(STATE_ALARM_ARMED_VACATION): cv.string,
                         vol.Optional(STATE_ALARM_PENDING): cv.string,
                         vol.Optional(STATE_ALARM_ARMING): cv.string,
                         vol.Optional(STATE_ALARM_DISARMING): cv.string,
@@ -128,6 +130,7 @@ class AlarmoConfigView(HomeAssistantView):
                         vol.Optional(const.COMMAND_ARM_HOME): cv.string,
                         vol.Optional(const.COMMAND_ARM_NIGHT): cv.string,
                         vol.Optional(const.COMMAND_ARM_CUSTOM_BYPASS): cv.string,
+                        vol.Optional(const.COMMAND_ARM_VACATION): cv.string,
                         vol.Optional(const.COMMAND_DISARM): cv.string,
                     }),
                     vol.Required(const.ATTR_REQUIRE_CODE): cv.boolean,
@@ -155,6 +158,13 @@ class AlarmoAreaView(HomeAssistantView):
     url = "/api/alarmo/area"
     name = "api:alarmo:area"
 
+    mode_schema = vol.Schema({
+        vol.Required(const.ATTR_ENABLED): cv.boolean,
+        vol.Required(const.ATTR_EXIT_TIME): cv.positive_int,
+        vol.Required(const.ATTR_ENTRY_TIME): cv.positive_int,
+        vol.Optional(const.ATTR_TRIGGER_TIME): cv.positive_int,
+    })
+
     @RequestDataValidator(
         vol.Schema(
             {
@@ -162,30 +172,11 @@ class AlarmoAreaView(HomeAssistantView):
                 vol.Optional(ATTR_NAME): cv.string,
                 vol.Optional(const.ATTR_REMOVE): cv.boolean,
                 vol.Optional(const.ATTR_MODES): vol.Schema({
-                    vol.Required(STATE_ALARM_ARMED_AWAY): vol.Schema({
-                        vol.Required(const.ATTR_ENABLED): cv.boolean,
-                        vol.Required(const.ATTR_EXIT_TIME): cv.positive_int,
-                        vol.Required(const.ATTR_ENTRY_TIME): cv.positive_int,
-                        vol.Optional(const.ATTR_TRIGGER_TIME): cv.positive_int,
-                    }),
-                    vol.Required(STATE_ALARM_ARMED_HOME): vol.Schema({
-                        vol.Required(const.ATTR_ENABLED): cv.boolean,
-                        vol.Required(const.ATTR_EXIT_TIME): cv.positive_int,
-                        vol.Required(const.ATTR_ENTRY_TIME): cv.positive_int,
-                        vol.Optional(const.ATTR_TRIGGER_TIME): cv.positive_int,
-                    }),
-                    vol.Required(STATE_ALARM_ARMED_NIGHT): vol.Schema({
-                        vol.Required(const.ATTR_ENABLED): cv.boolean,
-                        vol.Required(const.ATTR_EXIT_TIME): cv.positive_int,
-                        vol.Required(const.ATTR_ENTRY_TIME): cv.positive_int,
-                        vol.Optional(const.ATTR_TRIGGER_TIME): cv.positive_int,
-                    }),
-                    vol.Required(STATE_ALARM_ARMED_CUSTOM_BYPASS): vol.Schema({
-                        vol.Required(const.ATTR_ENABLED): cv.boolean,
-                        vol.Required(const.ATTR_EXIT_TIME): cv.positive_int,
-                        vol.Required(const.ATTR_ENTRY_TIME): cv.positive_int,
-                        vol.Optional(const.ATTR_TRIGGER_TIME): cv.positive_int,
-                    })
+                    vol.Optional(STATE_ALARM_ARMED_AWAY): mode_schema,
+                    vol.Optional(STATE_ALARM_ARMED_HOME): mode_schema,
+                    vol.Optional(STATE_ALARM_ARMED_NIGHT): mode_schema,
+                    vol.Optional(STATE_ALARM_ARMED_CUSTOM_BYPASS): mode_schema,
+                    vol.Optional(STATE_ALARM_ARMED_VACATION): mode_schema
                 })
             }
         )
