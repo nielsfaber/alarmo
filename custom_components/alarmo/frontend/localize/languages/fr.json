@@ -5,7 +5,7 @@
       "armed_home": "Présence",
       "armed_night": "Nuit",
       "armed_custom_bypass": "Personnalisé",
-      "armed_vacation": "Vacation"
+      "armed_vacation": "Vacances"
     },
     "enabled": "Actif",
     "disabled": "Inactif"
@@ -24,9 +24,9 @@
     },
     "table": {
       "filter": {
-        "label": "Filter items",
-        "item": "Filter by {name}",
-        "hidden_items": "{number} {number, plural,\n  one {item is}\n  other {items are}\n} hidden"
+        "label": "Filtrer par items",
+        "item": "Filtrer par {name}",
+        "hidden_items": "{number} {number, plural,\n  one { item est caché}\n  other { items sont cachés}\n} "
       }
     }
   },
@@ -62,15 +62,15 @@
           "modes": {
             "armed_away": "Ce mode sera utilisé lorsque toutes les personnes auront quitté la maison. Toutes les portes et fenêtres permettant l'accès à la maison seront surveillées, les détecteurs de mouvement à l'intérieur de la maison seront opérationnels.",
             "armed_home": "Ce mode sera utilisée lorsque des personnes sont dans la maison. Toutes les portes et fenêtres permettant l'accès à la maison seront surveillées (périmétrie), les détecteurs de mouvement à l'intérieur de la maison seront inopérants.",
-            "armed_night": "Ce mode sera utilisée lors du réglage de l'alarme avant de s'endormir. Toutes les portes et fenêtres permettant l'accès à la maison seront surveillées, et les capteurs de mouvement sélectionnés (ex : rez de chaussée) dans la maison seront opérationnels.",
-            "armed_vacation": "Armed vacation can be used as an extension to the armed away mode in case of absence for longer duration. The delay times and trigger responses can be adapted (as desired) to being distant from home.",
+            "armed_night": "Ce mode sera utilisé lors du réglage de l'alarme avant de s'endormir. Toutes les portes et fenêtres permettant l'accès à la maison seront surveillées, et les capteurs de mouvement sélectionnés (ex : rez de chaussée) dans la maison seront opérationnels.",
+            "armed_vacation": "Ce mode peut être utilisé comme une extension du mode armé absent en cas d'absence pour une durée plus longue. Les temps de retard et les réponses de déclenchement peuvent être adaptés (au choix) à l'éloignement du domicile.",
             "armed_custom_bypass": "Ce mode supplémentaire permet de définir votre propre périmètre de sécurité."
           },
-          "number_sensors_active": "{number} {number, plural,\n  one {capteur}\n  other {capteurs}\n} actif",
+          "number_sensors_active": "{number} {number, plural,\n  one {capteur actif}\n  other {capteurs actifs}\n} ",
           "fields": {
             "status": {
-              "heading": "Status",
-              "description": "Controls whether the alarm can be armed in this mode."
+              "heading": "Statut",
+              "description": "Active l'alarme dans ce mode."
             },
             "exit_delay": {
               "heading": "Délai pour sortir",
@@ -162,7 +162,7 @@
           "description": "Capteurs actuellement configurés. Cliquez sur une entité pour apporter des modifications.",
           "table": {
             "no_items": "Il n'y a pas encore de capteur ajouté à l'alarme. Assurez-vous de les ajouter d'abord.",
-            "no_area_warning": "Sensor is not assigned to any area.",
+            "no_area_warning": "Le capteur n'est affecté à aucune zone.",
             "arm_modes": "Type d'activation",
             "always_on": "(Toujours)"
           }
@@ -176,7 +176,7 @@
           },
           "actions": {
             "add_to_alarm": "Ajouter à l'alarme",
-            "filter_supported": "Hide items with unknown type"
+            "filter_supported": "Masquer les éléments de type inconnu"
           }
         },
         "editor": {
@@ -395,7 +395,7 @@
           "description": "À l'aide de ce panneau, vous pouvez gérer les notifications à envoyer lors d'un évènement d'alarme",
           "table": {
             "no_items": "Il n'y a aucune notification de créée.",
-            "no_area_warning": "Action is not assigned to any area."
+            "no_area_warning": "L'action n'est affectée à aucune zone."
           },
           "actions": {
             "new_notification": "Nouvelle notification"
