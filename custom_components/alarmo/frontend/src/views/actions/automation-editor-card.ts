@@ -98,6 +98,8 @@ export class AutomationEditorCard extends LitElement {
         this._setArea(new CustomEvent('value-changed', { detail: { value: areaOptions[0] } }));
       else if (areaOptions.includes(0)) this._setArea(new CustomEvent('value-changed', { detail: { value: 0 } }));
     }
+
+    if(this.item && !this.config.triggers[0].area && !this.alarmoConfig.master.enabled) this.errors = {...this.errors, area: true};
   }
 
   protected render(): TemplateResult {
@@ -149,7 +151,7 @@ export class AutomationEditorCard extends LitElement {
                     label=${localize('panels.actions.cards.new_action.fields.area.heading', this.hass.language)}
                     .value=${this.config.triggers[0].area}
                     @value-changed=${this._setArea}
-                    ?invalid=${this.errors.area || (!this.config.triggers[0].area && !this.alarmoConfig.master.enabled)}
+                    ?invalid=${this.errors.area}
                   ></alarmo-select>
                 </settings-row>
               `
@@ -529,8 +531,10 @@ export class AutomationEditorCard extends LitElement {
       return localize(
         `panels.actions.cards.new_action.fields.name.placeholders.${event}`,
         this.hass.language,
-        ['{entity}', '{state}'],
-        [entity, state]
+        'entity',
+        entity,
+        'state',
+        state
       );
   }
 
