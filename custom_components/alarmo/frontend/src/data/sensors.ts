@@ -59,7 +59,6 @@ export const sensorClassToType = (stateObj: HassEntity): ESensorTypes | undefine
     case 'sound':
     case 'opening':
     case 'vibration':
-    case 'problem':
       return ESensorTypes.Tamper;
     default:
       return;
