@@ -3,7 +3,7 @@ import { property, customElement } from 'lit/decorators.js';
 import { HomeAssistant, navigate, fireEvent } from 'custom-card-helpers';
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
 
-import { fetchConfig, saveConfig, fetchAreas, fetchAutomations } from '../../data/websockets';
+import { fetchConfig, saveConfig, fetchAreas, fetchAutomations, deleteAutomation } from '../../data/websockets';
 import { SubscribeMixin } from '../../subscribe-mixin';
 import { localize } from '../../../localize/localize';
 import { pick, handleError } from '../../helpers';
@@ -164,8 +164,8 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
     const target = ev.target as HTMLInputElement;
     let enabled = target.checked;
     if (!enabled) {
-      const automations = Object.values(this.automations).filter(e => !e.triggers?.map(e => e.area).length).length;
-      if (automations) {
+      const automations = Object.values(this.automations).filter(e => e.triggers.some(e => !e.area));
+      if (automations.length) {
         const result = await new Promise(resolve => {
           fireEvent(target, 'show-dialog', {
             dialogTag: 'confirm-delete-dialog',
@@ -175,8 +175,8 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
               description: localize(
                 'panels.general.dialogs.disable_master.description',
                 this.hass!.language,
-                ['{automations}'],
-                [String(automations)]
+                'automations',
+                String(automations.length)
               ),
               cancel: () => resolve(false),
               confirm: () => resolve(true),
@@ -186,6 +186,10 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
         if (!result) {
           enabled = true;
           target.checked = true;
+        } else if (!enabled && automations.length) {
+          automations.forEach(e => {
+            deleteAutomation(this.hass!, e.automation_id!).catch(e => handleError(e, ev));
+          });
         }
       }
     }
