@@ -12,6 +12,7 @@ from homeassistant.const import (
     STATE_ALARM_ARMED_HOME,
     STATE_ALARM_ARMED_NIGHT,
     STATE_ALARM_ARMED_CUSTOM_BYPASS,
+    STATE_ALARM_ARMED_VACATION
 )
 
 from homeassistant.components.alarm_control_panel import (
@@ -75,7 +76,8 @@ class AreaEntry:
         STATE_ALARM_ARMED_AWAY: ModeEntry(),
         STATE_ALARM_ARMED_HOME: ModeEntry(),
         STATE_ALARM_ARMED_NIGHT: ModeEntry(),
-        STATE_ALARM_ARMED_CUSTOM_BYPASS: ModeEntry()
+        STATE_ALARM_ARMED_CUSTOM_BYPASS: ModeEntry(),
+        STATE_ALARM_ARMED_VACATION: ModeEntry()
     })
 
 
@@ -365,12 +367,6 @@ class AlarmoStorage:
                         enabled=True,
                         trigger_time=1800
                     )
-                ),
-                STATE_ALARM_ARMED_NIGHT: attr.asdict(
-                    ModeEntry()
-                ),
-                STATE_ALARM_ARMED_CUSTOM_BYPASS: attr.asdict(
-                    ModeEntry()
                 )
             }
         })

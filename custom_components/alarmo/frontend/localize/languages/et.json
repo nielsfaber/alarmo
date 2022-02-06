@@ -1,17 +1,14 @@
 {
   "common": {
-    "modes_long": {
-      "armed_away": "Valvestatud eemal",
-      "armed_home": "Valvestatud kodus",
-      "armed_night": "Valvestatud ööseks",
-      "armed_custom_bypass": "Valikuline valvestus"
-    },
     "modes_short": {
       "armed_away": "Eemal",
       "armed_home": "Kodus",
       "armed_night": "Ööseks",
-      "armed_custom_bypass": "Valikuline"
-    }
+      "armed_custom_bypass": "Valikuline",
+      "armed_vacation": "Vacation"
+    },
+    "enabled": "Lubatud",
+    "disabled": "Keelatud"
   },
   "components": {
     "time_slider": {
@@ -24,6 +21,13 @@
       "ui_mode": "Kasutajaliides",
       "yaml_mode": "Koodiredaktor",
       "edit_in_yaml": "Edit in YAML"
+    },
+    "table": {
+      "filter": {
+        "label": "Filter items",
+        "item": "Filter by {name}",
+        "hidden_items": "{number} {number, plural,\n  one {item is}\n  other {items are}\n} hidden"
+      }
     }
   },
   "title": "Alarm panel",
@@ -55,14 +59,18 @@
         "modes": {
           "title": "Režiimid",
           "description": "Selles vaates seadistatakse valvestamise režiime.",
+          "modes": {
+            "armed_away": "Täielik valvestamine kui kedagi pole kodus. Kasutusel on kõik andurid.",
+            "armed_home": "Valvestatud kodus ei kasuta liikumisandureid kuid väisuksed ja aknad on valve all.",
+            "armed_night": "Valvestatud ööseks ei kasuta määratud liikumisandureid, välisperimeeter on valve all.",
+            "armed_vacation": "Armed vacation can be used as an extension to the armed away mode in case of absence for longer duration. The delay times and trigger responses can be adapted (as desired) to being distant from home.",
+            "armed_custom_bypass": "Valikulise valvestuse puhul saab määrata kasutatavad andurid."
+          },
+          "number_sensors_active": "{number} {number, plural,\n  one {andur}\n  other {andurit}\n} aktiiv",
           "fields": {
-            "mode": {
-              "armed_away": "Täielik valvestamine kui kedagi pole kodus. Kasutusel on kõik andurid.",
-              "armed_home": "Valvestatud kodus ei kasuta liikumisandureid kuid väisuksed ja aknad on valve all.",
-              "armed_night": "Valvestatud ööseks ei kasuta määratud liikumisandureid, välisperimeeter on valve all.",
-              "armed_custom_bypass": "Valikulise valvestuse puhul saab määrata kasutatavad andurid.",
-              "enabled": "Lubatud",
-              "disabled": "Keelatud"
+            "status": {
+              "heading": "Status",
+              "description": "Controls whether the alarm can be armed in this mode."
             },
             "exit_delay": {
               "heading": "Ooteaeg valvestamisel",
@@ -100,11 +108,11 @@
             },
             "state_payload": {
               "heading": "Määra olekute toimeandmed",
-              "item": "Määra oleku '{state}' toimeandmed"
+              "item": "Määra oleku ''{state}'' toimeandmed"
             },
             "command_payload": {
               "heading": "Määra käskude toimeandmed",
-              "item": "Määra käsu '{command}' toimeandmed"
+              "item": "Määra käsu ''{command}'' toimeandmed"
             }
           }
         },
@@ -115,8 +123,8 @@
           "table": {
             "remarks": "Ala teave",
             "summary": "See ala sisaldab {summary_sensors} ja {summary_automations}.",
-            "summary_sensors": "{number} andur(it)",
-            "summary_automations": "{number} automatiseering(ut)"
+            "summary_sensors": "{number} {number, plural,\n  one {andur}\n  other {andurit}\n}",
+            "summary_automations": "{number} {number, plural,\n  one {automatiseering}\n  other {automatiseeringut}\n}"
           },
           "actions": {
             "add": "Lisa"
@@ -131,7 +139,7 @@
           }
         },
         "edit_area": {
-          "title": "Ala '{area}' muutmine",
+          "title": "Ala ''{area}'' muutmine",
           "name_warning": "NB! Nime muutmisel muutub ka olemi ID"
         },
         "remove_area": {
@@ -152,14 +160,11 @@
       "cards": {
         "sensors": {
           "description": "Kasutusel olevad andurid. Klõpsa olemil, et seadistada.",
-          "no_items": "Andureid pole lisatud. Alustuseks lisa mõni andur.",
           "table": {
+            "no_items": "Andureid pole lisatud. Alustuseks lisa mõni andur.",
+            "no_area_warning": "Sensor is not assigned to any area.",
             "arm_modes": "Valvestamise olek",
             "always_on": "(alati)"
-          },
-          "filter": {
-            "label": "Sordi ala järgi",
-            "no_area": "(Alad puuduvad)"
           }
         },
         "add_sensors": {
@@ -171,12 +176,12 @@
           },
           "actions": {
             "add_to_alarm": "Lisa valvesüsteemile",
-            "show_all": "Kuva kõik andurid"
+            "filter_supported": "Hide items with unknown type"
           }
         },
         "editor": {
           "title": "Andurite sätted",
-          "description": "Muuda olemi '{entity}' sätteid.",
+          "description": "Muuda olemi ''{entity}'' sätteid.",
           "fields": {
             "name": {
               "heading": "Nimi",
@@ -297,7 +302,7 @@
           }
         },
         "edit_group": {
-          "title": "Edit sensor group '{name}'"
+          "title": "Edit sensor group ''{name}''"
         }
       }
     },
@@ -372,7 +377,7 @@
         },
         "edit_user": {
           "title": "Muuda kasutaja sätteid",
-          "description": "Muuda kasutaja '{name}' sätteid.",
+          "description": "Muuda kasutaja ''{name}'' sätteid.",
           "fields": {
             "old_code": {
               "heading": "Kehtiv kood",
@@ -389,15 +394,11 @@
           "title": "Teavitused",
           "description": "Halda saadetavaid teavitusi",
           "table": {
-            "enabled": "Lubatud",
-            "no_items": "Teavitusi pole veel loodud."
+            "no_items": "Teavitusi pole veel loodud.",
+            "no_area_warning": "Action is not assigned to any area."
           },
           "actions": {
             "new_notification": "Uus teavitus"
-          },
-          "filter": {
-            "label": "Sordi alade järgi",
-            "no_area": "(Alad puuduvad)"
           }
         },
         "actions": {

@@ -160,6 +160,7 @@ The following modes are supported:
 * Armed away
 * Armed night
 * Armed home
+* Armed vacation
 * Armed custom bypass (let's just call it *armed custom* from now on)
 
 In the tab *general* you can find the settings for each mode.
@@ -181,6 +182,7 @@ The Alarmo entity follows the state definitions as defined by HA:
 | `armed_away`               | The alarm is armed in away mode.                                                         |
 | `armed_home`               | The alarm is armed in home mode.                                                         |
 | `armed_night`              | The alarm is armed in night mode.                                                        |
+| `armed_vacation`           | The alarm is armed in vacation mode.                                                     |
 | `armed_custom_bypass`      | The alarm is armed in custom mode.                                                       |
 | `pending`                  | The alarm is pending.<br>After the entry delay has expired, the alarm will be triggered. |
 | `triggered`                | The alarm is triggered.                                                                  |
@@ -200,13 +202,14 @@ The Alarmo entity defines the following attributes:
 #### Commands
 The Alarmo entities support the following commands:
 
-| Command             | Description                                  | Conditions                                                                                                                                   |
-| ------------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ARM_AWAY`          | Arm the alarm in mode `armed_away`.          | - The entity has the mode `away` enabled.<br>- The current alarm state is `disarmed`, `armed_home`, `armed_night`, or `armed_custom_bypass`. |
-| `ARM_HOME`          | Arm the alarm in mode `armed_home`.          | - The entity has the mode `home` enabled.<br>- The current alarm state is `disarmed`, `armed_away`, `armed_night`, or `armed_custom_bypass`. |
-| `ARM_NIGHT`         | Arm the alarm in mode `armed_night`.         | - The entity has the mode `night` enabled.<br>- The current alarm state is `disarmed`, `armed_away`, `armed_home`, or `armed_custom_bypass`. |
-| `ARM_CUSTOM_BYPASS` | Arm the alarm in mode `armed_custom_bypass`. | - The entity has the mode `custom` enabled.<br>- The current alarm state is `disarmed`, `armed_away`, `armed_home`, or `armed_night`.        |
-| `DISARM`            | Disarm the alarm.                            | - The current alarm state is not `disarmed`                                                                                                  |
+| Command             | Description                                  | Conditions                                                                                                                                                     |
+| ------------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ARM_AWAY`          | Arm the alarm in mode `armed_away`.          | - The entity has the mode `away` enabled.<br>- The current alarm state is `disarmed`, `armed_home`, `armed_night`, `armed_vacation`  or `armed_custom_bypass`. |
+| `ARM_HOME`          | Arm the alarm in mode `armed_home`.          | - The entity has the mode `home` enabled.<br>- The current alarm state is `disarmed`, `armed_away`, `armed_night`, `armed_vacation` or `armed_custom_bypass`.  |
+| `ARM_NIGHT`         | Arm the alarm in mode `armed_night`.         | - The entity has the mode `night` enabled.<br>- The current alarm state is `disarmed`, `armed_away`, `armed_home`, `armed_vacation` or `armed_custom_bypass`.  |
+| `ARM_VACATION`      | Arm the alarm in mode `armed_vacation`.      | - The entity has the mode `vacation` enabled.<br>- The current alarm state is `disarmed`, `armed_away`, `armed_home`, `armed_night` or `armed_custom_bypass`.  |
+| `ARM_CUSTOM_BYPASS` | Arm the alarm in mode `armed_custom_bypass`. | - The entity has the mode `custom` enabled.<br>- The current alarm state is `disarmed`, `armed_away`, `armed_home`, `armed_vacation` or `armed_night`.         |
+| `DISARM`            | Disarm the alarm.                            | - The current alarm state is not `disarmed`                                                                                                                    |
 
 ### Areas
 An area is a physical compartment of your house, such as a garage, 1st floor of the house, garden, etc.
@@ -234,18 +237,18 @@ An extra `alarm_control_panel` entity is created for the master, which watches t
  
  The following table shows the rules which are implemented to determine the the master alarm state (in order of priority):
 
- | Condition                                                                                                                   | Master Alarm state       |
- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
- | One or more areas have state `triggered`                                                                                    | `triggered`              |
- | One or more areas have state `pending`                                                                                      | `pending`                |
- | One or more areas have state `arming`, others have state `armed_away`, `armed_home`, `armed_night` or `armed_custom_bypass` | `arming`                 |
- | All areas have state `armed_away`                                                                                           | `armed_away`             |
- | All areas have state `armed_home`                                                                                           | `armed_home`             |
- | All areas have state `armed_night`                                                                                          | `armed_night`            |
- | All areas have state `armed_custom_bypass`                                                                                  | `armed_custom_bypass`    |
- | All areas have state `disarmed`                                                                                             | `disarmed`               |
- | Otherwise                                                                                                                   | (previous state is kept) |
-
+| Condition                                                                                                                                     | Master Alarm state       |
+| --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
+| One or more areas have state `triggered`                                                                                                      | `triggered`              |
+| One or more areas have state `pending`                                                                                                        | `pending`                |
+| One or more areas have state `arming`, others have state `armed_away`, `armed_home`, `armed_night`, `armed_vacation` or `armed_custom_bypass` | `arming`                 |
+| All areas have state `armed_away`                                                                                                             | `armed_away`             |
+| All areas have state `armed_home`                                                                                                             | `armed_home`             |
+| All areas have state `armed_night`                                                                                                            | `armed_night`            |
+| All areas have state `armed_vacation`                                                                                                         | `armed_vacation`         |
+| All areas have state `armed_custom_bypass`                                                                                                    | `armed_custom_bypass`    |
+| All areas have state `disarmed`                                                                                                               | `disarmed`               |
+| Otherwise                                                                                                                                     | (previous state is kept) |
 
 **Notes**:
 * The Alarm Master cannot determine its state if some are disarmed while others are armed. If the Alarm Master is used for arming/disarming the alarm, this condition should not occur.
@@ -278,13 +281,13 @@ When assigning sensors to Alarmo, the type of the sensor is automatically determ
 Note that assigning a sensor type is not mandatory, and all configuration settings can also be set manually. It is also possible to deviate from the predefined configuration after setting a type.
 
 The following table defines the sensor types and the predefined configuration:
-| Type          | Device classes                                        | Arm modes                                      | Enabled configuration options             |
-| ------------- | ----------------------------------------------------- | ---------------------------------------------- | ----------------------------------------- |
-| Door          | `door`<br> `garage_door`<br>`lock`<br> `opening `     | `Armed Away`<br> `Armed Home`<br>`Armed Night` | `Arm after closing`<br> `Use entry delay` |
-| Window        | `window`                                              | `Armed Away`<br>`Armed Home`<br>`Armed Night`  | -                                         |
-| Motion        | `motion`<br>`moving`<br>`occupancy`<br>`presence`     | `Armed Away`                                   | `Use exit delay`<br>`Use entry delay`     |
-| Tamper        | `sound`<br>`opening`<br> `vibration`                  | `Armed Away`<br>`Armed Home`<br>`Armed Night`  | -                                         |
-| Environmental | `gas`<br> `heat`<br>`moisture`<br>`smoke`<br>`safety` | N/A                                            | `Always on`                               |
+| Type          | Device classes                                        | Arm modes                                                          | Enabled configuration options             |
+| ------------- | ----------------------------------------------------- | ------------------------------------------------------------------ | ----------------------------------------- |
+| Door          | `door`<br> `garage_door`<br>`lock`<br> `opening `     | `Armed Away`<br> `Armed Home`<br>`Armed Night`<br>`Armed Vacation` | `Arm after closing`<br> `Use entry delay` |
+| Window        | `window`                                              | `Armed Away`<br>`Armed Home`<br>`Armed Night`<br>`Armed Vacation`  | -                                         |
+| Motion        | `motion`<br>`moving`<br>`occupancy`<br>`presence`     | `Armed Away`<br>`Armed Vacation`                                   | `Use exit delay`<br>`Use entry delay`     |
+| Tamper        | `sound`<br>`opening`<br> `vibration`                  | `Armed Away`<br>`Armed Home`<br>`Armed Night`<br>`Armed Vacation`  | -                                         |
+| Environmental | `gas`<br> `heat`<br>`moisture`<br>`smoke`<br>`safety` | N/A                                                                | `Always on`                               |
 
 
 #### Configuration options
@@ -375,6 +378,7 @@ The following table shows the events which are published on the event topic, tog
 | `ARM_AWAY`              | The alarm has been armed in mode `armed_away`                                                                      | - `delay`: exit delay (in seconds) configured for the operation (i.e. time during which the alarm is in state `arming`).                                                                                                                                                                                                  |
 | `ARM_HOME`              | The alarm has been armed in mode `armed_home`                                                                      | - `delay`: exit delay (in seconds) configured for the operation (i.e. time during which the alarm is in state `arming`).                                                                                                                                                                                                  |
 | `ARM_NIGHT`             | The alarm has been armed in mode `armed_night`                                                                     | - `delay`: exit delay (in seconds) configured for the operation (i.e. time during which the alarm is in state `arming`).                                                                                                                                                                                                  |
+| `ARM_VACATION`          | The alarm has been armed in mode `armed_vacation`                                                                  | - `delay`: exit delay (in seconds) configured for the operation (i.e. time during which the alarm is in state `arming`).                                                                                                                                                                                                  |
 | `ARM_CUSTOM_BYPASS`     | The alarm has been armed in mode `armed_custom_bypass`                                                             | - `delay`: exit delay (in seconds) configured for the operation (i.e. time during which the alarm is in state `arming`).                                                                                                                                                                                                  |
 | `TRIGGER`               | The alarm has been triggered                                                                                       | - `sensors`: list of sensors (usually a single sensor) which caused the triggering of the alarm. Each list item is a struct with the `entity_id` and `name` of the sensor entity).<br>- `delay`: entry delay (in seconds) configured to postpone the triggering (i.e. time during which the alarm is in state `pending`). |
 | `FAILED_TO_ARM`         | The arming was prevented or cancelled due to one or more blocking sensors.                                         | - `sensors`: list of sensors which prevented the arming operation. Each list item is a struct with the `entity_id` and `name` of the sensor entity).                                                                                                                                                                      |
@@ -623,11 +627,10 @@ There are two cards available:
 
 
 ## Say thank you
-If you want to make donation as appreciation of my work, you can do so via PayPal (preferred) or buy me a coffee. Thank you!
+If you want to make donation as appreciation of my work, you can do so via PayPal or buy me a coffee. Thank you!
 
-<a href="https://www.paypal.com/donate/?business=CLL4T6Y8ACXNN&no_recurring=0&item_name=Thank+you+for+supporting+my+work%2C+it+is+much+appreciated%21&currency_code=EUR" target="_blank"><img src="https://pics.paypal.com/00/s/YzlhMzI2ZjYtZDQxMi00NzNiLThmZTktOTk3MmEyYTA2Zjc0/file.PNG" width="150" /></a>
+<a href="https://www.paypal.com/donate/?business=CLL4T6Y8ACXNN&no_recurring=0&item_name=Thank+you+for+supporting+my+work+on+the+Alarmo+project%2E+Your+donation+is+much+appreciated%21&currency_code=EUR" target="_blank"><img src="https://pics.paypal.com/00/s/YzlhMzI2ZjYtZDQxMi00NzNiLThmZTktOTk3MmEyYTA2Zjc0/file.PNG" width="150" /></a>
 <a href="https://www.buymeacoffee.com/vrdx7mi" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png"></a>
-
 
 <!-- ### Alarm modes
  -->

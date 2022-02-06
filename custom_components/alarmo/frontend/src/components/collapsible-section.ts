@@ -4,9 +4,14 @@ import { mdiChevronDown, mdiChevronUp, mdiChevronRight } from '@mdi/js';
 
 @customElement('collapsible-section')
 export class CollapsibleSection extends LitElement {
-  @property({ type: Boolean, reflect: true }) public narrow!: boolean;
-  @property() header = '';
-  @property() open = false;
+  @property({ type: Boolean, reflect: true })
+  public narrow!: boolean;
+
+  @property()
+  header = '';
+
+  @property()
+  open = false;
 
   protected render() {
     return html`
@@ -26,7 +31,7 @@ export class CollapsibleSection extends LitElement {
           `
         : html`
             <div class="header">
-              <span @click=${() => { this.open = false; }}>${this.header}</span>
+              <span @click=${() => { this.open = true; }}>${this.header}</span>
               <ha-icon-button .path=${mdiChevronRight} @click=${() => { this.open = true; }}>
               </ha-icon-button>
             </div>

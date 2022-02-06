@@ -34,6 +34,7 @@ from homeassistant.const import (
     STATE_ALARM_ARMED_HOME,
     STATE_ALARM_ARMED_NIGHT,
     STATE_ALARM_ARMED_CUSTOM_BYPASS,
+    STATE_ALARM_ARMED_VACATION,
     STATE_ALARM_DISARMED,
     STATE_ALARM_TRIGGERED,
     STATE_ALARM_PENDING,
@@ -436,6 +437,11 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
         """Send arm custom_bypass command."""
         _LOGGER.debug("alarm_arm_custom_bypass")
         await self.async_handle_arm_request(STATE_ALARM_ARMED_CUSTOM_BYPASS, code=code, skip_code=skip_code)
+
+    async def async_alarm_arm_vacation(self, code=None, skip_code=False):
+        """Send arm vacation command."""
+        _LOGGER.debug("alarm_arm_vacation")
+        await self.async_handle_arm_request(STATE_ALARM_ARMED_VACATION, code=code, skip_code=skip_code)
 
     async def async_alarm_trigger(self, code=None) -> None:
         """Send alarm trigger command."""
@@ -878,6 +884,8 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
             state = STATE_ALARM_ARMED_NIGHT
         elif all(el == STATE_ALARM_ARMED_CUSTOM_BYPASS for el in states):
             state = STATE_ALARM_ARMED_CUSTOM_BYPASS
+        elif all(el == STATE_ALARM_ARMED_VACATION for el in states):
+            state = STATE_ALARM_ARMED_VACATION
         elif all(el == STATE_ALARM_DISARMED for el in states):
             state = STATE_ALARM_DISARMED
 

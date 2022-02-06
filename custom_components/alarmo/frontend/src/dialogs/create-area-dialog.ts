@@ -59,8 +59,7 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
       <ha-dialog open .heading=${true} @closed=${this.closeDialog} @close-dialog=${this.closeDialog}>
         <div slot="heading">
           <ha-header-bar>
-            <ha-icon-button slot="navigationIcon" dialogAction="cancel" .path=${mdiClose}>
-            </ha-icon-button>
+            <ha-icon-button slot="navigationIcon" dialogAction="cancel" .path=${mdiClose}></ha-icon-button>
             <span slot="title">
               ${this.area_id
                 ? localize(
@@ -78,13 +77,12 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
             label=${this.hass.localize('ui.components.area-picker.add_dialog.name')}
             @value-changed=${(ev: Event) => (this.name = (ev.target as HTMLInputElement).value)}
             value="${this.name}"
-          >
-          </paper-input>
+          ></paper-input>
           ${this.area_id
             ? html`
-                <span class="note"
-                  >${localize('panels.general.dialogs.edit_area.name_warning', this.hass.language)}</span
-                >
+                <span class="note">
+                  ${localize('panels.general.dialogs.edit_area.name_warning', this.hass.language)}
+                </span>
               `
             : ''}
           ${!this.area_id
@@ -95,8 +93,7 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
                   label="${localize('panels.general.dialogs.create_area.fields.copy_from', this.hass.language)}"
                   clearable=${true}
                   @value-changed=${(ev: Event) => (this.selectedArea = (ev.target as HTMLInputElement).value)}
-                >
-                </alarmo-select>
+                ></alarmo-select>
               `
             : ''}
         </div>
@@ -152,8 +149,10 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
             description: localize(
               'panels.general.dialogs.remove_area.description',
               this.hass.language,
-              ['{sensors}', '{automations}'],
-              [String(sensors), String(automations)]
+              'sensors',
+              String(sensors),
+              'automations',
+              String(automations)
             ),
             cancel: () => resolve(false),
             confirm: () => resolve(true),

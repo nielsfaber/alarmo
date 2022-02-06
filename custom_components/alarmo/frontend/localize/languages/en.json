@@ -1,17 +1,14 @@
 {
   "common": {
-    "modes_long": {
-      "armed_away": "Armed Away",
-      "armed_home": "Armed Home",
-      "armed_night": "Armed Night",
-      "armed_custom_bypass": "Armed Custom"
-    },
     "modes_short": {
       "armed_away": "Away",
       "armed_home": "Home",
       "armed_night": "Night",
-      "armed_custom_bypass": "Custom"
-    }
+      "armed_custom_bypass": "Custom",
+      "armed_vacation": "Vacation"
+    },
+    "enabled": "Enabled",
+    "disabled": "Disabled"
   },
   "components": {
     "time_slider": {
@@ -24,6 +21,13 @@
       "ui_mode": "To UI",
       "yaml_mode": "To YAML",
       "edit_in_yaml": "Edit in YAML"
+    },
+    "table": {
+      "filter": {
+        "label": "Filter items",
+        "item": "Filter by {name}",
+        "hidden_items": "{number} {number, plural,\n  one {item is}\n  other {items are}\n} hidden"
+      }
     }
   },
   "title": "Alarm panel",
@@ -55,14 +59,18 @@
         "modes": {
           "title": "Modes",
           "description": "This panel can be used to set up the arm modes of the alarm.",
+          "modes": {
+            "armed_away": "Armed away will be used when all people left the house. All doors and windows allowing access to the house will be guarded, as well as motion sensors inside the house.",
+            "armed_home": "Armed home (also known as armed stay) will be used when setting the alarm while people are in the house. All doors and windows allowing access to the house will be guarded, but not motion sensors inside the house.",
+            "armed_night": "Armed night will be used when setting the alarm before going to sleep. All doors and windows allowing access to the house will be guarded, and selected motion sensors (downstairs) in the house.",
+            "armed_vacation": "Armed vacation can be used as an extension to the armed away mode in case of absence for longer duration. The delay times and trigger responses can be adapted (as desired) to being distant from home.",
+            "armed_custom_bypass": "An extra mode for defining your own security perimeter."
+          },
+          "number_sensors_active": "{number} {number, plural,\n  one {sensor}\n  other {sensors}\n} active",
           "fields": {
-            "mode": {
-              "armed_away": "Armed away will be used when all people left the house. All doors and windows allowing access to the house will be guarded, as well as motion sensors inside the house.",
-              "armed_home": "Armed home (also known as armed stay) will be used when setting the alarm while people are in the house. All doors and windows allowing access to the house will be guarded, but not motion sensors inside the house.",
-              "armed_night": "Armed night will be used when setting the alarm before going to sleep. All doors and windows allowing access to the house will be guarded, and selected motion sensors (downstairs) in the house.",
-              "armed_custom_bypass": "An extra mode for defining your own security perimeter.",
-              "enabled": "Enabled",
-              "disabled": "Disabled"
+            "status": {
+              "heading": "Status",
+              "description": "Controls whether the alarm can be armed in this mode."
             },
             "exit_delay": {
               "heading": "Exit delay",
@@ -100,11 +108,11 @@
             },
             "state_payload": {
               "heading": "Configure payload per state",
-              "item": "Define a payload for state '{state}'"
+              "item": "Define a payload for state ''{state}''"
             },
             "command_payload": {
               "heading": "Configure payload per command",
-              "item": "Define a payload for command '{command}'"
+              "item": "Define a payload for command ''{command}''"
             }
           }
         },
@@ -115,8 +123,8 @@
           "table": {
             "remarks": "Remarks",
             "summary": "This area contains {summary_sensors} and {summary_automations}.",
-            "summary_sensors": "{number} sensors",
-            "summary_automations": "{number} automations"
+            "summary_sensors": "{number} {number, plural,\n  one {sensor}\n  other {sensors}\n}",
+            "summary_automations": "{number} {number, plural,\n  one {automation}\n  other {automations}\n}"
           },
           "actions": {
             "add": "Add"
@@ -131,7 +139,7 @@
           }
         },
         "edit_area": {
-          "title": "Editing area '{area}'",
+          "title": "Editing area ''{area}''",
           "name_warning": "Note: changing the name will change the entity ID"
         },
         "remove_area": {
@@ -151,32 +159,29 @@
       "title": "Sensors",
       "cards": {
         "sensors": {
-          "description": "Currently configured sensors. Click on an entity to make changes.",
-          "no_items": "There are no sensors to be displayed here.",
+          "description": "Currently configured sensors. Click on an item to make changes.",
           "table": {
+            "no_items": "There are no sensors to be displayed here.",
+            "no_area_warning": "Sensor is not assigned to any area.",
             "arm_modes": "Arm Modes",
             "always_on": "(Always)"
-          },
-          "filter": {
-            "label": "Filter by area",
-            "no_area": "(No area)"
           }
         },
         "add_sensors": {
           "title": "Add Sensors",
-          "description": "Add more sensors. Make sure that your sensors have a friendly_name, so you can identify them.",
+          "description": "Add more sensors. Make sure that your sensors have a suitable name, so you can identify them.",
           "no_items": "There are no available HA entities that can be configured for the alarm. Make sure to include entities of the type binary_sensor.",
           "table": {
             "type": "Detected type"
           },
           "actions": {
             "add_to_alarm": "add to alarm",
-            "show_all": "Show all"
+            "filter_supported": "Hide items with unknown type"
           }
         },
         "editor": {
           "title": "Edit Sensor",
-          "description": "Configuring the sensor settings of '{entity}'.",
+          "description": "Configuring the sensor settings of ''{entity}''.",
           "fields": {
             "name": {
               "heading": "Name",
@@ -297,7 +302,7 @@
           }
         },
         "edit_group": {
-          "title": "Edit sensor group '{name}'"
+          "title": "Edit sensor group ''{name}''"
         }
       }
     },
@@ -372,7 +377,7 @@
         },
         "edit_user": {
           "title": "Edit User",
-          "description": "Change configuration for user '{name}'.",
+          "description": "Change configuration for user ''{name}''.",
           "fields": {
             "old_code": {
               "heading": "Current code",
@@ -389,15 +394,11 @@
           "title": "Notifications",
           "description": "Using this panel, you can manage notifications to be sent when during a certain alarm event.",
           "table": {
-            "enabled": "Enabled",
-            "no_items": "There are no notifications created yet."
+            "no_items": "There are no notifications created yet.",
+            "no_area_warning": "Action is not assigned to any area."
           },
           "actions": {
             "new_notification": "new notification"
-          },
-          "filter": {
-            "label": "Filter by area",
-            "no_area": "(No area)"
           }
         },
         "actions": {

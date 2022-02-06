@@ -1,17 +1,14 @@
 {
   "common": {
-    "modes_long": {
-      "armed_away": "Activée en mode absence",
-      "armed_home": "Activée en mode présence",
-      "armed_night": "Activée en mode nuit",
-      "armed_custom_bypass": "Activée en mode personnalisé"
-    },
     "modes_short": {
       "armed_away": "Absence",
       "armed_home": "Présence",
       "armed_night": "Nuit",
-      "armed_custom_bypass": "Personnalisé"
-    }
+      "armed_custom_bypass": "Personnalisé",
+      "armed_vacation": "Vacances"
+    },
+    "enabled": "Actif",
+    "disabled": "Inactif"
   },
   "components": {
     "time_slider": {
@@ -24,6 +21,13 @@
       "ui_mode": "Afficher l'éditeur visuel",
       "yaml_mode": "Afficher l'éditeur de code",
       "edit_in_yaml": "Editer en YAML"
+    },
+    "table": {
+      "filter": {
+        "label": "Filtrer par items",
+        "item": "Filtrer par {name}",
+        "hidden_items": "{number} {number, plural,\n  one { item est caché}\n  other { items sont cachés}\n} "
+      }
     }
   },
   "title": "Configuration de l' alarme",
@@ -55,14 +59,18 @@
         "modes": {
           "title": "Modes",
           "description": "Ce panneau définit le mode de gestion pour chaque type d'activation.",
+          "modes": {
+            "armed_away": "Ce mode sera utilisé lorsque toutes les personnes auront quitté la maison. Toutes les portes et fenêtres permettant l'accès à la maison seront surveillées, les détecteurs de mouvement à l'intérieur de la maison seront opérationnels.",
+            "armed_home": "Ce mode sera utilisée lorsque des personnes sont dans la maison. Toutes les portes et fenêtres permettant l'accès à la maison seront surveillées (périmétrie), les détecteurs de mouvement à l'intérieur de la maison seront inopérants.",
+            "armed_night": "Ce mode sera utilisé lors du réglage de l'alarme avant de s'endormir. Toutes les portes et fenêtres permettant l'accès à la maison seront surveillées, et les capteurs de mouvement sélectionnés (ex : rez de chaussée) dans la maison seront opérationnels.",
+            "armed_vacation": "Ce mode peut être utilisé comme une extension du mode armé absent en cas d'absence pour une durée plus longue. Les temps de retard et les réponses de déclenchement peuvent être adaptés (au choix) à l'éloignement du domicile.",
+            "armed_custom_bypass": "Ce mode supplémentaire permet de définir votre propre périmètre de sécurité."
+          },
+          "number_sensors_active": "{number} {number, plural,\n  one {capteur actif}\n  other {capteurs actifs}\n} ",
           "fields": {
-            "mode": {
-              "armed_away": "Ce mode sera utilisé lorsque toutes les personnes auront quitté la maison. Toutes les portes et fenêtres permettant l'accès à la maison seront surveillées, les détecteurs de mouvement à l'intérieur de la maison seront opérationnels.",
-              "armed_home": "Ce mode sera utilisée lorsque des personnes sont dans la maison. Toutes les portes et fenêtres permettant l'accès à la maison seront surveillées (périmétrie), les détecteurs de mouvement à l'intérieur de la maison seront inopérants.",
-              "armed_night": "Ce mode sera utilisée lors du réglage de l'alarme avant de s'endormir. Toutes les portes et fenêtres permettant l'accès à la maison seront surveillées, et les capteurs de mouvement sélectionnés (ex : rez de chaussée) dans la maison seront opérationnels.",
-              "armed_custom_bypass": "Ce mode supplémentaire permet de définir votre propre périmètre de sécurité.",
-              "enabled": "Actif",
-              "disabled": "Inactif"
+            "status": {
+              "heading": "Statut",
+              "description": "Active l'alarme dans ce mode."
             },
             "exit_delay": {
               "heading": "Délai pour sortir",
@@ -100,11 +108,11 @@
             },
             "state_payload": {
               "heading": "Configurer une valeur par état",
-              "item": "Définir une valeur par état '{state}'"
+              "item": "Définir une valeur par état ''{state}''"
             },
             "command_payload": {
               "heading": "Configurer une valeur par commande",
-              "item": "Définir une valeur par commande '{command}'"
+              "item": "Définir une valeur par commande ''{command}''"
             }
           }
         },
@@ -115,8 +123,8 @@
           "table": {
             "remarks": "Remarque",
             "summary": "Cette zone contient des {summary_sensors} et {summary_automations}.",
-            "summary_sensors": "{number} capteurs",
-            "summary_automations": "{number} automatisations"
+            "summary_sensors": "{number} {number, plural,\n  one {capteur}\n  other {capteurs}\n}",
+            "summary_automations": "{number} {number, plural,\n  one {automatisation}\n  other {automatisations}\n}"
           },
           "actions": {
             "add": "Ajouter"
@@ -131,7 +139,7 @@
           }
         },
         "edit_area": {
-          "title": "Editer la zone '{area}'",
+          "title": "Editer la zone ''{area}''",
           "name_warning": "Note: Changer le nom, changera l'entity ID"
         },
         "remove_area": {
@@ -152,14 +160,11 @@
       "cards": {
         "sensors": {
           "description": "Capteurs actuellement configurés. Cliquez sur une entité pour apporter des modifications.",
-          "no_items": "Il n'y a pas encore de capteur ajouté à l'alarme. Assurez-vous de les ajouter d'abord.",
           "table": {
+            "no_items": "Il n'y a pas encore de capteur ajouté à l'alarme. Assurez-vous de les ajouter d'abord.",
+            "no_area_warning": "Le capteur n'est affecté à aucune zone.",
             "arm_modes": "Type d'activation",
             "always_on": "(Toujours)"
-          },
-          "filter": {
-            "label": "Filtrer par zone",
-            "no_area": "(Aucune zone)"
           }
         },
         "add_sensors": {
@@ -171,12 +176,12 @@
           },
           "actions": {
             "add_to_alarm": "Ajouter à l'alarme",
-            "show_all": "Tout montrer"
+            "filter_supported": "Masquer les éléments de type inconnu"
           }
         },
         "editor": {
           "title": "Editer un capteur",
-          "description": "Configurer les paramètres du capteur '{entity}'.",
+          "description": "Configurer les paramètres du capteur ''{entity}''.",
           "fields": {
             "name": {
               "heading": "Nom",
@@ -297,7 +302,7 @@
           }
         },
         "edit_group": {
-          "title": "Editer le groupe de capteurs '{name}'"
+          "title": "Editer le groupe de capteurs ''{name}''"
         }
       }
     },
@@ -372,7 +377,7 @@
         },
         "edit_user": {
           "title": "Editer l'utilisateur",
-          "description": "Changer la  configuration pour l'utilisateur '{name}'.",
+          "description": "Changer la  configuration pour l'utilisateur ''{name}''.",
           "fields": {
             "old_code": {
               "heading": "Code utilisé",
@@ -389,15 +394,11 @@
           "title": "Notifications",
           "description": "À l'aide de ce panneau, vous pouvez gérer les notifications à envoyer lors d'un évènement d'alarme",
           "table": {
-            "enabled": "Active",
-            "no_items": "Il n'y a aucune notification de  créée."
+            "no_items": "Il n'y a aucune notification de créée.",
+            "no_area_warning": "L'action n'est affectée à aucune zone."
           },
           "actions": {
             "new_notification": "Nouvelle notification"
-          },
-          "filter": {
-            "label": "Filtrer par zone",
-            "no_area": "(Aucune zone)"
           }
         },
         "actions": {

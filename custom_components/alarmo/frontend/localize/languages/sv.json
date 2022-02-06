@@ -1,17 +1,14 @@
 {
   "common": {
-    "modes_long": {
-      "armed_away": "Larmat borta",
-      "armed_home": "Larmat hemma",
-      "armed_night": "Larmat natt",
-      "armed_custom_bypass": "Larmat anpassad"
-    },
     "modes_short": {
       "armed_away": "Borta",
       "armed_home": "Hemma",
       "armed_night": "Natt",
-      "armed_custom_bypass": "Anpassad"
-    }
+      "armed_custom_bypass": "Anpassad",
+      "armed_vacation": "Vacation"
+    },
+    "enabled": "Aktiverat",
+    "disabled": "Inaktiverat"
   },
   "components": {
     "time_slider": {
@@ -24,6 +21,13 @@
       "ui_mode": "Till UI",
       "yaml_mode": "Till YAML",
       "edit_in_yaml": "Redigera i YAML"
+    },
+    "table": {
+      "filter": {
+        "label": "Filter items",
+        "item": "Filter by {name}",
+        "hidden_items": "{number} {number, plural,\n  one {item is}\n  other {items are}\n} hidden"
+      }
     }
   },
   "title": "Alarm panel",
@@ -55,14 +59,18 @@
         "modes": {
           "title": "Lägen",
           "description": "Denna panel kan användas för att konfiguera larmets olika larmlägen.",
+          "modes": {
+            "armed_away": "Larmat borta användas när alla personer lämnat huset. Alla dörrar och fönster som tillåter tillgång till huset kommer att larmas, det samma gäller rörelsesensorer inne i huset.",
+            "armed_home": "Larmat hemma används när det finns personer kvar i huset. Alla dörrar och fönster som tillåter tillgång till huset kommer att larmas, dock inga rörelsesensorer inne i huset.",
+            "armed_night": "Larmat natt används när du aktiverar larmen innan du lägger dig. Alla dörrar och fönster som tillåter tillgång till huset kommer att larmas, det samma gäller utvalda rörelsesensorer inne i huset.",
+            "armed_vacation": "Armed vacation can be used as an extension to the armed away mode in case of absence for longer duration. The delay times and trigger responses can be adapted (as desired) to being distant from home.",
+            "armed_custom_bypass": "Ett extra läge för för att definiera sin egen säkerhetsperimeter."
+          },
+          "number_sensors_active": "{number} {number, plural,\n  one {sensor}\n  other {sensorer}\n} aktiv",
           "fields": {
-            "mode": {
-              "armed_away": "Larmat borta användas när alla personer lämnat huset. Alla dörrar och fönster som tillåter tillgång till huset kommer att larmas, det samma gäller rörelsesensorer inne i huset.",
-              "armed_home": "Larmat hemma används när det finns personer kvar i huset. Alla dörrar och fönster som tillåter tillgång till huset kommer att larmas, dock inga rörelsesensorer inne i huset.",
-              "armed_night": "Larmat natt används när du aktiverar larmen innan du lägger dig. Alla dörrar och fönster som tillåter tillgång till huset kommer att larmas, det samma gäller utvalda rörelsesensorer inne i huset.",
-              "armed_custom_bypass": "Ett extra läge för för att definiera sin egen säkerhetsperimeter.",
-              "enabled": "Aktiverat",
-              "disabled": "Inaktiverat"
+            "status": {
+              "heading": "Status",
+              "description": "Controls whether the alarm can be armed in this mode."
             },
             "exit_delay": {
               "heading": "Lämna fördröjning",
@@ -100,11 +108,11 @@
             },
             "state_payload": {
               "heading": "Konfiguera payload per state",
-              "item": "Definiera en payload för state '{state}'"
+              "item": "Definiera en payload för state ''{state}''"
             },
             "command_payload": {
               "heading": "Konfiguera payload per kommando",
-              "item": "Definiera en payload för kommando '{command}'"
+              "item": "Definiera en payload för kommando ''{command}''"
             }
           }
         },
@@ -115,8 +123,8 @@
           "table": {
             "remarks": "Anmärkningar",
             "summary": "Denna area innehåller {summary_sensors} och {summary_automations}.",
-            "summary_sensors": "{number} sensorer",
-            "summary_automations": "{number} automationer"
+            "summary_sensors": "{number} {number, plural,\n  one {sensor}\n  other {sensorer}\n}",
+            "summary_automations": "{number} {number, plural,\n  one {automation}\n  other {automationer}\n}"
           },
           "actions": {
             "add": "Lägg till"
@@ -131,7 +139,7 @@
           }
         },
         "edit_area": {
-          "title": "Redigera area '{area}'",
+          "title": "Redigera area ''{area}''",
           "name_warning": "OBS: Ändrar du namn kommer entity ID att ändras"
         },
         "remove_area": {
@@ -152,14 +160,11 @@
       "cards": {
         "sensors": {
           "description": "Nuvarande konfiguerade sensorer. Klicka på ett entity för att göra förändringar.",
-          "no_items": "Det finns inga sensorer att visa här.",
           "table": {
+            "no_items": "Det finns inga sensorer att visa här.",
+            "no_area_warning": "Sensor is not assigned to any area.",
             "arm_modes": "Larmläge",
             "always_on": "(Alltid)"
-          },
-          "filter": {
-            "label": "Filtrera per area",
-            "no_area": "(Ingen area)"
           }
         },
         "add_sensors": {
@@ -171,12 +176,12 @@
           },
           "actions": {
             "add_to_alarm": "Addera till larmet",
-            "show_all": "Visa alla"
+            "filter_supported": "Hide items with unknown type"
           }
         },
         "editor": {
           "title": "Justera Sensor",
-          "description": "Justera inställningarna för sensor '{entity}'.",
+          "description": "Justera inställningarna för sensor ''{entity}''.",
           "fields": {
             "name": {
               "heading": "Namn",
@@ -297,7 +302,7 @@
           }
         },
         "edit_group": {
-          "title": "Justera sensor grupp '{name}'"
+          "title": "Justera sensor grupp ''{name}''"
         }
       }
     },
@@ -372,7 +377,7 @@
         },
         "edit_user": {
           "title": "Justera användare",
-          "description": "Ändra inställningar för användare '{name}'.",
+          "description": "Ändra inställningar för användare ''{name}''.",
           "fields": {
             "old_code": {
               "heading": "Nuvarande kod",
@@ -389,15 +394,11 @@
           "title": "Notifikationer",
           "description": "Du använder denna panel för att hantera notifikationer som ska sändas vid utvalda larmevents.",
           "table": {
-            "enabled": "Aktiverad",
-            "no_items": "Det är inga notifikationer skapade än."
+            "no_items": "Det är inga notifikationer skapade än.",
+            "no_area_warning": "Action is not assigned to any area."
           },
           "actions": {
             "new_notification": "ny notifikation"
-          },
-          "filter": {
-            "label": "Filtrera after area",
-            "no_area": "(Ingen area)"
           }
         },
         "actions": {

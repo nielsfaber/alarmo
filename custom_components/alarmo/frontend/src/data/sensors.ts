@@ -59,7 +59,6 @@ export const sensorClassToType = (stateObj: HassEntity): ESensorTypes | undefine
     case 'sound':
     case 'opening':
     case 'vibration':
-    case 'problem':
       return ESensorTypes.Tamper;
     default:
       return;
@@ -71,7 +70,7 @@ export const sensorConfigByType = (modeList: EArmModes[]): Dictionary<Partial<Al
 
   return {
     [ESensorTypes.Door]: {
-      modes: filterModes([EArmModes.ArmedAway, EArmModes.ArmedHome, EArmModes.ArmedNight]),
+      modes: filterModes([EArmModes.ArmedAway, EArmModes.ArmedHome, EArmModes.ArmedNight, EArmModes.ArmedVacation]),
       always_on: false,
       allow_open: false,
       arm_on_close: false,
@@ -79,7 +78,7 @@ export const sensorConfigByType = (modeList: EArmModes[]): Dictionary<Partial<Al
       use_exit_delay: false,
     },
     [ESensorTypes.Window]: {
-      modes: filterModes([EArmModes.ArmedAway, EArmModes.ArmedHome, EArmModes.ArmedNight]),
+      modes: filterModes([EArmModes.ArmedAway, EArmModes.ArmedHome, EArmModes.ArmedNight, EArmModes.ArmedVacation]),
       always_on: false,
       allow_open: false,
       arm_on_close: false,
@@ -87,7 +86,7 @@ export const sensorConfigByType = (modeList: EArmModes[]): Dictionary<Partial<Al
       use_exit_delay: false,
     },
     [ESensorTypes.Motion]: {
-      modes: filterModes([EArmModes.ArmedAway]),
+      modes: filterModes([EArmModes.ArmedAway, EArmModes.ArmedVacation]),
       always_on: false,
       allow_open: true,
       arm_on_close: false,
@@ -95,7 +94,13 @@ export const sensorConfigByType = (modeList: EArmModes[]): Dictionary<Partial<Al
       use_exit_delay: true,
     },
     [ESensorTypes.Tamper]: {
-      modes: filterModes([EArmModes.ArmedAway, EArmModes.ArmedHome, EArmModes.ArmedNight, EArmModes.ArmedCustom]),
+      modes: filterModes([
+        EArmModes.ArmedAway,
+        EArmModes.ArmedHome,
+        EArmModes.ArmedNight,
+        EArmModes.ArmedVacation,
+        EArmModes.ArmedCustom,
+      ]),
       always_on: false,
       allow_open: false,
       arm_on_close: false,
@@ -103,7 +108,13 @@ export const sensorConfigByType = (modeList: EArmModes[]): Dictionary<Partial<Al
       use_exit_delay: false,
     },
     [ESensorTypes.Environmental]: {
-      modes: filterModes([EArmModes.ArmedAway, EArmModes.ArmedHome, EArmModes.ArmedNight, EArmModes.ArmedCustom]),
+      modes: filterModes([
+        EArmModes.ArmedAway,
+        EArmModes.ArmedHome,
+        EArmModes.ArmedNight,
+        EArmModes.ArmedVacation,
+        EArmModes.ArmedCustom,
+      ]),
       always_on: true,
       allow_open: false,
       arm_on_close: false,
