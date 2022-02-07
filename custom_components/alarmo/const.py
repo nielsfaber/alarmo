@@ -47,7 +47,7 @@ PANEL_TITLE = NAME
 PANEL_ICON = "mdi:shield-home"
 PANEL_NAME = "alarm-panel"
 
-INITIALIZATION_TIME = datetime.timedelta(seconds=30)
+INITIALIZATION_TIME = datetime.timedelta(seconds=60)
 SENSOR_ARM_TIME = datetime.timedelta(seconds=5)
 
 STATES = [

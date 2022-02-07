@@ -94,38 +94,15 @@ class SensorHandler:
         self._groups = {}
         self._group_events = {}
 
-        def async_alarm_state_updated(area_id: str = None, old_state: str = None, state: str = None):
-            """watch sensors based on the state of the alarm entities."""
-            sensors_list = []
-            for area in self.hass.data[const.DOMAIN]["areas"].keys():
-                sensors_list.extend(self.active_sensors_for_alarm_state(area))
-
-            if self._state_listener:
-                self._state_listener()
-
-            if len(sensors_list):
-                self._state_listener = async_track_state_change(
-                    self.hass, sensors_list, self.async_sensor_state_changed
-                )
-            else:
-                self._state_listener = None
-
-            # clear previous sensor group events which are not active for current alarm state
-            for group_id in self._group_events.keys():
-                self._group_events[group_id] = dict(filter(
-                    lambda el: el[0] in sensors_list,
-                    self._group_events[group_id].items()
-                ))
-
         def async_update_sensor_config():
             """sensor config updated, reload the configuration."""
             self._config = self.hass.data[const.DOMAIN]["coordinator"].store.async_get_sensors()
             self._groups = self.hass.data[const.DOMAIN]["coordinator"].store.async_get_sensor_groups()
             self._group_events = {}
-            async_alarm_state_updated()
+            self.async_watch_sensor_states()
 
         self._subscriptions.append(
-            async_dispatcher_connect(hass, "alarmo_state_updated", async_alarm_state_updated)
+            async_dispatcher_connect(hass, "alarmo_state_updated", self.async_watch_sensor_states)
         )
         self._subscriptions.append(
             async_dispatcher_connect(hass, "alarmo_sensors_updated", async_update_sensor_config)
@@ -139,6 +116,29 @@ class SensorHandler:
             self._state_listener = None
         while len(self._subscriptions):
             self._subscriptions.pop()()
+
+    def async_watch_sensor_states(self, area_id: str = None, old_state: str = None, state: str = None):
+        """watch sensors based on the state of the alarm entities."""
+        sensors_list = []
+        for area in self.hass.data[const.DOMAIN]["areas"].keys():
+            sensors_list.extend(self.active_sensors_for_alarm_state(area))
+
+        if self._state_listener:
+            self._state_listener()
+
+        if len(sensors_list):
+            self._state_listener = async_track_state_change(
+                self.hass, sensors_list, self.async_sensor_state_changed
+            )
+        else:
+            self._state_listener = None
+
+        # clear previous sensor group events which are not active for current alarm state
+        for group_id in self._group_events.keys():
+            self._group_events[group_id] = dict(filter(
+                lambda el: el[0] in sensors_list,
+                self._group_events[group_id].items()
+            ))
 
     def active_sensors_for_alarm_state(self, area_id: str, state: str = None):
         """Compose a list of sensors that are active for the state"""
@@ -232,7 +232,7 @@ class SensorHandler:
         elif not alarm_entity.state and self.all_sensors_available_for_alarm(sensor_config["area"]):
             _LOGGER.debug("All sensors are initialized, restoring state")
             if alarm_entity.arm_mode:
-                await alarm_entity.async_arm(alarm_entity.arm_mode)
+                await alarm_entity.async_arm(alarm_entity.arm_mode, skip_delay=True)
             else:
                 await alarm_entity.async_update_state(STATE_ALARM_DISARMED)
 
@@ -281,18 +281,19 @@ class SensorHandler:
                 open_sensors=open_sensors
             )
 
-    def all_sensors_available_for_alarm(self, area_id: str, state: str = None):
-        sensors_list = self.active_sensors_for_alarm_state(area_id, state)
+    def all_sensors_available_for_alarm(self, area_id: str, init_state: str = None):
+        """check whether all sensors are available such that the prior state can be restored"""
+        sensors_list = self.active_sensors_for_alarm_state(area_id, init_state)
         passed = True
 
         for entity in sensors_list:
             state = self.hass.states.get(entity)
-            if (
-                not state
-                or not state.state
-                or (state.state not in SENSOR_STATES_CLOSED and state.state not in SENSOR_STATES_OPEN)
-            ):
+            if parse_sensor_state(state) not in [STATE_OPEN, STATE_CLOSED]:
                 passed = False
+
+        if not passed and init_state:
+            # watch for sensors to become available
+            self.async_watch_sensor_states(area_id)
 
         return passed
 
