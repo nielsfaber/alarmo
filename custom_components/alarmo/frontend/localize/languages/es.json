@@ -5,7 +5,7 @@
       "armed_home": "En casa",
       "armed_night": "Nocturno",
       "armed_custom_bypass": "Personalizado",
-      "armed_vacation": "Vacation"
+      "armed_vacation": "Vacaciones"
     },
     "enabled": "Habilitar",
     "disabled": "Deshabilitar"
@@ -20,13 +20,13 @@
     "editor": {
       "ui_mode": "Editar en la UI",
       "yaml_mode": "Editar en YAML",
-      "edit_in_yaml": "Edit in YAML"
+      "edit_in_yaml": "Editar en YAML"
     },
     "table": {
       "filter": {
-        "label": "Filter items",
-        "item": "Filter by {name}",
-        "hidden_items": "{number} {number, plural,\n  one {item is}\n  other {items are}\n} hidden"
+        "label": "Filtrar entidades",
+        "item": "Filtrar por {name}",
+        "hidden_items": "{number} {number, plural,\n  one {entidas está}\n  other {entidades están}\n} oculta"
       }
     }
   },
@@ -63,14 +63,14 @@
             "armed_away": "Armado ausente se utilizará cuando todas las personas salgan de la casa. Todas las puertas y ventanas que permitan el acceso a la casa estarán vigiladas, así como los sensores de movimiento dentro de la casa.",
             "armed_home": "Armado en casa (también conocido como estancia armada) se utilizará cuando se active la alarma mientras haya personas en la casa. Todas las puertas y ventanas que permitan el acceso a la casa estarán protegidas, pero no los sensores de movimiento dentro de la casa.",
             "armed_night": "Armado nocturno se usará al configurar la alarma antes de irse a dormir. Todas las puertas y ventanas que permitan el acceso a la casa estarán resguardadas y se seleccionarán sensores de movimiento en la casa.",
-            "armed_vacation": "Armed vacation can be used as an extension to the armed away mode in case of absence for longer duration. The delay times and trigger responses can be adapted (as desired) to being distant from home.",
+            "armed_vacation": "Armado en vacaciones se puede usar como una extensión del modo armado ausente en caso de ausencia de mayor duración. Los tiempos de retardo y las respuestas de activación se pueden adaptar (como se desee) a estar lejos de casa.",
             "armed_custom_bypass": "Un modo adicional para definir su propio perímetro de seguridad."
           },
           "number_sensors_active": "{number} {number, plural,\n  one {sensor}\n  other {sensores}\n} activo",
           "fields": {
             "status": {
-              "heading": "Status",
-              "description": "Controls whether the alarm can be armed in this mode."
+              "heading": "Estado",
+              "description": "Controla si la alarma se puede armar en este modo."
             },
             "exit_delay": {
               "heading": "Retardo de salida",
@@ -162,21 +162,21 @@
           "description": "Sensores configurados actualmente. Haga clic en una entidad para realizar cambios.",
           "table": {
             "no_items": "No hay sensores para mostrar aquí.",
-            "no_area_warning": "Sensor is not assigned to any area.",
+            "no_area_warning": "El sensor no está asignado a ningún área.",
             "arm_modes": "Modos de armado",
             "always_on": "(Siempre)"
           }
         },
         "add_sensors": {
-          "title": "Agregar  sensores",
+          "title": "Agregar sensores",
           "description": "Agrega más sensores. Asegúrate de que tus sensores tengan un nombre amigable, para que puedas identificarlos.",
           "no_items": "No hay entidades HA disponibles que se puedan configurar para la alarma. Asegúrese de incluir entidades del tipo sensor binario.",
           "table": {
-            "type": "Detected type"
+            "type": "Tipo detectado"
           },
           "actions": {
             "add_to_alarm": "agregar a la alarma",
-            "filter_supported": "Hide items with unknown type"
+            "filter_supported": "Ocultar elementos con tipo desconocido"
           }
         },
         "editor": {
@@ -192,8 +192,8 @@
               "description": "Seleccione un área que contenga este sensor."
             },
             "group": {
-              "heading": "Group",
-              "description": "Group with other sensors for combined triggering."
+              "heading": "Grupo",
+              "description": "Agrupar con otros sensores para un disparado combinado."
             },
             "device_type": {
               "heading": "Tipo de dispositivo",
@@ -234,24 +234,24 @@
             },
             "arm_on_close": {
               "heading": "Armar después de cerrar",
-              "description": "Después de la desactivación de este sensor, el retardo de salida restante se saltará automáticamente."
+              "description": "Después de la desactivación de este sensor, se saltará automáticamente el retardo de salida restante."
             },
             "use_exit_delay": {
-              "heading": "Use exit delay",
-              "description": "Sensor is allowed to be active when the exit delay starts."
+              "heading": "Usar retardo de salida",
+              "description": "Se permite que el sensor esté activo cuando comienza el retardo de salida."
             },
             "use_entry_delay": {
-              "heading": "Use entry delay",
-              "description": "Sensor activation triggers the alarm after the entry delay rather than directly."
+              "heading": "Usar retardo de entrada",
+              "description": "La activación del sensor activa la alarma después del retardo de entrada en lugar de directamente."
             },
             "allow_open": {
               "heading": "Permitir abrir mientras se arma",
-              "description": "Permita que este sensor se active poco después de salir de manera que no bloquee el armado."
+              "description": "Si el sensor aún está activo después del retardo de salida, esto no hará que falle el armado."
             },
             "auto_bypass": {
               "heading": "Omitir automáticamente",
               "description": "Excluya este sensor de la alarma si está abierto mientras se arma.",
-              "modes": "Modes in which sensor may be bypassed"
+              "modes": "Modos en los que se puede omitir el sensor"
             },
             "trigger_unavailable": {
               "heading": "Activar cuando no esté disponible",
@@ -261,48 +261,48 @@
           "actions": {
             "toggle_advanced": "Configuración avanzada",
             "remove": "Eliminar",
-            "setup_groups": "Setup groups"
+            "setup_groups": "Configuraar grupos"
           },
           "errors": {
             "description": "Por favor, corrija los siguientes errores:",
-            "no_area": "No se ha seleccionado ninguna área.",
-            "no_modes": "No se han seleccionados modos para los que el sensor deba estar activo.",
-            "no_auto_bypass_modes": "No modes are selected for the sensor may be automatically bypassed"
+            "no_area": "No se ha seleccionado ninguna área",
+            "no_modes": "No se han seleccionados modos para los que el sensor deba estar activo",
+            "no_auto_bypass_modes": "No se han seleccionados modos para los que el sensor pueda ser omitido"
           }
         }
       },
       "dialogs": {
         "manage_groups": {
-          "title": "Manage sensor groups",
-          "description": "In a sensor group multiple sensors must be activated within a time period before the alarm is triggered.",
-          "no_items": "No groups yet",
+          "title": "Administrar grupos de sensores",
+          "description": "En un grupo de sensores, se deben activar varios sensores dentro de un período de tiempo antes de que se dispare la alarma.",
+          "no_items": "Todavía no hay grupos",
           "actions": {
-            "new_group": "New group"
+            "new_group": "Nuevo grupo"
           }
         },
         "create_group": {
-          "title": "New sensor group",
+          "title": "Nuevo grupo de sensores",
           "fields": {
             "name": {
-              "heading": "Name",
-              "description": "Name for sensor group"
+              "heading": "Nombre",
+              "description": "Nombre del grupo de sensores"
             },
             "timeout": {
-              "heading": "Time-out",
-              "description": "Time period during which consecutive sensor activations triggers the alarm."
+              "heading": "Tiempo muerto",
+              "description": "Período de tiempo durante el cual las activaciones consecutivas del sensor activan la alarma."
             },
             "sensors": {
-              "heading": "Sensors",
-              "description": "Select the sensors which are contained by this group."
+              "heading": "Sensores",
+              "description": "Seleccione los sensores que están contenidos en este grupo."
             }
           },
           "errors": {
-            "invalid_name": "Invalid name provided.",
-            "insufficient_sensors": "At least 2 sensors need to be selected."
+            "invalid_name": "Nombre proporcionado no válido.",
+            "insufficient_sensors": "Se deben seleccionar al menos 2 sensores."
           }
         },
         "edit_group": {
-          "title": "Edit sensor group ''{name}''"
+          "title": "Editar grupo de sensores '{name}'"
         }
       }
     },
@@ -365,8 +365,8 @@
               "description": "Al ingresar este código se forzará el armado de la alarma."
             },
             "area_limit": {
-              "heading": "Restricted areas",
-              "description": "Limit user to control only the selected areas"
+              "heading": "Áreas restringidas",
+              "description": "Limitar al usuario a controlar solo las áreas seleccionadas"
             }
           },
           "errors": {
@@ -395,7 +395,7 @@
           "description": "Usando este panel, puede administrar las notificaciones que se enviarán durante un evento de alarma determinado.",
           "table": {
             "no_items": "Aún no se han creado notificaciones.",
-            "no_area_warning": "Action is not assigned to any area."
+            "no_area_warning": "La acción no está asignada a ningún área."
           },
           "actions": {
             "new_notification": "nueva notificación"
@@ -413,9 +413,9 @@
         "new_notification": {
           "title": "Crear notificación",
           "description": "Crear una nueva notificación.",
-          "trigger": "Condition",
-          "action": "Task",
-          "options": "Options",
+          "trigger": "Condición",
+          "action": "Tarea",
+          "options": "Opciones",
           "fields": {
             "event": {
               "heading": "Evento",
@@ -469,16 +469,16 @@
               }
             },
             "open_sensors_format": {
-              "heading": "Format for open_sensors wildcard",
-              "description": "Choose which sensor information in inserted in the message",
+              "heading": "Formato para el comodín open_sensors",
+              "description": "Elija qué información del sensor se inserta en el mensaje",
               "options": {
-                "default": "Names and states",
-                "short": "Names only"
+                "default": "Nombres y estados",
+                "short": "Solo nombres"
               }
             },
             "arm_mode_format": {
-              "heading": "Translation for arm_mode wildcard",
-              "description": "Choose in which language the arm mode is inserted in the message"
+              "heading": "Traducción del comodín arm_mode",
+              "description": "Elija en qué idioma se inserta el modo de armado en el mensaje"
             },
             "target": {
               "heading": "Objetivo",
@@ -528,7 +528,7 @@
             "action": {
               "heading": "Acción",
               "description": "Acción a realizar en la entidad.",
-              "no_common_actions": "Actions can only be assigned in YAML mode for the selected entities."
+              "no_common_actions": "Las acciones solo se pueden asignar en modo YAML para las entidades seleccionadas."
             },
             "name": {
               "heading": "Nombre",
