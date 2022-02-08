@@ -291,20 +291,15 @@ class AlarmoCoordinator(DataUpdateCoordinator):
         # handle push notifications with action buttons
         @callback
         async def async_handle_push_event(event):
-            action = None
-            if (
-                event.data
-                and "categoryName" in event.data
-                and "actionName" in event.data
-                and event.data["categoryName"] in const.EVENT_CATEGORIES
-            ):
-                # IOS push notification format
-                action = event.data["actionName"]
-            elif "action" in "action" and event.data["action"]:
-                # Android push notification format
-                action = event.data["action"]
+            if not event.data:
+                return
+            action = event.data.get("actionName") if "actionName" in event.data else event.data.get("action")
 
-            if not action:
+            if action not in [
+                const.EVENT_ACTION_FORCE_ARM,
+                const.EVENT_ACTION_RETRY_ARM,
+                const.EVENT_ACTION_DISARM
+            ]:
                 return
 
             if self.hass.data[const.DOMAIN]["master"]:
@@ -330,10 +325,9 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                 _LOGGER.info("Received request for disarming")
                 await alarm_entity.async_alarm_disarm(None, True)
 
-        for event in const.PUSH_EVENTS:
-            self._subscriptions.append(
-                self.hass.bus.async_listen(event, async_handle_push_event)
-            )
+        self._subscriptions.append(
+            self.hass.bus.async_listen(const.PUSH_EVENT, async_handle_push_event)
+        )
 
         @callback
         async def async_handle_event(event: str, area_id: str, args: dict = {}):

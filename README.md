@@ -487,46 +487,36 @@ Example:
 
 <img src="https://raw.githubusercontent.com/nielsfaber/alarmo/main/screenshots/actionable_push_message.png" width="400">
 
-The 'Retry Arm' option will repeat the command that failed before. You could use it if you solved the issue in the mean time.
+**Available actions**
 
-The 'Force Arm' option will repeat the command that failed before. The sensor/sensors that failed, shall be ignored while the alarm is armed.
+The following actions are defined in Alarmo and can be used in actionable notifications:
 
-**Preparation (iOS devices only)**
-
-Add this to the `configuration.yaml` file:
-```yaml
-ios:
-  push:
-    categories:
-      - name: Alarm Arm Failure
-        identifier: alarmo_arm_failure
-        actions:
-          - identifier: ALARMO_RETRY_ARM
-            title: Retry Arm # feel free to change this text
-            destructive: true
-          - identifier: ALARMO_FORCE_ARM
-            title: Force Arm # feel free to change this text
-            destructive: true
-```
-
-Restart HA to make the configuration effective.
+| action             | Description                                                                                                                      | Suitable events               |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| `ALARMO_RETRY_ARM` | Repeats the command that failed before.<br>Will only succeed in case the issue blocking the arming before has been restored.     | Failed to arm                 |
+| `ALARMO_FORCE_ARM` | Repeats the command that failed before.<br>The sensor/sensors that failed, shall be ignored (bypassed) while the alarm is armed. | Failed to arm                 |
+| `ALARMO_DISARM`    | Disarm the alarm.                                                                                                                | Armed, Leave, Entry, Triggered |
 
 **Set up notification with actions**
 
-In the Alarmo notifications editor, create a notification with the 'Failed to arm' event.
+In the Alarmo notifications editor, create a notification and select an event.
 Choose your iOS/Android device as target, set a message and title as you want.
 
 Switch to YAML mode. Look for the part that has `service_data`, and extend it as follows:
 ```yaml
- service_data:
-   ... # your message and title should be here already
-   data:
-     actions:
-       - action: ALARMO_RETRY_ARM
-         title: Retry Arm # feel free to change this text
-       - action: ALARMO_FORCE_ARM
-         title: Force Arm # feel free to change this text
+service_data:
+  ... # your message and title should be here already
+  data:
+    actions:
+      - action: ALARMO_RETRY_ARM
+        title: Retry Arm # feel free to change this text
+      - action: ALARMO_FORCE_ARM
+        title: Force Arm # feel free to change this text
 ```
+
+For more info about actionable notifications in HA, see [here](https://companion.home-assistant.io/docs/notifications/actionable-notifications/).
+
+**Note**: In case you have multiple areas set up, the actionable notifications only work for the [alarm master](#alarm-master) (since no area info can be sent along with the action data).
 
 #### Actions
 

@@ -145,13 +145,7 @@ ATTR_COMMAND_PAYLOAD = "command_payload"
 ATTR_FORCE = "force"
 ATTR_SKIP_DELAY = "skip_delay"
 
-PUSH_EVENTS = [
-    "ios.notification_action_fired",
-    "mobile_app_notification_action",
-]
-EVENT_CATEGORIES = [
-    "ALARMO_ARM_FAILURE",
-]
+PUSH_EVENT = "mobile_app_notification_action"
 EVENT_ACTION_FORCE_ARM = "ALARMO_FORCE_ARM"
 EVENT_ACTION_RETRY_ARM = "ALARMO_RETRY_ARM"
 EVENT_ACTION_DISARM = "ALARMO_DISARM"
