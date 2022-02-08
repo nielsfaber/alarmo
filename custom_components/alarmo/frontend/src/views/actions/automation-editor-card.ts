@@ -99,7 +99,8 @@ export class AutomationEditorCard extends LitElement {
       else if (areaOptions.includes(0)) this._setArea(new CustomEvent('value-changed', { detail: { value: 0 } }));
     }
 
-    if(this.item && !this.config.triggers[0].area && !this.alarmoConfig.master.enabled) this.errors = {...this.errors, area: true};
+    if (this.item && !this.config.triggers[0].area && !this.alarmoConfig.master.enabled)
+      this.errors = { ...this.errors, area: true };
   }
 
   protected render(): TemplateResult {
@@ -328,7 +329,6 @@ export class AutomationEditorCard extends LitElement {
           class="${isMatchingAction(this._selectedAction(), action) ? 'active' : ''}"
           @click=${() => this._setAction(action)}
           ?invalid=${this.errors.service}
-          ?disabled=${actions.length == 1}
         >
           ${computeActionDisplay(action, this.hass)}
         </mwc-button>
