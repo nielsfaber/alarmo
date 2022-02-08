@@ -242,7 +242,6 @@ class SensorHandler:
                 new_state in [STATE_OPEN, STATE_UNKNOWN, STATE_UNAVAILABLE]
                 and not sensor_config[ATTR_USE_ENTRY_DELAY]
                 and not sensor_config[ATTR_ALLOW_OPEN]
-                and not self._bypass_mode
             ):
                 open_sensors = self.process_group_event(entity, new_state, open_sensors)
                 if not open_sensors:
