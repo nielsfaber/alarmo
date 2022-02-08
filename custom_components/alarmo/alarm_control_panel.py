@@ -341,7 +341,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             if self.changed_by:
                 _LOGGER.info("Alarm '{}' is disarmed by {}.".format(self.name, self.changed_by))
             else:
-                _LOGGER.info("Alarm '{}' is disarmed.").format(self.name)
+                _LOGGER.info("Alarm '{}' is disarmed.".format(self.name))
             return True
 
     async def async_service_arm_handler(self, code, mode, skip_delay, force):
