@@ -183,10 +183,6 @@
           "title": "Modifica Sensore",
           "description": "Configura le impostazioni del sensore ''{entity}''.",
           "fields": {
-            "name": {
-              "heading": "Nome",
-              "description": "Sovrascrivi friendly name."
-            },
             "area": {
               "heading": "Area",
               "description": "Select an area which contains this sensor."

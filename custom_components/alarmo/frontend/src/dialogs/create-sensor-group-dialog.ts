@@ -152,7 +152,7 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
         const type = Object.entries(ESensorTypes).find(([, v]) => v == this.sensors[e].type)![0];
         return {
           value: e,
-          name: this.sensors[e].name || prettyPrint(computeName(stateObj)),
+          name: prettyPrint(computeName(stateObj)),
           icon: ESensorIcons[type],
         };
       });

@@ -47,7 +47,6 @@ export type AlarmoConfig = {
 
 export type AlarmoSensor = {
   entity_id: string;
-  name?: string;
   type: ESensorTypes;
   modes: EArmModes[];
   use_exit_delay: boolean;

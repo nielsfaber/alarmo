@@ -183,10 +183,6 @@
           "title": "Andurite sätted",
           "description": "Muuda olemi ''{entity}'' sätteid.",
           "fields": {
-            "name": {
-              "heading": "Nimi",
-              "description": "Muuda kuvatavat nime."
-            },
             "area": {
               "heading": "Ala",
               "description": "Vali ala kus see andur asub."

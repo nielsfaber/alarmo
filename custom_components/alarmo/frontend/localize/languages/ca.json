@@ -183,10 +183,6 @@
           "title": "Edita el sensor",
           "description": "Edita la configuració del sensor de ''{entity}''.",
           "fields": {
-            "name": {
-              "heading": "Nom",
-              "description": "Sobreescriu el friendly_name"
-            },
             "area": {
               "heading": "Àrea",
               "description": "Seleccioneu una àrea que contingui aquest sensor."

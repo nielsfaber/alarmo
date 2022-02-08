@@ -130,7 +130,6 @@ export function defaultSensorConfig(stateObj: HassEntity | undefined, modeList: 
 
   let config: AlarmoSensor = {
     entity_id: stateObj.entity_id,
-    name: stateObj.attributes.friendly_name || stateObj.entity_id,
     modes: [],
     use_entry_delay: true,
     use_exit_delay: true,

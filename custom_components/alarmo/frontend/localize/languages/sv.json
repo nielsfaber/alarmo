@@ -183,10 +183,6 @@
           "title": "Justera Sensor",
           "description": "Justera inställningarna för sensor ''{entity}''.",
           "fields": {
-            "name": {
-              "heading": "Namn",
-              "description": "Skriv över friendly name."
-            },
             "area": {
               "heading": "Area",
               "description": "Välj en area som innehåller denna sensor."

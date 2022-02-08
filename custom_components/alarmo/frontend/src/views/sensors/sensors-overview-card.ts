@@ -61,49 +61,12 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
   render() {
     if (!this.hass || !this.areas || !this.sensors) return html``;
 
-    const namedSensors = Object.keys(this.sensors).filter(e => {
-      const stateObj = this.hass.states[e];
-      return stateObj && this.sensors[e].name?.length
-        ? prettyPrint(computeName(stateObj)) != this.sensors[e].name
-        : false;
-    });
-
     return html`
       <ha-card header="${localize('panels.sensors.title', this.hass.language)}">
         <div class="card-content">
           ${localize('panels.sensors.cards.sensors.description', this.hass.language)}
         </div>
 
-        ${namedSensors.length
-          ? html`
-              <ha-alert .alertType=${'warning'}>
-                You have sensors assigned with a custom name, a feature which will be removed in an upcoming update. The
-                following sensors are affected:
-                <ul>
-                  ${namedSensors.map(
-                    e => html`
-                      <li>
-                        '${this.sensors[e].name}' will be renamed to '${prettyPrint(computeName(this.hass.states[e]))}'
-                        (
-                        <a
-                          href="#"
-                          @click=${() => {
-                            this.removeCustomName(e);
-                          }}
-                        >
-                          approve change
-                        </a>
-                        )
-                      </li>
-                    `
-                  )}
-                </ul>
-                If you want to maintain the current sensor names, please assign appropriate names in HA instead (see
-                <a href="${String(window.location).replace('alarmo/sensors', 'config/entities')}">here</a>
-                ).
-              </ha-alert>
-            `
-          : ''}
         <alarmo-table
           .hass=${this.hass}
           ?selectable=${true}
@@ -157,7 +120,7 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
         width: '60%',
         grow: true,
         text: true,
-        renderer: (data: AlarmoSensor) => html`
+        renderer: (data: AlarmoSensor & { name: string }) => html`
           ${data.area == noArea ? warningTooltip() : ''}
           <span class="${!data.enabled ? 'disabled' : ''}">${data.name}</span>
           <span class="secondary ${!data.enabled ? 'disabled' : ''}">${data.entity_id}</span>
@@ -203,7 +166,7 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
       let res: TableData & { name: string } = {
         ...config,
         id: id,
-        name: stateObj ? config.name || computeName(stateObj) : computeName(stateObj),
+        name: computeName(stateObj),
         modes: config.modes.filter(e =>
           config.area ? modesByArea(this.areas[config.area]).includes(e) : getModesList(this.areas).includes(e)
         ),

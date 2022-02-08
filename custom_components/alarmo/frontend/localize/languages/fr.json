@@ -183,10 +183,6 @@
           "title": "Editer un capteur",
           "description": "Configurer les paramètres du capteur ''{entity}''.",
           "fields": {
-            "name": {
-              "heading": "Nom",
-              "description": "Remplacer le nom personnalisé (friendly name)."
-            },
             "area": {
               "heading": "Zone",
               "description": "Selectionner une zone contenant ce capteur."

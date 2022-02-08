@@ -183,10 +183,6 @@
           "title": "Edit Sensor",
           "description": "Configuring the sensor settings of ''{entity}''.",
           "fields": {
-            "name": {
-              "heading": "Name",
-              "description": "Overwrite friendly name."
-            },
             "area": {
               "heading": "Area",
               "description": "Select an area which contains this sensor."

@@ -205,7 +205,6 @@ class AlarmoSensorView(HomeAssistantView):
         vol.Schema(
             {
                 vol.Required(ATTR_ENTITY_ID): cv.entity_id,
-                vol.Optional(ATTR_NAME): cv.string,
                 vol.Optional(const.ATTR_REMOVE): cv.boolean,
                 vol.Optional(const.ATTR_TYPE): vol.In(SENSOR_TYPES),
                 vol.Optional(const.ATTR_MODES): vol.All(

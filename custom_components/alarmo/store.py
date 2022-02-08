@@ -31,7 +31,7 @@ _LOGGER = logging.getLogger(__name__)
 
 DATA_REGISTRY = f"{DOMAIN}_storage"
 STORAGE_KEY = f"{DOMAIN}.storage"
-STORAGE_VERSION = 4
+STORAGE_VERSION = 5
 SAVE_DELAY = 10
 
 
@@ -98,7 +98,6 @@ class SensorEntry:
     """Sensor storage Entry."""
 
     entity_id = attr.ib(type=str, default=None)
-    name = attr.ib(type=str, default="")
     type = attr.ib(type=str, default=SENSOR_TYPE_OTHER)
     modes = attr.ib(type=list, default=[])
     use_exit_delay = attr.ib(type=bool, default=True)
@@ -259,6 +258,14 @@ class MigratableStore(Store):
                         if "auto_bypass" in sensor and sensor["auto_bypass"]
                         else [],
                     }
+                ))
+                for sensor in data["sensors"]
+            ]
+
+        if old_version <= 4:
+            data["sensors"] = [
+                attr.asdict(SensorEntry(
+                    **omit(sensor, ["name"]),
                 ))
                 for sensor in data["sensors"]
             ]
