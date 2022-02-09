@@ -3060,7 +3060,7 @@ class Ji extends class{constructor(e){}T(e,t,a){this.Σdt=e,this.M=t,this.Σct=a
               ${mi("title",this.hass.language)}
             </div>
             <div class="version">
-              v${"1.8.4"}
+              v${"1.8.5"}
             </div>
           </app-toolbar>
           <ha-tabs
