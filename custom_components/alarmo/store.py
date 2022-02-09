@@ -251,7 +251,7 @@ class MigratableStore(Store):
             data["sensors"] = [
                 attr.asdict(SensorEntry(
                     **{
-                        **omit(sensor, ["immediate"]),
+                        **omit(sensor, ["immediate", "name"]),
                         "use_exit_delay": not sensor["immediate"] and not sensor["always_on"],
                         "use_entry_delay": not sensor["immediate"] and not sensor["always_on"],
                         "auto_bypass_modes": sensor["modes"]
