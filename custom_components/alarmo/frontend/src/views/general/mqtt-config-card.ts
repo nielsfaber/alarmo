@@ -2,7 +2,7 @@ import { LitElement, html } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 import { HomeAssistant, navigate } from 'custom-card-helpers';
 import { mdiClose } from '@mdi/js';
-import { loadHaForm } from '../../load-ha-form';
+import { loadHaForm } from '../../load-ha-elements';
 import { AlarmoConfig, MqttConfig, AlarmoArea, Dictionary } from '../../types';
 import { commonStyle } from '../../styles';
 

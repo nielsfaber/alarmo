@@ -1,7 +1,7 @@
 import { LitElement, html, CSSResultGroup, css } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 import { HomeAssistant, navigate } from 'custom-card-helpers';
-import { loadHaForm } from './load-ha-form';
+import { loadHaForm } from './load-ha-elements';
 
 import './views/general/view-general.ts';
 import './views/sensors/view-sensors.ts';

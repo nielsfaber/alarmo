@@ -1,7 +1,7 @@
 import { LitElement, html } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 import { HomeAssistant, navigate, computeDomain } from 'custom-card-helpers';
-import { loadHaForm } from '../../load-ha-form';
+import { loadHaForm } from '../../load-ha-elements';
 
 import { AlarmEntity, AlarmoAutomation, Dictionary, AlarmoArea, AlarmoConfig } from '../../types';
 import { SubscribeMixin } from '../../subscribe-mixin';

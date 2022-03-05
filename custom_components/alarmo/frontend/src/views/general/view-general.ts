@@ -7,7 +7,7 @@ import { fetchConfig, saveConfig, fetchAreas, fetchAutomations, deleteAutomation
 import { SubscribeMixin } from '../../subscribe-mixin';
 import { localize } from '../../../localize/localize';
 import { pick, handleError } from '../../helpers';
-import { loadHaForm } from '../../load-ha-form';
+import { loadHaForm } from '../../load-ha-elements';
 import { AlarmoConfig, Dictionary, AlarmoArea, AlarmoAutomation } from '../../types';
 import { commonStyle } from '../../styles';
 import { exportPath, Path } from '../../common/navigation';

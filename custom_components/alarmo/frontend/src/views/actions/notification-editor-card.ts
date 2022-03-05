@@ -33,6 +33,7 @@ import {
 
 import { EAutomationTypes } from '../../const';
 import { exportPath } from '../../common/navigation';
+import { loadHaYamlEditor } from '../../load-ha-elements';
 
 import '../../components/alarmo-selector';
 import '../../components/alarmo-select';
@@ -74,6 +75,8 @@ export class NotificationEditorCard extends LitElement {
   errors: Dictionary<boolean> = {};
 
   async firstUpdated() {
+    await loadHaYamlEditor();
+    
     this.areas = await fetchAreas(this.hass);
     this.alarmoConfig = await fetchConfig(this.hass);
 
