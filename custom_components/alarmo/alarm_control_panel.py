@@ -580,7 +580,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
         """handle arm failure."""
         self._open_sensors = open_sensors
 
-        if self._state != self._revert_state:
+        if self._state != self._revert_state and self._revert_state:
             await self.async_update_state(self._revert_state)
         else:
             # when disarmed, only update the attributes
@@ -987,7 +987,7 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
         self._target_state = None
 
         for item in self.hass.data[const.DOMAIN]["areas"].values():
-            if item.state != self._revert_state:
+            if item.state != self._revert_state and self._revert_state:
                 await item.async_update_state(self._revert_state)
 
         self._revert_state = None

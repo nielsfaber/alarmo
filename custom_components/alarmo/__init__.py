@@ -317,10 +317,10 @@ class AlarmoCoordinator(DataUpdateCoordinator):
 
             if action == const.EVENT_ACTION_FORCE_ARM:
                 _LOGGER.info("Received request for force arming")
-                await alarm_entity.async_arm(arm_mode, bypass_open_sensors=True)
+                await alarm_entity.async_handle_arm_request(arm_mode, skip_code=True, bypass_open_sensors=True)
             elif action == const.EVENT_ACTION_RETRY_ARM:
                 _LOGGER.info("Received request for retry arming")
-                await alarm_entity.async_arm(arm_mode)
+                await alarm_entity.async_handle_arm_request(arm_mode, skip_code=True)
             elif action == const.EVENT_ACTION_DISARM:
                 _LOGGER.info("Received request for disarming")
                 await alarm_entity.async_alarm_disarm(None, True)
