@@ -34,8 +34,6 @@ NAME = "Alarmo"
 MANUFACTURER = "@nielsfaber"
 
 DOMAIN = "alarmo"
-ALARM_ENTITY = "{}.{}".format(PLATFORM, DOMAIN)
-
 
 CUSTOM_COMPONENTS = "custom_components"
 INTEGRATION_FOLDER = DOMAIN

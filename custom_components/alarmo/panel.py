@@ -14,7 +14,6 @@ from .const import (
     PANEL_NAME,
     PANEL_FILENAME,
     DOMAIN,
-    ALARM_ENTITY,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -25,7 +24,11 @@ async def async_register_panel(hass):
     panel_dir = os.path.join(root_dir, PANEL_FOLDER)
     view_url = os.path.join(panel_dir, PANEL_FILENAME)
 
-    hass.http.register_static_path(PANEL_URL, view_url)
+    hass.http.register_static_path(
+        PANEL_URL,
+        view_url,
+        cache_headers=False
+    )
 
     await panel_custom.async_register_panel(
         hass,
@@ -35,7 +38,7 @@ async def async_register_panel(hass):
         sidebar_title=PANEL_TITLE,
         sidebar_icon=PANEL_ICON,
         require_admin=True,
-        config={"entity_id": ALARM_ENTITY},
+        config={},
     )
 
 
