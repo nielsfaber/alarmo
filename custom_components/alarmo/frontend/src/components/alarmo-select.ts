@@ -36,7 +36,7 @@ export class AlarmoSelect extends LitElement {
 
   public focus() {
     this.updateComplete.then(() => {
-      (this.shadowRoot?.querySelector('paper-input') as HTMLInputElement).focus();
+      (this.shadowRoot?.querySelector('ha-textfield') as HTMLInputElement).focus();
     });
   }
 
@@ -53,6 +53,8 @@ export class AlarmoSelect extends LitElement {
   }
 
   protected render(): TemplateResult {
+    const hasValue = isDefined(this._value) && this.items.find(e => e.value == this._value);
+
     return html`
       <vaadin-combo-box-light
         item-value-path="value"
@@ -65,7 +67,7 @@ export class AlarmoSelect extends LitElement {
         @opened-changed=${this._openedChanged}
         @value-changed=${this._valueChanged}
       >
-        <paper-input
+        <ha-textfield
           .label=${this.label}
           class="input"
           autocapitalize="none"
@@ -74,75 +76,62 @@ export class AlarmoSelect extends LitElement {
           spellcheck="false"
           ?disabled=${this.disabled}
           ?invalid=${this.invalid}
+          .icon=${this.icons && hasValue}
         >
-          ${isDefined(this._value) && this.items.find(e => e.value == this._value)
-            ? html`
-                ${this.icons
-                  ? html`
-                      <ha-icon slot="prefix" icon="${this.items.find(e => e.value == this._value)!.icon}"> </ha-icon>
-                    `
-                  : ''}
-                ${this.clearable
-                  ? html`
-                      <ha-icon-button slot="suffix" class="clear-button" @click=${this._clearValue} .path=${mdiClose}>
-                      </ha-icon-button>
-                    `
-                  : ''}
-              `
-            : ''}
-          <ha-icon-button slot="suffix" class="toggle-button" .path=${this._opened ? mdiMenuUp : mdiMenuDown}>
-          </ha-icon-button>
-        </paper-input>
+          <ha-icon
+            name="icon"
+            slot="leadingIcon"
+            icon="${this.icons && hasValue ? this.items.find(e => e.value == this._value)!.icon : undefined}"
+          ></ha-icon>
+        </ha-textfield>
+        <ha-svg-icon
+          class="toggle-button ${this.items.length ? '' : 'disabled'}"
+          .path=${this._opened && this.items.length ? mdiMenuUp : mdiMenuDown}
+          @click=${this._toggleOpen}
+        ></ha-svg-icon>
+        ${this.clearable && hasValue
+          ? html`
+              <ha-svg-icon class="clear-button" @click=${this._clearValue} .path=${mdiClose}></ha-svg-icon>
+            `
+          : ''}
       </vaadin-combo-box-light>
     `;
   }
 
   rowRenderer = (root: HTMLElement, _owner, entry: { item: Option }) => {
+    const hasDescription = isDefined(entry.item.description);
     if (!root.firstElementChild && this.icons) {
       root.innerHTML = `
         <style>
-          paper-icon-item {
-              margin: -10px;
-              padding: 0;
-          }
-          ha-icon {
-              display: flex;
-              flex: 0 0 40px;
-              color: var(--state-icon-color);
-          }
-          :host([selected]) paper-icon-item {
-            margin-left: 24px;
+          mwc-list-item {
+            font-size: 15px;
+            --mdc-typography-body2-font-size: 14px;
+            --mdc-list-item-meta-size: 8px;
+            --mdc-list-item-graphic-margin: 8px;
           }
         </style>
-        <paper-icon-item>
-          <ha-icon icon="" slot="item-icon"></ha-icon>
-          <paper-item-body two-line>
-            <div class="name"></div>
-            <div secondary></div>
-          </paper-item-body>
-        </paper-icon-item>
+        <mwc-list-item graphic="avatar" ${hasDescription ? 'twoline' : ''}>
+          <ha-icon icon="" slot="graphic"></ha-icon>
+          <span class="name"></span>
+          <span slot="secondary"></span>
+        </mwc-list-item>
         `;
     } else if (!root.firstElementChild) {
       root.innerHTML = `
         <style>
-          paper-item {
-              margin: -10px;
-              padding: 0;
-          }
-          :host([selected]) paper-item {
-            margin-left: 24px;
+          mwc-list-item {
+            font-size: 15px;
+            --mdc-typography-body2-font-size: 14px;
           }
         </style>
-        <paper-item>
-          <paper-item-body two-line>
-            <div class="name"></div>
-            <div secondary></div>
-          </paper-item-body>
-        </paper-item>
+        <mwc-list-item ${hasDescription ? 'twoline' : ''}>
+          <span class="name"></span>
+          <span slot="secondary"></span>
+        </mwc-list-item>
         `;
     }
     root.querySelector('.name')!.textContent = entry.item.name;
-    root.querySelector('[secondary]')!.textContent = entry.item.description || '';
+    root.querySelector('[slot="secondary"]')!.textContent = entry.item.description || '';
     if (this.icons) (root.querySelector('ha-icon')! as any).icon = entry.item.icon;
   };
 
@@ -153,6 +142,19 @@ export class AlarmoSelect extends LitElement {
 
   private get _value() {
     return isDefined(this.value) ? this.value : '';
+  }
+
+  private _toggleOpen(ev: Event) {
+    if (!this.items.length) {
+      ev.stopPropagation();
+      return;
+    }
+    if (this._opened) {
+      (this.shadowRoot?.querySelector('vaadin-combo-box-light') as any)?.inputElement?.blur();
+      ev.stopPropagation();
+    } else {
+      (this.shadowRoot?.querySelector('vaadin-combo-box-light') as any)?.inputElement?.focus();
+    }
   }
 
   private _openedChanged(ev: CustomEvent) {
@@ -177,23 +179,39 @@ export class AlarmoSelect extends LitElement {
   static get styles(): CSSResultGroup {
     return css`
       :host {
-        line-height: 1em;
+        display: block;
       }
-      paper-input > ha-icon-button {
+      vaadin-combo-box-light {
+        position: relative;
+      }
+      ha-textfield {
+        width: 100%;
+      }
+      ha-textfield > ha-icon-button {
         --mdc-icon-button-size: 24px;
         padding: 2px;
         color: var(--secondary-text-color);
       }
-      [hidden] {
-        display: none;
+      ha-svg-icon {
+        color: var(--input-dropdown-icon-color);
+        position: absolute;
+        cursor: pointer;
       }
-      paper-input > ha-icon {
-        display: flex;
-        flex: 0 0 40px;
-        color: var(--state-icon-color);
-        width: 40px;
-        height: 26px;
-        align-items: center;
+      ha-svg-icon.disabled {
+        cursor: default;
+        color: var(--disabled-text-color);
+      }
+      .toggle-button {
+        right: 12px;
+        bottom: 5px;
+      }
+      :host([opened]) .toggle-button {
+        color: var(--primary-color);
+      }
+      .clear-button {
+        --mdc-icon-size: 20px;
+        bottom: 5px;
+        right: 36px;
       }
     `;
   }

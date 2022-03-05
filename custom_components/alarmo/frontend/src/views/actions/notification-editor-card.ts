@@ -210,15 +210,15 @@ export class NotificationEditorCard extends LitElement {
                     ${localize('panels.actions.cards.new_notification.fields.title.description', this.hass.language)}
                   </span>
 
-                  <paper-input
+                  <ha-textfield
                     label="${localize(
                       'panels.actions.cards.new_notification.fields.title.heading',
                       this.hass.language
                     )}"
-                    .value=${this.config.actions[0].service_data?.title}
-                    @value-changed=${this._setTitle}
+                    .value=${this.config.actions[0].service_data?.title || ''}
+                    @input=${this._setTitle}
                     ?invalid=${this.errors.title}
-                  ></paper-input>
+                  ></ha-textfield>
                 </settings-row>
 
                 <settings-row .narrow=${this.narrow} .large=${true} last>
@@ -229,17 +229,17 @@ export class NotificationEditorCard extends LitElement {
                     ${localize('panels.actions.cards.new_notification.fields.message.description', this.hass.language)}
                   </span>
 
-                  <paper-textarea
+                  <ha-textarea
                     id="message"
                     label="${localize(
                       'panels.actions.cards.new_notification.fields.message.heading',
                       this.hass.language
                     )}"
                     placeholder=${this._messagePlaceholder()}
-                    .value=${this.config.actions[0].service_data?.message}
-                    @value-changed=${this._setMessage}
+                    .value=${this.config.actions[0].service_data?.message || ''}
+                    @input=${(ev: Event) => this._setMessage((ev.target as HTMLInputElement).value)}
                     ?invalid=${this.errors.message}
-                  ></paper-textarea>
+                  ></ha-textarea>
 
                   ${this.config.triggers[0].event
                     ? html`
@@ -365,13 +365,13 @@ export class NotificationEditorCard extends LitElement {
               ${localize('panels.actions.cards.new_notification.fields.name.description', this.hass.language)}
             </span>
 
-            <paper-input
+            <ha-textfield
               label="${localize('panels.actions.cards.new_notification.fields.name.heading', this.hass.language)}"
-              placeholder=${this._namePlaceholder()}
-              .value=${this.config.name}
-              @value-changed=${this._setName}
+              .placeholder=${this._namePlaceholder()}
+              .value=${this.config.name || ''}
+              @input=${this._setName}
               ?invalid=${this.errors.name}
-            ></paper-input>
+            ></ha-textfield>
           </settings-row>
 
           ${this.item?.automation_id
@@ -451,9 +451,9 @@ export class NotificationEditorCard extends LitElement {
     if (Object.keys(this.errors).includes('service')) this._validateConfig();
   }
 
-  private _setTitle(ev: CustomEvent) {
+  private _setTitle(ev: Event) {
     ev.stopPropagation();
-    const value = String(ev.detail.value);
+    const value = (ev.target as HTMLInputElement).value;
     let actionConfig = this.config.actions;
     Object.assign(actionConfig, {
       [0]: {
@@ -466,9 +466,7 @@ export class NotificationEditorCard extends LitElement {
     if (Object.keys(this.errors).includes('title')) this._validateConfig();
   }
 
-  private _setMessage(ev: CustomEvent) {
-    ev.stopPropagation();
-    const value = String(ev.detail.value);
+  private _setMessage(value: string) {
     let actionConfig = this.config.actions;
     Object.assign(actionConfig, {
       [0]: {
@@ -481,9 +479,9 @@ export class NotificationEditorCard extends LitElement {
     if (Object.keys(this.errors).includes('message')) this._validateConfig();
   }
 
-  private _setName(ev: CustomEvent) {
+  private _setName(ev: Event) {
     ev.stopPropagation();
-    const value = String(ev.detail.value);
+    const value = (ev.target as HTMLInputElement).value;
     this.config = { ...this.config, name: value };
   }
 
@@ -553,7 +551,7 @@ export class NotificationEditorCard extends LitElement {
       field && field.selectionStart !== null && field.selectionEnd !== null
         ? message.substring(0, field.selectionStart) + value + message.substring(field.selectionEnd, message.length)
         : message + value;
-    this._setMessage(new CustomEvent('value-changed', { detail: { value: message } }));
+    this._setMessage(message);
   }
 
   private _toggleYamlMode() {
@@ -722,21 +720,17 @@ export class NotificationEditorCard extends LitElement {
         flex-direction: column;
       }
       div.header {
-        font-family: var(--paper-font-headline_-_font-family);
-        -webkit-font-smoothing: var(--paper-font-headline_-_-webkit-font-smoothing);
-        font-size: var(--paper-font-headline_-_font-size);
-        font-weight: var(--paper-font-headline_-_font-weight);
-        letter-spacing: var(--paper-font-headline_-_letter-spacing);
-        line-height: var(--paper-font-headline_-_line-height);
+        font-size: 24px;
+        font-weight: 400;
+        letter-spacing: -0.012em;
+        line-height: 32px;
         opacity: var(--dark-primary-opacity);
       }
       div.section-header {
-        font-family: var(--paper-font-headline_-_font-family);
-        -webkit-font-smoothing: var(--paper-font-headline_-_-webkit-font-smoothing);
         font-size: 18px;
-        font-weight: var(--paper-font-headline_-_font-weight);
-        letter-spacing: var(--paper-font-headline_-_letter-spacing);
-        line-height: var(--paper-font-headline_-_line-height);
+        font-weight: 400;
+        letter-spacing: -0.012em;
+        line-height: 32px;
         opacity: var(--dark-primary-opacity);
         margin: 20px 0px 5px 10px;
       }
@@ -754,9 +748,9 @@ export class NotificationEditorCard extends LitElement {
       }
       h2 {
         margin-top: 10px;
-        font-size: var(--paper-font-headline_-_font-size);
-        font-weight: var(--paper-font-headline_-_font-weight);
-        letter-spacing: var(--paper-font-headline_-_letter-spacing);
+        font-size: 24px;
+        font-weight: 400;
+        letter-spacing: -0.012em;
       }
       span.error-message {
         color: var(--error-color);

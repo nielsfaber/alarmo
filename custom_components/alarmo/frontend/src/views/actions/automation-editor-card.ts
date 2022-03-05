@@ -206,7 +206,7 @@ export class AutomationEditorCard extends LitElement {
 
                 ${this.config.actions.map(e => e.entity_id).length
                   ? html`
-                      <settings-row .narrow=${this.narrow}>
+                      <settings-row .narrow=${this.narrow} .large=${!this.renderActions()}>
                         <span slot="heading">
                           ${localize('panels.actions.cards.new_action.fields.action.heading', this.hass.language)}
                         </span>
@@ -215,7 +215,11 @@ export class AutomationEditorCard extends LitElement {
                         </span>
 
                         <div>
-                          ${this.renderActions()}
+                          ${this.renderActions() ||
+                            localize(
+                              'panels.actions.cards.new_action.fields.action.no_common_actions',
+                              this.hass.language
+                            )}
                         </div>
                       </settings-row>
                     `
@@ -271,13 +275,13 @@ export class AutomationEditorCard extends LitElement {
               ${localize('panels.actions.cards.new_action.fields.name.description', this.hass.language)}
             </span>
 
-            <paper-input
+            <ha-textfield
               label="${localize('panels.actions.cards.new_action.fields.name.heading', this.hass.language)}"
-              placeholder=${this._namePlaceholder()}
-              .value=${this.config.name}
-              @value-changed=${this._setName}
+              .placeholder=${this._namePlaceholder()}
+              .value=${this.config.name || ''}
+              @input=${this._setName}
               ?invalid=${this.errors.name}
-            ></paper-input>
+            ></ha-textfield>
           </settings-row>
 
           ${this.item?.automation_id
@@ -314,9 +318,7 @@ export class AutomationEditorCard extends LitElement {
     let selectedEntities = this.config.actions.map(e => e.entity_id);
     let actions = computeActions(selectedEntities, this.hass);
 
-    if (!actions.length) {
-      return localize('panels.actions.cards.new_action.fields.action.no_common_actions', this.hass.language);
-    }
+    if (!actions.length) return;
 
     const isMatchingAction = (...actions: (string | null)[]) => {
       if (!actions.every(isDefined)) return false;
@@ -419,9 +421,9 @@ export class AutomationEditorCard extends LitElement {
     this.config = { ...this.config, actions: actionConfig };
   }
 
-  private _setName(ev: CustomEvent) {
+  private _setName(ev: Event) {
     ev.stopPropagation();
-    const value = String(ev.detail.value);
+    const value = (ev.target as HTMLInputElement).value;
     this.config = { ...this.config, name: value };
   }
 
@@ -606,21 +608,17 @@ export class AutomationEditorCard extends LitElement {
         flex-direction: column;
       }
       div.header {
-        font-family: var(--paper-font-headline_-_font-family);
-        -webkit-font-smoothing: var(--paper-font-headline_-_-webkit-font-smoothing);
-        font-size: var(--paper-font-headline_-_font-size);
-        font-weight: var(--paper-font-headline_-_font-weight);
-        letter-spacing: var(--paper-font-headline_-_letter-spacing);
-        line-height: var(--paper-font-headline_-_line-height);
+        font-size: 24px;
+        font-weight: 400;
+        letter-spacing: -0.012em;
+        line-height: 32px;
         opacity: var(--dark-primary-opacity);
       }
       div.section-header {
-        font-family: var(--paper-font-headline_-_font-family);
-        -webkit-font-smoothing: var(--paper-font-headline_-_-webkit-font-smoothing);
         font-size: 18px;
-        font-weight: var(--paper-font-headline_-_font-weight);
-        letter-spacing: var(--paper-font-headline_-_letter-spacing);
-        line-height: var(--paper-font-headline_-_line-height);
+        font-weight: 400;
+        letter-spacing: -0.012em;
+        line-height: 32px;
         opacity: var(--dark-primary-opacity);
         margin: 20px 0px 5px 10px;
       }
@@ -638,9 +636,9 @@ export class AutomationEditorCard extends LitElement {
       }
       h2 {
         margin-top: 10px;
-        font-size: var(--paper-font-headline_-_font-size);
-        font-weight: var(--paper-font-headline_-_font-weight);
-        letter-spacing: var(--paper-font-headline_-_letter-spacing);
+        font-size: 24px;
+        font-weight: 400;
+        letter-spacing: -0.012em;
       }
       span.error-message {
         color: var(--error-color);

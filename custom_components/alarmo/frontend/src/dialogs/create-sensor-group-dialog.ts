@@ -72,12 +72,12 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
             <span slot="description">
               ${localize('panels.sensors.dialogs.create_group.fields.name.description', this.hass.language)}
             </span>
-            <paper-input
+            <ha-textfield
               label=${this.hass.localize('ui.components.area-picker.add_dialog.name')}
-              @value-changed=${(ev: Event) =>
+              @input=${(ev: Event) =>
                 (this.data = { ...this.data, name: String((ev.target as HTMLInputElement).value).trim() })}
               value="${this.data.name}"
-            ></paper-input>
+            ></ha-textfield>
           </settings-row>
 
           <settings-row large dialog>

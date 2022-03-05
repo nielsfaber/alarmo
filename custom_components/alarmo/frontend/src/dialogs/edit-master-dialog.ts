@@ -29,18 +29,16 @@ export class EditMasterDialog extends LitElement {
       <ha-dialog open .heading=${true} @closed=${this.closeDialog} @close-dialog=${this.closeDialog}>
         <div slot="heading">
           <ha-header-bar>
-            <ha-icon-button slot="navigationIcon" dialogAction="cancel" .path=${mdiClose}>
-            </ha-icon-button>
-            <span slot="title"> ${localize('panels.general.dialogs.edit_master.title', this.hass.language)}</span>
+            <ha-icon-button slot="navigationIcon" dialogAction="cancel" .path=${mdiClose}></ha-icon-button>
+            <span slot="title">${localize('panels.general.dialogs.edit_master.title', this.hass.language)}</span>
           </ha-header-bar>
         </div>
         <div class="wrapper">
-          <paper-input
+          <ha-textfield
             label=${this.hass.localize('ui.components.area-picker.add_dialog.name')}
-            @value-changed=${(ev: Event) => (this.name = (ev.target as HTMLInputElement).value)}
+            @input=${(ev: Event) => (this.name = (ev.target as HTMLInputElement).value)}
             value="${this.name}"
-          >
-          </paper-input>
+          ></ha-textfield>
           <span class="note">${localize('panels.general.dialogs.edit_area.name_warning', this.hass.language)}</span>
         </div>
         <mwc-button slot="primaryAction" @click=${this.saveClick}>
@@ -76,6 +74,9 @@ export class EditMasterDialog extends LitElement {
       }
       span.note {
         color: var(--secondary-text-color);
+      }
+      ha-textfield {
+        display: block;
       }
     `;
   }

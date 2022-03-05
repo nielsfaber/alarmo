@@ -64,17 +64,16 @@ export class AlarmoSelector extends LitElement {
         `
               )
           : ''}
-        <alarmo-select
-          .hass=${this.hass}
-          .items=${this.items.filter(e => !this.value.includes(e.value))}
-          ?disabled=${this.value.length == this.items.length}
-          label=${this.label}
-          icons=${true}
-          @value-changed=${this._addClick}
-          ?invalid=${this.invalid && this.value.length != this.items.length}
-        >
-        </alarmo-select>
       </div>
+      <alarmo-select
+        .hass=${this.hass}
+        .items=${this.items.filter(e => !this.value.includes(e.value))}
+        ?disabled=${this.value.length == this.items.length}
+        label=${this.label}
+        icons=${true}
+        @value-changed=${this._addClick}
+        ?invalid=${this.invalid && this.value.length != this.items.length}
+      ></alarmo-select>
     `;
   }
 
@@ -94,6 +93,9 @@ export class AlarmoSelector extends LitElement {
 
   static get styles(): CSSResultGroup {
     return css`
+      div.chip-set {
+        margin: 0px -4px;
+      }
       div.chip {
         height: 32px;
         border-radius: 16px;
@@ -105,7 +107,7 @@ export class AlarmoSelector extends LitElement {
         display: inline-flex;
         align-items: center;
         box-sizing: border-box;
-        margin: 1px 0px;
+        margin: 4px;
       }
       .icon {
         vertical-align: middle;

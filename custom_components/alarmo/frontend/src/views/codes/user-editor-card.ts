@@ -80,12 +80,12 @@ export class UserEditorCard extends LitElement {
             ${localize('panels.codes.cards.new_user.fields.name.description', this.hass.language)}
           </span>
 
-          <paper-input
+          <ha-textfield
             label="${localize('panels.codes.cards.new_user.fields.name.heading', this.hass.language)}"
             placeholder=""
             value=${this.data.name}
-            @change=${(ev: Event) => (this.data = { ...this.data!, name: (ev.target as HTMLInputElement).value })}
-          ></paper-input>
+            @input=${(ev: Event) => (this.data = { ...this.data!, name: (ev.target as HTMLInputElement).value })}
+          ></ha-textfield>
         </settings-row>
 
         ${this.item
@@ -98,14 +98,14 @@ export class UserEditorCard extends LitElement {
                   ${localize('panels.codes.cards.edit_user.fields.old_code.description', this.hass.language)}
                 </span>
 
-                <paper-input
+                <ha-textfield
                   label="${localize('panels.codes.cards.edit_user.fields.old_code.heading', this.hass.language)}"
                   placeholder=""
                   type="password"
                   value=${this.data.old_code || ''}
-                  @change=${(ev: Event) =>
+                  @input=${(ev: Event) =>
                     (this.data = { ...this.data!, old_code: String((ev.target as HTMLInputElement).value).trim() })}
-                ></paper-input>
+                ></ha-textfield>
               </settings-row>
             `
           : ''}
@@ -120,14 +120,14 @@ export class UserEditorCard extends LitElement {
                   ${localize('panels.codes.cards.new_user.fields.code.description', this.hass.language)}
                 </span>
 
-                <paper-input
+                <ha-textfield
                   label="${localize('panels.codes.cards.new_user.fields.code.heading', this.hass.language)}"
                   placeholder=""
                   type="password"
                   value=${this.data.code}
-                  @change=${(ev: Event) =>
+                  @input=${(ev: Event) =>
                     (this.data = { ...this.data!, code: String((ev.target as HTMLInputElement).value).trim() })}
-                ></paper-input>
+                ></ha-textfield>
               </settings-row>
 
               <settings-row .narrow=${this.narrow}>
@@ -138,13 +138,13 @@ export class UserEditorCard extends LitElement {
                   ${localize('panels.codes.cards.new_user.fields.confirm_code.description', this.hass.language)}
                 </span>
 
-                <paper-input
+                <ha-textfield
                   label="${localize('panels.codes.cards.new_user.fields.confirm_code.heading', this.hass.language)}"
                   placeholder=""
                   type="password"
                   value=${this.repeatCode || ''}
-                  @change=${(ev: Event) => (this.repeatCode = String((ev.target as HTMLInputElement).value).trim())}
-                ></paper-input>
+                  @input=${(ev: Event) => (this.repeatCode = String((ev.target as HTMLInputElement).value).trim())}
+                ></ha-textfield>
               </settings-row>
             `}
 

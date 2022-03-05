@@ -73,11 +73,11 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
           </ha-header-bar>
         </div>
         <div class="wrapper">
-          <paper-input
+          <ha-textfield
             label=${this.hass.localize('ui.components.area-picker.add_dialog.name')}
-            @value-changed=${(ev: Event) => (this.name = (ev.target as HTMLInputElement).value)}
+            @input=${(ev: Event) => (this.name = (ev.target as HTMLInputElement).value)}
             value="${this.name}"
-          ></paper-input>
+          ></ha-textfield>
           ${this.area_id
             ? html`
                 <span class="note">
@@ -178,6 +178,12 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
       }
       span.note {
         color: var(--secondary-text-color);
+      }
+      ha-textfield {
+        display: block;
+      }
+      alarmo-select {
+        margin-top: 10px;
       }
     `;
   }

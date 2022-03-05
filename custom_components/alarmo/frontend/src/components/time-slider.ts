@@ -133,7 +133,6 @@ export class TimeSlider extends LitElement {
     }
 
     ha-slider {
-      --paper-slider-pin-start-color: var(--primary-color);
       width: 100%;
     }
 

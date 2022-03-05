@@ -379,7 +379,7 @@ export class AlarmoTable extends LitElement {
     }
 
     ha-icon {
-      color: var(--paper-item-icon-color);
+      color: var(--state-icon-color);
       padding: 8px;
     }
 

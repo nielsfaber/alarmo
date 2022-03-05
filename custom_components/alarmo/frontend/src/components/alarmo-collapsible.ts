@@ -1,4 +1,4 @@
-import { css, html, LitElement } from 'lit';
+import { css, html, LitElement, PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators';
 
 @customElement('alarmo-collapsible-group')
@@ -22,13 +22,15 @@ class AlarmoCollabsibleGroup extends LitElement {
     this.addEventListener('clickHeader', this.manageSpoilers);
   }
 
-  manageSpoilers(ev) {
-    ev.target.toggleAttribute('active');
+  manageSpoilers(ev: Event) {
+    const el = ev.target as HTMLElement;
+    if (el.getAttribute('active')) el.removeAttribute('active');
+    else el.setAttribute('active', 'true');
 
     let active = this.querySelectorAll('alarmo-collapsible-header[active]');
 
-    active.forEach(function(el) {
-      if (el !== ev.target) el.removeAttribute('active');
+    active.forEach(function(i) {
+      if (i !== el) i.removeAttribute('active');
     });
   }
 }
@@ -77,16 +79,12 @@ class AlarmoCollabsibleHeader extends LitElement {
 
   render() {
     return html`
-      <paper-icon-item>
-        <slot name="icon" slot="item-icon"></slot>
-        <paper-item-body two-line>
-          <slot name="title"></slot>
-          <div secondary>
-            <slot name="description"></slot>
-          </div>
-        </paper-item-body>
-        <ha-icon icon="hass:chevron-down" class="chevron"></ha-icon>
-      </paper-icon-item>
+      <mwc-list-item graphic="avatar" twoline hasMeta>
+        <slot name="icon" slot="graphic"></slot>
+        <span><slot name="title"></slot></span>
+        <span slot="secondary"><slot name="description"></slot></span>
+        <ha-icon slot="meta" icon="hass:chevron-down" class="chevron"></ha-icon>
+      </mwc-list-item>
     `;
   }
 
@@ -96,14 +94,7 @@ class AlarmoCollabsibleHeader extends LitElement {
         display: block;
         cursor: pointer;
       }
-      :host .chevron {
-        transition: 0.4s;
-      }
-      :host([active]) .chevron {
-        transform: rotate(180deg);
-      }
-
-      :host paper-icon-item::before {
+      :host mwc-list-item::before {
         position: absolute;
         top: 0;
         right: 0;
@@ -116,26 +107,37 @@ class AlarmoCollabsibleHeader extends LitElement {
         background-color: black;
         opacity: 0;
       }
-      :host paper-icon-item:hover::before {
+      :host mwc-list-item:hover::before {
         opacity: 0.04;
       }
-      :host([active]) paper-icon-item::before {
+      :host([active]) mwc-list-item::before {
         opacity: 0.1;
       }
-      :host([active]) paper-icon-item:hover::before {
+      :host([active]) mwc-list-item:hover::before {
         opacity: 0.12;
       }
-      :host paper-icon-item:active::before, :host([active]) paper-icon-item:active::before {
+      :host mwc-list-item:active::before,
+      :host([active]) mwc-list-item:active::before {
         opacity: 0.14;
       }
       ::slotted(ha-icon) {
-          width: 40px;
-          height: 40px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin-right: 16px;
-        }
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 16px;
+      }
+      :host mwc-list-item {
+        font-size: 15px;
+        --mdc-typography-body2-font-size: 14px;
+      }
+      :host .chevron {
+        display: block;
+        transition: 0.4s;
+      }
+      :host([active]) .chevron {
+        transform: rotate(180deg);
       }
     `;
   }
