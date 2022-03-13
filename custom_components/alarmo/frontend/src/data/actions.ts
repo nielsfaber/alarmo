@@ -165,7 +165,12 @@ export const computeServiceDisplay = (hass: HomeAssistant, ...services: (string 
       return data;
     })
     .filter(isDefined);
-  output.sort(sortAlphabetically);
+  output.sort((a, b) => {
+    const domainA = computeDomain(a.value);
+    const domainB = computeDomain(b.value);
+    if (domainA != domainB) return sortAlphabetically(domainA, domainB);
+    return sortAlphabetically(a, b);
+  });
 
   return output;
 };
@@ -206,9 +211,16 @@ export const computeEntityDisplay = (entity_id: string[], hass: HomeAssistant) =
   return data;
 };
 
-export const getNotifyServices = (hass: HomeAssistant) => [
-  ...Object.keys(hass.services.notify).map(service => `notify.${service}`),
-];
+export const getNotifyServices = (hass: HomeAssistant) => {
+  let res = [...Object.keys(hass.services.notify).map(service => `notify.${service}`)];
+  res = [
+    ...res,
+    ...Object.keys(hass.services.tts)
+      .filter(e => e != 'clear_cache')
+      .map(service => `tts.${service}`),
+  ];
+  return res;
+};
 
 export const computeMergedActions = (...actionLists: string[][]) => {
   if (!actionLists.length || !actionLists.every(e => e.length)) return [];
@@ -269,6 +281,12 @@ export const getAutomationEntities = (hass: HomeAssistant, additionalEntities?: 
   entities.sort(sortAlphabetically);
   return entities;
 };
+
+export const getMediaPlayerEntities = (hass: HomeAssistant) => {
+  let entities = [...Object.keys(hass.states).filter(e => computeDomain(e) == 'media_player')];
+  entities.sort(sortAlphabetically);
+  return entities;
+}
 
 export const getWildcardOptions = (event?: EAlarmEvent, alarmoConfig?: AlarmoConfig) => {
   let options: { name: string; value: string }[] = [];

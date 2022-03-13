@@ -12,7 +12,7 @@ import {
   AlarmoConfig,
 } from '../../types';
 
-import { handleError, omit, showErrorDialog, isDefined } from '../../helpers';
+import { handleError, omit, showErrorDialog, isDefined, computeName } from '../../helpers';
 import { saveAutomation, fetchAreas, fetchConfig, deleteAutomation } from '../../data/websockets';
 import { localize } from '../../../localize/localize';
 import {
@@ -29,6 +29,8 @@ import {
   isObject,
   getOpenSensorsWildCardOptions,
   getArmModeWildCardOptions,
+  computeEntityDisplay,
+  getMediaPlayerEntities,
 } from '../../data/actions';
 
 import { EAutomationTypes } from '../../const';
@@ -76,7 +78,7 @@ export class NotificationEditorCard extends LitElement {
 
   async firstUpdated() {
     await loadHaYamlEditor();
-    
+
     this.areas = await fetchAreas(this.hass);
     this.alarmoConfig = await fetchConfig(this.hass);
 
@@ -205,24 +207,52 @@ export class NotificationEditorCard extends LitElement {
                   ></alarmo-select>
                 </settings-row>
 
-                <settings-row .narrow=${this.narrow}>
-                  <span slot="heading">
-                    ${localize('panels.actions.cards.new_notification.fields.title.heading', this.hass.language)}
-                  </span>
-                  <span slot="description">
-                    ${localize('panels.actions.cards.new_notification.fields.title.description', this.hass.language)}
-                  </span>
+                ${!this.config.actions[0].service || computeDomain(this.config.actions[0].service) == 'notify'
+                  ? html`
+                      <settings-row .narrow=${this.narrow}>
+                        <span slot="heading">
+                          ${localize('panels.actions.cards.new_notification.fields.title.heading', this.hass.language)}
+                        </span>
+                        <span slot="description">
+                          ${localize(
+                            'panels.actions.cards.new_notification.fields.title.description',
+                            this.hass.language
+                          )}
+                        </span>
 
-                  <ha-textfield
-                    label="${localize(
-                      'panels.actions.cards.new_notification.fields.title.heading',
-                      this.hass.language
-                    )}"
-                    .value=${this.config.actions[0].service_data?.title || ''}
-                    @input=${this._setTitle}
-                    ?invalid=${this.errors.title}
-                  ></ha-textfield>
-                </settings-row>
+                        <ha-textfield
+                          label="${localize(
+                            'panels.actions.cards.new_notification.fields.title.heading',
+                            this.hass.language
+                          )}"
+                          .value=${this.config.actions[0].service_data?.title || ''}
+                          @input=${this._setTitle}
+                          ?invalid=${this.errors.title}
+                        ></ha-textfield>
+                      </settings-row>
+                    `
+                  : ''}
+                ${this.config.actions[0].service && computeDomain(this.config.actions[0].service) == 'tts'
+                  ? html`
+                      <settings-row .narrow=${this.narrow} .large=${true} first>
+                        <span slot="heading">
+                          ${localize('panels.actions.cards.new_action.fields.entity.heading', this.hass.language)}
+                        </span>
+                        <span slot="description">
+                          ${localize('panels.actions.cards.new_action.fields.entity.description', this.hass.language)}
+                        </span>
+
+                        <alarmo-select
+                          .items=${computeEntityDisplay(getMediaPlayerEntities(this.hass), this.hass)}
+                          label=${localize('panels.actions.cards.new_action.fields.entity.heading', this.hass.language)}
+                          .value=${this.config.actions[0].service_data?.entity_id || ''}
+                          @value-changed=${this._setEntity}
+                          .icons=${true}
+                          ?invalid=${this.errors.entity}
+                        ></alarmo-select>
+                      </settings-row>
+                    `
+                  : ''}
 
                 <settings-row .narrow=${this.narrow} .large=${true} last>
                   <span slot="heading">
@@ -331,7 +361,7 @@ export class NotificationEditorCard extends LitElement {
                           'ui.errors.config.key_missing',
                           'key',
                           Object.entries(this.errors).find(
-                            ([k, v]) => v && ['service', 'title', 'message'].includes(k)
+                            ([k, v]) => v && ['service', 'title', 'message', 'entity'].includes(k)
                           )![0]
                         )}
                       </span>
@@ -450,6 +480,10 @@ export class NotificationEditorCard extends LitElement {
     const value = String(ev.detail.value);
     let actionConfig = this.config.actions;
     Object.assign(actionConfig, { [0]: { ...actionConfig[0], service: value, ...omit(actionConfig[0], 'service') } });
+    if ((actionConfig[0].service_data || {}).entity_id && computeDomain(value) == 'notify')
+      Object.assign(actionConfig, {
+        [0]: { ...actionConfig[0], service_data: omit(actionConfig[0].service_data || {}, 'entity_id') },
+      });
     this.config = { ...this.config, actions: actionConfig };
     if (Object.keys(this.errors).includes('service')) this._validateConfig();
   }
@@ -467,6 +501,21 @@ export class NotificationEditorCard extends LitElement {
     });
     this.config = { ...this.config, actions: actionConfig };
     if (Object.keys(this.errors).includes('title')) this._validateConfig();
+  }
+
+  private _setEntity(ev: Event) {
+    ev.stopPropagation();
+    const value = (ev.target as HTMLInputElement).value;
+    let actionConfig = this.config.actions;
+    Object.assign(actionConfig, {
+      [0]: {
+        ...actionConfig[0],
+        service: actionConfig[0].service || '',
+        service_data: { ...(actionConfig[0].service_data || {}), entity_id: value },
+      },
+    });
+    this.config = { ...this.config, actions: actionConfig };
+    if (Object.keys(this.errors).includes('entity')) this._validateConfig();
   }
 
   private _setMessage(value: string) {
@@ -523,6 +572,13 @@ export class NotificationEditorCard extends LitElement {
       (!getNotifyServices(this.hass).includes(actionConfig.service) && computeDomain(actionConfig.service) != 'script')
     )
       this.errors = { ...this.errors, service: true };
+    else if (
+      actionConfig.service &&
+      computeDomain(actionConfig.service) == 'tts' &&
+      (!Object.keys(actionConfig.service_data || {}).includes('entity_id') ||
+        !getMediaPlayerEntities(this.hass).includes(actionConfig.service_data!.entity_id))
+    )
+      this.errors = { ...this.errors, entity: true };
 
     if (!isValidString(actionConfig.service_data?.message)) this.errors = { ...this.errors, message: true };
 
@@ -560,35 +616,71 @@ export class NotificationEditorCard extends LitElement {
   private _toggleYamlMode() {
     this.viewMode = this.viewMode == ViewMode.UI ? ViewMode.Yaml : ViewMode.UI;
 
-    if (this.viewMode == ViewMode.Yaml)
+    if (this.viewMode == ViewMode.Yaml) {
+      let actionConfig = { ...this.config.actions[0] };
+      let serviceData =
+        typeof actionConfig.service_data == 'object' && isDefined(actionConfig.service_data)
+          ? actionConfig.service_data
+          : {};
+
+      actionConfig = {
+        ...actionConfig,
+        service: actionConfig.service || '',
+      };
+
+      if (!serviceData.message) serviceData = { ...serviceData, message: '' };
+
+      if (getNotifyServices(this.hass).includes(actionConfig.service!)) {
+        if (computeDomain(actionConfig.service!) == 'notify' && !serviceData.title)
+          serviceData = { ...serviceData, title: '' };
+        if (computeDomain(actionConfig.service!) == 'tts' && !serviceData.entity_id)
+          serviceData = { ...serviceData, entity_id: '' };
+      }
+
+      actionConfig = {
+        ...actionConfig,
+        service_data: serviceData,
+      };
+
       this.config = {
         ...this.config,
         actions: Object.assign(this.config.actions, {
-          [0]: {
-            ...this.config.actions[0],
-            service: this.config.actions[0].service || '',
-            service_data: {
-              ...(this.config.actions[0].service_data || {}),
-              title: this.config.actions[0].service_data?.title || '',
-              message: this.config.actions[0].service_data?.message || '',
-            },
-          },
+          [0]: actionConfig,
         }),
       };
+    }
   }
 
   private _namePlaceholder() {
     const event = this.config.triggers[0].event;
     const domain = this.config.actions[0].service ? computeDomain(this.config.actions[0].service) : null;
-    const target = computeServiceDisplay(this.hass, this.config.actions[0].service);
-    if (!event || domain != 'notify' || !target.length) return '';
-    else
+    if (!event) return '';
+    if (domain == 'notify') {
+      const target = computeServiceDisplay(this.hass, this.config.actions[0].service);
+      if (!target.length) return '';
+
       return localize(
         `panels.actions.cards.new_notification.fields.name.placeholders.${event}`,
         this.hass.language,
         '{target}',
         target[0].name
       );
+    } else if (domain == 'tts') {
+      const entity =
+        typeof this.config.actions[0].service_data == 'object' && isDefined(this.config.actions[0].service_data)
+          ? this.config.actions[0].service_data.entity_id
+          : null;
+      if (!entity || !this.hass.states[entity]) return '';
+      const target = computeName(this.hass.states[entity]);
+
+      return localize(
+        `panels.actions.cards.new_notification.fields.name.placeholders.${event}`,
+        this.hass.language,
+        '{target}',
+        target
+      );
+    }
+    return '';
   }
 
   private _messagePlaceholder() {
@@ -781,6 +873,10 @@ export class NotificationEditorCard extends LitElement {
       }
       div.heading .description {
         grid-area: description;
+      }
+      ha-textarea[invalid] {
+        --mdc-text-field-idle-line-color: var(--mdc-theme-error);
+        --mdc-text-field-label-ink-color: var(--mdc-theme-error);
       }
     `;
   }
