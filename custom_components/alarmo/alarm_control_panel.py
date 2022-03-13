@@ -482,6 +482,10 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
         self.area_id = area_id
         self._timer = None
 
+        coordinator = self.hass.data[const.DOMAIN]["coordinator"]
+        self._config = coordinator.store.async_get_config()
+        self._config.update(coordinator.store.async_get_area(self.area_id))
+
     @property
     def supported_features(self) -> int:
         """Return the list of supported features."""
@@ -499,7 +503,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
         """Connect to dispatcher listening for entity data notifications."""
         await super().async_added_to_hass()
 
-        # load the configuration and make sure that it is reloaded on changes
+        # make sure that the config is reloaded on changes
         @callback
         async def async_update_config(area_id: str = None):
             coordinator = self.hass.data[const.DOMAIN]["coordinator"]
@@ -510,7 +514,6 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
         self.async_on_remove(
             async_dispatcher_connect(self.hass, "alarmo_config_updated", async_update_config)
         )
-        await async_update_config()
 
         state = await self.async_get_last_state()
         initial_state = STATE_ALARM_DISARMED

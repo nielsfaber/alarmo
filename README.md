@@ -41,6 +41,10 @@ This is an alarm system integration for Home Assistant. It provides a user inter
         - [Advanced actions](#advanced-actions)
       - [Automatic arming](#automatic-arming)
     - [Alarmo-card](#alarmo-card)
+  - [Third party platforms](#third-party-platforms)
+    - [Android MQTT Alarm Panel](#android-mqtt-alarm-panel)
+    - [Apple Homekit](#apple-homekit)
+    - [Google Home](#google-home)
   - [Say thank you](#say-thank-you)
 
 
@@ -615,6 +619,77 @@ There are two cards available:
 
 ---
 
+## Third party platforms
+This section is intended to give a starting point for users who want to operate Alarmo outside of HA.
+
+### Android MQTT Alarm Panel
+Alarmo is designed to be fully compatible with the [Android MQTT Alarm Panel](http://thanksmister.com/android-mqtt-alarm-panel/) project.
+
+This project provides a GUI for you to operate your alarm via a tablet which you could (for example) mount on the wall at your main entrance.
+
+For using Alarmo with the Android MQTT Alarm Panel, make sure to enable the MQTT interface. For additional instructions on how to set up MQTT to be compatible with The MQTT Alarm Panel, see [here](https://github.com/thanksmister/android-mqtt-alarm-panel#home-assistant-alarmo-integration).
+
+
+### Apple Homekit
+Alarmo can be operated via Homekit.
+Follow the instructions on the [Home Assistant page](https://www.home-assistant.io/integrations/homekit/) to establish a gateway between HA and Homekit.
+
+Alarmo entities are of type `alarm_control_panel`, so make sure to configure the homekit gateway in HA have these included. 
+The alarm should now automatically become visible in Homekit, with the current state visible together with the possibility to arm and disarm.
+
+In case you have Alarmo configured to require a code for arming/disarming, you need to setup homekit in yaml mode (instead of via the integrations page).
+
+Example of minimal setup in `configuration.yaml`:
+```yaml
+homekit:
+  - filter:
+      include_domains:
+        - alarm_control_panel
+    entity_config:
+      alarm_control_panel.alarmo:
+        code: 1234 # should be identical to a user in Alarmo as well
+```
+
+
+The Homekit gateway has the following limitations:
+* The [arm modes](#arm-modes) `custom` and `vacation` are not visible in Homekit.
+* Alarmo allows enabling/disabling arm modes 'on the fly', however it is needed to restart HA (or reconfigure Homekit via HA) before this becomes effective in Homekit.
+* In case arming fails, the alarm tile in Homekit will stay in 'arming...' state indefinitely.
+* Homekit will not show the `pending` [state](#states), so it is not possible to identify when the entry delay is effective.
+
+### Google Home
+Alarmo can work together with Google Home.
+The first step is to set up the [Google Assistant](https://www.home-assistant.io/integrations/google_assistant/) integration in HA.
+For Nabu Casa subscribers, this requires just a few clicks, other users need to register a project in Google cloud first (see instructions in HA docs).
+
+Example of minimal setup in `configuration.yaml`:
+```yaml
+google_assistant:
+  project_id: <your project ID>
+  service_account: !include <path to account json file>
+  secure_devices_pin: 1234 # should be identical to a user in Alarmo as well
+  report_state: true
+  expose_by_default: false
+  entity_config:
+    alarm_control_panel.alarmo:
+      expose: true
+      room: Home
+```
+
+For arming and disarming the alarm, you can use voice commands like:
+* *Arm the security system to armed away*
+* *Disarm the security system*
+
+Obviously the exact commands are depending on your local language setting.
+
+It is also possible to arm/disarm the alarm as a step in a routine (e.g. the *'Good Morning'* routine):
+* For arming in a routine: select *'adjust home devices'* followed by  action *'arm security system'*
+* For disarming in a routine select *'try adding your own'* and enter *'disarm the security system'*.
+
+**Remarks**
+* Since anyone can wake up your device and speak to Google Assistant, it's highly recommended to set up a pincode for disarming.
+* In case you have a pin set up, the Google Assistant will ask you to speak the pin. In some devices, like the Nest Hub, it is also possible to enter the pin via the keypad on the screen.
+* The Google Translate [text-to-speech service](https://www.home-assistant.io/integrations/google_translate/) can be very useful to provide additional feedback (e.g. when arming fails) for the members of your home. You can set up a notification action via Alarmo.
 
 ## Say thank you
 If you want to make donation as appreciation of my work, you can do so via PayPal or buy me a coffee. Thank you!
