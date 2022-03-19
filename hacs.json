@@ -1,14 +1,9 @@
 {
   "name": "Alarmo",
   "render_readme": "true",
-  "iot_class": [
-    "Local Push"
-  ],
-  "domains": [
-    "alarm_control_panel"
-  ],
+  "iot_class": ["Local Push"],
+  "domains": ["alarm_control_panel"],
   "zip_release": true,
   "filename": "alarmo.zip",
-  "hide_default_branch": true,
-  "homeassistant": "2022.3.0"
+  "hide_default_branch": true
 }
