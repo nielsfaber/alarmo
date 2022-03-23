@@ -5,7 +5,7 @@
       "armed_home": "Hemma",
       "armed_night": "Natt",
       "armed_custom_bypass": "Anpassad",
-      "armed_vacation": "Vacation"
+      "armed_vacation": "Semester"
     },
     "enabled": "Aktiverat",
     "disabled": "Inaktiverat"
@@ -24,9 +24,9 @@
     },
     "table": {
       "filter": {
-        "label": "Filter items",
-        "item": "Filter by {name}",
-        "hidden_items": "{number} {number, plural,\n  one {item is}\n  other {items are}\n} hidden"
+        "label": "Filtrera sensorer",
+        "item": "Filtrera med {name}",
+        "hidden_items": "{number} {number, plural,\n  en {item is}\n  andra {items are}\n} dolda"
       }
     }
   },
@@ -60,17 +60,17 @@
           "title": "Lägen",
           "description": "Denna panel kan användas för att konfiguera larmets olika larmlägen.",
           "modes": {
-            "armed_away": "Larmat borta användas när alla personer lämnat huset. Alla dörrar och fönster som tillåter tillgång till huset kommer att larmas, det samma gäller rörelsesensorer inne i huset.",
+            "armed_away": "Larmat borta används när alla personer lämnat huset. Alla dörrar och fönster som tillåter tillgång till huset kommer att larmas, det samma gäller rörelsesensorer inne i huset.",
             "armed_home": "Larmat hemma används när det finns personer kvar i huset. Alla dörrar och fönster som tillåter tillgång till huset kommer att larmas, dock inga rörelsesensorer inne i huset.",
             "armed_night": "Larmat natt används när du aktiverar larmen innan du lägger dig. Alla dörrar och fönster som tillåter tillgång till huset kommer att larmas, det samma gäller utvalda rörelsesensorer inne i huset.",
-            "armed_vacation": "Armed vacation can be used as an extension to the armed away mode in case of absence for longer duration. The delay times and trigger responses can be adapted (as desired) to being distant from home.",
+            "armed_vacation": "Larmat semester kan användas som en förlängning av läget för larmat borta vid längre frånvaro. Fördröjningstiderna och triggersvaren kan anpassas (efter önskemål) för att vara borta längre tid från hemmet.",
             "armed_custom_bypass": "Ett extra läge för för att definiera sin egen säkerhetsperimeter."
           },
-          "number_sensors_active": "{number} {number, plural,\n  one {sensor}\n  other {sensorer}\n} aktiv",
+          "number_sensors_active": "{number} {number, plural,\n  en {sensor}\n  andra {sensorer}\n} aktiv",
           "fields": {
             "status": {
               "heading": "Status",
-              "description": "Controls whether the alarm can be armed in this mode."
+              "description": "Styr om larmet kan aktiveras i detta läge."
             },
             "exit_delay": {
               "heading": "Lämna fördröjning",
@@ -117,14 +117,14 @@
           }
         },
         "areas": {
-          "title": "Areor",
-          "description": "Areor kan användas för att dela upp ditt larm till flera delar.",
-          "no_items": "Det är inga areor definierade än.",
+          "title": "Områden",
+          "description": "Områden kan användas för att dela upp ditt larm till flera områden.",
+          "no_items": "Det är inga områden definierade än.",
           "table": {
             "remarks": "Anmärkningar",
-            "summary": "Denna area innehåller {summary_sensors} och {summary_automations}.",
-            "summary_sensors": "{number} {number, plural,\n  one {sensor}\n  other {sensorer}\n}",
-            "summary_automations": "{number} {number, plural,\n  one {automation}\n  other {automationer}\n}"
+            "summary": "Detta område innehåller {summary_sensors} och {summary_automations}.",
+            "summary_sensors": "{number} {number, plural,\n  en {sensor}\n  andra {sensorer}\n}",
+            "summary_automations": "{number} {number, plural,\n  en {automation}\n  andra {automationer}\n}"
           },
           "actions": {
             "add": "Lägg till"
@@ -133,18 +133,18 @@
       },
       "dialogs": {
         "create_area": {
-          "title": "Ny area",
+          "title": "Nytt område",
           "fields": {
             "copy_from": "Kopiera inställningarna från"
           }
         },
         "edit_area": {
-          "title": "Redigera area ''{area}''",
+          "title": "Redigera område ''{area}''",
           "name_warning": "OBS: Ändrar du namn kommer entity ID att ändras"
         },
         "remove_area": {
-          "title": "Ta bort area?",
-          "description": "Är du säker att du vill ta bort denna area? Denna area innehåller {sensors} sensorer och {automations} automationer, som också kommer att tas bort."
+          "title": "Ta bort område?",
+          "description": "Är du säker att du vill ta bort detta område? Detta område innehåller {sensors} sensorer och {automations} automationer, som också kommer att tas bort."
         },
         "edit_master": {
           "title": "Master konfiguration"
@@ -162,7 +162,7 @@
           "description": "Nuvarande konfiguerade sensorer. Klicka på ett entity för att göra förändringar.",
           "table": {
             "no_items": "Det finns inga sensorer att visa här.",
-            "no_area_warning": "Sensor is not assigned to any area.",
+            "no_area_warning": "Sensor är inte tilldelat till något område.",
             "arm_modes": "Larmläge",
             "always_on": "(Alltid)"
           }
@@ -176,7 +176,7 @@
           },
           "actions": {
             "add_to_alarm": "Addera till larmet",
-            "filter_supported": "Hide items with unknown type"
+            "filter_supported": "Dölj sensorer av typen unknown"
           }
         },
         "editor": {
@@ -184,8 +184,8 @@
           "description": "Justera inställningarna för sensor ''{entity}''.",
           "fields": {
             "area": {
-              "heading": "Area",
-              "description": "Välj en area som innehåller denna sensor."
+              "heading": "Område",
+              "description": "Välj ett område som innehåller denna sensor."
             },
             "group": {
               "heading": "Grupp",
@@ -230,10 +230,10 @@
             },
             "arm_on_close": {
               "heading": "Larma efter stängning",
-              "description": "Resternade lämna fördröjning skippas automatiskt när denna sensor inaktiveras."
+              "description": "Resterande lämna fördröjning skippas automatiskt när denna sensor inaktiveras."
             },
             "use_exit_delay": {
-              "heading": "Anväld lämna fördröjning",
+              "heading": "Använd lämna fördröjning",
               "description": "Sensorn är tillåten att vara aktiv när lämna fördröjningen startar."
             },
             "use_entry_delay": {
@@ -261,7 +261,7 @@
           },
           "errors": {
             "description": "Var vänlig att justera följande fel:",
-            "no_area": "Ingen area är vald",
+            "no_area": "Inget område är vald",
             "no_modes": "Inga lägen är valda när sensorn ska vara aktiv",
             "no_auto_bypass_modes": "Inga lägen är valda när sensorn eventuellt automatiskt ska förbikopplas"
           }
@@ -327,14 +327,14 @@
         "user_management": {
           "title": "Användarhantering",
           "description": "Varje användare har sin egen kod för aktivera/inaktivera larmet.",
-          "no_items": "Det finns inga användae än",
+          "no_items": "Det finns inga användare än",
           "actions": {
-            "new_user": "ny användare"
+            "new_user": "Ny användare"
           }
         },
         "new_user": {
           "title": "Skapa en ny användare",
-          "description": "Users can be created for providing access to operating the alarm.",
+          "description": "Användare kan skapas för att ge tillgång att styra larmet.",
           "fields": {
             "name": {
               "heading": "Namn",
@@ -345,15 +345,15 @@
               "description": "Koden för användaren."
             },
             "confirm_code": {
-              "heading": "Repetra koden",
-              "description": "Repetra koden."
+              "heading": "Repetera koden",
+              "description": "Repetera koden."
             },
             "can_arm": {
-              "heading": "Tillåt kod för pålarming",
+              "heading": "Tillåt kod för pålarmning",
               "description": "Denna kod aktiverar larmet"
             },
             "can_disarm": {
-              "heading": "Tillåt kod för avlarming",
+              "heading": "Tillåt kod för avlarmning",
               "description": "Denna kod inaktiverar larmet"
             },
             "is_override_code": {
@@ -361,12 +361,12 @@
               "description": "Denna kod tvingar aktivering av larmet"
             },
             "area_limit": {
-              "heading": "Begränsade areor",
-              "description": "Begränsa användare att hantera utvalda areor"
+              "heading": "Begränsade områden",
+              "description": "Begränsa användare att hantera utvalda områden"
             }
           },
           "errors": {
-            "no_name": "Ingen namn angivet.",
+            "no_name": "Inget namn angivet.",
             "no_code": "Koden ska vara minst 4 tecken eller siffror.",
             "code_mismatch": "Koderna matchar inte."
           }
@@ -384,14 +384,14 @@
       }
     },
     "actions": {
-      "title": "Actions",
+      "title": "Åtgärder",
       "cards": {
         "notifications": {
           "title": "Notifikationer",
           "description": "Du använder denna panel för att hantera notifikationer som ska sändas vid utvalda larmevents.",
           "table": {
             "no_items": "Det är inga notifikationer skapade än.",
-            "no_area_warning": "Action is not assigned to any area."
+            "no_area_warning": "Åtgärd är inte tilldelad till något område."
           },
           "actions": {
             "new_notification": "ny notifikation"
@@ -400,17 +400,17 @@
         "actions": {
           "description": "I denna panel kan du trigga olika beteende på enheter baserat på oliak events från ditt larm.",
           "table": {
-            "no_items": "Det finns inga actions skapade ännu."
+            "no_items": "Det finns inga åtgärder skapade ännu."
           },
           "actions": {
-            "new_action": "ny action"
+            "new_action": "ny åtgärd"
           }
         },
         "new_notification": {
           "title": "Konfiguera notifikationer",
           "description": "Ta emot en notifikation när ditt larm aktivera/inaktiveras eller om en sensor aktiveras eller liknande.",
           "trigger": "Villkor",
-          "action": "Task",
+          "action": "Åtgärd",
           "options": "Inställningar",
           "fields": {
             "event": {
@@ -445,7 +445,7 @@
             },
             "mode": {
               "heading": "Läge",
-              "description": "Begräns action till specifikt larmläge (valfritt)"
+              "description": "Begränsa åtgärd till specifikt larmläge (valfritt)"
             },
             "title": {
               "heading": "Titel",
@@ -465,16 +465,16 @@
               }
             },
             "open_sensors_format": {
-              "heading": "Format for open_sensors wildcard",
-              "description": "Choose which sensor information in inserted in the message",
+              "heading": "Format för open_sensors wildcard",
+              "description": "Välj vilken sensorinformation som ska infogas i meddelandet",
               "options": {
-                "default": "Names and states",
-                "short": "Names only"
+                "default": "Namn och tillstånd",
+                "short": "Endast namn"
               }
             },
             "arm_mode_format": {
-              "heading": "Translation for arm_mode wildcard",
-              "description": "Choose in which language the arm mode is inserted in the message"
+              "heading": "Översättning för larmläge wildcard",
+              "description": "Välj vilket språk som larmläge ska infogas i meddelandet"
             },
             "target": {
               "heading": "Mål",
@@ -510,25 +510,25 @@
               "description": "När ska denna action aktiveras"
             },
             "area": {
-              "heading": "Area",
-              "description": "Area som etta event ska appliceras på, lämna tomt om det ska gälla globalt."
+              "heading": "Område",
+              "description": "Område som detta event ska appliceras på, lämna tomt om det ska gälla globalt."
             },
             "mode": {
               "heading": "Läge",
-              "description": "Begränsa action till specifika larmläge (frivilligt)"
+              "description": "Begränsa åtgärd till specifika larmlägen (frivilligt)"
             },
             "entity": {
-              "heading": "Entity",
-              "description": "Entity att utföra action på"
+              "heading": "Entitet",
+              "description": "Entitet att utföra åtgärd på"
             },
             "action": {
-              "heading": "Action",
-              "description": "Action att utföra på entity",
-              "no_common_actions": "Actions kan enbart bli applicerade i YAML läge för utvalda entities."
+              "heading": "Åtgärd",
+              "description": "Åtgärd att utföra på entitet",
+              "no_common_actions": "Åtgärder kan enbart bli applicerade i YAML läge för utvalda entiteter."
             },
             "name": {
               "heading": "Namn",
-              "description": "Beskrivning av denna action",
+              "description": "Beskrivning av denna åtgärd",
               "placeholders": {
                 "armed": "Sätt {entity} till {state} vid aktivering av larmet",
                 "disarmed": "Sätt {entity} till {state} vid inaktivering av larmet",
