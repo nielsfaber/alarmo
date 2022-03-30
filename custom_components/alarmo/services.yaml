@@ -31,6 +31,7 @@ arm:
             - away
             - night
             - home
+            - vacation
             - custom
     skip_delay:
       name: Skip Delay
