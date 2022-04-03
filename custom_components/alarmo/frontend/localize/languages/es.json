@@ -108,7 +108,7 @@
             },
             "state_payload": {
               "heading": "Configurar la carga útil por estado",
-              "item": "Defina una carga útil para el estado ''{'state}''"
+              "item": "Defina una carga útil para el estado ''{state}''"
             },
             "command_payload": {
               "heading": "Configurar la carga útil por comando",
@@ -139,7 +139,7 @@
           }
         },
         "edit_area": {
-          "title": "Editando área ''{'area}''",
+          "title": "Editando área ''{area}''",
           "name_warning": "Nota: cambiar el nombre cambiará el ID de la entidad."
         },
         "remove_area": {
@@ -181,7 +181,7 @@
         },
         "editor": {
           "title": "Editar sensor",
-          "description": "Configurando los ajustes del sensor de ''{'entity}''.",
+          "description": "Configurando los ajustes del sensor de ''{entity}''.",
           "fields": {
             "area": {
               "heading": "Área",
@@ -373,7 +373,7 @@
         },
         "edit_user": {
           "title": "Editar usuario",
-          "description": "Cambiar la configuración del usuario ''{'name}''.",
+          "description": "Cambiar la configuración del usuario ''{name}''.",
           "fields": {
             "old_code": {
               "heading": "Código actual",
