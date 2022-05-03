@@ -212,13 +212,17 @@ export const computeEntityDisplay = (entity_id: string[], hass: HomeAssistant) =
 };
 
 export const getNotifyServices = (hass: HomeAssistant) => {
-  let res = [...Object.keys(hass.services.notify).map(service => `notify.${service}`)];
-  res = [
-    ...res,
-    ...Object.keys(hass.services.tts)
-      .filter(e => e != 'clear_cache')
-      .map(service => `tts.${service}`),
-  ];
+  let res: string[] = [];
+  if ('notify' in hass.services)
+    res = [...res, ...Object.keys(hass.services.notify).map(service => `notify.${service}`)];
+
+  if ('tts' in hass.services)
+    res = [
+      ...res,
+      ...Object.keys(hass.services.tts)
+        .filter(e => e != 'clear_cache')
+        .map(service => `tts.${service}`),
+    ];
   return res;
 };
 
@@ -286,7 +290,7 @@ export const getMediaPlayerEntities = (hass: HomeAssistant) => {
   let entities = [...Object.keys(hass.states).filter(e => computeDomain(e) == 'media_player')];
   entities.sort(sortAlphabetically);
   return entities;
-}
+};
 
 export const getWildcardOptions = (event?: EAlarmEvent, alarmoConfig?: AlarmoConfig) => {
   let options: { name: string; value: string }[] = [];
