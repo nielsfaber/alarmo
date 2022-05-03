@@ -931,7 +931,12 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
                 for item in self.hass.data[const.DOMAIN]["areas"].values():
                     if item.delay:
                         delays.append(item.delay)
-                self.delay = max(delays) if len(delays) else None
+                if state == STATE_ALARM_ARMING:
+                    # use maximum of all areas as exit delay
+                    self.delay = max(delays) if len(delays) else None
+                else:
+                    # use minimum of all areas as entry delay
+                    self.delay = min(delays) if len(delays) else None
 
             self._state = state
             _LOGGER.debug("entity {} was updated from {} to {}".format(self.entity_id, old_state, state))
