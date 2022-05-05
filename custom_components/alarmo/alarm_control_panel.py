@@ -118,7 +118,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
         self._open_sensors = {}
         self._bypassed_sensors = []
         self._delay = None
-        self._expiration = None
+        self.expiration = None
         self.area_id = None
         self._revert_state = None
 
@@ -250,16 +250,6 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             self.expiration = None
 
     @property
-    def expiration(self):
-        """Get expiration."""
-        return self._expiration
-
-    @expiration.setter
-    def expiration(self, value):
-        """Set expiration."""
-        self._expiration = value
-
-    @property
     def extra_state_attributes(self):
         """Return the data of the entity."""
 
@@ -267,10 +257,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             "arm_mode": self.arm_mode,
             "open_sensors": self.open_sensors,
             "bypassed_sensors": self.bypassed_sensors,
-            "delay": self.delay,
-            "expiration": self.expiration,
         }
-
 
     def _validate_code(self, code, state):
         """Validate given code."""
