@@ -524,6 +524,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
             initial_state
         ):
             _LOGGER.debug("Waiting for all sensors to be ready...")
+            self._revert_state = STATE_ALARM_DISARMED
 
             @callback
             async def async_initialization_timer_finished(now):
