@@ -257,6 +257,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             "arm_mode": self.arm_mode,
             "open_sensors": self.open_sensors,
             "bypassed_sensors": self.bypassed_sensors,
+            "delay": self.delay,
         }
 
     def _validate_code(self, code, state):
