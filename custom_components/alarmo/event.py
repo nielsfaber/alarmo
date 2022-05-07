@@ -48,7 +48,6 @@ class EventHandler:
                 data["sensors"] = list(data["open_sensors"].keys())
                 del data["open_sensors"]
 
-            _LOGGER.debug(data)
             self.hass.bus.fire("alarmo_failed_to_arm", data)
 
         elif event in [
@@ -64,5 +63,4 @@ class EventHandler:
                 data["mode"] = const.STATE_TO_ARM_MODE[data["arm_mode"]]
                 del data["arm_mode"]
 
-            _LOGGER.debug(data)
             self.hass.bus.fire("alarmo_command_success", data)

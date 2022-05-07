@@ -720,8 +720,6 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
             self.open_sensors = open_sensors
 
         if self._state and self._state != STATE_ALARM_PENDING:
-            _LOGGER.debug(self.entity_id)
-            _LOGGER.debug(self._open_sensors)
             async_dispatcher_send(
                 self.hass,
                 "alarmo_event",
