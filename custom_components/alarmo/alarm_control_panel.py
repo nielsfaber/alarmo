@@ -860,7 +860,7 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
                     )
             if event == const.EVENT_TRIGGER_TIME_EXPIRED:
                 if self.hass.data[const.DOMAIN]["areas"][area_id].state == STATE_ALARM_DISARMED:
-                    await self.async_alarm_disarm(None, True)
+                    await self.async_alarm_disarm(skip_code=True)
 
         async_dispatcher_connect(self.hass, "alarmo_event", async_handle_event)
 
@@ -961,10 +961,10 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
         context_id = kwargs.get("context_id", None)
 
         """Send disarm command."""
-        res = await super().async_alarm_disarm(code, skip_code)
+        res = await super().async_alarm_disarm(code=code, skip_code=skip_code)
         if res:
             for item in self.hass.data[const.DOMAIN]["areas"].values():
-                await item.async_alarm_disarm(code, skip_code)
+                await item.async_alarm_disarm(code=code, skip_code=skip_code)
 
             async_dispatcher_send(self.hass, "alarmo_event", const.EVENT_DISARM, self.area_id, {
                 const.ATTR_CONTEXT_ID: context_id
