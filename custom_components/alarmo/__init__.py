@@ -325,7 +325,7 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                 await alarm_entity.async_handle_arm_request(arm_mode, skip_code=True)
             elif action == const.EVENT_ACTION_DISARM:
                 _LOGGER.info("Received request for disarming")
-                await alarm_entity.async_alarm_disarm(None, True)
+                await alarm_entity.async_alarm_disarm(code=None, skip_code=True)
 
         self._subscriptions.append(
             self.hass.bus.async_listen(const.PUSH_EVENT, async_handle_push_event)

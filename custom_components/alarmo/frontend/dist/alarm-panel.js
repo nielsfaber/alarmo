@@ -3080,7 +3080,7 @@ class es extends class{constructor(e){}T(e,t,a){this.Σdt=e,this.M=t,this.Σct=a
               ${pi("title",this.hass.language)}
             </div>
             <div class="version">
-              v${"1.9.2"}
+              v${"1.9.3"}
             </div>
           </app-toolbar>
           <ha-tabs
