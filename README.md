@@ -202,6 +202,7 @@ The Alarmo entity defines the following attributes:
 | `changed_by`       | `null`        | `Niels`                        | User who last armed or disarmed the alarm.<br> Detected from the entered code.<br> Cleared when alarm is armed or disarmed without a code.                                                                                                          |
 | `open_sensors`     | `null`        | `{binary_sensor.backdoor: on}` | Dictionary of sensors with their entity-ID + state, that caused the alarm to change state.<br>Set when arming attempt failed (due to one or more sensors).<br>Set when alarm is triggered (only first sensor that caused the triggering is stored). |
 | `bypassed_sensors` | `null`        | `[binary_sensor.backdoor]`     | List of sensors that are temporarily excluded from the alarm, due to arming in force.                                                                                                                                                               |
+| `delay` | `null` | 30 | Duration of the exit or entry delay. Only set in the `arming` and `pending` states, `null` otherwise. |
 
 #### Commands
 The Alarmo entities support the following commands:
