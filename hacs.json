@@ -1,7 +1,6 @@
 {
   "name": "Alarmo",
   "render_readme": true,
-  "domains": ["alarm_control_panel"],
   "zip_release": true,
   "filename": "alarmo.zip",
   "hide_default_branch": true
