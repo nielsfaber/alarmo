@@ -1,7 +1,6 @@
 {
   "name": "Alarmo",
   "render_readme": true,
-  "iot_class": ["Local Push"],
   "domains": ["alarm_control_panel"],
   "zip_release": true,
   "filename": "alarmo.zip",
