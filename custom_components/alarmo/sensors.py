@@ -28,6 +28,7 @@ from homeassistant.const import (
     STATE_ALARM_DISARMED,
     STATE_ALARM_PENDING,
     STATE_ALARM_ARMING,
+    STATE_ALARM_TRIGGERED,
     ATTR_STATE,
     ATTR_LAST_TRIP_TIME,
     ATTR_NAME,
@@ -82,6 +83,37 @@ def parse_sensor_state(state):
         return STATE_CLOSED
     else:
         return STATE_UNKNOWN
+
+
+def sensor_state_allowed(state, sensor_config, alarm_state):
+    """return whether the sensor state is permitted or a state change should occur"""
+
+    if state != STATE_OPEN and (state != STATE_UNAVAILABLE or not sensor_config[ATTR_TRIGGER_UNAVAILABLE]):
+        # sensor has the safe state
+        return True
+
+    elif alarm_state == STATE_ALARM_TRIGGERED:
+        # alarm is already triggered
+        return True
+
+    elif sensor_config[ATTR_ALWAYS_ON]:
+        # alarm should always be triggered by always-on sensor
+        return False
+
+    elif alarm_state == STATE_ALARM_ARMING and not sensor_config[ATTR_USE_EXIT_DELAY]:
+        # arming should be aborted if sensor without exit delay is active
+        return False
+
+    elif alarm_state in const.ARM_MODES:
+        # normal triggering case
+        return False
+
+    elif alarm_state == STATE_ALARM_PENDING and not sensor_config[ATTR_USE_ENTRY_DELAY]:
+        # triggering of immediate sensor while alarm is pending
+        return False
+
+    else:
+        return True
 
 
 class SensorHandler:
@@ -140,6 +172,14 @@ class SensorHandler:
                 self._group_events[group_id].items()
             ))
 
+        # handle initial sensor states
+        if area_id and old_state is None:
+            sensors_list = self.active_sensors_for_alarm_state(area_id)
+            for entity in sensors_list:
+                sensor_state = parse_sensor_state(self.hass.states.get(entity))
+                is_allowed = sensor_state_allowed(sensor_state, self._config[entity], state)
+                _LOGGER.debug("entity {} has initial state {}, is allowed: {}".format(entity, sensor_state, is_allowed))
+
     def active_sensors_for_alarm_state(self, area_id: str, state: str = None):
         """Compose a list of sensors that are active for the state"""
         alarm_entity = self.hass.data[const.DOMAIN]["areas"][area_id]
@@ -159,6 +199,50 @@ class SensorHandler:
             ):
                 entities.append(entity)
         return entities
+
+    def is_transition_allowed(self, area_id: str, target_state: str = None, **kwargs):
+        """indicate whether alarm state transition is allowed."""
+
+        use_delay = kwargs.get("use_delay", False)
+        bypass_open_sensors = kwargs.get("bypass_open_sensors", False)
+
+        sensors_list = self.active_sensors_for_alarm_state(area_id)
+
+        open_sensors = {}
+        bypassed_sensors = []
+
+        alarm_state = target_state
+        if use_delay and alarm_state in const.ARM_MODES:
+            alarm_state = STATE_ALARM_ARMING
+        elif use_delay and alarm_state == STATE_ALARM_TRIGGERED
+            alarm_state = STATE_ALARM_PENDING
+
+        for entity in sensors_list:
+            sensor_config = self._config[entity]
+            sensor_state = parse_sensor_state(self.hass.states.get(entity))
+            res = sensor_state_allowed(sensor_state, sensor_config, alarm_state)
+
+            if not res and target_state in const.ARM_MODES:
+                # sensor is active while arming
+                if sensor_config[ATTR_ALLOW_OPEN]:
+                    # sensor is permitted to be open during/after arming
+                    continue
+                elif bypass_open_sensors or (
+                    sensor_config[ATTR_AUTO_BYPASS] and
+                    target_state in sensor_config[ATTR_AUTO_BYPASS_MODES]
+                ):
+                    # sensor may be bypassed
+                    bypassed_sensors.append(entity)
+                else:
+                    open_sensors[entity] = sensor_state
+
+            else:
+                open_sensors[entity] = sensor_state
+
+        res = not bool(open_sensors)
+
+        return (res, open_sensors, bypassed_sensors)
+
 
     def validate_event(
         self,
@@ -202,9 +286,9 @@ class SensorHandler:
 
         old_state = parse_sensor_state(old_state)
         new_state = parse_sensor_state(new_state)
+        _LOGGER.debug("entity {} changed: old_state={}, new_state={}".format(entity, old_state, new_state))
         if old_state == new_state:
             return
-        _LOGGER.debug("entity {} changed: old_state={}, new_state={}".format(entity, old_state, new_state))
 
         sensor_config = self._config[entity]
         if new_state in [STATE_UNAVAILABLE, STATE_UNKNOWN] and not sensor_config[ATTR_TRIGGER_UNAVAILABLE]:
@@ -228,13 +312,13 @@ class SensorHandler:
                 open_sensors=open_sensors
             )
 
-        # initializing -> check if all sensors have a known state
-        elif not alarm_entity.state and self.all_sensors_available_for_alarm(sensor_config["area"]):
-            _LOGGER.debug("All sensors are initialized, restoring state")
-            if alarm_entity.arm_mode:
-                await alarm_entity.async_arm(alarm_entity.arm_mode, skip_delay=True)
-            else:
-                await alarm_entity.async_update_state(STATE_ALARM_DISARMED)
+        # # initializing -> check if all sensors have a known state
+        # elif not alarm_entity.state and self.all_sensors_available_for_alarm(sensor_config["area"]):
+        #     _LOGGER.debug("All sensors are initialized, restoring state")
+        #     if alarm_entity.arm_mode:
+        #         await alarm_entity.async_arm(alarm_entity.arm_mode, skip_delay=True)
+        #     else:
+        #         await alarm_entity.async_update_state(STATE_ALARM_DISARMED)
 
         # arming while immediate sensor is triggered -> cancel arm
         elif alarm_entity.state == STATE_ALARM_ARMING:
@@ -279,22 +363,6 @@ class SensorHandler:
                 skip_delay=True,
                 open_sensors=open_sensors
             )
-
-    def all_sensors_available_for_alarm(self, area_id: str, init_state: str = None):
-        """check whether all sensors are available such that the prior state can be restored"""
-        sensors_list = self.active_sensors_for_alarm_state(area_id, init_state)
-        passed = True
-
-        for entity in sensors_list:
-            state = self.hass.states.get(entity)
-            if parse_sensor_state(state) not in [STATE_OPEN, STATE_CLOSED]:
-                passed = False
-
-        if not passed and init_state:
-            # watch for sensors to become available
-            self.async_watch_sensor_states(area_id)
-
-        return passed
 
     def start_arm_timer(self, entity):
         """start timer for automatical arming"""

@@ -488,7 +488,6 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
 
         self.area_id = area_id
         self._timer = None
-
         coordinator = self.hass.data[const.DOMAIN]["coordinator"]
         self._config = coordinator.store.async_get_config()
         self._config.update(coordinator.store.async_get_area(self.area_id))
@@ -513,6 +512,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
         # make sure that the config is reloaded on changes
         @callback
         async def async_update_config(area_id: str = None):
+            _LOGGER.debug("async_update_config")
             coordinator = self.hass.data[const.DOMAIN]["coordinator"]
             self._config = coordinator.store.async_get_config()
             self._config.update(coordinator.store.async_get_area(self.area_id))
@@ -522,44 +522,19 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
             async_dispatcher_connect(self.hass, "alarmo_config_updated", async_update_config)
         )
 
-        state = await self.async_get_last_state()
-        initial_state = STATE_ALARM_DISARMED
-
         # restore previous state
+        state = await self.async_get_last_state()
         if state:
-
-            # determine the state to start in
-            if (state.state in const.ARM_MODES or state.state == STATE_ALARM_ARMING) and self._arm_mode:
-                initial_state = self._arm_mode
-            elif state.state in [STATE_ALARM_PENDING, STATE_ALARM_TRIGGERED]:
-                initial_state = STATE_ALARM_TRIGGERED
+            initial_state = state.state
+            _LOGGER.debug("Initial state for {} is {}".format(self.entity_id, initial_state))
+            if initial_state == STATE_ALARM_ARMING:
+                await self.async_arm(self.arm_mode)
+            elif initial_state == STATE_ALARM_PENDING:
+                await self.async_trigger()
+            elif initial_state == STATE_ALARM_TRIGGERED:
+                await self.async_trigger(skip_delay=True)
             else:
-                initial_state = STATE_ALARM_DISARMED
-
-        _LOGGER.debug("Initial state is {}".format(initial_state))
-        if initial_state == STATE_ALARM_TRIGGERED:
-            await self.async_trigger(skip_delay=True)
-        elif not self.hass.data[const.DOMAIN]["sensor_handler"].all_sensors_available_for_alarm(
-            self.area_id,
-            initial_state
-        ):
-            _LOGGER.debug("Waiting for all sensors to be ready...")
-            self._revert_state = STATE_ALARM_DISARMED
-
-            @callback
-            async def async_initialization_timer_finished(now):
-                """Update state at a scheduled point in time."""
-                _LOGGER.info("Not all sensors are initialized yet, starting anyway.")
-                if initial_state in const.ARM_MODES:
-                    await self.async_arm(initial_state, skip_delay=True)
-                else:
-                    await self.async_update_state(STATE_ALARM_DISARMED)
-
-            self.async_set_timer(const.INITIALIZATION_TIME, async_initialization_timer_finished)
-        elif initial_state in const.ARM_MODES:
-            await self.async_arm(self._arm_mode, skip_delay=True)
-        else:
-            await self.async_update_state(STATE_ALARM_DISARMED)
+                await self.async_update_state(initial_state)
 
         self.async_write_ha_state()
 
@@ -875,10 +850,9 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
         async_dispatcher_connect(self.hass, "alarmo_event", async_handle_event)
 
         state = await self.async_get_last_state()
-        # if state and state.state:
-        #   self._state = state.state
-        # updated, wait for areas to initialize
-        if not state or not state.state:
+        if state and state.state:
+            self._state = state.state
+        else:
             self._state = STATE_ALARM_DISARMED
         self.async_write_ha_state()
 
