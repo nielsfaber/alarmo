@@ -55,7 +55,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     store = await async_get_registry(hass)
     coordinator = AlarmoCoordinator(hass, session, entry, store)
 
-    device_registry = await dr.async_get_registry(hass)
+    device_registry = dr.async_get(hass)
     device_registry.async_get_or_create(
         config_entry_id=entry.entry_id,
         identifiers={(const.DOMAIN, coordinator.id)},
@@ -332,7 +332,7 @@ class AlarmoCoordinator(DataUpdateCoordinator):
         )
 
     async def async_remove_entity(self, area_id: str):
-        entity_registry = await self.hass.helpers.entity_registry.async_get_registry()
+        entity_registry = self.hass.helpers.entity_registry.async_get(self.hass)
         if area_id == "master":
             entity = self.hass.data[const.DOMAIN]["master"]
             entity_registry.async_remove(entity.entity_id)

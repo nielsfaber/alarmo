@@ -27,8 +27,7 @@ from homeassistant.const import (
 )
 
 from homeassistant.components.alarm_control_panel import (
-    FORMAT_NUMBER as CODE_FORMAT_NUMBER,
-    FORMAT_TEXT as CODE_FORMAT_TEXT,
+    CodeFormat,
     ATTR_CODE_ARM_REQUIRED,
 )
 from homeassistant.components.websocket_api import (decorators, async_register_command)
@@ -107,7 +106,7 @@ class AlarmoConfigView(HomeAssistantView):
                 vol.Optional(ATTR_CODE_ARM_REQUIRED): cv.boolean,
                 vol.Optional(const.ATTR_CODE_DISARM_REQUIRED): cv.boolean,
                 vol.Optional(ATTR_CODE_FORMAT): vol.In(
-                    [CODE_FORMAT_NUMBER, CODE_FORMAT_TEXT]
+                    [CodeFormat.NUMBER, CodeFormat.TEXT]
                 ),
                 vol.Optional(const.ATTR_TRIGGER_TIME): cv.positive_int,
                 vol.Optional(const.ATTR_DISARM_AFTER_TRIGGER): cv.boolean,

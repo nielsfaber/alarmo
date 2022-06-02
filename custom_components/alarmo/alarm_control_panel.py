@@ -25,7 +25,7 @@ from homeassistant.components.alarm_control_panel import (
     AlarmControlPanelEntity,
     ATTR_CODE_ARM_REQUIRED,
     DOMAIN as PLATFORM,
-    SUPPORT_ALARM_TRIGGER,
+    AlarmControlPanelEntityFeature,
 )
 
 from homeassistant.const import (
@@ -499,7 +499,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
         if not self._config or const.ATTR_MODES not in self._config:
             return 0
         else:
-            supported_features = SUPPORT_ALARM_TRIGGER
+            supported_features = AlarmControlPanelEntityFeature.TRIGGER
             for (mode, mode_config) in self._config[const.ATTR_MODES].items():
                 if mode_config[const.ATTR_ENABLED]:
                     supported_features = supported_features | const.MODES_TO_SUPPORTED_FEATURES[mode]
