@@ -119,10 +119,10 @@ export class AutomationEditorCard extends LitElement {
         <div class="card-content">
           <settings-row .narrow=${this.narrow} .large=${true} first>
             <span slot="heading">
-              ${localize('panels.actions.cards.new_notification.fields.event.heading', this.hass.language)}
+              ${localize('panels.actions.cards.new_action.fields.event.heading', this.hass.language)}
             </span>
             <span slot="description">
-              ${localize('panels.actions.cards.new_notification.fields.event.description', this.hass.language)}
+              ${localize('panels.actions.cards.new_action.fields.event.description', this.hass.language)}
             </span>
 
             <alarmo-select
@@ -363,11 +363,16 @@ export class AutomationEditorCard extends LitElement {
     const value = ev.detail.value;
     let triggerConfig = this.config.triggers;
     Object.assign(triggerConfig, { [0]: { ...triggerConfig[0], area: value } });
+    const armModes = getArmModeOptions(value, this.areas!);
+
+    if (triggerConfig[0].modes?.length)
+      this._setModes(
+        new CustomEvent('value-changed', {
+          detail: { value: triggerConfig[0].modes.filter(e => armModes.includes(e)) },
+        })
+      );
+
     this.config = { ...this.config, triggers: triggerConfig };
-
-    if (!this.config.triggers[0].modes?.length)
-      this._setModes(new CustomEvent('value-changed', { detail: { value: getArmModeOptions(value, this.areas) } }));
-
     if (Object.keys(this.errors).includes('area')) this._validateConfig();
   }
 

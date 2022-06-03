@@ -478,7 +478,7 @@
             },
             "target": {
               "heading": "Target",
-              "description": "Device to send the push message to"
+              "description": "Device to send the notification to"
             },
             "name": {
               "heading": "Name",

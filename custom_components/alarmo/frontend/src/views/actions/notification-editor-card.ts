@@ -453,9 +453,7 @@ export class NotificationEditorCard extends LitElement {
     Object.assign(triggerConfig, { [0]: { ...triggerConfig[0], area: value } });
     const armModes = getArmModeOptions(value, this.areas!);
 
-    if (!triggerConfig[0].modes?.length)
-      this._setModes(new CustomEvent('value-changed', { detail: { value: armModes } }));
-    else
+    if (triggerConfig[0].modes?.length)
       this._setModes(
         new CustomEvent('value-changed', {
           detail: { value: triggerConfig[0].modes.filter(e => armModes.includes(e)) },
