@@ -234,7 +234,7 @@ class AutomationHandler:
             translations = await self.hass.helpers.translation.async_get_translations(
                 language,
                 "device_automation",
-                "binary_sensor"
+                ["binary_sensor"]
             )
 
             self._sensorTranslationCache = translations
@@ -283,7 +283,7 @@ class AutomationHandler:
             translations = await self.hass.helpers.translation.async_get_translations(
                 language,
                 "state",
-                "alarm_control_panel"
+                ["alarm_control_panel"]
             )
 
             self._alarmTranslationCache = translations
