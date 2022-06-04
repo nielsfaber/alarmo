@@ -53,7 +53,7 @@ def validate_area(trigger, area_id):
 def validate_modes(trigger, mode):
     if const.ATTR_MODES not in trigger:
         return False
-    elif not trigger[const.ATTR_MODES] or not mode:
+    elif not trigger[const.ATTR_MODES]:
         return True
     else:
         return mode in trigger[const.ATTR_MODES]
@@ -104,7 +104,7 @@ class AutomationHandler:
                 for trigger in config[const.ATTR_TRIGGERS]:
                     if (
                         validate_area(trigger, area_id) and
-                        validate_modes(trigger, alarm_entity.arm_mode) and
+                        validate_modes(trigger, alarm_entity._arm_mode) and
                         const.ATTR_EVENT in trigger and
                         trigger[const.ATTR_EVENT] == new_state
                     ):
@@ -131,7 +131,7 @@ class AutomationHandler:
                 for trigger in config[const.ATTR_TRIGGERS]:
                     if (
                         validate_area(trigger, area_id) and
-                        validate_modes(trigger, alarm_entity.arm_mode) and
+                        validate_modes(trigger, alarm_entity._arm_mode) and
                         const.ATTR_EVENT in trigger and
                         trigger[const.ATTR_EVENT] == EVENT_ARM_FAILURE
                     ):

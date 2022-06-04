@@ -200,7 +200,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
     @property
     def arm_mode(self):
         """Return the arm mode."""
-        return self._arm_mode
+        return self._arm_mode if self._state != STATE_ALARM_DISARMED else None
 
     @property
     def open_sensors(self):
@@ -330,7 +330,6 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             _LOGGER.warning("Wrong code provided.")
             return
         else:
-            self._arm_mode = None
             self.open_sensors = None
             self.bypassed_sensors = None
             await self.async_update_state(STATE_ALARM_DISARMED)
@@ -557,6 +556,8 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
 
         if state in const.ARM_MODES:
             self._arm_mode = state
+        elif old_state == STATE_ALARM_DISARMED and state == STATE_ALARM_TRIGGERED:
+            self._arm_mode = None
 
         async_dispatcher_send(self.hass, "alarmo_state_updated", self.area_id, old_state, state)
 
@@ -887,7 +888,7 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
             state = STATE_ALARM_DISARMED
 
         arm_modes = [
-            item.arm_mode
+            item._arm_mode
             for item in self.hass.data[const.DOMAIN]["areas"].values()
         ]
         arm_mode = arm_modes[0] if len(set(arm_modes)) == 1 else None

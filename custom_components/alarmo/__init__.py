@@ -312,7 +312,7 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                 _LOGGER.info("Cannot process the push action, since there are multiple areas.")
                 return
 
-            arm_mode = alarm_entity.arm_mode
+            arm_mode = alarm_entity._arm_mode
             if not arm_mode:
                 _LOGGER.info("Cannot process the push action, since the arm mode is not known.")
                 return
