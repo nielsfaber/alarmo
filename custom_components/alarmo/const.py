@@ -21,7 +21,7 @@ from homeassistant.const import (
 from homeassistant.components.alarm_control_panel import AlarmControlPanelEntityFeature
 from homeassistant.helpers import config_validation as cv
 
-VERSION = "1.9.3"
+VERSION = "1.9.4"
 NAME = "Alarmo"
 MANUFACTURER = "@nielsfaber"
 
@@ -104,6 +104,7 @@ EVENT_NO_CODE_PROVIDED = "no_code_provided"
 EVENT_TRIGGER_TIME_EXPIRED = "trigger_time_expired"
 
 ATTR_MODES = "modes"
+ATTR_ARM_MODE = "arm_mode"
 ATTR_CODE_DISARM_REQUIRED = "code_disarm_required"
 ATTR_REMOVE = "remove"
 ATTR_OLD_CODE = "old_code"
