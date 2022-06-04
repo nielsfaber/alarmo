@@ -599,11 +599,10 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
         if skip_delay or not exit_delay:
             # immediate arm event
 
-            (open_sensors, bypassed_sensors) = self.hass.data[const.DOMAIN]["sensor_handler"].validate_event(
+            (open_sensors, bypassed_sensors) = self.hass.data[const.DOMAIN]["sensor_handler"].validate_arming_event(
                 area_id=self.area_id,
-                event=const.EVENT_ARM,
-                bypass_open_sensors=bypass_open_sensors,
-                arm_mode=arm_mode
+                target_state=arm_mode,
+                bypass_open_sensors=bypass_open_sensors
             )
 
             if open_sensors:
@@ -639,11 +638,11 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
 
         else:  # normal arm event (from disarmed via arming)
 
-            (open_sensors, _bypassed_sensors) = self.hass.data[const.DOMAIN]["sensor_handler"].validate_event(
+            (open_sensors, _bypassed_sensors) = self.hass.data[const.DOMAIN]["sensor_handler"].validate_arming_event(
                 area_id=self.area_id,
-                event=const.EVENT_LEAVE,
+                target_state=arm_mode,
+                use_delay=True,
                 bypass_open_sensors=bypass_open_sensors,
-                arm_mode=arm_mode
             )
 
             if open_sensors:
