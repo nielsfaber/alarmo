@@ -129,10 +129,11 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
             ${this.modesByArea(this.data.area).map(
               el => html`
                 <mwc-button
-                  class="${this.data!.modes.includes(el) ? 'active' : ''}"
+                  class="${this.data!.modes.includes(el) || this.data!.always_on ? 'active' : ''}"
                   @click=${() => {
                     this.setMode(el);
                   }}
+                  ?disabled=${this.data!.always_on}
                 >
                   <ha-icon icon="${EArmModeIcons[Object.entries(EArmModes).find(([, v]) => v == el)![0]]}"></ha-icon>
                   ${localize(`common.modes_short.${el}`, this.hass.language)}

@@ -163,13 +163,12 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
     let sensorsList = Object.keys(this.sensors).map(id => {
       const stateObj = this.hass!.states[id];
       const config = this.sensors[id];
+      const modesList = config.area ? modesByArea(this.areas[config.area]) : getModesList(this.areas);
       let res: TableData & { name: string } = {
         ...config,
         id: id,
         name: computeName(stateObj),
-        modes: config.modes.filter(e =>
-          config.area ? modesByArea(this.areas[config.area]).includes(e) : getModesList(this.areas).includes(e)
-        ),
+        modes: config.always_on ? modesList : config.modes.filter(e => modesList.includes(e)),
         warning: !config.area,
         area: config.area || noArea,
       };
