@@ -5,10 +5,10 @@
       "armed_home": "In casa",
       "armed_night": "Notte",
       "armed_custom_bypass": "Personalizzato",
-      "armed_vacation": "Vacation"
+      "armed_vacation": "Vacanza"
     },
-    "enabled": "Enabled",
-    "disabled": "Disabled"
+    "enabled": "Abilitato",
+    "disabled": "Disabilitato"
   },
   "components": {
     "time_slider": {
@@ -20,20 +20,20 @@
     "editor": {
       "ui_mode": "Passa a UI",
       "yaml_mode": "Passa a YAML",
-      "edit_in_yaml": "Edit in YAML"
+      "edit_in_yaml": "Modifica in YAML"
     },
     "table": {
       "filter": {
-        "label": "Filter items",
-        "item": "Filter by {name}",
+        "label": "Filtra elementi",
+        "item": "Filtra per {name}",
         "hidden_items": "{number} {number, plural,\n  one {item is}\n  other {items are}\n} hidden"
       }
     }
   },
-  "title": "Alarm panel",
+  "title": "Pannello Allarme",
   "panels": {
     "general": {
-      "title": "Generali",
+      "title": "Generale",
       "cards": {
         "general": {
           "description": "Questo pannello definisce alcune impostazioni da applicare alle modalità di allarme.",
@@ -47,30 +47,30 @@
               "description": "Permetti al pannello allarme di essere controllato attraverso MQTT."
             },
             "enable_master": {
-              "heading": "Enable alarm master",
-              "description": "Creates an entity for controlling all areas simultaneously."
+              "heading": "Abilita Allarme Master",
+              "description": "Crea una entità per controllare tutte le aree simultaneamente."
             }
           },
           "actions": {
             "setup_mqtt": "Configurazione MQTT",
-            "setup_master": "Master Configuration"
+            "setup_master": "Configurazione Master"
           }
         },
         "modes": {
-          "title": "Modes",
-          "description": "This panel can be used to set up the arm modes of the alarm.",
+          "title": "Modalità",
+          "description": "Questo pannello può essere usato per impostare le modalità dell'allarme.",
           "modes": {
             "armed_away": "Modalità 'fuori casa': da utilizzare quando tutte le persone lasciano la casa. Tutti i sensori di porte e finestre che consentono l'accesso alla casa saranno attivi, così come i sensori di movimento all'interno della casa.",
             "armed_home": "Modalità 'in casa': da utilizzare quando si attiva l'allarme mentre le persone sono in casa. Tutti i sensori di porte e finestre che consentono l'accesso alla casa saranno attivi, ma non i sensori di movimento all'interno della casa.",
             "armed_night": "Modalità 'notte': da utilizzare quando si imposta la sveglia prima di andare a dormire. Tutti i sensori di porte e finestre che consentono l'accesso alla casa saranno attivi e sensori di movimento selezionati (ad esempio al piano di sotto) nella casa.",
-            "armed_vacation": "Armed vacation can be used as an extension to the armed away mode in case of absence for longer duration. The delay times and trigger responses can be adapted (as desired) to being distant from home.",
+            "armed_vacation": "Modalità 'vacanza': da utlizzare come estensione della modalità 'fuori casa' in caso di assenza prolungata. I ritardi e i tempi di attivazione possono essere adattati per essere distanti da casa.",
             "armed_custom_bypass": "Modalità 'personalizzato': da utilizzare per definire una modalità di allarme specifica per le esigenze dell'utilizzatore."
           },
           "number_sensors_active": "{number} {number, plural,\n  one {sensor}\n  other {sensors}\n} active",
           "fields": {
             "status": {
-              "heading": "Status",
-              "description": "Controls whether the alarm can be armed in this mode."
+              "heading": "Stato",
+              "description": "Definisce quando l'allarme può essere armato in questa modalità."
             },
             "exit_delay": {
               "heading": "Tempo di preattivazione",
@@ -82,7 +82,7 @@
             },
             "trigger_time": {
               "heading": "Tempo di attivazione",
-              "description": "Tempo durante il quale suonerà la sirena"
+              "description": "Tempo durante il quale suonerà la sirena."
             }
           }
         },
@@ -96,7 +96,7 @@
             },
             "event_topic": {
               "heading": "Event topic",
-              "description": "Topic on which alarm events are published"
+              "description": "opic su cui vengono pubblicati gli eventi"
             },
             "command_topic": {
               "heading": "Topic di comando",
@@ -117,12 +117,12 @@
           }
         },
         "areas": {
-          "title": "Areas",
-          "description": "Areas can be used for dividing your alarm system into multiple compartments.",
-          "no_items": "There are no areas defined yet.",
+          "title": "Aree",
+          "description": "Le aree possono essere utilizzate per dividere il tuo allarme in più sezioni.",
+          "no_items": "Non ci sono ancora aree definite.",
           "table": {
-            "remarks": "Remarks",
-            "summary": "This area contains {summary_sensors} and {summary_automations}.",
+            "remarks": "Commenti",
+            "summary": "Questa area contiene {summary_sensors} e {summary_automations}.",
             "summary_sensors": "{number} {number, plural,\n  one {sensor}\n  other {sensors}\n}",
             "summary_automations": "{number} {number, plural,\n  one {automation}\n  other {automations}\n}"
           },
@@ -133,25 +133,25 @@
       },
       "dialogs": {
         "create_area": {
-          "title": "New area",
+          "title": "Nuova area",
           "fields": {
-            "copy_from": "Copy settings from"
+            "copy_from": "Copia impostazioni da"
           }
         },
         "edit_area": {
-          "title": "Editing area ''{area}''",
-          "name_warning": "Note: changing the name will change the entity ID"
+          "title": "Modifica Area ''{area}''",
+          "name_warning": "Nota: cambiare il nome modificherà l'entity ID"
         },
         "remove_area": {
-          "title": "Remove area?",
-          "description": "Are you sure you want to remove this area? This area contains {sensors} sensors and {automations} automations, which will be removed as well."
+          "title": "Rimuovi Area?",
+          "description": "Sei sicuro che vuoi rimuovere questa area? Questa area contiene {sensors} sensori e {automations} automazioni, che verranno anch'esse rimossi."
         },
         "edit_master": {
-          "title": "Master configuration"
+          "title": "Configura Master"
         },
         "disable_master": {
-          "title": "Disable master?",
-          "description": "Are you sure you want to remove the alarm master? This area contains {automations} automations, which will be removed with this action."
+          "title": "Disabilita Master?",
+          "description": "Sei sicuro che vuoi rimuovere l'allarme master? Questa area contiene {automations} automazioni, che verranno eliminate con questa azione."
         }
       }
     },
@@ -162,7 +162,7 @@
           "description": "Sensori attualmente configurati. Clicca sull'entità per modificare.",
           "table": {
             "no_items": "Non ci sono ancora sensori aggiunti a questo allarme. Assicurati di aggiungerli prima.",
-            "no_area_warning": "Sensor is not assigned to any area.",
+            "no_area_warning": "Sensore non assegnato a nessuna area.",
             "arm_modes": "Modalità di attivazione",
             "always_on": "(Sempre)"
           }
@@ -172,11 +172,11 @@
           "description": "Aggiungi più sensori. Assicurati che i sensori abbiano un friendly_name (nome amichevole), in modo da identificarli più facilmente.",
           "no_items": "Non ci sono entità disponibili che possono essere configurate con l'allarme. Assicurati di includere entità del tipo binary_sensor (sensore binario).",
           "table": {
-            "type": "Detected type"
+            "type": "Tipologia Innesco"
           },
           "actions": {
             "add_to_alarm": "aggiungi all'allarme",
-            "filter_supported": "Hide items with unknown type"
+            "filter_supported": "Nascondi elementi con tipologia sconosciuta"
           }
         },
         "editor": {
@@ -185,38 +185,38 @@
           "fields": {
             "area": {
               "heading": "Area",
-              "description": "Select an area which contains this sensor."
+              "description": "Seleziona una area che contiene questo sensore."
             },
             "group": {
-              "heading": "Group",
-              "description": "Group with other sensors for combined triggering."
+              "heading": "Gruppo",
+              "description": "Raggruppa con altri sensori per inneschi combinati."
             },
             "device_type": {
-              "heading": "Device Type",
-              "description": "Choose a device type to automatically apply appropriate settings.",
+              "heading": "Tipologia Dispositivo",
+              "description": "Scegli la tipologia del dispositivo per applicare le impostazioni appropriate.",
               "choose": {
                 "door": {
-                  "name": "Door",
-                  "description": "A door, gate or other entrance that is used for entering/leaving the home."
+                  "name": "Porta",
+                  "description": "Una porta, cancello o altro ingresso che è usato per entrare/lasciare casa."
                 },
                 "window": {
-                  "name": "Window",
-                  "description": "A window, or a door not used for entering the house such as balcony."
+                  "name": "Finestra",
+                  "description": "Una finestra, o una porta-finestra non usata per accedere alla casa."
                 },
                 "motion": {
-                  "name": "Motion",
-                  "description": "Presence sensor or similar device having a delay between activations."
+                  "name": "Movimento",
+                  "description": "Sensore di presenza o simile che ha un ritardo tra le attivazioni."
                 },
                 "tamper": {
-                  "name": "Tamper",
-                  "description": "Detector of sensor cover removal, glass break sensor, etc."
+                  "name": "Vibrazione",
+                  "description": "Rilaveamento di vibrazione, rottura vetri, ecc."
                 },
                 "environmental": {
-                  "name": "Environmental",
-                  "description": "Smoke/gas sensor, leak detector, etc. (not related to burglar protection)."
+                  "name": "Ambientale",
+                  "description": "Rilevatori fumo/gas, ecc. (non correlati alla protezione intrusi)."
                 },
                 "other": {
-                  "name": "Generic"
+                  "name": "Generico"
                 }
               }
             },
@@ -229,25 +229,25 @@
               "description": "Modalità di allarme in cui il sensore risulta collegato."
             },
             "arm_on_close": {
-              "heading": "Arm after closing",
-              "description": "After deactivation of this sensor, the remaining exit delay will automatically be skipped."
+              "heading": "Attiva dopo chisura after closing",
+              "description": "Dopo la disattivazione di questo sensore il ritardo rimanente verrà automaticamente skippato."
             },
             "use_exit_delay": {
-              "heading": "Use exit delay",
-              "description": "Sensor is allowed to be active when the exit delay starts."
+              "heading": "Usa Ritardo d'uscita",
+              "description": "Sensore che può rimanre attivo mentre il ritardo di uscita è in corso."
             },
             "use_entry_delay": {
-              "heading": "Use entry delay",
-              "description": "Sensor activation triggers the alarm after the entry delay rather than directly."
+              "heading": "Usa ritardo in ingresso",
+              "description": "Sensore che innesca l'allarme dopo il ritardo in ingresso anzichè direttamente."
             },
             "allow_open": {
               "heading": "Permetti apertura",
               "description": "Consentire a questo sensore di rimanere attivo poco dopo essere usciti."
             },
             "auto_bypass": {
-              "heading": "Bypass automatically",
-              "description": "Exclude this sensor from the alarm if it is open while arming.",
-              "modes": "Modes in which sensor may be bypassed"
+              "heading": "Bypass automatico",
+              "description": "Escludi questo sensore dall'allarme se è aperto durante l'attivazione.",
+              "modes": "Modalità in cui il sensore può essere bypassato"
             },
             "trigger_unavailable": {
               "heading": "Fai scattare l'allarme quando non disponibile",
@@ -255,50 +255,50 @@
             }
           },
           "actions": {
-            "toggle_advanced": "Advanced settings",
-            "remove": "Remove",
-            "setup_groups": "Setup groups"
+            "toggle_advanced": "Impostazione avanzate",
+            "remove": "Rimuovi",
+            "setup_groups": "Setup gruppi"
           },
           "errors": {
-            "description": "Please correct the following errors:",
-            "no_area": "No area is selected",
-            "no_modes": "No modes are selected for which the sensor should be active",
-            "no_auto_bypass_modes": "No modes are selected for the sensor may be automatically bypassed"
+            "description": "Per favore correggi i seguenti errori:",
+            "no_area": "Nessuna area è selezionata",
+            "no_modes": "Nessuna modalità è selezionata per la quale il sensore dovrebbe essere attivo",
+            "no_auto_bypass_modes": "Nessuna modalità è selezionata per il sensore che può essere automaticamente bypassato"
           }
         }
       },
       "dialogs": {
         "manage_groups": {
-          "title": "Manage sensor groups",
-          "description": "In a sensor group multiple sensors must be activated within a time period before the alarm is triggered.",
-          "no_items": "No groups yet",
+          "title": "Gestisci gruppi sensori",
+          "description": "In un gruppo sensori più sensori devono essere attivi in un intevallo di tempo prima che l'allarme sia innescato.",
+          "no_items": "Nessun gruppo",
           "actions": {
-            "new_group": "New group"
+            "new_group": "Nuovo gruppo"
           }
         },
         "create_group": {
-          "title": "New sensor group",
+          "title": "Nuovo gruppo sensori",
           "fields": {
             "name": {
-              "heading": "Name",
-              "description": "Name for sensor group"
+              "heading": "Nome",
+              "description": "Nome del gruppo sensori"
             },
             "timeout": {
               "heading": "Time-out",
-              "description": "Time period during which consecutive sensor activations triggers the alarm."
+              "description": "Periodo di tempo durante il quale l'attivazione consecutiva innesca l'allarme."
             },
             "sensors": {
-              "heading": "Sensors",
-              "description": "Select the sensors which are contained by this group."
+              "heading": "Sensori",
+              "description": "Seleziona i sensori che fanno parte di questo gruppo."
             }
           },
           "errors": {
-            "invalid_name": "Invalid name provided.",
-            "insufficient_sensors": "At least 2 sensors need to be selected."
+            "invalid_name": "Nome non valido.",
+            "insufficient_sensors": "Almeno 2 sensori devono essere selezionati."
           }
         },
         "edit_group": {
-          "title": "Edit sensor group ''{name}''"
+          "title": "Modifica gruppo sensori ''{name}''"
         }
       }
     },
@@ -329,7 +329,7 @@
           "description": "Ogni utente ha il suo codice per attivare/disattivare l'allarme.",
           "no_items": "Non è stato creato nessun utente per ora",
           "actions": {
-            "new_user": "nuovo utente"
+            "new_user": "Nuovo utente"
           }
         },
         "new_user": {
@@ -361,8 +361,8 @@
               "description": "Inserendo questo codice forzerai lo stato di attivazione dell'allarme"
             },
             "area_limit": {
-              "heading": "Restricted areas",
-              "description": "Limit user to control only the selected areas"
+              "heading": "Aree riservate areas",
+              "description": "Limita l'utente a controllare solo le aree selezionate"
             }
           },
           "errors": {
@@ -391,10 +391,10 @@
           "description": "Con questo pannello puoi gestire le notifiche da inviare quanto accade un determinato evento",
           "table": {
             "no_items": "Non è stata creata nessuna notifica per ora.",
-            "no_area_warning": "Action is not assigned to any area."
+            "no_area_warning": "Azione non assegnata a nessuna."
           },
           "actions": {
-            "new_notification": "nuova notifica"
+            "new_notification": "Nuova notifica"
           }
         },
         "actions": {
@@ -403,43 +403,43 @@
             "no_items": "Non è stata creata nessuna azione per ora."
           },
           "actions": {
-            "new_action": "nuova azione"
+            "new_action": "Nuova azione"
           }
         },
         "new_notification": {
           "title": "Crea notifica",
           "description": "Crea una nuova notifica.",
-          "trigger": "Condition",
-          "action": "Task",
-          "options": "Options",
+          "trigger": "Condizione",
+          "action": "Azione",
+          "options": "Opzioni",
           "fields": {
             "event": {
               "heading": "Evento",
               "description": "Quando questa notifica deve essere inviata",
               "choose": {
                 "armed": {
-                  "name": "Alarm is armed",
-                  "description": "The alarm is succesfully armed"
+                  "name": "Allarme attivato",
+                  "description": "L'allarme è attivo"
                 },
                 "disarmed": {
-                  "name": "Alarm is disarmed",
-                  "description": "The alarm is disarmed"
+                  "name": "Allarme disattivato",
+                  "description": "L'allarme è disattivato"
                 },
                 "triggered": {
-                  "name": "Alarm is triggered",
-                  "description": "The alarm is triggered"
+                  "name": "Allarme innescato",
+                  "description": "L'allarme è innescato"
                 },
                 "arm_failure": {
-                  "name": "Failed to arm",
-                  "description": "The arming of the alarm failed due to one or more open sensors"
+                  "name": "Impossibile attivare",
+                  "description": "L'attivazione dell'allarme non è riuscita a casa di uno o più sensori aperti"
                 },
                 "arming": {
-                  "name": "Exit delay started",
-                  "description": "Exit delay started, ready to leave the house."
+                  "name": "Ritardo d'uscita partito",
+                  "description": "Ritardo d'uscita partito, preparati a lasciare la casa."
                 },
                 "pending": {
-                  "name": "Entry delay started",
-                  "description": "Entry delay started, the alarm will trigger soon."
+                  "name": "Ritardo in ingresso partito",
+                  "description": "Ritardo in ingresso partito, l'allarme verrà innescato a breve."
                 }
               }
             },
@@ -454,27 +454,27 @@
             "message": {
               "heading": "Messaggio",
               "description": "Contenuto del messaggio di notifica",
-              "insert_wildcard": "Insert wildcard",
+              "insert_wildcard": "Inserisci wildcard",
               "placeholders": {
-                "armed": "The alarm is set to {{arm_mode}}",
-                "disarmed": "The alarm is now OFF",
-                "triggered": "The alarm is triggered! Cause: {{open_sensors}}.",
-                "arm_failure": "The alarm could not be armed right now, due to: {{open_sensors}}.",
-                "arming": "The alarm will be armed soon, please leave the house.",
-                "pending": "The alarm is about to trigger, disarm it quickly!"
+                "armed": "L'allarme è impostato in {{arm_mode}}",
+                "disarmed": "L'allarme è disattivatoF",
+                "triggered": "L'allarme è stato innescato! Causa: {{open_sensors}}.",
+                "arm_failure": "L'allarme non può essere attivato adesso. Causa: {{open_sensors}}.",
+                "arming": "L'allarme verrà attivato a breve, per favore lascia la casa.",
+                "pending": "L'allarme sta per essere innescato, disattivalo velocemente!"
               }
             },
             "open_sensors_format": {
-              "heading": "Format for open_sensors wildcard",
-              "description": "Choose which sensor information in inserted in the message",
+              "heading": "Formato per la wildcard open_sensors",
+              "description": "Scegli quale informazione è inserita nel messaggio",
               "options": {
-                "default": "Names and states",
-                "short": "Names only"
+                "default": "Nomi e stati",
+                "short": "Nomi soltanto"
               }
             },
             "arm_mode_format": {
-              "heading": "Translation for arm_mode wildcard",
-              "description": "Choose in which language the arm mode is inserted in the message"
+              "heading": "Traduzione per le wildcard per arm_mode",
+              "description": "Scegli la lingua in cui è scritto il messaggio"
             },
             "target": {
               "heading": "Destinatario",
@@ -484,21 +484,21 @@
               "heading": "Nome",
               "description": "Descrizione della notifica",
               "placeholders": {
-                "armed": "Notify {target} upon arming",
-                "disarmed": "Notify {target} upon disarming",
-                "triggered": "Notify {target} when triggered",
-                "arm_failure": "Notify {target} on failure",
-                "arming": "Notify {target} when leaving",
-                "pending": "Notify {target} when arriving"
+                "armed": "Notifica {target} in attivazione",
+                "disarmed": "Notifica {target} in disattivazione",
+                "triggered": "Notifica {target} quando innescato",
+                "arm_failure": "Notifica {target} quando impossibile attivare",
+                "arming": "Notifica {target} in uscita",
+                "pending": "Notifica {target} in ingresso"
               }
             },
             "delete": {
-              "heading": "Delete automation",
-              "description": "Permanently remove this automation"
+              "heading": "Elimina automazione",
+              "description": "Elimina l'automazione permanentemente"
             }
           },
           "actions": {
-            "test": "Try it"
+            "test": "Prova"
           }
         },
         "new_action": {
@@ -511,7 +511,7 @@
             },
             "area": {
               "heading": "Area",
-              "description": "Area for which the event applies, leave empty to select the global alarm."
+              "description": "Area nella quale l'evento avviene, lascia vuoti per selezionare l'intero allarme."
             },
             "mode": {
               "heading": "Modalità",
@@ -524,18 +524,18 @@
             "action": {
               "heading": "Azione",
               "description": "Azione che deve eseguire l'entità",
-              "no_common_actions": "Actions can only be assigned in YAML mode for the selected entities."
+              "no_common_actions": "Le azioni possono essere definite solo in YAML mode per le entità selezionate."
             },
             "name": {
               "heading": "Nome",
               "description": "Descrizione dell'azione",
               "placeholders": {
-                "armed": "Set {entity} to {state} upon arming",
-                "disarmed": "Set {entity} to {state} upon disarming",
-                "triggered": "Set {entity} to {state} when triggered",
-                "arm_failure": "Set {entity} to {state} on failure",
-                "arming": "Set {entity} to {state} when leaving",
-                "pending": "Set {entity} to {state} when arriving"
+                "armed": "Imposta {entity} su {state} in attivazione",
+                "disarmed": "Imposta {entity} su {state} in disattivazione",
+                "triggered": "Imposta {entity} su {state} in innesco",
+                "arm_failure": "Imposta {entity} su {state} quando è impossibile attivare",
+                "arming": "Imposta {entity} su {state} in uscita",
+                "pending": "Imposta {entity} su {state} in entrata"
               }
             }
           }
