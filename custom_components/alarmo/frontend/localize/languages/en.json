@@ -388,7 +388,7 @@
       "cards": {
         "notifications": {
           "title": "Notifications",
-          "description": "Using this panel, you can manage notifications to be sent when during a certain alarm event.",
+          "description": "Using this panel, you can manage notifications to be sent when a certain alarm event occurs.",
           "table": {
             "no_items": "There are no notifications created yet.",
             "no_area_warning": "Action is not assigned to any area."
