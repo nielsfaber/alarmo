@@ -285,6 +285,14 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             # user is not allowed to operate this area
             _LOGGER.debug("User {} has no permission to arm/disarm this area.".format(res[ATTR_NAME]))
             return (False, const.EVENT_INVALID_CODE_PROVIDED)
+        elif state == STATE_ALARM_DISARMED and not res["can_disarm"]:
+            # user is not allowed to disarm the alarm
+            _LOGGER.debug("User {} has no permission to disarm the alarm.".format(res[ATTR_NAME]))
+            return (False, const.EVENT_INVALID_CODE_PROVIDED)
+        elif state in const.ARM_MODES and not res["can_arm"]:
+            # user is not allowed to arm the alarm
+            _LOGGER.debug("User {} has no permission to arm the alarm.".format(res[ATTR_NAME]))
+            return (False, const.EVENT_INVALID_CODE_PROVIDED)
         else:
             self._changed_by = res[ATTR_NAME]
             return (True, res)
