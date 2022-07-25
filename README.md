@@ -292,7 +292,7 @@ The following table defines the sensor types and the predefined configuration:
 | Window        | `window`                                              | `Armed Away`<br>`Armed Home`<br>`Armed Night`<br>`Armed Vacation`  | -                                         |
 | Motion        | `motion`<br>`moving`<br>`occupancy`<br>`presence`     | `Armed Away`<br>`Armed Vacation`                                   | `Use exit delay`<br>`Use entry delay`     |
 | Tamper        | `sound`<br>`opening`<br> `vibration`                  | `Armed Away`<br>`Armed Home`<br>`Armed Night`<br>`Armed Vacation`  | -                                         |
-| Environmental | `gas`<br> `heat`<br>`moisture`<br>`smoke`<br>`safety` | N/A                                                                | `Always on`                               |
+| Environmental | `carbon_monoxide`<br>`gas`<br> `heat`<br>`moisture`<br>`smoke`<br>`safety` | N/A                                                                | `Always on`                               |
 
 
 #### Configuration options
