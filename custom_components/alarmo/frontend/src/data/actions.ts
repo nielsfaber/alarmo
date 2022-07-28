@@ -72,6 +72,16 @@ export const computeEventDisplay = (event: EAlarmEvent, hass: HomeAssistant) => 
         ),
         icon: 'hass:bell-alert-outline',
       };
+    case EAlarmEvent.Untriggered:
+      return {
+        value: EAlarmEvent.Untriggered,
+        name: localize('panels.actions.cards.new_notification.fields.event.choose.untriggered.name', hass.language),
+        description: localize(
+          'panels.actions.cards.new_notification.fields.event.choose.untriggered.description',
+          hass.language
+        ),
+        icon: 'hass:bell-off-outline',
+      };
     case EAlarmEvent.ArmFailure:
       return {
         value: EAlarmEvent.ArmFailure,
@@ -319,7 +329,7 @@ export const getWildcardOptions = (event?: EAlarmEvent, alarmoConfig?: AlarmoCon
     !event ||
     (alarmoConfig?.code_arm_required &&
       [EAlarmEvent.Armed, EAlarmEvent.Arming, EAlarmEvent.ArmFailure].includes(event)) ||
-    (alarmoConfig?.code_disarm_required && [EAlarmEvent.Disarmed].includes(event))
+    (alarmoConfig?.code_disarm_required && [EAlarmEvent.Disarmed, EAlarmEvent.Untriggered].includes(event))
   )
     options = [
       ...options,

@@ -101,6 +101,7 @@ export enum EAlarmEvent {
   Armed = 'armed',
   Disarmed = 'disarmed',
   Triggered = 'triggered',
+  Untriggered = 'untriggered',
   ArmFailure = 'arm_failure',
   Arming = 'arming',
   Pending = 'pending',

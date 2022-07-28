@@ -429,6 +429,10 @@
                   "name": "Se ha disparado la alarma",
                   "description": "La alarma se ha disparado."
                 },
+                "untriggered": {
+                  "name": "Alarm not longer triggered",
+                  "description": "The triggered state of the alarm has ended"
+                },
                 "arm_failure": {
                   "name": "No se pudo armar",
                   "description": "El armado de la alarma falló debido a uno o más sensores abiertos."
@@ -459,6 +463,7 @@
                 "armed": "La alarma está configurada en {{arm_mode}}",
                 "disarmed": "Ahora la alarma está APAGADA",
                 "triggered": "¡Se ha disparado la alarma! Causa: {{open_sensors}}.",
+                "untriggered": "The alarm is not longer triggered.",
                 "arm_failure": "No se pudo armar la alarma en este momento debido a: {{open_sensors}}.",
                 "arming": "Se armará pronto la alarma, por favor, salga de la casa.",
                 "pending": "¡La alarma está a punto de dispararse, desarme rápidamente!"
@@ -487,6 +492,7 @@
                 "armed": "Notificar a {target} al armar",
                 "disarmed": "Notificar a {target} al desarmar",
                 "triggered": "Notificar a {target} cuando se dispare",
+                "untriggered": "Notify {target} when triggering stops",
                 "arm_failure": "Notificar a {target} si falla",
                 "arming": "Notificar a {target} cuando se vaya",
                 "pending": "Notificar a {target} cuando llegue"
@@ -533,6 +539,7 @@
                 "armed": "Establecer {entity} en {state} al armar",
                 "disarmed": "Establecer {entity} en {state} al desarmar",
                 "triggered": "Establecer {entity} en {state} cuando se dispare",
+                "untriggered": "Set {entity} to {state} when triggering stops",
                 "arm_failure": "Establecer {entity} en {state} si falla",
                 "arming": "Establecer {entity} en {state} cuando se vaya",
                 "pending": "Establecer {entity} en {state} cuando llegue"

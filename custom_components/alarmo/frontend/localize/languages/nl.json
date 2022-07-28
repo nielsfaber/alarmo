@@ -429,6 +429,10 @@
                   "name": "Alarm is afgegaan",
                   "description": "Het alarm gaat af"
                 },
+                "untriggered": {
+                  "name": "Gestopt na afgaan",
+                  "description": "Het alarm gaat niet meer af"
+                },
                 "arm_failure": {
                   "name": "Kan niet inschakelen",
                   "description": "Het inschakelen van het alarm is mislukt vanwege een of meerdere blokkerende sensoren"
@@ -459,6 +463,7 @@
                 "armed": "Het alarm is ingeschakeld op {{arm_mode}}",
                 "disarmed": "Het alarm is nu uit",
                 "triggered": "Het alarm is geactiveerd! Oorzaak: {{open_sensors}}.",
+                "untriggered": "The alarm gaat niet langer af.",
                 "arm_failure": "Het alarm kon niet worden ingeschakeld. Oorzaak: {{open_sensors}}.",
                 "arming": "Het alarm wordt ingeschakeld, verlaat het huis.",
                 "pending": "Het alarm moet nu worden uitgeschakeld, anders wordt deze geactiveerd."
@@ -487,6 +492,7 @@
                 "armed": "Stuur notificatie naar {target} bij inschakelen",
                 "disarmed": "Stuur notificatie naar {target} bij uitschakelen",
                 "triggered": "Stuur notificatie naar {target} bij alarm",
+                "untriggered": "Stuur notificatie naar {target} als het alarm stopt met afgaan",
                 "arm_failure": "Stuur notificatie naar {target} bij fout",
                 "arming": "Stuur notificatie naar {target} bij vertrek",
                 "pending": "Stuur notificatie naar {target} bij binnenkomst"
@@ -533,6 +539,7 @@
                 "armed": "Schakel {entity} naar {state} bij inschakelen",
                 "disarmed": "Schakel {entity} naar {state} bij uitschakelen",
                 "triggered": "Schakel {entity} naar {state} bij alarm",
+                "untriggered": "Set {entity} to {state} when triggering stops",
                 "arm_failure": "Schakel {entity} naar {state} bij fout",
                 "arming": "Schakel {entity} naar {state} bij vertrek",
                 "pending": "Schakel {entity} naar {state} bij binnenkomst"

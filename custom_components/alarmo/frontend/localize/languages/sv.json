@@ -429,6 +429,10 @@
                   "name": "Larmet har triggats",
                   "description": "Larmet har triggats"
                 },
+                "untriggered": {
+                  "name": "Alarm not longer triggered",
+                  "description": "The triggered state of the alarm has ended"
+                },
                 "arm_failure": {
                   "name": "Misslyckas att aktivera larm",
                   "description": "Larmet misslyckas att kativeras på grund av någon sensor"
@@ -459,6 +463,7 @@
                 "armed": "Larmet har bytt status till {{arm_mode}}",
                 "disarmed": "Larmet är nu AVSTÄNGT",
                 "triggered": "Larmet har triggats! Anledning: {{open_sensors}}.",
+                "untriggered": "The alarm is not longer triggered.",
                 "arm_failure": "Larmet kunde inte aktiveras nu, detta på grund av: {{open_sensors}}.",
                 "arming": "Larmet kommer aktiveras snart, lämna huset.",
                 "pending": "Larmet kommer snart triggas, inaktivera larmet snarast!"
@@ -487,6 +492,7 @@
                 "armed": "Notifiera {target} vid aktivering av larm",
                 "disarmed": "Notifiera {target} vid inaktivering av larm",
                 "triggered": "Notifiera {target} vid triggning av larm",
+                "untriggered": "Notify {target} when triggering stops",
                 "arm_failure": "Notifiera {target} vid fel av larm",
                 "arming": "Notifiera {target} vid utpassering",
                 "pending": "Notifiera {target} vid ankomst"
@@ -533,6 +539,7 @@
                 "armed": "Sätt {entity} till {state} vid aktivering av larmet",
                 "disarmed": "Sätt {entity} till {state} vid inaktivering av larmet",
                 "triggered": "Sätt {entity} till {state} när larmet triggas",
+                "untriggered": "Set {entity} to {state} when triggering stops",
                 "arm_failure": "Sätt {entity} till {state} vid fel av larmet",
                 "arming": "Sätt {entity} till {state} vid utpassering",
                 "pending": "Sätt {entity} till {state} vid ankomst"

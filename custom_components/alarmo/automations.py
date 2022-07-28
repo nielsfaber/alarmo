@@ -59,6 +59,17 @@ def validate_modes(trigger, mode):
         return mode in trigger[const.ATTR_MODES]
 
 
+def validate_trigger(trigger, to_state, from_state=None):
+    if const.ATTR_EVENT not in trigger:
+        return False
+    elif trigger[const.ATTR_EVENT] == "untriggered" and from_state == "triggered":
+        return True
+    elif trigger[const.ATTR_EVENT] == to_state:
+        return True
+    else:
+        return False
+
+
 class AutomationHandler:
     def __init__(self, hass: HomeAssistant):
         self.hass = hass
@@ -101,12 +112,12 @@ class AutomationHandler:
             for automation_id, config in self._config.items():
                 if not config[const.ATTR_ENABLED]:
                     continue
+                _LOGGER.debug(config)
                 for trigger in config[const.ATTR_TRIGGERS]:
                     if (
                         validate_area(trigger, area_id) and
                         validate_modes(trigger, alarm_entity._arm_mode) and
-                        const.ATTR_EVENT in trigger and
-                        trigger[const.ATTR_EVENT] == new_state
+                        validate_trigger(trigger, new_state, old_state)
                     ):
                         await self.async_execute_automation(automation_id, alarm_entity)
 
@@ -132,8 +143,7 @@ class AutomationHandler:
                     if (
                         validate_area(trigger, area_id) and
                         validate_modes(trigger, alarm_entity._arm_mode) and
-                        const.ATTR_EVENT in trigger and
-                        trigger[const.ATTR_EVENT] == EVENT_ARM_FAILURE
+                        validate_trigger(trigger, EVENT_ARM_FAILURE)
                     ):
                         await self.async_execute_automation(automation_id, alarm_entity)
 
