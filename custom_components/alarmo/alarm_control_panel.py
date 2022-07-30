@@ -965,7 +965,8 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
         res = await super().async_alarm_disarm(code=code, skip_code=skip_code)
         if res:
             for item in self.hass.data[const.DOMAIN]["areas"].values():
-                await item.async_alarm_disarm(code=code, skip_code=skip_code)
+                if item.state != STATE_ALARM_DISARMED:
+                    await item.async_alarm_disarm(code=code, skip_code=skip_code)
 
             async_dispatcher_send(self.hass, "alarmo_event", const.EVENT_DISARM, self.area_id, {
                 const.ATTR_CONTEXT_ID: context_id
