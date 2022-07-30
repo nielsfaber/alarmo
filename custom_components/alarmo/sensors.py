@@ -1,5 +1,4 @@
 import logging
-from enum import IntEnum
 
 import homeassistant.util.dt as dt_util
 
@@ -90,11 +89,6 @@ def parse_sensor_state(state):
 def sensor_state_allowed(state, sensor_config, alarm_state):
     """return whether the sensor state is permitted or a state change should occur"""
 
-    _LOGGER.debug("----")
-    _LOGGER.debug(state)
-    _LOGGER.debug(sensor_config)
-    _LOGGER.debug(alarm_state)
-
     if state != STATE_OPEN and (state != STATE_UNAVAILABLE or not sensor_config[ATTR_TRIGGER_UNAVAILABLE]):
         # sensor has the safe state
         return True
@@ -151,9 +145,9 @@ class SensorHandler:
 
         def handle_startup(_event):
             self._startup_complete = True
-        
+
         if hass.state == CoreState.running:
-             self._startup_complete = True
+            self._startup_complete = True
         else:
             hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STARTED, handle_startup)
 
@@ -266,7 +260,7 @@ class SensorHandler:
         if old_state == new_state:
             # not a state change - ignore
             return
-    
+
         _LOGGER.debug("entity {} changed: old_state={}, new_state={}".format(entity, old_state, new_state))
 
         sensor_config = self._config[entity]
@@ -298,7 +292,7 @@ class SensorHandler:
                 skip_delay=True,
                 open_sensors=open_sensors
             )
-        
+
         elif alarm_state == STATE_ALARM_ARMING:
             # sensor triggered while arming, abort arming
             _LOGGER.debug("Arming was aborted due to a sensor being active: {}".format(entity))
@@ -311,7 +305,7 @@ class SensorHandler:
                 skip_delay=(not sensor_config[ATTR_USE_ENTRY_DELAY]),
                 open_sensors=open_sensors
             )
-        
+
         elif alarm_state == STATE_ALARM_PENDING:
             # immediate trigger while in pending state
             _LOGGER.info("Alarm is triggered due to sensor: {}".format(entity))
