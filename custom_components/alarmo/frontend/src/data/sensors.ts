@@ -13,6 +13,7 @@ export const isValidSensor = (entity: HassEntity, showAllDeviceClasses: boolean)
     if (!type) return false;
     if (
       [
+        'carbon_monoxide',
         'door',
         'garage_door',
         'gas',
@@ -45,6 +46,7 @@ export const sensorClassToType = (stateObj: HassEntity): ESensorTypes | undefine
       return ESensorTypes.Door;
     case 'window':
       return ESensorTypes.Window;
+    case 'carbon_monoxide':
     case 'gas':
     case 'heat':
     case 'moisture':
