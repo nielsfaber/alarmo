@@ -12,7 +12,7 @@ from homeassistant.const import (
     ATTR_NAME,
     ATTR_CODE,
     ATTR_SERVICE,
-    ATTR_SERVICE_DATA,
+    CONF_SERVICE_DATA,
     ATTR_STATE,
     STATE_ALARM_ARMED_AWAY,
     STATE_ALARM_ARMED_HOME,
@@ -323,7 +323,7 @@ class AlarmoAutomationView(HomeAssistantView):
                         {
                             vol.Optional(ATTR_ENTITY_ID): cv.string,
                             vol.Required(ATTR_SERVICE): cv.string,
-                            vol.Optional(ATTR_SERVICE_DATA): dict,
+                            vol.Optional(CONF_SERVICE_DATA): dict,
                         }
                     )]
                 ),

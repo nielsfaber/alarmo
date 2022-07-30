@@ -225,7 +225,7 @@ export class NotificationEditorCard extends LitElement {
                             'panels.actions.cards.new_notification.fields.title.heading',
                             this.hass.language
                           )}"
-                          .value=${this.config.actions[0].service_data?.title || ''}
+                          .value=${this.config.actions[0].data?.title || ''}
                           @input=${this._setTitle}
                           ?invalid=${this.errors.title}
                         ></ha-textfield>
@@ -245,7 +245,7 @@ export class NotificationEditorCard extends LitElement {
                         <alarmo-select
                           .items=${computeEntityDisplay(getMediaPlayerEntities(this.hass), this.hass)}
                           label=${localize('panels.actions.cards.new_action.fields.entity.heading', this.hass.language)}
-                          .value=${this.config.actions[0].service_data?.entity_id || ''}
+                          .value=${this.config.actions[0].data?.entity_id || ''}
                           @value-changed=${this._setEntity}
                           .icons=${true}
                           ?invalid=${this.errors.entity}
@@ -269,7 +269,7 @@ export class NotificationEditorCard extends LitElement {
                       this.hass.language
                     )}"
                     placeholder=${this._messagePlaceholder()}
-                    .value=${this.config.actions[0].service_data?.message || ''}
+                    .value=${this.config.actions[0].data?.message || ''}
                     @input=${(ev: Event) => this._setMessage((ev.target as HTMLInputElement).value)}
                     ?invalid=${this.errors.message}
                   ></ha-textarea>
@@ -478,9 +478,9 @@ export class NotificationEditorCard extends LitElement {
     const value = String(ev.detail.value);
     let actionConfig = this.config.actions;
     Object.assign(actionConfig, { [0]: { ...actionConfig[0], service: value, ...omit(actionConfig[0], 'service') } });
-    if ((actionConfig[0].service_data || {}).entity_id && computeDomain(value) == 'notify')
+    if ((actionConfig[0].data || {}).entity_id && computeDomain(value) == 'notify')
       Object.assign(actionConfig, {
-        [0]: { ...actionConfig[0], service_data: omit(actionConfig[0].service_data || {}, 'entity_id') },
+        [0]: { ...actionConfig[0], data: omit(actionConfig[0].data || {}, 'entity_id') },
       });
     this.config = { ...this.config, actions: actionConfig };
     if (Object.keys(this.errors).includes('service')) this._validateConfig();
@@ -494,7 +494,7 @@ export class NotificationEditorCard extends LitElement {
       [0]: {
         ...actionConfig[0],
         service: actionConfig[0].service || '',
-        service_data: { ...(actionConfig[0].service_data || {}), title: value },
+        data: { ...(actionConfig[0].data || {}), title: value },
       },
     });
     this.config = { ...this.config, actions: actionConfig };
@@ -509,7 +509,7 @@ export class NotificationEditorCard extends LitElement {
       [0]: {
         ...actionConfig[0],
         service: actionConfig[0].service || '',
-        service_data: { ...(actionConfig[0].service_data || {}), entity_id: value },
+        data: { ...(actionConfig[0].data || {}), entity_id: value },
       },
     });
     this.config = { ...this.config, actions: actionConfig };
@@ -522,7 +522,7 @@ export class NotificationEditorCard extends LitElement {
       [0]: {
         ...actionConfig[0],
         service: actionConfig[0].service || '',
-        service_data: { ...(actionConfig[0].service_data || {}), message: value },
+        data: { ...(actionConfig[0].data || {}), message: value },
       },
     });
     this.config = { ...this.config, actions: actionConfig };
@@ -541,7 +541,7 @@ export class NotificationEditorCard extends LitElement {
 
     if (isString(value?.service)) output = { ...output, service: String(value.service) };
 
-    if (isObject(value?.service_data)) output = { ...output, service_data: value.service_data };
+    if (isObject(value?.data)) output = { ...output, data: value.data };
 
     if (Object.keys(output).length)
       this.config = {
@@ -562,7 +562,7 @@ export class NotificationEditorCard extends LitElement {
     if (!isDefined(triggerConfig.area) || !getAreaOptions(this.areas, this.alarmoConfig!).includes(triggerConfig.area))
       this.errors = { ...this.errors, area: true };
     if (!(triggerConfig.modes || []).every(e => getArmModeOptions(triggerConfig.area, this.areas!).includes(e)))
-      this.errors = { ...this.errors, modes: true };   
+      this.errors = { ...this.errors, modes: true };
 
     const actionConfig = data.actions[0];
     if (
@@ -573,15 +573,15 @@ export class NotificationEditorCard extends LitElement {
     else if (
       actionConfig.service &&
       computeDomain(actionConfig.service) == 'tts' &&
-      (!Object.keys(actionConfig.service_data || {}).includes('entity_id') ||
-        !getMediaPlayerEntities(this.hass).includes(actionConfig.service_data!.entity_id))
+      (!Object.keys(actionConfig.data || {}).includes('entity_id') ||
+        !getMediaPlayerEntities(this.hass).includes(actionConfig.data!.entity_id))
     )
       this.errors = { ...this.errors, entity: true };
 
-    if (!isValidString(actionConfig.service_data?.message)) this.errors = { ...this.errors, message: true };
+    if (!isValidString(actionConfig.data?.message)) this.errors = { ...this.errors, message: true };
 
     // title is optional
-    // if (!isValidString(actionConfig.service_data?.title))
+    // if (!isValidString(actionConfig.data?.title))
     //   this.errors = { ...this.errors, title: true };
 
     if (!isValidString(data.name)) this.errors = { ...this.errors, name: true };
@@ -596,14 +596,14 @@ export class NotificationEditorCard extends LitElement {
       actionConfig.service &&
       (computeDomain(actionConfig.service) == 'script' ||
         getNotifyServices(this.hass).includes(actionConfig.service)) &&
-      isValidString(actionConfig.service_data?.message)
+      isValidString(actionConfig.data?.message)
     );
   }
 
   private _insertWildCard(value: string) {
     const field = this.shadowRoot!.querySelector('#message') as HTMLInputElement | undefined;
     if (field) field.focus();
-    let message = this.config.actions[0].service_data?.message || '';
+    let message = this.config.actions[0].data?.message || '';
     message =
       field && field.selectionStart !== null && field.selectionEnd !== null
         ? message.substring(0, field.selectionStart) + value + message.substring(field.selectionEnd, message.length)
@@ -616,10 +616,7 @@ export class NotificationEditorCard extends LitElement {
 
     if (this.viewMode == ViewMode.Yaml) {
       let actionConfig = { ...this.config.actions[0] };
-      let serviceData =
-        typeof actionConfig.service_data == 'object' && isDefined(actionConfig.service_data)
-          ? actionConfig.service_data
-          : {};
+      let serviceData = typeof actionConfig.data == 'object' && isDefined(actionConfig.data) ? actionConfig.data : {};
 
       actionConfig = {
         ...actionConfig,
@@ -637,7 +634,7 @@ export class NotificationEditorCard extends LitElement {
 
       actionConfig = {
         ...actionConfig,
-        service_data: serviceData,
+        data: serviceData,
       };
 
       this.config = {
@@ -665,8 +662,8 @@ export class NotificationEditorCard extends LitElement {
       );
     } else if (domain == 'tts') {
       const entity =
-        typeof this.config.actions[0].service_data == 'object' && isDefined(this.config.actions[0].service_data)
-          ? this.config.actions[0].service_data.entity_id
+        typeof this.config.actions[0].data == 'object' && isDefined(this.config.actions[0].data)
+          ? this.config.actions[0].data.entity_id
           : null;
       if (!entity || !this.hass.states[entity]) return '';
       const target = computeName(this.hass.states[entity]);
@@ -693,8 +690,8 @@ export class NotificationEditorCard extends LitElement {
     let action = data.actions[0];
 
     //fill in message placeholder
-    if (!isValidString(action.service_data?.message) && this.viewMode == ViewMode.UI && this._messagePlaceholder()) {
-      action = { ...action, service_data: { ...action.service_data, message: this._messagePlaceholder() } };
+    if (!isValidString(action.data?.message) && this.viewMode == ViewMode.UI && this._messagePlaceholder()) {
+      action = { ...action, data: { ...action.data, message: this._messagePlaceholder() } };
       Object.assign(data, { actions: Object.assign(data.actions, { [0]: action }) });
     }
 
@@ -705,7 +702,7 @@ export class NotificationEditorCard extends LitElement {
   }
 
   private _getOpenSensorsFormat(forceResult = false): null | string {
-    const message = this.config.actions[0].service_data?.message || '';
+    const message = this.config.actions[0].data?.message || '';
     const res = message.match(/{{open_sensors(\|[^}]+)?}}/);
     if (res !== null) return res[0];
     else return forceResult ? '{{open_sensors}}' : null;
@@ -714,7 +711,7 @@ export class NotificationEditorCard extends LitElement {
   private _setOpenSensorsFormat(ev: CustomEvent) {
     ev.stopPropagation();
     const value = String(ev.detail.value);
-    let message = this.config.actions[0].service_data?.message || '';
+    let message = this.config.actions[0].data?.message || '';
     message = message.replace(/{{open_sensors(\|[^}]+)?}}/, value);
 
     let actionConfig = this.config.actions;
@@ -722,14 +719,14 @@ export class NotificationEditorCard extends LitElement {
       [0]: {
         ...actionConfig[0],
         service: actionConfig[0].service || '',
-        service_data: { ...(actionConfig[0].service_data || {}), message: message },
+        data: { ...(actionConfig[0].data || {}), message: message },
       },
     });
     this.config = { ...this.config, actions: actionConfig };
   }
 
   private _getArmModeFormat(forceResult = false): null | string {
-    const message = this.config.actions[0].service_data?.message || '';
+    const message = this.config.actions[0].data?.message || '';
     const res = message.match(/{{arm_mode(\|[^}]+)?}}/);
     if (res !== null) return res[0];
     else return forceResult ? '{{arm_mode}}' : null;
@@ -738,7 +735,7 @@ export class NotificationEditorCard extends LitElement {
   private _setArmModeFormat(ev: CustomEvent) {
     ev.stopPropagation();
     const value = String(ev.detail.value);
-    let message = this.config.actions[0].service_data?.message || '';
+    let message = this.config.actions[0].data?.message || '';
     message = message.replace(/{{arm_mode(\|[^}]+)?}}/, value);
 
     let actionConfig = this.config.actions;
@@ -746,7 +743,7 @@ export class NotificationEditorCard extends LitElement {
       [0]: {
         ...actionConfig[0],
         service: actionConfig[0].service || '',
-        service_data: { ...(actionConfig[0].service_data || {}), message: message },
+        data: { ...(actionConfig[0].data || {}), message: message },
       },
     });
     this.config = { ...this.config, actions: actionConfig };
@@ -780,7 +777,7 @@ export class NotificationEditorCard extends LitElement {
     const action = data.actions[0];
     const [domain, service] = action.service!.split('.');
 
-    let message = action.service_data!.message;
+    let message = action.data!.message;
     message = message.replace('{{open_sensors|format=short}}', 'Some Example Sensor');
     message = message.replace(/{{open_sensors(\|[^}]+)?}}/, 'Some Example Sensor is open');
     message = message.replace('{{bypassed_sensors}}', 'Some Bypassed Sensor');
@@ -789,7 +786,7 @@ export class NotificationEditorCard extends LitElement {
 
     this.hass
       .callService(domain, service, {
-        ...action.service_data,
+        ...action.data,
         message: message,
       })
       .then()

@@ -31,7 +31,7 @@ _LOGGER = logging.getLogger(__name__)
 
 DATA_REGISTRY = f"{DOMAIN}_storage"
 STORAGE_KEY = f"{DOMAIN}.storage"
-STORAGE_VERSION = 5
+STORAGE_VERSION = 6
 SAVE_DELAY = 10
 
 
@@ -151,7 +151,7 @@ class ActionEntry:
 
     service = attr.ib(type=str, default="")
     entity_id = attr.ib(type=str, default=None)
-    service_data = attr.ib(type=dict, default={})
+    data = attr.ib(type=dict, default={})
 
 
 @attr.s(slots=True, frozen=True)
@@ -269,6 +269,27 @@ class MigratableStore(Store):
                 ))
                 for sensor in data["sensors"]
             ]
+
+        if old_version <= 5:
+            data["automations"] = [
+                attr.asdict(AutomationEntry(
+                    **parse_automation_entry({
+                        **automation,
+                        **{
+                            "actions": list(map(
+                                lambda el: attr.asdict(ActionEntry(
+                                    service=el["service"],
+                                    entity_id=el["entity_id"],
+                                    data=el["service_data"]
+                                )),
+                                automation["actions"]
+                            ))
+                        }
+                    })
+                ))
+                for automation in data["automations"]
+            ]
+
         return data
 
 

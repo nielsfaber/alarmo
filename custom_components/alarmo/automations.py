@@ -9,7 +9,7 @@ from homeassistant.core import (
 
 from homeassistant.const import (
     ATTR_SERVICE,
-    ATTR_SERVICE_DATA,
+    CONF_SERVICE_DATA,
     ATTR_ENTITY_ID,
     CONF_TYPE,
     # STATE_UNKNOWN,
@@ -170,9 +170,9 @@ class AutomationHandler:
 
             if (
                 self._config[automation_id][CONF_TYPE] == const.ATTR_NOTIFICATION
-                and ATTR_MESSAGE in action[ATTR_SERVICE_DATA]
+                and ATTR_MESSAGE in action[CONF_SERVICE_DATA]
             ):
-                data = copy.copy(action[ATTR_SERVICE_DATA])
+                data = copy.copy(action[CONF_SERVICE_DATA])
 
                 res = re.search(r'{{open_sensors(\|lang=([^}]+))?(\|format=short)?}}', data[ATTR_MESSAGE])
                 if res:
@@ -213,10 +213,10 @@ class AutomationHandler:
                     changed_by = alarm_entity.changed_by if alarm_entity.changed_by else ""
                     data[ATTR_MESSAGE] = data[ATTR_MESSAGE].replace("{{changed_by}}", changed_by)
 
-                service_call["data"] = data
+                service_call[CONF_SERVICE_DATA] = data
 
-            elif ATTR_SERVICE_DATA in action:
-                service_call["data"] = action[ATTR_SERVICE_DATA]
+            elif CONF_SERVICE_DATA in action:
+                service_call[CONF_SERVICE_DATA] = action[CONF_SERVICE_DATA]
 
             await async_call_from_config(
                 self.hass,

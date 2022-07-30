@@ -455,7 +455,7 @@ export class AutomationEditorCard extends LitElement {
 
         if (isObject(entry) && isString(entry.service)) output = { ...output, service: entry.service };
         if (isObject(entry) && isString(entry.entity_id)) output = { ...output, entity_id: entry.entity_id };
-        if (isObject(entry) && isObject(entry.service_data)) output = { ...output, service_data: entry.service_data };
+        if (isObject(entry) && isObject(entry.data)) output = { ...output, data: entry.data };
 
         Object.assign(actionConfig, { [i]: output });
       });
@@ -515,8 +515,8 @@ export class AutomationEditorCard extends LitElement {
           [0]: {
             ...this.config.actions[0],
             service: this.config.actions[0].service || '',
-            service_data: {
-              ...(this.config.actions[0].service_data || {}),
+            data: {
+              ...(this.config.actions[0].data || {}),
             },
           },
         }),
@@ -597,7 +597,7 @@ export class AutomationEditorCard extends LitElement {
     const data = this._parseAutomation();
     data.actions.forEach(action => {
       const [domain, service] = action.service!.split('.');
-      let serviceData = { ...action.service_data };
+      let serviceData = { ...action.data };
       if (action.entity_id) serviceData = { ...serviceData, entity_id: action.entity_id };
       this.hass
         .callService(domain, service, serviceData)

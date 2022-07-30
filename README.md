@@ -507,9 +507,9 @@ The following actions are defined in Alarmo and can be used in actionable notifi
 In the Alarmo notifications editor, create a notification and select an event.
 Choose your iOS/Android device as target, set a message and title as you want.
 
-Switch to YAML mode. Look for the part that has `service_data`, and extend it as follows:
+Switch to YAML mode. Look for the part that has `data`, and extend it as follows:
 ```yaml
-service_data:
+data:
   ... # your message and title should be here already
   data:
     actions:
