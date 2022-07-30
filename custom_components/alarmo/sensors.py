@@ -90,6 +90,11 @@ def parse_sensor_state(state):
 def sensor_state_allowed(state, sensor_config, alarm_state):
     """return whether the sensor state is permitted or a state change should occur"""
 
+    _LOGGER.debug("----")
+    _LOGGER.debug(state)
+    _LOGGER.debug(sensor_config)
+    _LOGGER.debug(alarm_state)
+
     if state != STATE_OPEN and (state != STATE_UNAVAILABLE or not sensor_config[ATTR_TRIGGER_UNAVAILABLE]):
         # sensor has the safe state
         return True
@@ -205,7 +210,7 @@ class SensorHandler:
             elif alarm_entity.bypassed_sensors and entity in alarm_entity.bypassed_sensors:
                 continue
             elif (
-                alarm_entity.arm_mode in config[const.ATTR_MODES]
+                state in config[const.ATTR_MODES]
                 or config[ATTR_ALWAYS_ON]
             ):
                 entities.append(entity)
@@ -217,8 +222,7 @@ class SensorHandler:
         use_delay = kwargs.get("use_delay", False)
         bypass_open_sensors = kwargs.get("bypass_open_sensors", False)
 
-        sensors_list = self.active_sensors_for_alarm_state(area_id)
-
+        sensors_list = self.active_sensors_for_alarm_state(area_id, target_state)
         open_sensors = {}
         bypassed_sensors = []
 
