@@ -542,6 +542,8 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
                 await self.async_trigger(skip_delay=True)
             else:
                 await self.async_update_state(initial_state)
+        else:
+            await self.async_update_state(STATE_ALARM_DISARMED)
 
         self.async_write_ha_state()
 
