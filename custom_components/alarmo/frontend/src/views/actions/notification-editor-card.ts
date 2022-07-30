@@ -561,8 +561,8 @@ export class NotificationEditorCard extends LitElement {
       this.errors = { ...this.errors, event: true };
     if (!isDefined(triggerConfig.area) || !getAreaOptions(this.areas, this.alarmoConfig!).includes(triggerConfig.area))
       this.errors = { ...this.errors, area: true };
-    if (!triggerConfig.modes?.every(e => getArmModeOptions(triggerConfig.area, this.areas!).includes(e)))
-      this.errors = { ...this.errors, modes: true };
+    if (!(triggerConfig.modes || []).every(e => getArmModeOptions(triggerConfig.area, this.areas!).includes(e)))
+      this.errors = { ...this.errors, modes: true };   
 
     const actionConfig = data.actions[0];
     if (

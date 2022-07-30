@@ -207,9 +207,9 @@ export class AutomationEditorCard extends LitElement {
                   ></alarmo-selector>
                 </settings-row>
 
-                ${this.config.actions.map(e => e.entity_id).length
+                ${this._getEntities().length
                   ? html`
-                      <settings-row .narrow=${this.narrow} .large=${!this.renderActions()}>
+                      <settings-row .narrow=${this.narrow} .large=${true}>
                         <span slot="heading">
                           ${localize('panels.actions.cards.new_action.fields.action.heading', this.hass.language)}
                         </span>
@@ -224,6 +224,13 @@ export class AutomationEditorCard extends LitElement {
                               this.hass.language
                             )}
                         </div>
+                        ${this.errors.service
+                          ? html`
+                              <span class="error-message">
+                                ${this.hass.localize('ui.common.error_required', this.hass.language)}
+                              </span>
+                            `
+                          : ''}
                       </settings-row>
                     `
                   : ''}
@@ -333,7 +340,6 @@ export class AutomationEditorCard extends LitElement {
         <mwc-button
           class="${isMatchingAction(this._selectedAction(), action) ? 'active' : ''}"
           @click=${() => this._setAction(action)}
-          ?invalid=${this.errors.service}
         >
           ${computeActionDisplay(action, this.hass)}
         </mwc-button>
@@ -427,6 +433,7 @@ export class AutomationEditorCard extends LitElement {
       Object.assign(actionConfig, { [i]: { service: service, ...omit(e, 'service') } });
     });
     this.config = { ...this.config, actions: actionConfig };
+    if (Object.keys(this.errors).includes('service')) this._validateConfig();
   }
 
   private _setName(ev: Event) {
@@ -465,7 +472,7 @@ export class AutomationEditorCard extends LitElement {
       this.errors = { ...this.errors, event: true };
     if (!isDefined(triggerConfig.area) || !getAreaOptions(this.areas, this.alarmoConfig!).includes(triggerConfig.area))
       this.errors = { ...this.errors, area: true };
-    if (!triggerConfig.modes?.every(e => getArmModeOptions(triggerConfig.area, this.areas!).includes(e)))
+    if (!(triggerConfig.modes || []).every(e => getArmModeOptions(triggerConfig.area, this.areas!).includes(e)))
       this.errors = { ...this.errors, modes: true };
 
     let entities = data.actions.map(e => e.entity_id);
@@ -473,11 +480,11 @@ export class AutomationEditorCard extends LitElement {
     if (!data.actions.length || !entities.every(e => isValidEntity(e, this.hass)))
       this.errors = { ...this.errors, entity_id: true };
 
-    const services = data.actions.map(e => e.service);
+    const services = data.actions.map(e => e.service).filter(isDefined);
     if (!services.length || !services.every(e => isValidService(e, this.hass))) {
       this.errors = { ...this.errors, service: true };
       let availableActions = computeActions(entities, this.hass);
-      if (!availableActions.length) this.viewMode = ViewMode.Yaml;
+      if (!availableActions.length && services.length) this.viewMode = ViewMode.Yaml;
     }
 
     if (!isValidString(data.name)) this.errors = { ...this.errors, name: true };
@@ -650,6 +657,9 @@ export class AutomationEditorCard extends LitElement {
       }
       span.error-message {
         color: var(--error-color);
+        font-size: 0.875rem;
+        display: flex;
+        margin-top: 10px;
       }
       mwc-button.warning {
         --mdc-theme-primary: var(--error-color);

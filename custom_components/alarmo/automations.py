@@ -112,7 +112,6 @@ class AutomationHandler:
             for automation_id, config in self._config.items():
                 if not config[const.ATTR_ENABLED]:
                     continue
-                _LOGGER.debug(config)
                 for trigger in config[const.ATTR_TRIGGERS]:
                     if (
                         validate_area(trigger, area_id) and
