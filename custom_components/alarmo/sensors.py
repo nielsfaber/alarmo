@@ -75,7 +75,7 @@ _LOGGER = logging.getLogger(__name__)
 
 def parse_sensor_state(state):
     if not state or not state.state:
-        return STATE_UNKNOWN
+        return STATE_UNAVAILABLE
     elif state.state == STATE_UNAVAILABLE:
         return STATE_UNAVAILABLE
     elif state.state in SENSOR_STATES_OPEN:
@@ -186,9 +186,10 @@ class SensorHandler:
         if area_id and old_state is None:
             sensors_list = self.active_sensors_for_alarm_state(area_id)
             for entity in sensors_list:
-                sensor_state = parse_sensor_state(self.hass.states.get(entity))
-                if sensor_state != STATE_UNKNOWN:
-                    _LOGGER.debug("Initial state for {} is {}".format(entity, state))
+                state = self.hass.states.get(entity)
+                sensor_state = parse_sensor_state(state)
+                if state and state.state and sensor_state != STATE_UNKNOWN:
+                    _LOGGER.debug("Initial state for {} is {}".format(entity, parse_sensor_state(state)))
 
     def active_sensors_for_alarm_state(self, area_id: str, state: str = None):
         """Compose a list of sensors that are active for the state"""
@@ -228,12 +229,17 @@ class SensorHandler:
 
         for entity in sensors_list:
             sensor_config = self._config[entity]
-            sensor_state = parse_sensor_state(self.hass.states.get(entity))
-            res = sensor_state_allowed(sensor_state, sensor_config, alarm_state)
+            state = self.hass.states.get(entity)
+            sensor_state = parse_sensor_state(state)
+            if not state or not state.state:
+                # entity does not exist in HA
+                res = False
+            else:
+                res = sensor_state_allowed(sensor_state, sensor_config, alarm_state)
 
             if not res and target_state in const.ARM_MODES:
                 # sensor is active while arming
-                if sensor_config[ATTR_ALLOW_OPEN]:
+                if sensor_config[ATTR_ALLOW_OPEN] and sensor_state == STATE_OPEN:
                     # sensor is permitted to be open during/after arming
                     continue
                 elif bypass_open_sensors or (
