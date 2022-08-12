@@ -1,0 +1,553 @@
+{
+  "common": {
+    "modes_short": {
+      "armed_away": "Po za",
+      "armed_home": "Dom",
+      "armed_night": "Noc",
+      "armed_custom_bypass": "Własny",
+      "armed_vacation": "Wakacje"
+    },
+    "enabled": "Uzbrojony",
+    "disabled": "Rozbrojony"
+  },
+  "components": {
+    "time_slider": {
+      "seconds": "sek",
+      "minutes": "min",
+      "infinite": "infinite",
+      "none": "brak"
+    },
+    "editor": {
+      "ui_mode": "Do UI",
+      "yaml_mode": "Do YAML",
+      "edit_in_yaml": "Edytuj w YAML"
+    },
+    "table": {
+      "filter": {
+        "label": "Filter items",
+        "item": "Filter by {name}",
+        "hidden_items": "{number} {number, plural,\n  one {item is}\n  other {items are}\n} hidden"
+      }
+    }
+  },
+  "title": "Panel alarmu",
+  "panels": {
+    "general": {
+      "title": "Ogólne",
+      "cards": {
+        "general": {
+          "description": "This panel defines some global settings for the alarm.",
+          "fields": {
+            "disarm_after_trigger": {
+              "heading": "Disarm after trigger",
+              "description": "After trigger time has expired, disarm the alarm instead of returning to armed state."
+            },
+            "enable_mqtt": {
+              "heading": "Włącz MQTT",
+              "description": "Allow the alarm panel to be controlled through MQTT."
+            },
+            "enable_master": {
+              "heading": "Enable alarm master",
+              "description": "Creates an entity for controlling all areas simultaneously."
+            }
+          },
+          "actions": {
+            "setup_mqtt": "Konfiguracja MQTT",
+            "setup_master": "Master Configuration"
+          }
+        },
+        "modes": {
+          "title": "Tryby",
+          "description": "This panel can be used to set up the arm modes of the alarm.",
+          "modes": {
+            "armed_away": "Armed away will be used when all people left the house. All doors and windows allowing access to the house will be guarded, as well as motion sensors inside the house.",
+            "armed_home": "Armed home (also known as armed stay) will be used when setting the alarm while people are in the house. All doors and windows allowing access to the house will be guarded, but not motion sensors inside the house.",
+            "armed_night": "Armed night will be used when setting the alarm before going to sleep. All doors and windows allowing access to the house will be guarded, and selected motion sensors (downstairs) in the house.",
+            "armed_vacation": "Armed vacation can be used as an extension to the armed away mode in case of absence for longer duration. The delay times and trigger responses can be adapted (as desired) to being distant from home.",
+            "armed_custom_bypass": "An extra mode for defining your own security perimeter."
+          },
+          "number_sensors_active": "{number} {number, plural,\n  one {sensor}\n  other {sensors}\n} active",
+          "fields": {
+            "status": {
+              "heading": "Status",
+              "description": "Controls whether the alarm can be armed in this mode."
+            },
+            "exit_delay": {
+              "heading": "Opóźnienie wyjścia",
+              "description": "When arming the alarm, within this time period the sensors will not trigger the alarm yet."
+            },
+            "entry_delay": {
+              "heading": "Opóźnienie wejścia",
+              "description": "Delay time until the alarm is triggered after one of the sensors is activated."
+            },
+            "trigger_time": {
+              "heading": "Trigger time",
+              "description": "Time during which the alarm will remain in the triggered state after activation."
+            }
+          }
+        },
+        "mqtt": {
+          "title": "Konfiguracja MQTT",
+          "description": "This panel can be used for configuration of the MQTT interface.",
+          "fields": {
+            "state_topic": {
+              "heading": "State topic",
+              "description": "Topic on which state updates are published"
+            },
+            "event_topic": {
+              "heading": "Event topic",
+              "description": "Topic on which alarm events are published"
+            },
+            "command_topic": {
+              "heading": "Command topic",
+              "description": "Topic which Alarmo listens to for arm/disarm commands."
+            },
+            "require_code": {
+              "heading": "Require code",
+              "description": "Require the code to be sent with the command."
+            },
+            "state_payload": {
+              "heading": "Configure payload per state",
+              "item": "Define a payload for state ''{state}''"
+            },
+            "command_payload": {
+              "heading": "Configure payload per command",
+              "item": "Define a payload for command ''{command}''"
+            }
+          }
+        },
+        "areas": {
+          "title": "Obszary",
+          "description": "Areas can be used for dividing your alarm system into multiple compartments.",
+          "no_items": "There are no areas defined yet.",
+          "table": {
+            "remarks": "Remarks",
+            "summary": "This area contains {summary_sensors} and {summary_automations}.",
+            "summary_sensors": "{number} {number, plural,\n  one {sensor}\n  other {sensors}\n}",
+            "summary_automations": "{number} {number, plural,\n  one {automation}\n  other {automations}\n}"
+          },
+          "actions": {
+            "add": "Dodaj"
+          }
+        }
+      },
+      "dialogs": {
+        "create_area": {
+          "title": "Nowy obszar",
+          "fields": {
+            "copy_from": "Copy settings from"
+          }
+        },
+        "edit_area": {
+          "title": "Edytuj obszar ''{area}''",
+          "name_warning": "Note: changing the name will change the entity ID"
+        },
+        "remove_area": {
+          "title": "Usunąć obszar?",
+          "description": "Are you sure you want to remove this area? This area contains {sensors} sensors and {automations} automations, which will be removed as well."
+        },
+        "edit_master": {
+          "title": "Master configuration"
+        },
+        "disable_master": {
+          "title": "Disable master?",
+          "description": "Are you sure you want to remove the alarm master? This area contains {automations} automations, which will be removed with this action."
+        }
+      }
+    },
+    "sensors": {
+      "title": "Czujniki",
+      "cards": {
+        "sensors": {
+          "description": "Currently configured sensors. Click on an item to make changes.",
+          "table": {
+            "no_items": "There are no sensors to be displayed here.",
+            "no_area_warning": "Sensor is not assigned to any area.",
+            "arm_modes": "Arm Modes",
+            "always_on": "(Zawsze)"
+          }
+        },
+        "add_sensors": {
+          "title": "Dodaj czujniki",
+          "description": "Add more sensors. Make sure that your sensors have a suitable name, so you can identify them.",
+          "no_items": "There are no available HA entities that can be configured for the alarm. Make sure to include entities of the type binary_sensor.",
+          "table": {
+            "type": "Wykryty typ"
+          },
+          "actions": {
+            "add_to_alarm": "dodaj do alarmu",
+            "filter_supported": "Hide items with unknown type"
+          }
+        },
+        "editor": {
+          "title": "Edytuj czujnik",
+          "description": "Configuring the sensor settings of ''{entity}''.",
+          "fields": {
+            "area": {
+              "heading": "Obszar",
+              "description": "Select an area which contains this sensor."
+            },
+            "group": {
+              "heading": "Grupa",
+              "description": "Group with other sensors for combined triggering."
+            },
+            "device_type": {
+              "heading": "Typ urządzenia",
+              "description": "Choose a device type to automatically apply appropriate settings.",
+              "choose": {
+                "door": {
+                  "name": "Drzwi",
+                  "description": "A door, gate or other entrance that is used for entering/leaving the home."
+                },
+                "window": {
+                  "name": "Okno",
+                  "description": "A window, or a door not used for entering the house such as balcony."
+                },
+                "motion": {
+                  "name": "Ruch",
+                  "description": "Presence sensor or similar device having a delay between activations."
+                },
+                "tamper": {
+                  "name": "Wstrząsowy",
+                  "description": "Detector of sensor cover removal, glass break sensor, etc."
+                },
+                "environmental": {
+                  "name": "Bezpieczeństwa",
+                  "description": "Smoke/gas sensor, leak detector, etc. (not related to burglar protection)."
+                },
+                "other": {
+                  "name": "Ogólny"
+                }
+              }
+            },
+            "always_on": {
+              "heading": "Zawsze włączony",
+              "description": "Sensor should always trigger the alarm."
+            },
+            "modes": {
+              "heading": "Dostępne tryby",
+              "description": "Alarm modes in which this sensor is active."
+            },
+            "arm_on_close": {
+              "heading": "Uzbrój po zamknięciu",
+              "description": "After deactivation of this sensor, the remaining exit delay will automatically be skipped."
+            },
+            "use_exit_delay": {
+              "heading": "Uzbrój pomimo że aktywny",
+              "description": "Sensor is allowed to be active when the exit delay starts."
+            },
+            "use_entry_delay": {
+              "heading": "Use entry delay",
+              "description": "Sensor activation triggers the alarm after the entry delay rather than directly."
+            },
+            "allow_open": {
+              "heading": "Aktywny po uzbrojeniu",
+              "description": "If the sensor is still active after the exit delay, this will not cause arming to fail."
+            },
+            "auto_bypass": {
+              "heading": "Wyklucz automatycznie",
+              "description": "Exclude this sensor from the alarm if it is open while arming.",
+              "modes": "Modes in which sensor may be bypassed"
+            },
+            "trigger_unavailable": {
+              "heading": "Aktywuj kiedy niedostępny",
+              "description": "When the sensor state becomes 'unavailable', this will activate the sensor."
+            }
+          },
+          "actions": {
+            "toggle_advanced": "Zaawansowane ustawienia",
+            "remove": "Usuń",
+            "setup_groups": "Ustaw grupy"
+          },
+          "errors": {
+            "description": "Please correct the following errors:",
+            "no_area": "No area is selected",
+            "no_modes": "No modes are selected for which the sensor should be active",
+            "no_auto_bypass_modes": "No modes are selected for the sensor may be automatically bypassed"
+          }
+        }
+      },
+      "dialogs": {
+        "manage_groups": {
+          "title": "Zarządzaj grupami czujników",
+          "description": "In a sensor group multiple sensors must be activated within a time period before the alarm is triggered.",
+          "no_items": "Brak grup",
+          "actions": {
+            "new_group": "Nowa grupa"
+          }
+        },
+        "create_group": {
+          "title": "Nowa grupa czujników",
+          "fields": {
+            "name": {
+              "heading": "Nazwa",
+              "description": "Name for sensor group"
+            },
+            "timeout": {
+              "heading": "Time-out",
+              "description": "Time period during which consecutive sensor activations triggers the alarm."
+            },
+            "sensors": {
+              "heading": "Czujnik",
+              "description": "Select the sensors which are contained by this group."
+            }
+          },
+          "errors": {
+            "invalid_name": "Invalid name provided.",
+            "insufficient_sensors": "At least 2 sensors need to be selected."
+          }
+        },
+        "edit_group": {
+          "title": "Edytuj grupę ''{name}''"
+        }
+      }
+    },
+    "codes": {
+      "title": "Kody",
+      "cards": {
+        "codes": {
+          "description": "Change settings for the code.",
+          "fields": {
+            "code_arm_required": {
+              "heading": "Użyj kodów uzbrojenia",
+              "description": "Require a code for arming the alarm"
+            },
+            "code_disarm_required": {
+              "heading": "Użyj kodów rozbrojenia",
+              "description": "Require a code for disarming the alarm"
+            },
+            "code_format": {
+              "heading": "Typ kodów",
+              "description": "Sets the input type for Lovelace alarm card.",
+              "code_format_number": "liczbowe",
+              "code_format_text": "hasłowe"
+            }
+          }
+        },
+        "user_management": {
+          "title": "Zarządzanie użytkownikami",
+          "description": "Each user has its own code to arm/disarm the alarm.",
+          "no_items": "There are no users yet",
+          "actions": {
+            "new_user": "nowy użytkownik"
+          }
+        },
+        "new_user": {
+          "title": "Utwórz nowego użytkownika",
+          "description": "Users can be created for providing access to operating the alarm.",
+          "fields": {
+            "name": {
+              "heading": "Imię",
+              "description": "Name of the user."
+            },
+            "code": {
+              "heading": "Kod",
+              "description": "Code for this user."
+            },
+            "confirm_code": {
+              "heading": "Potwierdź kod",
+              "description": "Repeat the code."
+            },
+            "can_arm": {
+              "heading": "Kod może uzbroić",
+              "description": "Entering this code activates the alarm"
+            },
+            "can_disarm": {
+              "heading": "Kod może rozbroić",
+              "description": "Entering this code deactivates the alarm"
+            },
+            "is_override_code": {
+              "heading": "Is override code",
+              "description": "Entering this code will arm the alarm in force"
+            },
+            "area_limit": {
+              "heading": "Tylko wybrane obszary",
+              "description": "Limit user to control only the selected areas"
+            }
+          },
+          "errors": {
+            "no_name": "Nie podano imienia.",
+            "no_code": "Code should have 4 characters/numbers minimum.",
+            "code_mismatch": "Kody nie są zgodne."
+          }
+        },
+        "edit_user": {
+          "title": "Edytuj użytkownika",
+          "description": "Change configuration for user ''{name}''.",
+          "fields": {
+            "old_code": {
+              "heading": "Obecny kod",
+              "description": "Current code, leave empty to leave unchanged."
+            }
+          }
+        }
+      }
+    },
+    "actions": {
+      "title": "Akcje",
+      "cards": {
+        "notifications": {
+          "title": "Powiadomienia",
+          "description": "Using this panel, you can manage notifications to be sent when a certain alarm event occurs.",
+          "table": {
+            "no_items": "There are no notifications created yet.",
+            "no_area_warning": "Action is not assigned to any area."
+          },
+          "actions": {
+            "new_notification": "nowe powiadomienie"
+          }
+        },
+        "actions": {
+          "description": "This panel can be used to switch a device when the alarm state changes.",
+          "table": {
+            "no_items": "There are no actions created yet."
+          },
+          "actions": {
+            "new_action": "nowa akcja"
+          }
+        },
+        "new_notification": {
+          "title": "Konfiguracja powiadomień",
+          "description": "Receive a notification when arming/disarming the alarm, on activation, etc.",
+          "trigger": "Warunki",
+          "action": "Task",
+          "options": "Opcje",
+          "fields": {
+            "event": {
+              "heading": "Zdarzenie",
+              "description": "When should the notification be sent",
+              "choose": {
+                "armed": {
+                  "name": "Alarm jest uzbrojony",
+                  "description": "The alarm is succesfully armed"
+                },
+                "disarmed": {
+                  "name": "Alarm jest rozbrojony",
+                  "description": "The alarm is disarmed"
+                },
+                "triggered": {
+                  "name": "Alarm został wywołany",
+                  "description": "The alarm is triggered"
+                },
+                "untriggered": {
+                  "name": "Alarm został zakończony",
+                  "description": "The triggered state of the alarm has ended"
+                },
+                "arm_failure": {
+                  "name": "Błąd uzbrojenia alarmu",
+                  "description": "The arming of the alarm failed due to one or more open sensors"
+                },
+                "arming": {
+                  "name": "Opóźnienie wyjścia rozpoczęte",
+                  "description": "Exit delay started, ready to leave the house."
+                },
+                "pending": {
+                  "name": "Opóźnienie wejścia rozpoczęte",
+                  "description": "Entry delay started, the alarm will trigger soon."
+                }
+              }
+            },
+            "mode": {
+              "heading": "Tryb",
+              "description": "Limit the action to specific arm modes (optional)"
+            },
+            "title": {
+              "heading": "Tytuł",
+              "description": "Title for the notification message"
+            },
+            "message": {
+              "heading": "Wiadomość",
+              "description": "Content of the notification message",
+              "insert_wildcard": "Wstaw opisy",
+              "placeholders": {
+                "armed": "The alarm is set to {{arm_mode}}",
+                "disarmed": "The alarm is now OFF",
+                "triggered": "The alarm is triggered! Cause: {{open_sensors}}.",
+                "untriggered": "The alarm is not longer triggered.",
+                "arm_failure": "The alarm could not be armed right now, due to: {{open_sensors}}.",
+                "arming": "The alarm will be armed soon, please leave the house.",
+                "pending": "The alarm is about to trigger, disarm it quickly!"
+              }
+            },
+            "open_sensors_format": {
+              "heading": "Format for open_sensors wildcard",
+              "description": "Choose which sensor information in inserted in the message",
+              "options": {
+                "default": "Nazwa i stan",
+                "short": "Tylko nazwa"
+              }
+            },
+            "arm_mode_format": {
+              "heading": "Translation for arm_mode wildcard",
+              "description": "Choose in which language the arm mode is inserted in the message"
+            },
+            "target": {
+              "heading": "Urządzenie",
+              "description": "Device to send the notification to"
+            },
+            "name": {
+              "heading": "Nazwa",
+              "description": "Description for this notification",
+              "placeholders": {
+                "armed": "Notify {target} upon arming",
+                "disarmed": "Notify {target} upon disarming",
+                "triggered": "Notify {target} when triggered",
+                "untriggered": "Notify {target} when triggering stops",
+                "arm_failure": "Notify {target} on failure",
+                "arming": "Notify {target} when leaving",
+                "pending": "Notify {target} when arriving"
+              }
+            },
+            "delete": {
+              "heading": "Usuń automatyzacje",
+              "description": "Permanently remove this automation"
+            }
+          },
+          "actions": {
+            "test": "Wypróbuj"
+          }
+        },
+        "new_action": {
+          "title": "Konfiguracja akcji",
+          "description": "Switch lights or devices (such as sirens) when arming/disarming the alarm, on activation, etc.",
+          "fields": {
+            "event": {
+              "heading": "Zdarzenie",
+              "description": "When should the action be executed"
+            },
+            "area": {
+              "heading": "Obszar",
+              "description": "Area for which the event applies, leave empty to select the global alarm."
+            },
+            "mode": {
+              "heading": "Tryb",
+              "description": "Limit the action to specific arm modes (optional)"
+            },
+            "entity": {
+              "heading": "Encja",
+              "description": "Entity to perform action on"
+            },
+            "action": {
+              "heading": "Akcja",
+              "description": "Action to perform on the entity",
+              "no_common_actions": "Actions can only be assigned in YAML mode for the selected entities."
+            },
+            "name": {
+              "heading": "Nazwa",
+              "description": "Description for this action",
+              "placeholders": {
+                "armed": "Set {entity} to {state} upon arming",
+                "disarmed": "Set {entity} to {state} upon disarming",
+                "triggered": "Set {entity} to {state} when triggered",
+                "untriggered": "Set {entity} to {state} when triggering stops",
+                "arm_failure": "Set {entity} to {state} on failure",
+                "arming": "Set {entity} to {state} when leaving",
+                "pending": "Set {entity} to {state} when arriving"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
