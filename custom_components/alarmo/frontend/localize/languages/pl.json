@@ -14,7 +14,7 @@
     "time_slider": {
       "seconds": "sek",
       "minutes": "min",
-      "infinite": "infinite",
+      "infinite": "nieskończony",
       "none": "brak"
     },
     "editor": {
@@ -24,9 +24,9 @@
     },
     "table": {
       "filter": {
-        "label": "Filter items",
-        "item": "Filter by {name}",
-        "hidden_items": "{number} {number, plural,\n  one {item is}\n  other {items are}\n} hidden"
+        "label": "Wyfiltrowane pozycje",
+        "item": "Filtruj po {name}",
+        "hidden_items": "{number} {number, plural,\n  one {item is}\n  other {items are}\n} ukrytych"
       }
     }
   },
@@ -36,7 +36,7 @@
       "title": "Ogólne",
       "cards": {
         "general": {
-          "description": "This panel defines some global settings for the alarm.",
+          "description": "Ustawiasz tutaj podstawą konfiguracje dla alarmu.",
           "fields": {
             "disarm_after_trigger": {
               "heading": "Disarm after trigger",
@@ -44,16 +44,16 @@
             },
             "enable_mqtt": {
               "heading": "Włącz MQTT",
-              "description": "Allow the alarm panel to be controlled through MQTT."
+              "description": "Pozwala kontrlolować Alarm poprzez MQTT."
             },
             "enable_master": {
-              "heading": "Enable alarm master",
-              "description": "Creates an entity for controlling all areas simultaneously."
+              "heading": "Włącz alarm główny",
+              "description": "Tworzy encję do zarządzania wszystkimi alarami we wzystich obszarach."
             }
           },
           "actions": {
             "setup_mqtt": "Konfiguracja MQTT",
-            "setup_master": "Master Configuration"
+            "setup_master": "Konfiguracja alrmu głównego"
           }
         },
         "modes": {
