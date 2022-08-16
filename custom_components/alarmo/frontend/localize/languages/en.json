@@ -430,7 +430,7 @@
                   "description": "The alarm is triggered"
                 },
                 "untriggered": {
-                  "name": "Alarm not longer triggered",
+                  "name": "Alarm no longer triggered",
                   "description": "The triggered state of the alarm has ended"
                 },
                 "arm_failure": {
@@ -463,7 +463,7 @@
                 "armed": "The alarm is set to {{arm_mode}}",
                 "disarmed": "The alarm is now OFF",
                 "triggered": "The alarm is triggered! Cause: {{open_sensors}}.",
-                "untriggered": "The alarm is not longer triggered.",
+                "untriggered": "The alarm is no longer triggered.",
                 "arm_failure": "The alarm could not be armed right now, due to: {{open_sensors}}.",
                 "arming": "The alarm will be armed soon, please leave the house.",
                 "pending": "The alarm is about to trigger, disarm it quickly!"
