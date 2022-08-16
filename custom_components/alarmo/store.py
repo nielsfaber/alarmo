@@ -203,6 +203,31 @@ def parse_automation_entry(data: dict):
 class MigratableStore(Store):
     async def _async_migrate_func(self, old_version, data: dict):
 
+        def migrate_automation(data):
+            if old_version <= 2:
+                data["triggers"] = [
+                    {
+                        "event": el["state"] if "state" in el else el["event"],
+                        "area": el.get("area"),
+                        "modes": data["modes"]
+                    }
+                    for el in data["triggers"]
+                ]
+
+                data["type"] = "notification" if "is_notification" in data and data["is_notification"] else "action"
+
+            if old_version <= 5:
+                data["actions"] = [
+                    {
+                        "service": el.get("service"),
+                        "entity_id": el.get("entity_id"),
+                        "data": el.get("service_data")
+                    }
+                    for el in data["actions"]
+                ]
+
+            return attr.asdict(AutomationEntry(**parse_automation_entry(data)))
+
         if old_version == 1:
             area_id = str(int(time.time()))
             data["areas"] = [
@@ -223,29 +248,6 @@ class MigratableStore(Store):
             if "sensors" in data:
                 for sensor in data["sensors"]:
                     sensor["area"] = area_id
-
-        if old_version <= 2:
-            data["automations"] = [
-                attr.asdict(AutomationEntry(
-                    **parse_automation_entry({
-                        **automation,
-                        **{
-                            "triggers": list(map(
-                                lambda el: attr.asdict(AlarmoTriggerEntry(
-                                    event=el["state"] if "state" in el else el["event"],
-                                    area=automation["area"] if "area" in el else None,
-                                    modes=automation["modes"]
-                                )),
-                                automation["triggers"]
-                            )),
-                            "type": "notification"
-                            if "is_notification" in automation and automation["is_notification"]
-                            else "action"
-                        }
-                    })
-                ))
-                for automation in data["automations"]
-            ]
 
         if old_version <= 3:
             data["sensors"] = [
@@ -270,25 +272,10 @@ class MigratableStore(Store):
                 for sensor in data["sensors"]
             ]
 
-        if old_version <= 5:
-            data["automations"] = [
-                attr.asdict(AutomationEntry(
-                    **parse_automation_entry({
-                        **automation,
-                        **{
-                            "actions": list(map(
-                                lambda el: attr.asdict(ActionEntry(
-                                    service=el["service"],
-                                    entity_id=el["entity_id"],
-                                    data=el["service_data"]
-                                )),
-                                automation["actions"]
-                            ))
-                        }
-                    })
-                ))
-                for automation in data["automations"]
-            ]
+        data["automations"] = [
+            migrate_automation(automation)
+            for automation in data["automations"]
+        ]
 
         return data
 
