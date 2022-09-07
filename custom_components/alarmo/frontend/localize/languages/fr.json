@@ -430,8 +430,8 @@
                   "description": "L'alarme est déclenchée"
                 },
                 "untriggered": {
-                  "name": "Alarm not longer triggered",
-                  "description": "The triggered state of the alarm has ended"
+                  "name": "L'alarme n'est plus déclenchée",
+                  "description": "Le temps de déclenchement de l'alarme est terminé"
                 },
                 "arm_failure": {
                   "name": "Armement impossible",
@@ -463,7 +463,7 @@
                 "armed": "L'alarme est réglée sur {{arm_mode}}",
                 "disarmed": "L'alarme est maintenant désactivée",
                 "triggered": "L'alarme est déclenchée! En cause: {{open_sensors}}.",
-                "untriggered": "The alarm is not longer triggered.",
+                "untriggered": "L'alarme n'est plus déclenchée.",
                 "arm_failure": "L'alarme n'a pas pu être armée pour le moment, en cause: {{open_sensors}}.",
                 "arming": "L'alarme sera bientôt armée, veuillez quitter la maison.",
                 "pending": "L'alarme est sur le point de se déclencher, désarmez-la rapidement!"
@@ -492,7 +492,7 @@
                 "armed": "Notification à l'armement de : {target}",
                 "disarmed": "Notification au désarmement de : {target}",
                 "triggered": "Notification au déclenchement de : {target}",
-                "untriggered": "Notify {target} when triggering stops",
+                "untriggered": "Notification {target}, quand le temps de déclenchement est terminé",
                 "arm_failure": "Notification en cas d'échec de : {target}",
                 "arming": "Notification en quittant de : {target}",
                 "pending": "Notification au retour de : {target}"
@@ -539,7 +539,7 @@
                 "armed": "Mettre {entity} à {state} lors de l'armement",
                 "disarmed": "Mettre {entity} à {state} lors du désarmement",
                 "triggered": "Mettre {entity} à {state} lors du déclenchement de l'alarme",
-                "untriggered": "Set {entity} to {state} when triggering stops",
+                "untriggered": "Mettre {entity} à {state} quand le temps de déclenchement s'arrête",
                 "arm_failure": "Mettre {entity} à {state} en cas d'échec de l'armement",
                 "arming": "Mettre {entity} à {state} lors du départ de la maison",
                 "pending": "Mettre {entity} à {state} lors du retour à la maison"
