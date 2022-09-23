@@ -492,7 +492,7 @@
                 "armed": "Notifica {target} in attivazione",
                 "disarmed": "Notifica {target} in disattivazione",
                 "triggered": "Notifica {target} quando innescato",
-                "untriggered": "Notify {target} when triggering stops",
+                "untriggered": "Notifica {target} quando l'innesco termina",
                 "arm_failure": "Notifica {target} quando impossibile attivare",
                 "arming": "Notifica {target} in uscita",
                 "pending": "Notifica {target} in ingresso"
@@ -539,7 +539,7 @@
                 "armed": "Imposta {entity} su {state} in attivazione",
                 "disarmed": "Imposta {entity} su {state} in disattivazione",
                 "triggered": "Imposta {entity} su {state} in innesco",
-                "untriggered": "Set {entity} to {state} when triggering stops",
+                "untriggered": "Imposta {entity} su {state} quando l'innesco termina",
                 "arm_failure": "Imposta {entity} su {state} quando è impossibile attivare",
                 "arming": "Imposta {entity} su {state} in uscita",
                 "pending": "Imposta {entity} su {state} in entrata"
