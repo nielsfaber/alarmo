@@ -26,7 +26,7 @@
       "filter": {
         "label": "Filtrera sensorer",
         "item": "Filtrera med {name}",
-        "hidden_items": "{number} {number, plural,\n  en {item is}\n  andra {items are}\n} dolda"
+        "hidden_items": "{number} {number, plural,\n  en {item is}\n  other {items are}\n} dolda"
       }
     }
   },
@@ -66,7 +66,7 @@
             "armed_vacation": "Larmat semester kan användas som en förlängning av läget för larmat borta vid längre frånvaro. Fördröjningstiderna och triggersvaren kan anpassas (efter önskemål) för att vara borta längre tid från hemmet.",
             "armed_custom_bypass": "Ett extra läge för för att definiera sin egen säkerhetsperimeter."
           },
-          "number_sensors_active": "{number} {number, plural,\n  en {sensor}\n  andra {sensorer}\n} aktiv",
+          "number_sensors_active": "{number} {number, plural,\n  en {sensor}\n  other {sensorer}\n} aktiv",
           "fields": {
             "status": {
               "heading": "Status",
@@ -123,8 +123,8 @@
           "table": {
             "remarks": "Anmärkningar",
             "summary": "Detta område innehåller {summary_sensors} och {summary_automations}.",
-            "summary_sensors": "{number} {number, plural,\n  en {sensor}\n  andra {sensorer}\n}",
-            "summary_automations": "{number} {number, plural,\n  en {automation}\n  andra {automationer}\n}"
+            "summary_sensors": "{number} {number, plural,\n  en {sensor}\n  other {sensorer}\n}",
+            "summary_automations": "{number} {number, plural,\n  en {automation}\n  other {automationer}\n}"
           },
           "actions": {
             "add": "Lägg till"
@@ -508,7 +508,7 @@
           }
         },
         "new_action": {
-          "title": "Konfiguera action",
+          "title": "Konfigurera action",
           "description": "Aktivera lampor eller andra enheter som sirener eller högatalare vid aktivering/inaktivering av larmet, triggning av larmet osv.",
           "fields": {
             "event": {
