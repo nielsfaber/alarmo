@@ -430,8 +430,8 @@
                   "description": "L'allarme è innescato"
                 },
                 "untriggered": {
-                  "name": "Alarm not longer triggered",
-                  "description": "The triggered state of the alarm has ended"
+                  "name": "Allarme non innescato",
+                  "description": "L'allarme non è più innescato"
                 },
                 "arm_failure": {
                   "name": "Impossibile attivare",
