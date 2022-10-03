@@ -291,7 +291,7 @@ The following table defines the sensor types and the predefined configuration:
 | Door          | `door`<br> `garage_door`<br>`lock`<br> `opening `     | `Armed Away`<br> `Armed Home`<br>`Armed Night`<br>`Armed Vacation` | `Arm after closing`<br> `Use entry delay` |
 | Window        | `window`                                              | `Armed Away`<br>`Armed Home`<br>`Armed Night`<br>`Armed Vacation`  | -                                         |
 | Motion        | `motion`<br>`moving`<br>`occupancy`<br>`presence`     | `Armed Away`<br>`Armed Vacation`                                   | `Use exit delay`<br>`Use entry delay`     |
-| Tamper        | `sound`<br>`opening`<br> `vibration`                  | `Armed Away`<br>`Armed Home`<br>`Armed Night`<br>`Armed Vacation`  | -                                         |
+| Tamper        | `tamper`<br>`sound`<br>`opening`<br> `vibration`                  | `Armed Away`<br>`Armed Home`<br>`Armed Night`<br>`Armed Vacation`  | -                                         |
 | Environmental | `carbon_monoxide`<br>`gas`<br> `heat`<br>`moisture`<br>`smoke`<br>`safety` | N/A                                                                | `Always on`                               |
 
 

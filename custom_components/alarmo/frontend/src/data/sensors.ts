@@ -28,6 +28,7 @@ export const isValidSensor = (entity: HassEntity, showAllDeviceClasses: boolean)
         'safety',
         'smoke',
         'sound',
+        'tamper',
         'vibration',
         'window',
       ].includes(type)
@@ -61,6 +62,7 @@ export const sensorClassToType = (stateObj: HassEntity): ESensorTypes | undefine
     case 'sound':
     case 'opening':
     case 'vibration':
+    case 'tamper':
       return ESensorTypes.Tamper;
     default:
       return;
