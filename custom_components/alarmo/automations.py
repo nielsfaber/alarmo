@@ -41,11 +41,13 @@ _LOGGER = logging.getLogger(__name__)
 EVENT_ARM_FAILURE = "arm_failure"
 
 
-def validate_area(trigger, area_id):
+def validate_area(trigger, area_id, hass):
     if const.ATTR_AREA not in trigger:
         return False
     elif trigger[const.ATTR_AREA]:
         return trigger[const.ATTR_AREA] == area_id
+    elif len(hass.data[const.DOMAIN]["areas"]) == 1:
+        return True
     else:
         return area_id is None
 
@@ -114,7 +116,7 @@ class AutomationHandler:
                     continue
                 for trigger in config[const.ATTR_TRIGGERS]:
                     if (
-                        validate_area(trigger, area_id) and
+                        validate_area(trigger, area_id, self.hass) and
                         validate_modes(trigger, alarm_entity._arm_mode) and
                         validate_trigger(trigger, new_state, old_state)
                     ):
@@ -140,7 +142,7 @@ class AutomationHandler:
                     continue
                 for trigger in config[const.ATTR_TRIGGERS]:
                     if (
-                        validate_area(trigger, area_id) and
+                        validate_area(trigger, area_id, self.hass) and
                         validate_modes(trigger, alarm_entity._arm_mode) and
                         validate_trigger(trigger, EVENT_ARM_FAILURE)
                     ):
