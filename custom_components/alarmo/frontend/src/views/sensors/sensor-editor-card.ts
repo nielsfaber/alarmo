@@ -210,7 +210,7 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
                   ></ha-switch>
                 </settings-row>
 
-                ${(!this.data.type || [ESensorTypes.Motion, ESensorTypes.Other].includes(this.data.type)) &&
+                ${(!this.data.type || [ESensorTypes.Motion, ESensorTypes.Window, ESensorTypes.Other].includes(this.data.type)) &&
                 this.data.use_exit_delay
                   ? html`
                       <settings-row .narrow=${this.narrow} nested>
@@ -289,7 +289,7 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
 
                 ${this.data.auto_bypass
                   ? html`
-                      <settings-row .narrow=${this.narrow} nested>
+                      <settings-row .narrow=${this.narrow} .large=${this.modesByArea(this.data.area).length > 2} nested>
                         <span slot="heading">
                           ${localize('panels.sensors.cards.editor.fields.auto_bypass.modes', this.hass.language)}
                         </span>

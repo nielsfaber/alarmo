@@ -242,7 +242,7 @@
             },
             "allow_open": {
               "heading": "Allow open after arming",
-              "description": "If the sensor is still active after the exit delay, this will not cause arming to fail."
+              "description": "Initial state of the sensor is ignored upon arming."
             },
             "auto_bypass": {
               "heading": "Bypass automatically",

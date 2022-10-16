@@ -241,8 +241,8 @@
               "description": "Als de sensor actief wordt, activeert deze het alarm pas na de vertragingstijd voor binnenkomst."
             },
             "allow_open": {
-              "heading": "Sta open toe tijdens het inschakelen",
-              "description": "Sta toe dat deze sensor kort na het verlaten actief is, zodat hij het inschakelen niet blokkeert."
+              "heading": "Actieve toestand toestaan bij inschakelen",
+              "description": "Initiële toestand bij inschakelen van het alarm wordt genegeerd."
             },
             "auto_bypass": {
               "heading": "Automatisch omzeilen",
