@@ -58,7 +58,7 @@
         },
         "modes": {
           "title": "Lägen",
-          "description": "Denna panel kan användas för att konfiguera larmets olika larmlägen.",
+          "description": "Denna panel kan användas för att konfigurera larmets olika larmlägen.",
           "modes": {
             "armed_away": "Larmat borta används när alla personer lämnat huset. Alla dörrar och fönster som tillåter tillgång till huset kommer att larmas, det samma gäller rörelsesensorer inne i huset.",
             "armed_home": "Larmat hemma används när det finns personer kvar i huset. Alla dörrar och fönster som tillåter tillgång till huset kommer att larmas, dock inga rörelsesensorer inne i huset.",
@@ -107,11 +107,11 @@
               "description": "Kräv att koden ska skickas med kommandot."
             },
             "state_payload": {
-              "heading": "Konfiguera payload per state",
+              "heading": "Konfigurera payload per state",
               "item": "Definiera en payload för state ''{state}''"
             },
             "command_payload": {
-              "heading": "Konfiguera payload per kommando",
+              "heading": "Konfigurera payload per kommando",
               "item": "Definiera en payload för kommando ''{command}''"
             }
           }
@@ -159,7 +159,7 @@
       "title": "Sensorer",
       "cards": {
         "sensors": {
-          "description": "Nuvarande konfiguerade sensorer. Klicka på ett entity för att göra förändringar.",
+          "description": "Nuvarande konfigurerade sensorer. Klicka på ett entity för att göra förändringar.",
           "table": {
             "no_items": "Det finns inga sensorer att visa här.",
             "no_area_warning": "Sensor är inte tilldelat till något område.",
@@ -169,8 +169,8 @@
         },
         "add_sensors": {
           "title": "Lägg till sensorer",
-          "description": "Lägg till mer sensorer. Säkerhetsställ att dina sensorer har ett friendly_name, så du kan identifiera dem.",
-          "no_items": "Det finns inga tillgängliga HA entities som kan konfigueras för larmet. Säkerhetsställ att inkludera entities av type binary_sensor.",
+          "description": "Lägg till mer sensorer. Säkerställ att dina sensorer har ett friendly_name, så du kan identifiera dem.",
+          "no_items": "Det finns inga tillgängliga HA entities som kan konfigureras för larmet. Säkerställ att inkludera entities av type binary_sensor.",
           "table": {
             "type": "Detekteringstyp"
           },
@@ -193,7 +193,7 @@
             },
             "device_type": {
               "heading": "Enhetstyp",
-              "description": "Välj en enhetstyp att automatiskt applicera rekomenderade inställningar på.",
+              "description": "Välj en enhetstyp att automatiskt applicera rekommenderade inställningar på.",
               "choose": {
                 "door": {
                   "name": "Dörr",
@@ -407,7 +407,7 @@
           }
         },
         "new_notification": {
-          "title": "Konfiguera notifikationer",
+          "title": "Konfigurera notifikationer",
           "description": "Ta emot en notifikation när ditt larm aktivera/inaktiveras eller om en sensor aktiveras eller liknande.",
           "trigger": "Villkor",
           "action": "Åtgärd",
