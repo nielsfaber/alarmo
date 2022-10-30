@@ -460,7 +460,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
     async def async_alarm_trigger(self, code=None) -> None:
         """Send alarm trigger command."""
         _LOGGER.debug("async_alarm_trigger")
-        await self.async_trigger(skip_delay=False)
+        await self.async_trigger(skip_delay=True)
 
     async def async_added_to_hass(self):
         """Connect to dispatcher listening for entity data notifications."""
