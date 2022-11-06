@@ -576,6 +576,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
     async def async_arm_failure(self, open_sensors: dict, context_id=None):
         """handle arm failure."""
         self._open_sensors = open_sensors
+        command = self._arm_mode.replace("armed", "arm")
 
         if self._state != self._revert_state and self._revert_state:
             await self.async_update_state(self._revert_state)
@@ -594,6 +595,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
             self.area_id,
             {
                 "open_sensors": open_sensors,
+                "command": command,
                 const.ATTR_CONTEXT_ID: context_id
             }
         )
@@ -1015,6 +1017,7 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
     async def async_arm_failure(self, open_sensors: dict, context_id=None):
         """handle arm failure."""
         self.open_sensors = open_sensors
+        command = self._target_state.replace("armed", "arm")
         self._target_state = None
 
         for item in self.hass.data[const.DOMAIN]["areas"].values():
@@ -1029,6 +1032,7 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
             None,
             {
                 "open_sensors": open_sensors,
+                "command": command,
                 const.ATTR_CONTEXT_ID: context_id
             }
         )
