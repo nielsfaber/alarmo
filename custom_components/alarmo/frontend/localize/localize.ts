@@ -6,6 +6,7 @@ import * as et from './languages/et.json';
 import * as fr from './languages/fr.json';
 import * as it from './languages/it.json';
 import * as nl from './languages/nl.json';
+import * as sk from './languages/sk.json';
 import * as sv from './languages/sv.json';
 
 import IntlMessageFormat from 'intl-messageformat';
@@ -19,6 +20,7 @@ var languages: any = {
   fr: fr,
   it: it,
   nl: nl,
+  sk: sk,
   sv: sv,
 };
 
