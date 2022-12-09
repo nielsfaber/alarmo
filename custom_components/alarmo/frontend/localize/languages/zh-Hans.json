@@ -1,0 +1,553 @@
+{
+  "common": {
+    "modes_short": {
+      "armed_away": "离家警戒",
+      "armed_home": "在家警戒",
+      "armed_night": "夜间警戒",
+      "armed_custom_bypass": "自定义境界",
+      "armed_vacation": "假期境界"
+    },
+    "enabled": "已启用",
+    "disabled": "已禁用"
+  },
+  "components": {
+    "time_slider": {
+      "seconds": "秒",
+      "minutes": "分",
+      "infinite": "无限",
+      "none": "无"
+    },
+    "editor": {
+      "ui_mode": "UI模式",
+      "yaml_mode": "YAML模式",
+      "edit_in_yaml": "在YAML中编辑"
+    },
+    "table": {
+      "filter": {
+        "label": "过滤项目",
+        "item": "通过{name}过滤",
+        "hidden_items": "{number} {number, plural,\n  1 {item is}\n  其他 {items are}\n} 已隐藏"
+      }
+    }
+  },
+  "title": "警戒面板",
+  "panels": {
+    "general": {
+      "title": "通用",
+      "cards": {
+        "general": {
+          "description": "该面板定义了警戒的一些全局设置。",
+          "fields": {
+            "disarm_after_trigger": {
+              "heading": "触发后解除警戒",
+              "description": "触发时间超时后解除警报，而不是返回到警戒状态。"
+            },
+            "enable_mqtt": {
+              "heading": "启用MQTT",
+              "description": "允许通过MQTT控制警戒面板。"
+            },
+            "enable_master": {
+              "heading": "启用警戒主控",
+              "description": "创建一个实体，用于同时控制所有区域。"
+            }
+          },
+          "actions": {
+            "setup_mqtt": "MQTT配置",
+            "setup_master": "主控配置"
+          }
+        },
+        "modes": {
+          "title": "模式",
+          "description": "该面板可用于设置报警器的警戒模式。",
+          "modes": {
+            "armed_away": "当所有的人离开房子时，将使用离家警戒。所有接入房屋的门窗传感器都将被监听状态，包括有动作传感器。",
+            "armed_home": "当有人在家时，设置警戒时将使用在家警戒（也称为停留警戒）。所有接入房屋的门窗传感器都将被监听状态，但房屋的动作传感器不受监听。",
+            "armed_night": "在睡觉前设置警报时，将使用夜间警报。所有接入房屋的门窗传感器都将被监听状态，并且指定的动作传感器（例如：楼梯）也将被监听。",
+            "armed_vacation": "度假警戒可以作为离家警戒模式的拓展，以应对长时间的离家情况。延迟时间和触发反应可以根据离家的时间按需调整。",
+            "armed_custom_bypass": "一个额外的模式，用于定义你自己的警戒模式。"
+          },
+          "number_sensors_active": "{number} {number, plural,\n  1 {sensor}\n  其他 {sensors}\n} 激活",
+          "fields": {
+            "status": {
+              "heading": "状态",
+              "description": "控制警报器是否可以在此模式下警戒。"
+            },
+            "exit_delay": {
+              "heading": "离开延迟",
+              "description": "当开启警戒时，在这个时间段内，传感器还不会触发警报。"
+            },
+            "entry_delay": {
+              "heading": "进入延迟",
+              "description": "在其中一个传感器被触发后，直到触发警报的延迟时间。"
+            },
+            "trigger_time": {
+              "heading": "触发时间",
+              "description": "警戒在激活后保持在触发状态的时间。"
+            }
+          }
+        },
+        "mqtt": {
+          "title": "MQTT配置",
+          "description": "该面板可用于配置MQTT接口。",
+          "fields": {
+            "state_topic": {
+              "heading": "状态主题（Topic）",
+              "description": "更新状态发布的主题"
+            },
+            "event_topic": {
+              "heading": "事件主题（Topic）",
+              "description": "警戒事件发布的主题"
+            },
+            "command_topic": {
+              "heading": "指令主题（Topic）",
+              "description": "Alarmo 监听警戒或者解除警戒的主题"
+            },
+            "require_code": {
+              "heading": "需要密码",
+              "description": "需要密码和指令一起发送"
+            },
+            "state_payload": {
+              "heading": "配置每个状态的有效载荷",
+              "item": "定义状态的有效载荷 ''{state}''"
+            },
+            "command_payload": {
+              "heading": "配置每个指令的有效载荷",
+              "item": "定义指令的有效载荷 ''{command}''"
+            }
+          }
+        },
+        "areas": {
+          "title": "区域",
+          "description": "区域可用于将您的报警系统划分为多个区间。",
+          "no_items": "目前还没有定义任何区域。",
+          "table": {
+            "remarks": "备注",
+            "summary": "当前区域包含 {summary_sensors} 和 {summary_automations}.",
+            "summary_sensors": "{number} {number, plural,\n  1 {sensor}\n  其他 {sensors}\n}",
+            "summary_automations": "{number} {number, plural,\n  1 {automation}\n  其他 {automations}\n}"
+          },
+          "actions": {
+            "add": "添加"
+          }
+        }
+      },
+      "dialogs": {
+        "create_area": {
+          "title": "新区域",
+          "fields": {
+            "copy_from": "复制设置，从"
+          }
+        },
+        "edit_area": {
+          "title": "编辑区域 ''{area}''",
+          "name_warning": "注意：改变名称将改变实体ID。"
+        },
+        "remove_area": {
+          "title": "删除区域?",
+          "description": "你确定要删除区域吗? 当前区域包含 {sensors} 传感器和 {automations} 自动化, 也会一起删除。"
+        },
+        "edit_master": {
+          "title": "主控配置"
+        },
+        "disable_master": {
+          "title": "禁用主控?",
+          "description": "你确定你要删除警报器主控吗? 当前区域包含 {automations} 自动化, 也会一起删除。"
+        }
+      }
+    },
+    "sensors": {
+      "title": "传感器",
+      "cards": {
+        "sensors": {
+          "description": "目前配置的传感器。点击一个项目来进行修改。",
+          "table": {
+            "no_items": "这里没有要显示的传感器。",
+            "no_area_warning": "传感器没有被分配到任何区域。",
+            "arm_modes": "警戒模式",
+            "always_on": "(一直开启)"
+          }
+        },
+        "add_sensors": {
+          "title": "添加传感器",
+          "description": "添加更多的传感器。确保你的传感器有一个合适的名字，这样你就可以识别它们。",
+          "no_items": "没有可用的HA实体可以被配置为报警器。请确保包含 binary_sensor 类型的实体。",
+          "table": {
+            "type": "检测到的类型"
+          },
+          "actions": {
+            "add_to_alarm": "添加到报警器",
+            "filter_supported": "隐藏未知类型的项目"
+          }
+        },
+        "editor": {
+          "title": "编辑传感器",
+          "description": "配置传感器 ''{entity}'' 的设置。",
+          "fields": {
+            "area": {
+              "heading": "区域",
+              "description": "选择一个包含该传感器的区域。"
+            },
+            "group": {
+              "heading": "群组",
+              "description": "与其他传感器分组进行联合触发。"
+            },
+            "device_type": {
+              "heading": "设备类型",
+              "description": "选择一个设备类型来自动应用适当的设置。",
+              "choose": {
+                "door": {
+                  "name": "门",
+                  "description": "用于进入/离开房屋的门或其他入口。"
+                },
+                "window": {
+                  "name": "窗",
+                  "description": "窗户或不用于进入房屋的门，如阳台。"
+                },
+                "motion": {
+                  "name": "动作",
+                  "description": "存在传感器或类似装置，在激活之间有一个延迟。"
+                },
+                "tamper": {
+                  "name": "篡改",
+                  "description": "移除传感器盖的探测器，玻璃破碎传感器等。"
+                },
+                "environmental": {
+                  "name": "环境",
+                  "description": "烟雾/气体传感器、泄漏探测器等（与防盗不相关）。"
+                },
+                "other": {
+                  "name": "通用"
+                }
+              }
+            },
+            "always_on": {
+              "heading": "总是开启",
+              "description": "传感器应始终触发警报。"
+            },
+            "modes": {
+              "heading": "启用的模式",
+              "description": "该传感器处于活动状态的警戒模式。"
+            },
+            "arm_on_close": {
+              "heading": "关闭后警戒",
+              "description": "该传感器停用后，剩余的离开延迟将被自动跳过。"
+            },
+            "use_exit_delay": {
+              "heading": "使用离开延迟",
+              "description": "当离开延迟开始时，传感器被允许处于活动状态。"
+            },
+            "use_entry_delay": {
+              "heading": "使用进入延迟",
+              "description": "传感器的激活会在进入延迟后触发警报，而不是直接触发。"
+            },
+            "allow_open": {
+              "heading": "允许在警戒后打开",
+              "description": "在警戒时，传感器的初始状态将被忽略。"
+            },
+            "auto_bypass": {
+              "heading": "自动旁路",
+              "description": "如果该传感器在警戒时被触发，则将其排除在报警之外。",
+              "modes": "可绕过传感器的模式"
+            },
+            "trigger_unavailable": {
+              "heading": "不可用时触发",
+              "description": "当传感器状态变成\"不可用\"时，将激活传感器。"
+            }
+          },
+          "actions": {
+            "toggle_advanced": "高级设定",
+            "remove": "删除",
+            "setup_groups": "配置群组"
+          },
+          "errors": {
+            "description": "请修正以下错误：",
+            "no_area": "没有选择任何区域",
+            "no_modes": "没有选择传感器应处于活动状态的模式",
+            "no_auto_bypass_modes": "没有选择任何模式的传感器可能会被自动绕过。"
+          }
+        }
+      },
+      "dialogs": {
+        "manage_groups": {
+          "title": "管理传感器群组",
+          "description": "在一个传感器群组中，多个传感器必须在一个时间段内被触发，才能触发警报。",
+          "no_items": "尚无群组",
+          "actions": {
+            "new_group": "新群组"
+          }
+        },
+        "create_group": {
+          "title": "新传感器群组",
+          "fields": {
+            "name": {
+              "heading": "名称",
+              "description": "传感器群组的名称"
+            },
+            "timeout": {
+              "heading": "超时",
+              "description": "连续的传感器激活触发报警的时间段。"
+            },
+            "sensors": {
+              "heading": "传感器",
+              "description": "选择该群组所包含的传感器。"
+            }
+          },
+          "errors": {
+            "invalid_name": "提供的名称无效。",
+            "insufficient_sensors": "至少需要选择2个传感器。"
+          }
+        },
+        "edit_group": {
+          "title": "编辑传感器群组''{name}''"
+        }
+      }
+    },
+    "codes": {
+      "title": "密码",
+      "cards": {
+        "codes": {
+          "description": "更改密码的设置。",
+          "fields": {
+            "code_arm_required": {
+              "heading": "使用警戒密码",
+              "description": "需要密码才能启用警报器"
+            },
+            "code_disarm_required": {
+              "heading": "使用解除警戒密码",
+              "description": "需要密码才能解除警报器"
+            },
+            "code_format": {
+              "heading": "密码格式",
+              "description": "设置Lovelace alarm card的输入类型。",
+              "code_format_number": "PIN码",
+              "code_format_text": "密码"
+            }
+          }
+        },
+        "user_management": {
+          "title": "用户管理",
+          "description": "每个用户都有自己的密码来启用/解除警报。",
+          "no_items": "尚无用户",
+          "actions": {
+            "new_user": "新用户"
+          }
+        },
+        "new_user": {
+          "title": "创建新用户",
+          "description": "可以创建用户以提供操作警报器的权限。",
+          "fields": {
+            "name": {
+              "heading": "名称",
+              "description": "该用户的名称。"
+            },
+            "code": {
+              "heading": "密码",
+              "description": "该用户的密码"
+            },
+            "confirm_code": {
+              "heading": "确认密码",
+              "description": "重复输入密码。"
+            },
+            "can_arm": {
+              "heading": "允许密码用于警戒",
+              "description": "输入此密码可激活警戒"
+            },
+            "can_disarm": {
+              "heading": "允许密码用于解除警戒",
+              "description": "输入此密码可解除警戒"
+            },
+            "is_override_code": {
+              "heading": "是覆盖密码",
+              "description": "输入此密码将强制激活警戒。"
+            },
+            "area_limit": {
+              "heading": "限制区域",
+              "description": "限制用户只控制选定的区域"
+            }
+          },
+          "errors": {
+            "no_name": "没有提供名称。",
+            "no_code": "密码应至少有4个字符/数字。",
+            "code_mismatch": "密码不匹配。"
+          }
+        },
+        "edit_user": {
+          "title": "编辑用户",
+          "description": "为用户 ''{name}'' 变更配置。",
+          "fields": {
+            "old_code": {
+              "heading": "当前密码",
+              "description": "当前密码，留空表示保持不变。"
+            }
+          }
+        }
+      }
+    },
+    "actions": {
+      "title": "动作",
+      "cards": {
+        "notifications": {
+          "title": "提醒",
+          "description": "使用此面板，你可以管理当某个报警事件发生时要发送的通知。",
+          "table": {
+            "no_items": "目前还没有创建任何通知。",
+            "no_area_warning": "动作没有被分配到任何领域。"
+          },
+          "actions": {
+            "new_notification": "新通知"
+          }
+        },
+        "actions": {
+          "description": "当报警状态改变时，这个面板可以用来切换设备。",
+          "table": {
+            "no_items": "目前还没有创建任何动作。"
+          },
+          "actions": {
+            "new_action": "新动作"
+          }
+        },
+        "new_notification": {
+          "title": "配置通知",
+          "description": "在启动/解除警报时、激活时等收到通知。",
+          "trigger": "条件",
+          "action": "任务",
+          "options": "选项",
+          "fields": {
+            "event": {
+              "heading": "事件",
+              "description": "应在何时发送通知",
+              "choose": {
+                "armed": {
+                  "name": "警报器已警戒",
+                  "description": "警报器已成功警戒"
+                },
+                "disarmed": {
+                  "name": "警报器已解除警戒",
+                  "description": "警报器已解除警戒"
+                },
+                "triggered": {
+                  "name": "警报器已触发",
+                  "description": "警报器已触发"
+                },
+                "untriggered": {
+                  "name": "警报器不再被触发",
+                  "description": "警报器的触发状态已经结束"
+                },
+                "arm_failure": {
+                  "name": "警戒失败",
+                  "description": "由于一个或多个传感器打开，警报器的警戒失败。"
+                },
+                "arming": {
+                  "name": "离开延迟开始",
+                  "description": "离开延迟开始，准备离开房屋。"
+                },
+                "pending": {
+                  "name": "进入延迟开始",
+                  "description": "进入延迟开始，警报将很快触发。"
+                }
+              }
+            },
+            "mode": {
+              "heading": "模式",
+              "description": "将动作限制在特定的警戒模式（可选）。"
+            },
+            "title": {
+              "heading": "标题",
+              "description": "通知信息的标题"
+            },
+            "message": {
+              "heading": "信息",
+              "description": "通知信息的内容",
+              "insert_wildcard": "插入通配符",
+              "placeholders": {
+                "armed": "报警器被设置为 {{arm_mode}}",
+                "disarmed": "警报器现在是关闭的。",
+                "triggered": "警报被触发了! 因为：{{open_sensors}}.",
+                "untriggered": "警报器不再被触发。",
+                "arm_failure": "警报器现在无法启动，因为： {{open_sensors}}.",
+                "arming": "警报器很快就会警戒，请离开房屋。",
+                "pending": "警报器即将触发，请迅速解除警报!"
+              }
+            },
+            "open_sensors_format": {
+              "heading": "open_sensors通配符的格式",
+              "description": "选择在信息中插入哪些传感器信息",
+              "options": {
+                "default": "名称和状态",
+                "short": "仅名称"
+              }
+            },
+            "arm_mode_format": {
+              "heading": "警戒模式通配符的翻译",
+              "description": "选择在信息中插入警戒模式的语言"
+            },
+            "target": {
+              "heading": "目标",
+              "description": "要发送通知的设备"
+            },
+            "name": {
+              "heading": "名称",
+              "description": "该通知的描述",
+              "placeholders": {
+                "armed": "警戒时通知 {target}",
+                "disarmed": "解除警戒时通知 {target}",
+                "triggered": "触发警报时通知 {target}",
+                "untriggered": "警报解除时通知 {target}",
+                "arm_failure": "警戒失败时通知 {target}",
+                "arming": "警戒延迟开始时通知 {target}",
+                "pending": "警报即将触发时通知 {target}"
+              }
+            },
+            "delete": {
+              "heading": "删除自动化",
+              "description": "永久性地删除这个自动化"
+            }
+          },
+          "actions": {
+            "test": "测试"
+          }
+        },
+        "new_action": {
+          "title": "配置动作",
+          "description": "在启动/解除警报时，在激活时，切换灯光或设备（如警笛）。",
+          "fields": {
+            "event": {
+              "heading": "事件",
+              "description": "什么时候应该执行该动作"
+            },
+            "area": {
+              "heading": "区域",
+              "description": "事件适用的区域，留空选择全局报警。"
+            },
+            "mode": {
+              "heading": "模式",
+              "description": "将动作限制在特定的警戒模式（可选）。"
+            },
+            "entity": {
+              "heading": "实体",
+              "description": "要执行动作的实体"
+            },
+            "action": {
+              "heading": "动作",
+              "description": "对实体执行的动作",
+              "no_common_actions": "动作只能在YAML模式下为选定的实体分配。"
+            },
+            "name": {
+              "heading": "名称",
+              "description": "该动作的描述",
+              "placeholders": {
+                "armed": "警戒时将 {entity} 设置为 {state}。",
+                "disarmed": "解除警戒时将 {entity} 设置为 {state}。",
+                "triggered": "触发警报时将 {entity} 设置为 {state}。",
+                "untriggered": "警报解除时将 {entity} 设置为 {state}。",
+                "arm_failure": "警戒失败时将 {entity} 设置为 {state}。",
+                "arming": "警戒延迟开始时将 {entity} 设置为 {state}。",
+                "pending": "警报即将触发时将 {entity} 设置为 {state}。"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
