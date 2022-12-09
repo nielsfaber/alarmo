@@ -5,6 +5,7 @@ import re
 from homeassistant.core import (
     HomeAssistant,
     callback,
+    SERVICE_CALL_LIMIT,
 )
 
 from homeassistant.const import (
@@ -12,18 +13,15 @@ from homeassistant.const import (
     CONF_SERVICE_DATA,
     ATTR_ENTITY_ID,
     CONF_TYPE,
-    # STATE_UNKNOWN,
-    # STATE_OPEN,
-    # STATE_CLOSED,
 )
 
 from homeassistant.components.notify import ATTR_MESSAGE
-from homeassistant.helpers.service import async_call_from_config
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
 from homeassistant.components.binary_sensor.device_condition import (
     ENTITY_CONDITIONS,
 )
+from homeassistant.exceptions import HomeAssistantError
 
 from . import const
 from .alarm_control_panel import AlarmoBaseEntity
@@ -159,71 +157,74 @@ class AutomationHandler:
 
     async def async_execute_automation(self, automation_id: str, alarm_entity: AlarmoBaseEntity):
         # automation is a dict of AutomationEntry
-        _LOGGER.debug("executing automation {}".format(automation_id))
+        _LOGGER.debug("Executing automation {}".format(automation_id))
 
         actions = self._config[automation_id][const.ATTR_ACTIONS]
         for action in actions:
 
-            service_call = {
-                "service": action[ATTR_SERVICE]
-            }
-            if ATTR_ENTITY_ID in action and action[ATTR_ENTITY_ID]:
-                service_call["entity_id"] = action[ATTR_ENTITY_ID]
+            try:
+                service_data = copy.copy(action[CONF_SERVICE_DATA])
 
-            if (
-                self._config[automation_id][CONF_TYPE] == const.ATTR_NOTIFICATION
-                and ATTR_MESSAGE in action[CONF_SERVICE_DATA]
-            ):
-                data = copy.copy(action[CONF_SERVICE_DATA])
+                if ATTR_ENTITY_ID in action and action[ATTR_ENTITY_ID]:
+                    service_data[ATTR_ENTITY_ID] = action[ATTR_ENTITY_ID]
 
-                res = re.search(r'{{open_sensors(\|lang=([^}]+))?(\|format=short)?}}', data[ATTR_MESSAGE])
-                if res:
-                    lang = res.group(2) if res.group(2) else "en"
-                    names_only = True if res.group(3) else False
+                if (
+                    self._config[automation_id][CONF_TYPE] == const.ATTR_NOTIFICATION
+                    and ATTR_MESSAGE in service_data
+                ):
+                    res = re.search(r'{{open_sensors(\|lang=([^}]+))?(\|format=short)?}}', service_data[ATTR_MESSAGE])
+                    if res:
+                        lang = res.group(2) if res.group(2) else "en"
+                        names_only = True if res.group(3) else False
 
-                    open_sensors = ""
-                    if alarm_entity.open_sensors:
-                        parts = []
-                        for (entity_id, status) in alarm_entity.open_sensors.items():
-                            if names_only:
-                                parts.append(friendly_name_for_entity_id(entity_id, self.hass))
-                            else:
-                                parts.append(await self.async_get_open_sensor_string(entity_id, status, lang))
-                        open_sensors = ", ".join(parts)
+                        open_sensors = ""
+                        if alarm_entity.open_sensors:
+                            parts = []
+                            for (entity_id, status) in alarm_entity.open_sensors.items():
+                                if names_only:
+                                    parts.append(friendly_name_for_entity_id(entity_id, self.hass))
+                                else:
+                                    parts.append(await self.async_get_open_sensor_string(entity_id, status, lang))
+                            open_sensors = ", ".join(parts)
 
-                    data[ATTR_MESSAGE] = data[ATTR_MESSAGE].replace(res.group(0), open_sensors)
+                        service_data[ATTR_MESSAGE] = service_data[ATTR_MESSAGE].replace(res.group(0), open_sensors)
 
-                if "{{bypassed_sensors}}" in data[ATTR_MESSAGE]:
-                    bypassed_sensors = ""
-                    if alarm_entity.bypassed_sensors and len(alarm_entity.bypassed_sensors):
-                        parts = []
-                        for entity_id in alarm_entity.bypassed_sensors:
-                            name = friendly_name_for_entity_id(entity_id, self.hass)
-                            parts.append(name)
-                        bypassed_sensors = ", ".join(parts)
+                    if "{{bypassed_sensors}}" in service_data[ATTR_MESSAGE]:
+                        bypassed_sensors = ""
+                        if alarm_entity.bypassed_sensors and len(alarm_entity.bypassed_sensors):
+                            parts = []
+                            for entity_id in alarm_entity.bypassed_sensors:
+                                name = friendly_name_for_entity_id(entity_id, self.hass)
+                                parts.append(name)
+                            bypassed_sensors = ", ".join(parts)
 
-                    data[ATTR_MESSAGE] = data[ATTR_MESSAGE].replace("{{bypassed_sensors}}", bypassed_sensors)
+                        service_data[ATTR_MESSAGE] = service_data[ATTR_MESSAGE].replace("{{bypassed_sensors}}", bypassed_sensors)
 
-                res = re.search(r'{{arm_mode(\|lang=([^}]+))?}}', data[ATTR_MESSAGE])
-                if res:
-                    lang = res.group(2) if res.group(2) else "en"
-                    arm_mode = await self.async_get_arm_mode_string(alarm_entity.arm_mode, lang)
+                    res = re.search(r'{{arm_mode(\|lang=([^}]+))?}}', service_data[ATTR_MESSAGE])
+                    if res:
+                        lang = res.group(2) if res.group(2) else "en"
+                        arm_mode = await self.async_get_arm_mode_string(alarm_entity.arm_mode, lang)
 
-                    data[ATTR_MESSAGE] = data[ATTR_MESSAGE].replace(res.group(0), arm_mode)
+                        service_data[ATTR_MESSAGE] = service_data[ATTR_MESSAGE].replace(res.group(0), arm_mode)
 
-                if "{{changed_by}}" in data[ATTR_MESSAGE]:
-                    changed_by = alarm_entity.changed_by if alarm_entity.changed_by else ""
-                    data[ATTR_MESSAGE] = data[ATTR_MESSAGE].replace("{{changed_by}}", changed_by)
+                    if "{{changed_by}}" in service_data[ATTR_MESSAGE]:
+                        changed_by = alarm_entity.changed_by if alarm_entity.changed_by else ""
+                        service_data[ATTR_MESSAGE] = service_data[ATTR_MESSAGE].replace("{{changed_by}}", changed_by)
 
-                service_call[CONF_SERVICE_DATA] = data
+                domain, service = action[ATTR_SERVICE].split(".")
 
-            elif CONF_SERVICE_DATA in action:
-                service_call[CONF_SERVICE_DATA] = action[CONF_SERVICE_DATA]
-
-            await async_call_from_config(
-                self.hass,
-                service_call
-            )
+                await self.hass.async_create_task(
+                    self.hass.services.async_call(
+                        domain,
+                        service,
+                        service_data,
+                        blocking=True,
+                        context={},
+                        limit=SERVICE_CALL_LIMIT,
+                    )
+                )
+            except HomeAssistantError as e:
+                _LOGGER.error("Execution of action {} failed, reason: {}".format(automation_id, e))
 
     def get_automations_by_area(self, area_id: str):
         result = []
