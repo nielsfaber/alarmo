@@ -4,8 +4,8 @@
       "armed_away": "离家警戒",
       "armed_home": "在家警戒",
       "armed_night": "夜间警戒",
-      "armed_custom_bypass": "自定义境界",
-      "armed_vacation": "假期境界"
+      "armed_custom_bypass": "自定义警戒",
+      "armed_vacation": "度假警戒"
     },
     "enabled": "已启用",
     "disabled": "已禁用"
@@ -40,7 +40,7 @@
           "fields": {
             "disarm_after_trigger": {
               "heading": "触发后解除警戒",
-              "description": "触发时间超时后解除警报，而不是返回到警戒状态。"
+              "description": "触发超时后解除警报，而不是返回到警戒状态。"
             },
             "enable_mqtt": {
               "heading": "启用MQTT",
@@ -66,7 +66,7 @@
             "armed_vacation": "度假警戒可以作为离家警戒模式的拓展，以应对长时间的离家情况。延迟时间和触发反应可以根据离家的时间按需调整。",
             "armed_custom_bypass": "一个额外的模式，用于定义你自己的警戒模式。"
           },
-          "number_sensors_active": "{number} {number, plural,\n  one {sensor}\n  other {sensors}\n} 激活",
+          "number_sensors_active": "{number} {number, plural,\n  one {传感器}\n  other {传感器}\n} 激活",
           "fields": {
             "status": {
               "heading": "状态",
@@ -123,8 +123,8 @@
           "table": {
             "remarks": "备注",
             "summary": "This area contains {summary_sensors} and {summary_automations}.",
-            "summary_sensors": "{number} {number, plural,\n  one {sensor}\n  other {sensors}\n}",
-            "summary_automations": "{number} {number, plural,\n  one {automation}\n  other {automations}\n}"
+            "summary_sensors": "{number} {number, plural,\n  one {传感器}\n  other {传感器}\n}",
+            "summary_automations": "{number} {number, plural,\n  one {自动化}\n  other {自动化}\n}"
           },
           "actions": {
             "add": "添加"
@@ -271,7 +271,7 @@
         "manage_groups": {
           "title": "管理传感器群组",
           "description": "在一个传感器群组中，多个传感器必须在一个时间段内被触发，才能触发警报。",
-          "no_items": "尚无群组",
+          "no_items": "无群组",
           "actions": {
             "new_group": "新群组"
           }
@@ -318,7 +318,7 @@
             },
             "code_format": {
               "heading": "密码格式",
-              "description": "设置Lovelace alarm card的输入类型。",
+              "description": "设置 Lovelace Alarm Card 的输入类型。",
               "code_format_number": "PIN码",
               "code_format_text": "密码"
             }
@@ -327,7 +327,7 @@
         "user_management": {
           "title": "用户管理",
           "description": "每个用户都有自己的密码来启用/解除警报。",
-          "no_items": "尚无用户",
+          "no_items": "无用户",
           "actions": {
             "new_user": "新用户"
           }
