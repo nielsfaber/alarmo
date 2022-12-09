@@ -26,7 +26,7 @@
       "filter": {
         "label": "过滤项目",
         "item": "通过{name}过滤",
-        "hidden_items": "{number} {number, plural,\n  one {item is}\n  other {items are}\n} 已隐藏"
+        "hidden_items": "{number} {number, plural,\n  one {项目}\n  other {项目}\n} 已隐藏"
       }
     }
   },
