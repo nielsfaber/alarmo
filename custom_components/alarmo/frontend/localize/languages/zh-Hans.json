@@ -26,7 +26,7 @@
       "filter": {
         "label": "过滤项目",
         "item": "通过{name}过滤",
-        "hidden_items": "{number} {number, plural,\n  1 {item is}\n  其他 {items are}\n} 已隐藏"
+        "hidden_items": "{number} {number, plural,\n  one {item is}\n  other {items are}\n} 已隐藏"
       }
     }
   },
@@ -66,7 +66,7 @@
             "armed_vacation": "度假警戒可以作为离家警戒模式的拓展，以应对长时间的离家情况。延迟时间和触发反应可以根据离家的时间按需调整。",
             "armed_custom_bypass": "一个额外的模式，用于定义你自己的警戒模式。"
           },
-          "number_sensors_active": "{number} {number, plural,\n  1 {sensor}\n  其他 {sensors}\n} 激活",
+          "number_sensors_active": "{number} {number, plural,\n  one {sensor}\n  other {sensors}\n} 激活",
           "fields": {
             "status": {
               "heading": "状态",
@@ -122,9 +122,9 @@
           "no_items": "目前还没有定义任何区域。",
           "table": {
             "remarks": "备注",
-            "summary": "当前区域包含 {summary_sensors} 和 {summary_automations}.",
-            "summary_sensors": "{number} {number, plural,\n  1 {sensor}\n  其他 {sensors}\n}",
-            "summary_automations": "{number} {number, plural,\n  1 {automation}\n  其他 {automations}\n}"
+            "summary": "This area contains {summary_sensors} and {summary_automations}.",
+            "summary_sensors": "{number} {number, plural,\n  one {sensor}\n  other {sensors}\n}",
+            "summary_automations": "{number} {number, plural,\n  one {automation}\n  other {automations}\n}"
           },
           "actions": {
             "add": "添加"

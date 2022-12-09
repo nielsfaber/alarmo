@@ -27,7 +27,7 @@ var languages: any = {
 };
 
 export function localize(string: string, language: string, ...args: any[]): string {
-  const lang = language.replace(/['"]+/g, '').replace('-', '_');
+  const lang = language.replace(/['"]+/g, '');
 
   var translated: string;
 
