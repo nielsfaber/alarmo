@@ -1,5 +1,3 @@
-
-
 on:
   release:
     types: [published]
@@ -21,9 +19,8 @@ jobs:
         
           cd custom_components/alarmo/
           zip ../../alarmo.zip ./* frontend/dist/* -x '.*'
-      - uses: gacts/upload-to-release@master
+      - uses: JasonEtco/upload-to-release@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          file: ./alarmo.zip
-          type: application/zip
+          args: ./alarmo.zip application/zip
