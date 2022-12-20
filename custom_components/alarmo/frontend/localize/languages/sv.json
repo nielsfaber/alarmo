@@ -246,7 +246,7 @@
             },
             "auto_bypass": {
               "heading": "Exkludera automatiskt",
-              "description": "Exkludera denna sensor fr¨ån larmet open den är öppen vid pålarmning.",
+              "description": "Exkludera denna sensor från larmet om den är öppen vid pålarmning.",
               "modes": "Lägen där sensor kan bli exkluderad"
             },
             "trigger_unavailable": {
