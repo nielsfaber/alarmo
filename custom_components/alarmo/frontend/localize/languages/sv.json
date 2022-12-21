@@ -39,8 +39,8 @@
           "description": "Denna panel definierar några globala inställningar för larmet.",
           "fields": {
             "disarm_after_trigger": {
-              "heading": "Larma av efter trigger",
-              "description": "Efter trigger tiden har gått ut, larma av larmet istället för att återgå till larmat läge."
+              "heading": "Larma av efter utlös",
+              "description": "Efter utlös tiden har gått ut, larma av larmet istället för att återgå till larmat läge."
             },
             "enable_mqtt": {
               "heading": "Aktivera MQTT",
@@ -48,7 +48,7 @@
             },
             "enable_master": {
               "heading": "Aktivera alarm master",
-              "description": "Skapar en entity för att kontrollera alla areor samtidigt."
+              "description": "Skapar en entity för att kontrollera alla områden samtidigt."
             }
           },
           "actions": {
@@ -63,7 +63,7 @@
             "armed_away": "Larmat borta används när alla personer lämnat huset. Alla dörrar och fönster som tillåter tillgång till huset kommer att larmas, det samma gäller rörelsesensorer inne i huset.",
             "armed_home": "Larmat hemma används när det finns personer kvar i huset. Alla dörrar och fönster som tillåter tillgång till huset kommer att larmas, dock inga rörelsesensorer inne i huset.",
             "armed_night": "Larmat natt används när du aktiverar larmen innan du lägger dig. Alla dörrar och fönster som tillåter tillgång till huset kommer att larmas, det samma gäller utvalda rörelsesensorer inne i huset.",
-            "armed_vacation": "Larmat semester kan användas som en förlängning av läget för larmat borta vid längre frånvaro. Fördröjningstiderna och triggersvaren kan anpassas (efter önskemål) för att vara borta längre tid från hemmet.",
+            "armed_vacation": "Larmat semester kan användas som en förlängning av läget för larmat borta vid längre frånvaro. Fördröjningstiderna och utlössvaren kan anpassas (efter önskemål) för att vara borta längre tid från hemmet.",
             "armed_custom_bypass": "Ett extra läge för för att definiera sin egen säkerhetsperimeter."
           },
           "number_sensors_active": "{number} {number, plural,\n  en {sensor}\n  other {sensorer}\n} aktiv",
@@ -74,15 +74,15 @@
             },
             "exit_delay": {
               "heading": "Lämna fördröjning",
-              "description": "Efter att du har aktiverat larmet kommer dina sensorer inte trigga ditt larm inom denna tid."
+              "description": "Efter att du har aktiverat larmet kommer dina sensorer inte utlösa ditt larm inom denna tid."
             },
             "entry_delay": {
               "heading": "Ankomst fördröjning",
               "description": "Fördröjning i tid tills att ditt larm triggas efter att en av dina sensorer har aktiverats."
             },
             "trigger_time": {
-              "heading": "Trigger tid",
-              "description": "Tid som ditt larm kommer vara i triggat läge efter att ett larm har triggats."
+              "heading": "Utlös tid",
+              "description": "Tid som ditt larm kommer vara i utlöst läge efter att ett larm har utlösts."
             }
           }
         },
@@ -140,7 +140,7 @@
         },
         "edit_area": {
           "title": "Redigera område ''{area}''",
-          "name_warning": "OBS: Ändrar du namn kommer entity ID att ändras"
+          "name_warning": "OBS: Ändrar du namn kommer entitetens ID att ändras"
         },
         "remove_area": {
           "title": "Ta bort område?",
@@ -151,7 +151,7 @@
         },
         "disable_master": {
           "title": "Inaktivera master?",
-          "description": "Är du säker att du vill ta bort master alarm? Denna area innehåller {automations} automationer, som kommer att tas bort med detta val."
+          "description": "Är du säker att du vill ta bort master alarm? Detta område innehåller {automations} automationer, som kommer att tas bort med detta val."
         }
       }
     },
@@ -170,7 +170,7 @@
         "add_sensors": {
           "title": "Lägg till sensorer",
           "description": "Lägg till mer sensorer. Säkerställ att dina sensorer har ett friendly_name, så du kan identifiera dem.",
-          "no_items": "Det finns inga tillgängliga HA entities som kan konfigureras för larmet. Säkerställ att inkludera entities av type binary_sensor.",
+          "no_items": "Det finns inga tillgängliga HA entities som kan konfigureras för larmet. Säkerställ att inkludera entiteter av typen binary_sensor.",
           "table": {
             "type": "Detekteringstyp"
           },
@@ -222,7 +222,7 @@
             },
             "always_on": {
               "heading": "Larma alltid",
-              "description": "Sensorn ska alltid trigga larmet."
+              "description": "Sensorn ska alltid utlösa larmet."
             },
             "modes": {
               "heading": "Aktiverat läge",
@@ -238,7 +238,7 @@
             },
             "use_entry_delay": {
               "heading": "Använd ankomst fördröjning",
-              "description": "Sensor aktivering triggar larmet after ankomst fördröjningen istället för direkt."
+              "description": "Sensor aktivering utlöser larmet efter ankomst fördröjningen istället för direkt."
             },
             "allow_open": {
               "heading": "Tillåt öppnad efter larmning.",
@@ -285,7 +285,7 @@
             },
             "timeout": {
               "heading": "Time-out",
-              "description": "Tidsperiod för de sammankopplade sensorernas aktivitet ska trigga larmet."
+              "description": "Tidsperiod för de sammankopplade sensorernas aktivitet ska utlösa larmet."
             },
             "sensors": {
               "heading": "Sensorer",
@@ -388,7 +388,7 @@
       "cards": {
         "notifications": {
           "title": "Notifikationer",
-          "description": "Du använder denna panel för att hantera notifikationer som ska sändas vid utvalda larmevents.",
+          "description": "Du använder denna panel för att hantera notifikationer som ska skickas vid utvalda larmevents.",
           "table": {
             "no_items": "Det är inga notifikationer skapade än.",
             "no_area_warning": "Åtgärd är inte tilldelad till något område."
@@ -426,16 +426,16 @@
                   "description": "Larmet är inaktiverat"
                 },
                 "triggered": {
-                  "name": "Larmet har triggats",
-                  "description": "Larmet har triggats"
+                  "name": "Larmet har utlösts",
+                  "description": "Larmet har utlösts"
                 },
                 "untriggered": {
-                  "name": "Alarm not longer triggered",
-                  "description": "The triggered state of the alarm has ended"
+                  "name": "Larmet inte längre utlöst",
+                  "description": "Larmet inte längre utlöst"
                 },
                 "arm_failure": {
                   "name": "Misslyckas att aktivera larm",
-                  "description": "Larmet misslyckas att kativeras på grund av någon sensor"
+                  "description": "Larmet misslyckas att aktiveras på grund av någon sensor"
                 },
                 "arming": {
                   "name": "Lämna fördröjning startas",
@@ -462,11 +462,11 @@
               "placeholders": {
                 "armed": "Larmet har bytt status till {{arm_mode}}",
                 "disarmed": "Larmet är nu AVSTÄNGT",
-                "triggered": "Larmet har triggats! Anledning: {{open_sensors}}.",
-                "untriggered": "The alarm is not longer triggered.",
+                "triggered": "Larmet har utlösts! Anledning: {{open_sensors}}.",
+                "untriggered": "Larmet inte längre utlöst.",
                 "arm_failure": "Larmet kunde inte aktiveras nu, detta på grund av: {{open_sensors}}.",
                 "arming": "Larmet kommer aktiveras snart, lämna huset.",
-                "pending": "Larmet kommer snart triggas, inaktivera larmet snarast!"
+                "pending": "Larmet kommer snart utlösas, inaktivera larmet snarast!"
               }
             },
             "open_sensors_format": {
@@ -491,8 +491,8 @@
               "placeholders": {
                 "armed": "Notifiera {target} vid aktivering av larm",
                 "disarmed": "Notifiera {target} vid inaktivering av larm",
-                "triggered": "Notifiera {target} vid triggning av larm",
-                "untriggered": "Notify {target} when triggering stops",
+                "triggered": "Notifiera {target} vid utlöst larm",
+                "untriggered": "Notifiera {target} när larm inte längre utlöst",
                 "arm_failure": "Notifiera {target} vid fel av larm",
                 "arming": "Notifiera {target} vid utpassering",
                 "pending": "Notifiera {target} vid ankomst"
@@ -509,7 +509,7 @@
         },
         "new_action": {
           "title": "Konfigurera action",
-          "description": "Aktivera lampor eller andra enheter som sirener eller högatalare vid aktivering/inaktivering av larmet, triggning av larmet osv.",
+          "description": "Aktivera lampor eller andra enheter som sirener eller högtalare vid aktivering/inaktivering av larmet, triggning av larmet osv.",
           "fields": {
             "event": {
               "heading": "Event",
@@ -538,8 +538,8 @@
               "placeholders": {
                 "armed": "Sätt {entity} till {state} vid aktivering av larmet",
                 "disarmed": "Sätt {entity} till {state} vid inaktivering av larmet",
-                "triggered": "Sätt {entity} till {state} när larmet triggas",
-                "untriggered": "Set {entity} to {state} when triggering stops",
+                "triggered": "Sätt {entity} till {state} när larmet utlöses",
+                "untriggered": "Sätt {entity} till {state} när larmet inte längre utlöst",
                 "arm_failure": "Sätt {entity} till {state} vid fel av larmet",
                 "arming": "Sätt {entity} till {state} vid utpassering",
                 "pending": "Sätt {entity} till {state} vid ankomst"
