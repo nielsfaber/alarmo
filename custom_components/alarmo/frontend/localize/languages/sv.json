@@ -398,7 +398,7 @@
           }
         },
         "actions": {
-          "description": "I denna panel kan du trigga olika beteende på enheter baserat på oliak events från ditt larm.",
+          "description": "I denna panel kan du trigga olika beteende på enheter baserat på olika events från ditt larm.",
           "table": {
             "no_items": "Det finns inga åtgärder skapade ännu."
           },
