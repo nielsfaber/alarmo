@@ -127,7 +127,7 @@
             "summary_automations": "{number} {number, plural,\n  one {automation}\n  other {automations}\n}"
           },
           "actions": {
-            "add": "Add"
+            "add": "Aggiungi"
           }
         }
       },
@@ -175,7 +175,7 @@
             "type": "Tipologia Innesco"
           },
           "actions": {
-            "add_to_alarm": "aggiungi all'allarme",
+            "add_to_alarm": "Aggiungi all'allarme",
             "filter_supported": "Nascondi elementi con tipologia sconosciuta"
           }
         },
