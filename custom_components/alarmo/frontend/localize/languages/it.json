@@ -229,8 +229,8 @@
               "description": "Modalità di allarme in cui il sensore risulta collegato."
             },
             "arm_on_close": {
-              "heading": "Attiva dopo chisura after closing",
-              "description": "Dopo la disattivazione di questo sensore il ritardo rimanente verrà automaticamente skippato."
+              "heading": "Attiva dopo chisura",
+              "description": "Dopo la disattivazione di questo sensore il ritardo rimanente verrà automaticamente ignorato."
             },
             "use_exit_delay": {
               "heading": "Usa Ritardo d'uscita",
