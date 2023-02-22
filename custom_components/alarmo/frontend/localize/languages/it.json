@@ -327,7 +327,7 @@
         "user_management": {
           "title": "Gestione utente",
           "description": "Ogni utente ha il suo codice per attivare/disattivare l'allarme.",
-          "no_items": "Non è stato creato nessun utente per ora",
+          "no_items": "Non è stato ancora creato nessun utente.",
           "actions": {
             "new_user": "Nuovo utente"
           }
@@ -390,7 +390,7 @@
           "title": "Notifiche",
           "description": "Con questo pannello puoi gestire le notifiche da inviare quanto accade un determinato evento",
           "table": {
-            "no_items": "Non è stata creata nessuna notifica per ora.",
+            "no_items": "Non è stata ancora creata nessuna notifica.",
             "no_area_warning": "Azione non assegnata a nessuna."
           },
           "actions": {
@@ -398,9 +398,9 @@
           }
         },
         "actions": {
-          "description": "Questo pannello è in fase di sviluppo. Sarà usato per cambiare lo stato di una o più entità.",
+          "description": "Questo pannello può essere usato per cambiare lo stato di una o più entità.",
           "table": {
-            "no_items": "Non è stata creata nessuna azione per ora."
+            "no_items": "Non è stata ancora creata nessuna azione."
           },
           "actions": {
             "new_action": "Nuova azione"
