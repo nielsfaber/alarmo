@@ -233,7 +233,7 @@
               "description": "Dopo la disattivazione di questo sensore il ritardo rimanente verrà automaticamente ignorato."
             },
             "use_exit_delay": {
-              "heading": "Usa Ritardo d'uscita",
+              "heading": "Usa ritardo d'uscita",
               "description": "Sensore che può rimanre attivo mentre il ritardo di uscita è in corso."
             },
             "use_entry_delay": {
