@@ -257,7 +257,7 @@
           "actions": {
             "toggle_advanced": "Impostazione avanzate",
             "remove": "Rimuovi",
-            "setup_groups": "Setup gruppi"
+            "setup_groups": "Configurazione gruppi"
           },
           "errors": {
             "description": "Per favore correggi i seguenti errori:",
