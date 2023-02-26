@@ -229,11 +229,11 @@
               "description": "Modalità di allarme in cui il sensore risulta collegato."
             },
             "arm_on_close": {
-              "heading": "Attiva dopo chisura after closing",
-              "description": "Dopo la disattivazione di questo sensore il ritardo rimanente verrà automaticamente skippato."
+              "heading": "Attiva dopo chisura",
+              "description": "Dopo la disattivazione di questo sensore il ritardo rimanente verrà automaticamente ignorato."
             },
             "use_exit_delay": {
-              "heading": "Usa Ritardo d'uscita",
+              "heading": "Usa ritardo d'uscita",
               "description": "Sensore che può rimanre attivo mentre il ritardo di uscita è in corso."
             },
             "use_entry_delay": {
@@ -245,9 +245,9 @@
               "description": "Consentire a questo sensore di rimanere attivo poco dopo essere usciti."
             },
             "auto_bypass": {
-              "heading": "Bypass automatico",
+              "heading": "Esclusione automatica",
               "description": "Escludi questo sensore dall'allarme se è aperto durante l'attivazione.",
-              "modes": "Modalità in cui il sensore può essere bypassato"
+              "modes": "Modalità in cui il sensore può essere escluso"
             },
             "trigger_unavailable": {
               "heading": "Fai scattare l'allarme quando non disponibile",
@@ -257,13 +257,13 @@
           "actions": {
             "toggle_advanced": "Impostazione avanzate",
             "remove": "Rimuovi",
-            "setup_groups": "Setup gruppi"
+            "setup_groups": "Configurazione gruppi"
           },
           "errors": {
             "description": "Per favore correggi i seguenti errori:",
             "no_area": "Nessuna area è selezionata",
             "no_modes": "Nessuna modalità è selezionata per la quale il sensore dovrebbe essere attivo",
-            "no_auto_bypass_modes": "Nessuna modalità è selezionata per il sensore che può essere automaticamente bypassato"
+            "no_auto_bypass_modes": "Nessuna modalità è selezionata per il sensore che può essere automaticamente escluso"
           }
         }
       },
@@ -327,7 +327,7 @@
         "user_management": {
           "title": "Gestione utente",
           "description": "Ogni utente ha il suo codice per attivare/disattivare l'allarme.",
-          "no_items": "Non è stato creato nessun utente per ora",
+          "no_items": "Non è stato ancora creato nessun utente.",
           "actions": {
             "new_user": "Nuovo utente"
           }
@@ -390,7 +390,7 @@
           "title": "Notifiche",
           "description": "Con questo pannello puoi gestire le notifiche da inviare quanto accade un determinato evento",
           "table": {
-            "no_items": "Non è stata creata nessuna notifica per ora.",
+            "no_items": "Non è stata ancora creata nessuna notifica.",
             "no_area_warning": "Azione non assegnata a nessuna."
           },
           "actions": {
@@ -398,9 +398,9 @@
           }
         },
         "actions": {
-          "description": "Questo pannello è in fase di sviluppo. Sarà usato per cambiare lo stato di una o più entità.",
+          "description": "Questo pannello può essere usato per cambiare lo stato di una o più entità.",
           "table": {
-            "no_items": "Non è stata creata nessuna azione per ora."
+            "no_items": "Non è stata ancora creata nessuna azione."
           },
           "actions": {
             "new_action": "Nuova azione"
