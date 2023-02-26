@@ -400,7 +400,7 @@
         "actions": {
           "description": "Ce panneau est  utilisé pour changer d'état les appareils de votre choix.",
           "table": {
-            "no_items": "Il n'y a aucune action de créer."
+            "no_items": "Il n'y a aucune action de créée."
           },
           "actions": {
             "new_action": "Nouvelle action"
