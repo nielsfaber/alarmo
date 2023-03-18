@@ -231,7 +231,7 @@ class MqttHandler:
         for item in const.COMMANDS:
             if item in payload_config and payload_config[item]:
                 command_payloads[item] = payload_config[item].lower()
-            elif item not in payload_config:
+            else:
                 command_payloads[item] = item.lower()
 
         if command not in list(command_payloads.values()):
