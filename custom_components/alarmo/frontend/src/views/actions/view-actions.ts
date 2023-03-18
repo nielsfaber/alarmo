@@ -114,17 +114,17 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
                 `
               : item.type == EAutomationTypes.Notification
               ? html`
-                  <ha-icon icon="hass:message-text-outline"></ha-icon>
+                  <ha-icon icon="hass:message-text-outline"  class="${!item.enabled ? 'disabled' : ''}"></ha-icon>
                 `
               : html`
-                  <ha-icon icon="hass:flash"></ha-icon>
+                  <ha-icon icon="hass:flash"  class="${!item.enabled ? 'disabled' : ''}"></ha-icon>
                 `,
         },
         name: {
           title: this.hass.localize('ui.components.area-picker.add_dialog.name'),
           renderer: (item: AlarmoAutomation & { area: string }) => html`
             ${item.area == noArea && !this.config.master.enabled ? warningTooltip() : ''}
-            <span>${item.name}</span>
+            <span class="${!item.enabled ? 'disabled' : ''}">${item.name}</span>
           `,
           width: '40%',
           grow: true,
