@@ -81,8 +81,8 @@
               "description": "Temps d'attente avant que l'alarme ne se déclenche après détection d'un des capteurs."
             },
             "trigger_time": {
-              "heading": "Temps de fonctionnement",
-              "description": "Temps de fonctionnement de la sirène"
+              "heading": "Temps de fonctionnement avant réarmement",
+              "description": "Temps pendant lequel l'alarme restera dans l'état déclenché après intrusion"
             }
           }
         },
