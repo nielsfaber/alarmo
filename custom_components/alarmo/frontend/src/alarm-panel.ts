@@ -33,7 +33,7 @@ export class MyAlarmPanel extends LitElement {
   }
 
   render() {
-    if (!customElements.get('ha-app-layout') || !this.userConfig)
+    if (!customElements.get('ha-panel-config') || !this.userConfig)
       return html`
         loading...
       `;
@@ -41,38 +41,37 @@ export class MyAlarmPanel extends LitElement {
     const path = getPath();
 
     return html`
-      <ha-app-layout>
-        <app-header fixed slot="header">
-          <app-toolbar>
-            <ha-menu-button .hass=${this.hass} .narrow=${this.narrow}></ha-menu-button>
-            <div main-title>
-              ${localize('title', this.hass.language)}
-            </div>
-            <div class="version">
-              v${VERSION}
-            </div>
-          </app-toolbar>
-          <ha-tabs
-            scrollable
-            attr-for-selected="page-name"
-            .selected=${path.page}
-            @iron-activate=${this.handlePageSelected}
-          >
-            <paper-tab page-name="general">
-              ${localize('panels.general.title', this.hass.language)}
-            </paper-tab>
-            <paper-tab page-name="sensors">
-              ${localize('panels.sensors.title', this.hass.language)}
-            </paper-tab>
-            <paper-tab page-name="codes">
-              ${localize('panels.codes.title', this.hass.language)}
-            </paper-tab>
-            <paper-tab page-name="actions">
-              ${localize('panels.actions.title', this.hass.language)}
-            </paper-tab>
-          </ha-tabs>
-        </app-header>
-      </ha-app-layout>
+      <div class="header">
+        <div class="toolbar">
+          <ha-menu-button .hass=${this.hass} .narrow=${this.narrow}></ha-menu-button>
+          <div class="main-title">
+            ${localize('title', this.hass.language)}
+          </div>
+          <div class="version">
+            v${VERSION}
+          </div>
+        </div>
+
+        <ha-tabs
+          scrollable
+          attr-for-selected="page-name"
+          .selected=${path.page}
+          @iron-activate=${this.handlePageSelected}
+        >
+          <paper-tab page-name="general">
+            ${localize('panels.general.title', this.hass.language)}
+          </paper-tab>
+          <paper-tab page-name="sensors">
+            ${localize('panels.sensors.title', this.hass.language)}
+          </paper-tab>
+          <paper-tab page-name="codes">
+            ${localize('panels.codes.title', this.hass.language)}
+          </paper-tab>
+          <paper-tab page-name="actions">
+            ${localize('panels.actions.title', this.hass.language)}
+          </paper-tab>
+        </ha-tabs>
+      </div>
       <div class="view">
         ${this.getView(path)}
       </div>
@@ -126,26 +125,25 @@ export class MyAlarmPanel extends LitElement {
         color: var(--primary-text-color);
         --paper-card-header-color: var(--primary-text-color);
       }
-
-      app-header,
-      app-toolbar {
+      .header {
         background-color: var(--app-header-background-color);
-        font-weight: 400;
         color: var(--app-header-text-color, white);
+        border-bottom: var(--app-header-border-bottom, none);
       }
-      app-toolbar {
+      .toolbar {
         height: var(--header-height);
+        display: flex;
+        align-items: center;
+        font-size: 20px;
+        padding: 0 16px;
+        font-weight: 400;
+        box-sizing: border-box;
       }
-
-      ha-app-layout {
-        display: block;
-        z-index: 2;
+      .main-title {
+        margin: 0 0 0 24px;
+        line-height: 20px;
+        flex-grow: 1;
       }
-
-      app-toolbar [main-title] {
-        margin-left: 20px;
-      }
-
       ha-tabs {
         margin-left: max(env(safe-area-inset-left), 24px);
         margin-right: max(env(safe-area-inset-right), 24px);

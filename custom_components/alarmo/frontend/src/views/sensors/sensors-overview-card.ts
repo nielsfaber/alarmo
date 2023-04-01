@@ -1,13 +1,13 @@
 import { HomeAssistant, navigate } from 'custom-card-helpers';
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
-import { css, CSSResultGroup, html, LitElement, TemplateResult } from 'lit';
+import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators';
 
 import { localize } from '../../../localize/localize';
 import { TableColumn, TableData, TableFilterConfig } from '../../components/alarmo-table';
 import { ESensorIcons, ESensorTypes } from '../../const';
 import { fetchAreas, fetchSensors, saveSensor } from '../../data/websockets';
-import { computeIcon, computeName, handleError, isDefined, prettyPrint, sortAlphabetically } from '../../helpers';
+import { computeName, handleError, sortAlphabetically } from '../../helpers';
 import { commonStyle } from '../../styles';
 import { SubscribeMixin } from '../../subscribe-mixin';
 import { AlarmoArea, AlarmoSensor, Dictionary, EArmModes } from '../../types';
@@ -85,9 +85,9 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
 
   private tableColumns(): Dictionary<TableColumn> {
     const warningTooltip = () => html`
-      <paper-tooltip animation-delay="0">
+      <simple-tooltip animation-delay="0">
         ${localize('panels.sensors.cards.sensors.table.no_area_warning', this.hass.language)}
-      </paper-tooltip>
+      </simple-tooltip>
     `;
 
     return {
@@ -103,14 +103,14 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
                 <ha-icon icon="mdi:alert" style="color: var(--error-color)"></ha-icon>
               `
             : html`
-                <paper-tooltip animation-delay="0">
+                <simple-tooltip animation-delay="0">
                   ${stateObj
                     ? localize(
                         `panels.sensors.cards.editor.fields.device_type.choose.${data.type}.name`,
                         this.hass!.language
                       )
                     : this.hass.localize('state_badge.default.entity_not_found')}
-                </paper-tooltip>
+                </simple-tooltip>
                 <ha-icon icon="${icon}" class="${!data.enabled ? 'disabled' : ''}"></ha-icon>
               `;
         },
@@ -160,11 +160,11 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
   }
 
   private getTableData(): Record<string, any>[] {
-    let sensorsList = Object.keys(this.sensors).map(id => {
+    const sensorsList = Object.keys(this.sensors).map(id => {
       const stateObj = this.hass!.states[id];
       const config = this.sensors[id];
       const modesList = config.area ? modesByArea(this.areas[config.area]) : getModesList(this.areas);
-      let res: TableData & { name: string } = {
+      const res: TableData & { name: string } = {
         ...config,
         id: id,
         name: computeName(stateObj),
@@ -187,7 +187,7 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
   }
 
   removeCustomName(id: string) {
-    let data = {
+    const data = {
       entity_id: id,
       name: '',
     };

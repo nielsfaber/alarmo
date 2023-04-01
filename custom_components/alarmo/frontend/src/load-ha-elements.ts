@@ -1,46 +1,37 @@
-
 export const loadHaForm = async () => {
-  if (customElements.get("ha-checkbox") && customElements.get("ha-slider")) return;
+  if (customElements.get('ha-checkbox') && customElements.get('ha-slider')) return;
 
-  await customElements.whenDefined("partial-panel-resolver");
+  await customElements.whenDefined('partial-panel-resolver');
   const ppr = document.createElement('partial-panel-resolver') as any;
   ppr.hass = {
-    panels: [{
-      url_path: "tmp",
-      component_name: "config",
-    }]
+    panels: [
+      {
+        url_path: 'tmp',
+        component_name: 'config',
+      },
+    ],
   };
   ppr._updateRoutes();
   await ppr.routerOptions.routes.tmp.load();
 
-  await customElements.whenDefined("ha-panel-config");
-  const cpr = document.createElement("ha-panel-config") as any;
+  await customElements.whenDefined('ha-panel-config');
+
+  const cpr = document.createElement('ha-panel-config') as any;
   await cpr.routerOptions.routes.automation.load();
-
-  ppr.hass = {
-    panels: [{
-      url_path: "tmp",
-      component_name: "developer-tools",
-    }]
-  };
-  ppr._updateRoutes();
-  await ppr.routerOptions.routes.tmp.load();
-
-  await customElements.whenDefined("ha-app-layout");
-}
+};
 
 export const loadHaYamlEditor = async () => {
-  if (customElements.get("ha-yaml-editor")) return;
+  if (customElements.get('ha-yaml-editor')) return;
 
   // Load in ha-yaml-editor from developer-tools-service
-  const ppResolver = document.createElement("partial-panel-resolver");
+  const ppResolver = document.createElement('partial-panel-resolver');
   const routes = (ppResolver as any).getRoutes([
     {
-      component_name: "developer-tools",
-      url_path: "a",
+      component_name: 'developer-tools',
+      url_path: 'a',
     },
   ]);
   await routes?.routes?.a?.load?.();
-  const devToolsRouter = document.createElement("developer-tools-router");
+  const devToolsRouter = document.createElement('developer-tools-router');
   await (devToolsRouter as any)?.routerOptions?.routes?.service?.load?.();
 };
