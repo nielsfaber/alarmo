@@ -1,5 +1,6 @@
 import * as ca from './languages/ca.json';
 import * as cs from './languages/cs.json';
+import * as de from './languages/de.json';
 import * as en from './languages/en.json';
 import * as es from './languages/es.json';
 import * as et from './languages/et.json';
@@ -16,6 +17,7 @@ import IntlMessageFormat from 'intl-messageformat';
 var languages: any = {
   ca: ca,
   cs: cs,
+  de: de,
   en: en,
   et: et,
   es: es,
