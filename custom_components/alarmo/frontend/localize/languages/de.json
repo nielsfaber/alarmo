@@ -1,0 +1,553 @@
+{
+  "common": {
+    "modes_short": {
+      "armed_away": "Abwesend",
+      "armed_home": "Zuhause",
+      "armed_night": "Nacht",
+      "armed_custom_bypass": "Benutzerdefiniert",
+      "armed_vacation": "Urlaub"
+    },
+    "enabled": "Aktiviert",
+    "disabled": "Deaktiviert"
+  },
+  "components": {
+    "time_slider": {
+      "seconds": "s",
+      "minutes": "m",
+      "infinite": "unendlich",
+      "none": "keine"
+    },
+    "editor": {
+      "ui_mode": "Zu UI",
+      "yaml_mode": "Zu YAML",
+      "edit_in_yaml": "In YAML bearbeiten"
+    },
+    "table": {
+      "filter": {
+        "label": "Elemente filtern",
+        "item": "Filtern nach {name}",
+        "hidden_items": "{number} {number, plural,\n  ein {item is}\n  {items are}\n} versteckt"
+      }
+    }
+  },
+  "title": "Alarm Panel",
+  "panels": {
+    "general": {
+      "title": "Allgemein",
+      "cards": {
+        "general": {
+          "description": "Dieses Panel legt globale Einstellungen für den Alarm fest.",
+          "fields": {
+            "disarm_after_trigger": {
+              "heading": "Entschärfen nach Auslösung",
+              "description": "Nach Ablauf der Auslösezeit wird der Alarm entschärft, anstatt in den scharfen Zustand zurückzukehren."
+            },
+            "enable_mqtt": {
+              "heading": "MQTT aktivieren",
+              "description": "Erlaubt die Steuerung der Alarmzentrale über MQTT."
+            },
+            "enable_master": {
+              "heading": "Alarm-Master aktivieren",
+              "description": "Erzeugt eine Entität zur gleichzeitigen Kontrolle aller Bereiche."
+            }
+          },
+          "actions": {
+            "setup_mqtt": "MQTT Konfiguration",
+            "setup_master": "Master Konfiguration"
+          }
+        },
+        "modes": {
+          "title": "Modi",
+          "description": "Mit diesem Panel können die Scharfschaltmodi des Alarms eingestellt werden.",
+          "modes": {
+            "armed_away": "Armed away wird verwendet, wenn alle Personen das Haus verlassen haben. Alle Türen und Fenster, die den Zugang zum Haus ermöglichen, werden bewacht, ebenso wie die Bewegungsmelder im Haus.",
+            "armed_home": "Armed home (auch bekannt als armed stay) wird verwendet, wenn der Alarm ausgelöst wird, während sich Personen im Haus befinden. Alle Türen und Fenster, die den Zugang zum Haus ermöglichen, werden bewacht, aber nicht die Bewegungsmelder im Haus.",
+            "armed_night": "Armed night wird verwendet, wenn der Alarm vor dem Schlafengehen eingestellt wird. Alle Türen und Fenster, die den Zugang zum Haus ermöglichen, werden überwacht, und ausgewählte Bewegungssensoren (im Erdgeschoss) im Haus.",
+            "armed_vacation": "Armed vacation kann als Erweiterung des bewaffneten Abwesenheitsmodus bei längerer Abwesenheit verwendet werden. Die Verzögerungszeiten und Auslösereaktionen können (wie gewünscht) an die Abwesenheit angepasst werden.",
+            "armed_custom_bypass": "Ein zusätzlicher Modus, um Ihren eigenen Sicherheitsbereich zu definieren."
+          },
+          "number_sensors_active": "{number} {number, plural,\n  ein {sensor}\n  andere {sensors}\n} active",
+          "fields": {
+            "status": {
+              "heading": "Status",
+              "description": "Steuert, ob der Alarm in diesem Modus aktiviert werden kann."
+            },
+            "exit_delay": {
+              "heading": "Aktivierungsverzögerung",
+              "description": "Beim Scharfschalten des Alarms lösen die Sensoren innerhalb dieser Zeitspanne noch nicht den Alarm aus."
+            },
+            "entry_delay": {
+              "heading": "Auslöseverzögerung",
+              "description": "Verzögerungszeit bis zur Auslösung des Alarms, nachdem einer der Sensoren aktiviert wurde."
+            },
+            "trigger_time": {
+              "heading": "Auslösezeit",
+              "description": "Zeit, in der der Alarm nach der Aktivierung im ausgelösten Zustand bleibt."
+            }
+          }
+        },
+        "mqtt": {
+          "title": "MQTT Konfiguration",
+          "description": "Dieses Panel kann für die Konfiguration der MQTT-Schnittstelle verwendet werden.",
+          "fields": {
+            "state_topic": {
+              "heading": "Status-Topic",
+              "description": "Topic, unter dem Statusaktualisierungen veröffentlicht werden"
+            },
+            "event_topic": {
+              "heading": "Ereignis-Topic",
+              "description": "Topic, unter dem Alarmereignisse veröffentlicht werden"
+            },
+            "command_topic": {
+              "heading": "Kommando-Topic",
+              "description": "Topicauf das Alarmo bei Scharf-/Unscharfschaltbefehlen hört"
+            },
+            "require_code": {
+              "heading": "Require code",
+              "description": "Require the code to be sent with the command."
+            },
+            "state_payload": {
+              "heading": "Configure payload per state",
+              "item": "Define a payload for state ''{state}''"
+            },
+            "command_payload": {
+              "heading": "Configure payload per command",
+              "item": "Define a payload for command ''{command}''"
+            }
+          }
+        },
+        "areas": {
+          "title": "Bereiche",
+          "description": "Bereiche können verwendet werden, um Ihr Alarmsystem zu unterteilen.",
+          "no_items": "Es sind noch keine Bereiche definiert.",
+          "table": {
+            "remarks": "Bemerkungen",
+            "summary": "Dieser Bereich enthält {summary_sensors} und {summary_automations}.",
+            "summary_sensors": "{number} {number, plural,\n  ein {sensor}\n  other {sensors}\n}",
+            "summary_automations": "{number} {number, plural,\n  eine {automation}\n  other {automations}\n}"
+          },
+          "actions": {
+            "add": "Hinzufügen"
+          }
+        }
+      },
+      "dialogs": {
+        "create_area": {
+          "title": "Neuer Bereich",
+          "fields": {
+            "copy_from": "Einstellungen kopieren von"
+          }
+        },
+        "edit_area": {
+          "title": "Bereich  ''{area}'' bearbeiten",
+          "name_warning": "Hinweis: Das Ändern des Namens ändert die Entity-ID!"
+        },
+        "remove_area": {
+          "title": "Bereich entfernen?",
+          "description": "Sind Sie sicher, dass Sie diesen Bereich entfernen möchten? Dieser Bereich enthält {sensors} Sensoren und {automations} Automationen, die ebenfalls entfernt werden."
+        },
+        "edit_master": {
+          "title": "Master-Konfiguration"
+        },
+        "disable_master": {
+          "title": "Master deaktivieren?",
+          "description": "Sind Sie sicher, dass Sie den Alarmmaster entfernen möchten? Dieser Bereich enthält {automations} Automatisierungen, die mit dieser Aktion entfernt werden."
+        }
+      }
+    },
+    "sensors": {
+      "title": "Sensoren",
+      "cards": {
+        "sensors": {
+          "description": "Derzeit konfigurierte Sensoren. Klicken Sie auf ein Element, um Änderungen vorzunehmen.	",
+          "table": {
+            "no_items": "Hier gibt es keine Sensoren, die angezeigt werden sollen.",
+            "no_area_warning": "Der Sensor ist keinem Bereich zugeordnet.",
+            "arm_modes": "Aktivierungsmodi",
+            "always_on": "(Always)"
+          }
+        },
+        "add_sensors": {
+          "title": "Sensoren hinzufügen",
+          "description": "Fügen Sie weitere Sensoren hinzu. Achten Sie darauf, dass Ihre Sensoren einen passenden Namen haben, damit Sie sie identifizieren können.",
+          "no_items": "Es gibt keine verfügbaren HA-Entitäten, die für den Alarm konfiguriert werden können. Stellen Sie sicher, dass Sie Entitäten des Typs binary_sensor einschließen.",
+          "table": {
+            "type": "Erkannter Typ"
+          },
+          "actions": {
+            "add_to_alarm": "zum Alarm hinzufügen",
+            "filter_supported": "Elemente mit unbekanntem Typ ausblenden"
+          }
+        },
+        "editor": {
+          "title": "Sensor bearbeiten",
+          "description": "Konfigurieren der Sensoreinstellungen von ''{entity}''.",
+          "fields": {
+            "area": {
+              "heading": "Bereich",
+              "description": "Wählen Sie einen Bereich, der diesen Sensor enthält."
+            },
+            "group": {
+              "heading": "Gruppieren",
+              "description": "Mit anderen Sensoren gruppieren für kombinierte Auslösung."
+            },
+            "device_type": {
+              "heading": "Gerätetyp",
+              "description": "Wählen Sie einen Gerätetyp, um die entsprechenden Einstellungen automatisch anzuwenden.",
+              "choose": {
+                "door": {
+                  "name": "Tü",
+                  "description": "Eine Tür, ein Tor oder ein anderer Eingang, die/das/der zum Betreten/Verlassen der Wohnung verwendet wird."
+                },
+                "window": {
+                  "name": "Fenster",
+                  "description": "Ein Fenster oder eine Tür, das/die nicht zum Betreten des Hauses verwendet wird, z. B. ein Balkon."
+                },
+                "motion": {
+                  "name": "Bewegung",
+                  "description": "Anwesenheitssensor oder ähnliches Gerät mit einer Verzögerung zwischen den Aktivierungen."
+                },
+                "tamper": {
+                  "name": "Sabotagekontakt",
+                  "description": "Detektor für das Entfernen der Sensorabdeckung, Glasbruchsensor usw."
+                },
+                "environmental": {
+                  "name": "Umwelt",
+                  "description": "Rauch-/Gassensor, Leckdetektor usw. (nicht im Zusammenhang mit Einbruchschutz)."
+                },
+                "other": {
+                  "name": "Allgemein"
+                }
+              }
+            },
+            "always_on": {
+              "heading": "Immer aktiv",
+              "description": "Der Sensor soll immer den Alarm auslösen."
+            },
+            "modes": {
+              "heading": "Aktivierte Modi",
+              "description": "Alarmmodi, in denen dieser Sensor aktiv ist."
+            },
+            "arm_on_close": {
+              "heading": "Scharfschalten nach Schließen",
+              "description": "Nach der Deaktivierung dieses Sensors wird die verbleibende Ausgangsverzögerung automatisch übersprungen."
+            },
+            "use_exit_delay": {
+              "heading": "Aktivierungsverzögerung verwenden",
+              "description": "Der Sensor darf aktiv sein, wenn die Aktivierungsverzögerung	 beginnt."
+            },
+            "use_entry_delay": {
+              "heading": "Auslöseverzögerung verwenden",
+              "description": "Die Sensoraktivierung löst den Alarm nach der Auslöseverzögerung aus und nicht direkt."
+            },
+            "allow_open": {
+              "heading": "Öffnen nach Scharfschaltung zulassen",
+              "description": "Der Ausgangszustand des Sensors wird beim Scharfschalten ignoriert."
+            },
+            "auto_bypass": {
+              "heading": "Automatische Umgehung",
+              "description": "Diesen Sensor vom Alarm ausschließen, wenn er während des Scharfschaltens offen ist.",
+              "modes": "Modi, in denen der Sensor umgangen werden kann"
+            },
+            "trigger_unavailable": {
+              "heading": "Auslösen, wenn nicht verfügbar",
+              "description": "Wenn der Sensorstatus 'nicht verfügbar' wird, wird der Sensor aktiviert."
+            }
+          },
+          "actions": {
+            "toggle_advanced": "Erweiterte Einstellungen",
+            "remove": "Entfernen",
+            "setup_groups": "Gruppen einrichten"
+          },
+          "errors": {
+            "description": "Bitte korrigieren Sie die folgenden Fehler:",
+            "no_area": "Es ist kein Bereich ausgewählt",
+            "no_modes": "Es sind keine Modi ausgewählt, für die der Sensor aktiv sein sollte",
+            "no_auto_bypass_modes": "Es sind keine Modi ausgewählt, für die der Sensor automatisch umgangen werden kann"
+          }
+        }
+      },
+      "dialogs": {
+        "manage_groups": {
+          "title": "Sensorgruppen verwalten",
+          "description": "In einer Sensorgruppe müssen mehrere Sensoren innerhalb eines Zeitraums aktiviert werden, bevor der Alarm ausgelöst wird.",
+          "no_items": "Noch keine Gruppen",
+          "actions": {
+            "new_group": "Neue Gruppe"
+          }
+        },
+        "create_group": {
+          "title": "Neue Sensorgruppe",
+          "fields": {
+            "name": {
+              "heading": "Name",
+              "description": "Name der Sensorgruppe"
+            },
+            "timeout": {
+              "heading": "Time-out",
+              "description": "Zeitspanne, in der aufeinanderfolgende Sensoraktivierungen den Alarm auslösen."
+            },
+            "sensors": {
+              "heading": "Sensoren",
+              "description": "Wählen Sie die Sensoren aus, die in dieser Gruppe enthalten sind."
+            }
+          },
+          "errors": {
+            "invalid_name": "Ungültiger Name angegeben.",
+            "insufficient_sensors": "Es müssen mindestens 2 Sensoren ausgewählt werden."
+          }
+        },
+        "edit_group": {
+          "title": "Sensorgruppe ''{name}'' bearbeiten"
+        }
+      }
+    },
+    "codes": {
+      "title": "Codes",
+      "cards": {
+        "codes": {
+          "description": "Einstellungen für den Code ändern.",
+          "fields": {
+            "code_arm_required": {
+              "heading": "Scharfschalt-Code verwenden",
+              "description": "Scharfschaltung erfordert einen Code"
+            },
+            "code_disarm_required": {
+              "heading": "Entschärfungscode verwenden",
+              "description": "Unscharfschaltung erfordert einen Code"
+            },
+            "code_format": {
+              "heading": "Code-Format",
+              "description": "Legt den Eingabetyp für die Lovelace-Alarmkarte fest.",
+              "code_format_number": "Pincode",
+              "code_format_text": "Passwort"
+            }
+          }
+        },
+        "user_management": {
+          "title": "Benutzerverwaltung",
+          "description": "Jeder Benutzer hat seinen eigenen Code zum Scharf-/Unscharfschalten des Alarms.",
+          "no_items": "Es sind noch keine Benutzer vorhanden",
+          "actions": {
+            "new_user": "neuer Benutzer"
+          }
+        },
+        "new_user": {
+          "title": "Neuen Benutzer anlegen",
+          "description": "Es können Benutzer angelegt werden, die Zugriff auf die Bedienung des Alarms haben.",
+          "fields": {
+            "name": {
+              "heading": "Name",
+              "description": "Name des Benutzers."
+            },
+            "code": {
+              "heading": "Code",
+              "description": "Code für diesen Benutzer."
+            },
+            "confirm_code": {
+              "heading": "Code wiederholen",
+              "description": "Geben Sie den Code erneut ein."
+            },
+            "can_arm": {
+              "heading": "Code für Scharfschaltung zulassen",
+              "description": "Durch Eingabe dieses Codes wird der Alarm aktiviert"
+            },
+            "can_disarm": {
+              "heading": "Code zur Entschärfung zulassen",
+              "description": "Durch Eingabe dieses Codes wird der Alarm deaktiviert"
+            },
+            "is_override_code": {
+              "heading": "Ist Übersteuerungs-Code",
+              "description": "Die Eingabe dieses Codes schaltet den Alarm zwangsweise scharf"
+            },
+            "area_limit": {
+              "heading": "Eingeschränkte Bereiche",
+              "description": "Beschränkung der Kontrolle des Benutzers auf die ausgewählten Bereiche"
+            }
+          },
+          "errors": {
+            "no_name": "Kein Name angegeben.",
+            "no_code": "Der Code sollte mindestens 4 Zeichen/Zahlen enthalten.",
+            "code_mismatch": "Die Codes stimmen nicht überein."
+          }
+        },
+        "edit_user": {
+          "title": "Nutzer bearbeiten",
+          "description": "Ändere die Konfiguration für den Nutzer ''{name}''.",
+          "fields": {
+            "old_code": {
+              "heading": "Aktueller Code",
+              "description": "Aktueller Code (leer lassen, um Code nicht zu ändern)."
+            }
+          }
+        }
+      }
+    },
+    "actions": {
+      "title": "Aktionen",
+      "cards": {
+        "notifications": {
+          "title": "Benachrichtigungen",
+          "description": "Mit diesem Panel können Sie Benachrichtigungen verwalten, die beim Auftreten eines bestimmten Alarmereignisses gesendet werden.",
+          "table": {
+            "no_items": "Es sind noch keine Benachrichtigungen erstellt worden.",
+            "no_area_warning": "Die Aktion ist keinem Bereich zugeordnet."
+          },
+          "actions": {
+            "new_notification": "neue Benachrichtigung"
+          }
+        },
+        "actions": {
+          "description": "Dieses Panel kann verwendet werden, um ein Gerät zu schalten, wenn sich der Alarmzustand ändert.",
+          "table": {
+            "no_items": "Es sind noch keine Aktionen erstellt worden."
+          },
+          "actions": {
+            "new_action": "neue Aktion"
+          }
+        },
+        "new_notification": {
+          "title": "Benachrichtigung konfigurieren",
+          "description": "Erhalten Sie eine Benachrichtigung beim Scharf-/Unscharfschalten des Alarms, bei Aktivierung usw.",
+          "trigger": "Bedingung",
+          "action": "Aktion",
+          "options": "Optionen",
+          "fields": {
+            "event": {
+              "heading": "Ereignis",
+              "description": "Wann soll die Benachrichtigung gesendet werden",
+              "choose": {
+                "armed": {
+                  "name": "Alarm ist scharf",
+                  "description": "Der Alarm wurde erfolgreich scharfgeschaltet"
+                },
+                "disarmed": {
+                  "name": "Alarm ist unscharf",
+                  "description": "Der Alarm wurde unscharf"
+                },
+                "triggered": {
+                  "name": "Alarm ist ausgelöst",
+                  "description": "Der Alarm wurde ausgelöst"
+                },
+                "untriggered": {
+                  "name": "Alarm ist nicht mehr ausgelöst",
+                  "description": "Der ausgelöste Zustand des Alarms ist beendet"
+                },
+                "arm_failure": {
+                  "name": "Scharfschaltung fehlgeschlagen",
+                  "description": "Die Scharfschaltung des Alarms ist aufgrund eines oder mehrerer offener Sensoren fehlgeschlagen"
+                },
+                "arming": {
+                  "name": "Aktivierungsverzögerung gestartet",
+                  "description": "Aktivierungsverzögerung ist gestartet, bereit, das Haus zu verlassen."
+                },
+                "pending": {
+                  "name": "Auslöseverzögerung gestartet",
+                  "description": "Auslöseverzögerung ist gestartet, der Alarm wird bald ausgelöst."
+                }
+              }
+            },
+            "mode": {
+              "heading": "Modus",
+              "description": "Beschränkung der Aktion auf bestimmte Alarm-Modi (optional)"
+            },
+            "title": {
+              "heading": "Titel",
+              "description": "Titel für die Benachrichtigungsmeldung"
+            },
+            "message": {
+              "heading": "Nachricht",
+              "description": "Inhalt der Benachrichtigungsmeldung",
+              "insert_wildcard": "Platzhalter einfügen",
+              "placeholders": {
+                "armed": "Der Alarm ist auf {{arm_mode}} eingestellt",
+                "disarmed": "Der Alarm ist jetzt AUS",
+                "triggered": "Der Alarm wurde ausgelöst! Ursache: {{open_sensors}}.",
+                "untriggered": "Der Alarm ist nicht mehr ausgelöst.",
+                "arm_failure": "Der Alarm konnte im Moment nicht scharfgeschaltet werden, aufgrund von: {{open_sensors}}.",
+                "arming": "Der Alarm wird bald scharf geschaltet, bitte verlassen Sie das Haus.",
+                "pending": "Der Alarm wird in Kürze ausgelöst, bitte entschärfen Sie ihn schnell!"
+              }
+            },
+            "open_sensors_format": {
+              "heading": "Format für open_sensors Platzhalter",
+              "description": "Wählen Sie, welche Sensorinformationen in die Nachricht eingefügt werden",
+              "options": {
+                "default": "Namen und Zustände",
+                "short": "Nur Namen"
+              }
+            },
+            "arm_mode_format": {
+              "heading": "Übersetzung für arm_mode Platzhalter",
+              "description": "Wählen Sie, in welcher Sprache der Scharfschaltungsmodus in die Nachricht eingefügt wird"
+            },
+            "target": {
+              "heading": "Ziel",
+              "description": "Gerät, an das die Benachrichtigung gesendet werden soll"
+            },
+            "name": {
+              "heading": "Name",
+              "description": "Beschreibung für diese Meldung",
+              "placeholders": {
+                "armed": "Benachrichtigt {target} beim Scharfschalten",
+                "disarmed": "Benachrichtigt {target} beim Entschärfen",
+                "triggered": "Benachrichtigt {target} bei Auslösung",
+                "untriggered": "Benachrichtigt {target}, wenn Auslösung beendet",
+                "arm_failure": "Benachrichtigt {target}, wenn Scharfschaltung nicht möglich",
+                "arming": "Benachrichtigt {target} bei Beginn Aktivierungsverzögerung",
+                "pending": "Benachrichtigt {target} bei Beginn Auslöseverzögerung"
+              }
+            },
+            "delete": {
+              "heading": "Automatisierung löschen",
+              "description": "Diese Automatisierung dauerhaft entfernen"
+            }
+          },
+          "actions": {
+            "test": "Testen"
+          }
+        },
+        "new_action": {
+          "title": "Aktion konfigurieren",
+          "description": "Schaltet Lichter oder Geräte (z. B. Sirenen) beim Scharf-/Unscharfschalten des Alarms, bei Aktivierung usw.",
+          "fields": {
+            "event": {
+              "heading": "Ereignis",
+              "description": "Wann soll die Aktion ausgeführt werden"
+            },
+            "area": {
+              "heading": "Bereich",
+              "description": "Bereich, für den das Ereignis gilt; leer lassen, um den globalen Alarm auszuwählen."
+            },
+            "mode": {
+              "heading": "Modus",
+              "description": "Beschränkung der Aktion auf bestimmte Alarm-Modi (optional)"
+            },
+            "entity": {
+              "heading": "Entität",
+              "description": "Entität, für die eine Aktion durchgeführt werden soll"
+            },
+            "action": {
+              "heading": "Aktion",
+              "description": "Aktion, die mit der Entität durchgeführt werden soll",
+              "no_common_actions": "Aktionen können nur im YAML-Modus für die ausgewählten Entitäten zugewiesen werden."
+            },
+            "name": {
+              "heading": "Name",
+              "description": "Beschreibung für diese Aktion",
+              "placeholders": {
+                "armed": "Setzt {entity} beim Scharfschalten auf {state}",
+                "disarmed": "Setzt {entity} bei Entschärfung auf {state}",
+                "triggered": "Setzt {entity} bei Auslösung auf {state}",
+                "untriggered": "Setzt {entity} auf {state}, wenn die Auslösung endet",
+                "arm_failure": "Setzt {entity} im Fehlerfall auf {state}",
+                "arming": "Setzt {entity} bei Beginn Aktivierungsverzögerung auf {state}",
+                "pending": "Setzt {entity} bei Beginn Auslöseverzögerung auf {state}"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
