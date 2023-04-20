@@ -66,7 +66,7 @@
             "armed_vacation": "Armed vacation kann als Erweiterung des bewaffneten Abwesenheitsmodus bei längerer Abwesenheit verwendet werden. Die Verzögerungszeiten und Auslösereaktionen können (wie gewünscht) an die Abwesenheit angepasst werden.",
             "armed_custom_bypass": "Ein zusätzlicher Modus, um Ihren eigenen Sicherheitsbereich zu definieren."
           },
-          "number_sensors_active": "{number} {number, plural,\n  ein {sensor}\n  andere {sensors}\n} active",
+          "number_sensors_active": "{number} {number, plural,\n one {Sensor}\n other {Sensoren}\n} aktiv",
           "fields": {
             "status": {
               "heading": "Status",
@@ -123,8 +123,8 @@
           "table": {
             "remarks": "Bemerkungen",
             "summary": "Dieser Bereich enthält {summary_sensors} und {summary_automations}.",
-            "summary_sensors": "{number} {number, plural,\n  ein {sensor}\n  other {sensors}\n}",
-            "summary_automations": "{number} {number, plural,\n  eine {automation}\n  other {automations}\n}"
+            "summary_sensors": "{number} {number, plural,\n  one {Sensor}\n  other {Sensoren}\n}",
+            "summary_automations": "{number} {number, plural,\n  one {Automation}\n  other {Automationen}\n}"
           },
           "actions": {
             "add": "Hinzufügen"
