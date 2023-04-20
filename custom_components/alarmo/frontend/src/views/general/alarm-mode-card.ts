@@ -95,7 +95,7 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
                   <alarmo-collapsible-header>
                     <ha-icon slot="icon" icon="${EArmModeIcons[k]}"></ha-icon>
                     <span slot="title">
-                      ${this.hass.localize(`component.alarm_control_panel.state._.${mode}`)}
+                      ${this.hass.localize(`component.alarm_control_panel.entity_component._.state.${mode}`)}
                     </span>
                     <span slot="description">
                       ${this.data[mode]?.enabled

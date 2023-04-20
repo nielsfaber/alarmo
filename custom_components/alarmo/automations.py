@@ -294,14 +294,17 @@ class AutomationHandler:
         else:
             translations = await self.hass.helpers.translation.async_get_translations(
                 language,
-                "state",
+                "entity_component",
                 ["alarm_control_panel"]
             )
 
             self._alarmTranslationCache = translations
             self._alarmTranslationLang = language
 
-        translation_key = "component.alarm_control_panel.state._.{}".format(arm_mode) if arm_mode else None
+        translation_key = (
+            "component.alarm_control_panel.entity_component._.state.{}".format(arm_mode)
+        ) if arm_mode else None
+
         if translation_key and translation_key in translations:
             return translations[translation_key]
         elif arm_mode:
