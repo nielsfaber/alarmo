@@ -159,7 +159,7 @@
       "title": "Sensoren",
       "cards": {
         "sensors": {
-          "description": "Derzeit konfigurierte Sensoren. Klicken Sie auf ein Element, um Änderungen vorzunehmen.	",
+          "description": "Derzeit konfigurierte Sensoren. Klicken Sie auf ein Element, um Änderungen vorzunehmen.",
           "table": {
             "no_items": "Hier gibt es keine Sensoren, die angezeigt werden sollen.",
             "no_area_warning": "Der Sensor ist keinem Bereich zugeordnet.",
@@ -234,7 +234,7 @@
             },
             "use_exit_delay": {
               "heading": "Aktivierungsverzögerung verwenden",
-              "description": "Der Sensor darf aktiv sein, wenn die Aktivierungsverzögerung	 beginnt."
+              "description": "Der Sensor darf aktiv sein, wenn die Aktivierungsverzögerung beginnt."
             },
             "use_entry_delay": {
               "heading": "Auslöseverzögerung verwenden",
