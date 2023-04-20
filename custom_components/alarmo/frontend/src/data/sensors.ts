@@ -44,6 +44,7 @@ export const sensorClassToType = (stateObj: HassEntity): ESensorTypes | undefine
     case 'door':
     case 'garage_door':
     case 'lock':
+    case 'opening':
       return ESensorTypes.Door;
     case 'window':
       return ESensorTypes.Window;
@@ -60,7 +61,6 @@ export const sensorClassToType = (stateObj: HassEntity): ESensorTypes | undefine
     case 'presence':
       return ESensorTypes.Motion;
     case 'sound':
-    case 'opening':
     case 'vibration':
     case 'tamper':
       return ESensorTypes.Tamper;
