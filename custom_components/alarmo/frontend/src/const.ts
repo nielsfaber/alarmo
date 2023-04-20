@@ -4,11 +4,11 @@ export const platform = 'alarmo';
 export const editConfigService = 'edit_config';
 
 export enum EArmModeIcons {
-  ArmedAway = 'hass:car-traction-control',
-  ArmedHome = 'hass:home-outline',
-  ArmedNight = 'hass:weather-night',
-  ArmedCustom = 'hass:star-outline',
-  ArmedVacation = 'hass:airplane-takeoff',
+  ArmedAway = 'mdi:lock',
+  ArmedHome = 'mdi:home',
+  ArmedNight = 'mdi:moon-waning-crescent',
+  ArmedCustom = 'mdi:shield',
+  ArmedVacation = 'mdi:airplane',
 }
 
 export enum AlarmStates {
