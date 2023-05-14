@@ -257,7 +257,7 @@ export const computeMergedActions = (...actionLists: string[][]) => {
 export const computeActions = (
   entity_id: string | undefined | (string | undefined)[],
   hass: HomeAssistant,
-  recursionDepth: number = 1
+  recursionDepth = 1
 ): string[] => {
   if (recursionDepth > 10) return [];
   if (Array.isArray(entity_id)) {
@@ -297,7 +297,7 @@ export const getAutomationEntities = (hass: HomeAssistant, additionalEntities?: 
 };
 
 export const getMediaPlayerEntities = (hass: HomeAssistant) => {
-  let entities = [...Object.keys(hass.states).filter(e => computeDomain(e) == 'media_player')];
+  const entities = [...Object.keys(hass.states).filter(e => computeDomain(e) == 'media_player')];
   entities.sort(sortAlphabetically);
   return entities;
 };

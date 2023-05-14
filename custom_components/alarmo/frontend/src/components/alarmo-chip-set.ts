@@ -39,13 +39,12 @@ export class AlarmoChipSet extends LitElement {
   private _itemChanged(ev: CustomEvent) {
     const value = (ev.target as HTMLInputElement).checked;
     const key = String(ev.detail);
-    if(this.selectable) {
+    if (this.selectable) {
       if (this.value.includes(key) && !value) this.value = this.value.filter(e => e != key);
       else if (!this.value.includes(key) && value) this.value = [...this.value, key];
       const myEvent = new CustomEvent('value-changed', { detail: this.value });
       this.dispatchEvent(myEvent);
-    }
-    else {
+    } else {
       const myEvent = new CustomEvent('value-changed', { detail: key });
       this.dispatchEvent(myEvent);
     }

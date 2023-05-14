@@ -18,22 +18,52 @@ export class CollapsibleSection extends LitElement {
       ${this.open
         ? html`
             <div class="header open">
-              <span @click=${() => { this.open = false; }}>${this.header}</span>
-              <ha-icon-button .path=${mdiChevronDown} @click=${() => { this.open = false; }}>
-              </ha-icon-button>
+              <span
+                @click=${() => {
+                  this.open = false;
+                }}
+              >
+                ${this.header}
+              </span>
+              <ha-icon-button
+                .path=${mdiChevronDown}
+                @click=${() => {
+                  this.open = false;
+                }}
+              ></ha-icon-button>
             </div>
             <slot></slot>
             <div class="header open">
-              <span @click=${() => { this.open = false; }}>${this.header}</span>
-              <ha-icon-button .path=${mdiChevronUp} @click=${() => { this.open = false; }}>
-              </ha-icon-button>
+              <span
+                @click=${() => {
+                  this.open = false;
+                }}
+              >
+                ${this.header}
+              </span>
+              <ha-icon-button
+                .path=${mdiChevronUp}
+                @click=${() => {
+                  this.open = false;
+                }}
+              ></ha-icon-button>
             </div>
           `
         : html`
             <div class="header">
-              <span @click=${() => { this.open = true; }}>${this.header}</span>
-              <ha-icon-button .path=${mdiChevronRight} @click=${() => { this.open = true; }}>
-              </ha-icon-button>
+              <span
+                @click=${() => {
+                  this.open = true;
+                }}
+              >
+                ${this.header}
+              </span>
+              <ha-icon-button
+                .path=${mdiChevronRight}
+                @click=${() => {
+                  this.open = true;
+                }}
+              ></ha-icon-button>
             </div>
           `}
     `;

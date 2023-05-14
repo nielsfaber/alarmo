@@ -14,7 +14,7 @@ import { property, customElement, state, query } from 'lit/decorators.js';
 import { fireEvent } from 'custom-card-helpers';
 import { mdiClose, mdiMenuUp, mdiMenuDown } from '@mdi/js';
 import { IsEqual, isDefined } from '../helpers';
-import { directive, Directive, DirectiveResult, PartInfo, PartType } from 'lit/node_modules/lit-html/directive';
+import { directive, Directive, DirectiveResult, PartInfo, PartType } from 'lit-html/directive';
 
 export type Option = {
   name: string;
@@ -22,6 +22,115 @@ export type Option = {
   value: string;
   icon?: string;
 };
+
+type ComboBox = HTMLElement & { renderer: Function; requestContentUpdate: Function };
+type ComboBoxItemModel<T> = { item: T };
+
+/**
+ * From lit-vaadin-helpers
+ */
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type AbstractLitRenderer = (...args: any[]) => TemplateResult;
+
+// A sentinel that indicates renderer hasn't been initialized
+const initialValue = {};
+
+export abstract class AbstractRendererDirective<T extends Element, R extends AbstractLitRenderer> extends Directive {
+  previousValue: unknown = initialValue;
+
+  constructor(part: PartInfo) {
+    super(part);
+    if (part.type !== PartType.ELEMENT) {
+      throw new Error('renderer only supports binding to element');
+    }
+  }
+
+  render(_renderer: R, _value?: unknown): typeof nothing {
+    return nothing;
+  }
+
+  update(part: ElementPart, [renderer, value]: [R, unknown]): unknown {
+    const firstRender = this.previousValue === initialValue;
+
+    if (!this.hasChanged(value)) {
+      return nothing;
+    }
+
+    // Copy the value if it's an array so that if it's mutated we don't forget
+    // what the previous values were.
+    this.previousValue = Array.isArray(value) ? Array.from(value) : value;
+
+    const element = part.element as T;
+
+    // TODO: support re-assigning renderer function.
+    if (firstRender) {
+      const host = part.options?.host;
+      this.addRenderer(element, renderer, { host });
+    } else {
+      this.runRenderer(element);
+    }
+
+    return nothing;
+  }
+
+  hasChanged(value: unknown): boolean {
+    let result = true;
+
+    if (Array.isArray(value)) {
+      // Dirty-check arrays by item
+      if (
+        Array.isArray(this.previousValue) &&
+        this.previousValue.length === value.length &&
+        value.every((v, i) => v === (this.previousValue as Array<unknown>)[i])
+      ) {
+        result = false;
+      }
+    } else if (this.previousValue === value) {
+      // Dirty-check non-arrays by identity
+      result = false;
+    }
+    return result;
+  }
+
+  /**
+   * Set renderer callback to the element.
+   */
+  abstract addRenderer(element: T, renderer: R, options: RenderOptions): void;
+
+  /**
+   * Run renderer callback on the element.
+   */
+  abstract runRenderer(element: T): void;
+}
+
+export type ComboBoxLitRenderer<T> = (item: T, model: ComboBoxItemModel<T>, comboBox: ComboBox) => TemplateResult;
+
+class ComboBoxRendererDirective extends AbstractRendererDirective<ComboBox, ComboBoxLitRenderer<unknown>> {
+  /**
+   * Set renderer callback to the element.
+   */
+  addRenderer<T>(element: ComboBox, renderer: ComboBoxLitRenderer<T>, options: RenderOptions) {
+    element.renderer = (root: HTMLElement, comboBox: ComboBox, model: ComboBoxItemModel<T>) => {
+      render(renderer.call(options.host, model.item, model, comboBox), root, options);
+    };
+  }
+
+  /**
+   * Run renderer callback on the element.
+   */
+  runRenderer(element: ComboBox) {
+    element.requestContentUpdate();
+  }
+}
+
+const rendererDirective = directive(ComboBoxRendererDirective);
+
+export const comboBoxRenderer = <T>(
+  renderer: ComboBoxLitRenderer<T>,
+  value?: unknown
+): DirectiveResult<typeof ComboBoxRendererDirective> =>
+  rendererDirective(renderer as ComboBoxLitRenderer<unknown>, value);
 
 @customElement('alarmo-select')
 export class AlarmoSelect extends LitElement {
@@ -280,112 +389,3 @@ export class AlarmoSelect extends LitElement {
     `;
   }
 }
-
-type ComboBox = HTMLElement & { renderer: Function; requestContentUpdate: Function };
-type ComboBoxItemModel<T> = { item: T };
-
-/**
- * From lit-vaadin-helpers
- */
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type AbstractLitRenderer = (...args: any[]) => TemplateResult;
-
-// A sentinel that indicates renderer hasn't been initialized
-const initialValue = {};
-
-export abstract class AbstractRendererDirective<T extends Element, R extends AbstractLitRenderer> extends Directive {
-  previousValue: unknown = initialValue;
-
-  constructor(part: PartInfo) {
-    super(part);
-    if (part.type !== PartType.ELEMENT) {
-      throw new Error('renderer only supports binding to element');
-    }
-  }
-
-  render(_renderer: R, _value?: unknown): typeof nothing {
-    return nothing;
-  }
-
-  update(part: ElementPart, [renderer, value]: [R, unknown]): unknown {
-    const firstRender = this.previousValue === initialValue;
-
-    if (!this.hasChanged(value)) {
-      return nothing;
-    }
-
-    // Copy the value if it's an array so that if it's mutated we don't forget
-    // what the previous values were.
-    this.previousValue = Array.isArray(value) ? Array.from(value) : value;
-
-    const element = part.element as T;
-
-    // TODO: support re-assigning renderer function.
-    if (firstRender) {
-      const host = part.options?.host;
-      this.addRenderer(element, renderer, { host });
-    } else {
-      this.runRenderer(element);
-    }
-
-    return nothing;
-  }
-
-  hasChanged(value: unknown): boolean {
-    let result = true;
-
-    if (Array.isArray(value)) {
-      // Dirty-check arrays by item
-      if (
-        Array.isArray(this.previousValue) &&
-        this.previousValue.length === value.length &&
-        value.every((v, i) => v === (this.previousValue as Array<unknown>)[i])
-      ) {
-        result = false;
-      }
-    } else if (this.previousValue === value) {
-      // Dirty-check non-arrays by identity
-      result = false;
-    }
-    return result;
-  }
-
-  /**
-   * Set renderer callback to the element.
-   */
-  abstract addRenderer(element: T, renderer: R, options: RenderOptions): void;
-
-  /**
-   * Run renderer callback on the element.
-   */
-  abstract runRenderer(element: T): void;
-}
-
-export type ComboBoxLitRenderer<T> = (item: T, model: ComboBoxItemModel<T>, comboBox: ComboBox) => TemplateResult;
-
-class ComboBoxRendererDirective extends AbstractRendererDirective<ComboBox, ComboBoxLitRenderer<unknown>> {
-  /**
-   * Set renderer callback to the element.
-   */
-  addRenderer<T>(element: ComboBox, renderer: ComboBoxLitRenderer<T>, options: RenderOptions) {
-    element.renderer = (root: HTMLElement, comboBox: ComboBox, model: ComboBoxItemModel<T>) => {
-      render(renderer.call(options.host, model.item, model, comboBox), root, options);
-    };
-  }
-
-  /**
-   * Run renderer callback on the element.
-   */
-  runRenderer(element: ComboBox) {
-    element.requestContentUpdate();
-  }
-}
-
-const rendererDirective = directive(ComboBoxRendererDirective);
-
-export const comboBoxRenderer = <T>(
-  renderer: ComboBoxLitRenderer<T>,
-  value?: unknown
-): DirectiveResult<typeof ComboBoxRendererDirective> =>
-  rendererDirective(renderer as ComboBoxLitRenderer<unknown>, value);

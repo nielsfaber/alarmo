@@ -8,7 +8,7 @@ export interface Path {
 export const getPath = () => {
   const pairsToDict = (pairs: string[]) => {
     let res = {};
-    for (var i = 0; i < pairs.length; i += 2) {
+    for (let i = 0; i < pairs.length; i += 2) {
       const key = pairs[i];
       const val = i < pairs.length ? pairs[i + 1] : undefined;
       res = { ...res, [key]: val };
@@ -63,7 +63,7 @@ export const exportPath = (
     let string = '';
 
     keys.forEach(key => {
-      let val = dict[key];
+      const val = dict[key];
       string = string.length ? `${string}/${key}/${val}` : `${key}/${val}`;
     });
     return string;

@@ -76,8 +76,7 @@ export class ManageSensorGroupsDialog extends SubscribeMixin(LitElement) {
         .path=${mdiClose}
         dialogAction="close"
         class="header_button"
-      >
-      </ha-icon-button>
+      ></ha-icon-button>
     `;
   }
 
