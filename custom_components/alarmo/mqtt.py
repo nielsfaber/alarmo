@@ -213,6 +213,9 @@ class MqttHandler:
             if "area" in payload and payload["area"]:
                 area = payload["area"]
 
+            if ("bypass_open_sensors" in payload and payload["bypass_open_sensors"]) or ("force" in payload and payload["force"]):
+                bypass_open_sensors = payload["bypass_open_sensors"]
+
         except ValueError:
             # no JSON structure found
             command = msg.payload
@@ -258,12 +261,12 @@ class MqttHandler:
         if command == command_payloads[const.COMMAND_DISARM]:
             await entity.async_alarm_disarm(code=code, skip_code=skip_code)
         elif command == command_payloads[const.COMMAND_ARM_AWAY]:
-            await entity.async_alarm_arm_away(code, skip_code)
+            await entity.async_alarm_arm_away(code, skip_code, bypass_open_sensors)
         elif command == command_payloads[const.COMMAND_ARM_NIGHT]:
-            await entity.async_alarm_arm_night(code, skip_code)
+            await entity.async_alarm_arm_night(code, skip_code, bypass_open_sensors)
         elif command == command_payloads[const.COMMAND_ARM_HOME]:
-            await entity.async_alarm_arm_home(code, skip_code)
+            await entity.async_alarm_arm_home(code, skip_code, bypass_open_sensors)
         elif command == command_payloads[const.COMMAND_ARM_CUSTOM_BYPASS]:
-            await entity.async_alarm_arm_custom_bypass(code, skip_code)
+            await entity.async_alarm_arm_custom_bypass(code, skip_code, bypass_open_sensors)
         elif command == command_payloads[const.COMMAND_ARM_VACATION]:
-            await entity.async_alarm_arm_vacation(code, skip_code)
+            await entity.async_alarm_arm_vacation(code, skip_code, bypass_open_sensors)
