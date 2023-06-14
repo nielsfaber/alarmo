@@ -188,6 +188,7 @@ class MqttHandler:
         command = None
         code = None
         area = None
+        bypass_open_sensors = False
         try:
             payload = json.loads(msg.payload)
             payload = {k.lower(): v for k, v in payload.items()}
