@@ -1,549 +1,548 @@
 {
-    "common": {
-      "modes_short": {
-        "armed_away": "Ude",
-        "armed_home": "Hjemme",
-        "armed_night": "Nat",
-        "armed_custom_bypass": "Tilpasset",
-        "armed_vacation": "Ferie"
-      },
-      "enabled": "Aktiveret",
-      "disabled": "deaktiveret"
+  "common": {
+    "modes_short": {
+      "armed_away": "Ude",
+      "armed_home": "Hjemme",
+      "armed_night": "Nat",
+      "armed_custom_bypass": "Tilpasset",
+      "armed_vacation": "Ferie"
     },
-    "components": {
-      "time_slider": {
-        "seconds": "sek",
-        "minutes": "min",
-        "infinite": "Uendeligt",
-        "none": "ingen"
-      },
-      "editor": {
-        "ui_mode": "Til UI",
-        "yaml_mode": "Til YAML",
-        "edit_in_yaml": "Ret i YAML"
-      },
-      "table": {
-        "filter": {
-          "label": "Filtrer genstande",
-          "item": "Filtrer efter {name}",
-          "hidden_items": "{number} {number, plural,\n en {item is}\n  other {items are}\n} skjult"
-        }
+    "enabled": "Aktiveret",
+    "disabled": "deaktiveret"
+  },
+  "components": {
+    "time_slider": {
+      "seconds": "sek",
+      "minutes": "min",
+      "infinite": "Uendeligt",
+      "none": "ingen"
+    },
+    "editor": {
+      "ui_mode": "Til UI",
+      "yaml_mode": "Til YAML",
+      "edit_in_yaml": "Ret i YAML"
+    },
+    "table": {
+      "filter": {
+        "label": "Filtrer genstande",
+        "item": "Filtrer efter {name}",
+        "hidden_items": "{number} {number, plural,\n one {enhed er}\n  other {enheder er}\n} skjult"
       }
-    },
-    "title": "Alarm panel",
-    "panels": {
-      "general": {
-        "title": "Generelt",
-        "cards": {
-          "general": {
-            "description": "Dette panel definerer nogle globale indstillinger for alarmen.",
-            "fields": {
-              "disarm_after_trigger": {
-                "heading": "Frakobling efter alarm",
-                "description": "Efter udløsningstid er udløbet, deaktiver alarmen i stedet for at vende tilbage til aktiveret tilstand."
-              },
-              "enable_mqtt": {
-                "heading": "Aktiver MQTT",
-                "description": "Tillad at alarmpanelet blive styret igennem MQTT."
-              },
-              "enable_master": {
-                "heading": "Aktiver alarmmaster",
-                "description": "Opretter en enhed til at kontrollere alle områder samtidigt."
-              }
+    }
+  },
+  "title": "Alarm panel",
+  "panels": {
+    "general": {
+      "title": "Generelt",
+      "cards": {
+        "general": {
+          "description": "Dette panel definerer nogle globale indstillinger for alarmen.",
+          "fields": {
+            "disarm_after_trigger": {
+              "heading": "Frakobling efter alarm",
+              "description": "Efter udløsningstid er udløbet, deaktiver alarmen i stedet for at vende tilbage til aktiveret tilstand."
             },
-            "actions": {
-              "setup_mqtt": "MQTT indstillinger",
-              "setup_master": "Master indstillinger"
-            }
-          },
-          "modes": {
-            "title": "Tilstande",
-            "description": "Dette panel kan bruges til at indstille alarmens tilkoblingstilstande.",
-            "modes": {
-              "armed_away": "Tilkobling ude bliver brugt når alle mennesker forlader huset. Alle døre og vinduer der giver adgang til huset vil blive overvåget, samt bevægelsessensorer inde i huset.",
-              "armed_home": "Tilkobling hjemme (også kendt som tilkoblet ophold), bliver brugt når alarmen aktiveret når der er mennesker i huset. Alle døre og vinduer der giver adgang til huset vil være overvåget, men ikke bevægelsessensorer inde i huset.",
-              "armed_night": "Tilkobling nat vil blive brugt når du aktiveret alarmen før du går i seng. Alle døre og vinduer der giver adgang til huset vil være overvåget og udvalgte bevægelsessensorer i huset.",
-              "armed_vacation": "Tilkobling ferie kan bruges som en forlængelse af tilkobet udetilstand i tilfælde af længerevarende fravær. Forsinkelsestider og udløsningstider kan tilpasses (efter ønske) til at være lang tid hjemmefra.",
-              "armed_custom_bypass": "En ekstra tilstand til at definere din egen sikkerhedsperimeter."
+            "enable_mqtt": {
+              "heading": "Aktiver MQTT",
+              "description": "Tillad at alarmpanelet blive styret igennem MQTT."
             },
-            "number_sensors_active": "{number} {number, plural,\n  one {sensor}\n  other {sensors}\n} aktive",
-            "fields": {
-              "status": {
-                "heading": "Status",
-                "description": "Styrer om alarmen kan aktiveres i denne tilstand."
-              },
-              "exit_delay": {
-                "heading": "Udgangstid",
-                "description": "Når alarmen aktiveres, vil sensorerne ikke udløse alarmen inden for denne tidsperiode."
-              },
-              "entry_delay": {
-                "heading": "Indgangstid",
-                "description": "Forsinkelsestid indtil alarmen udløses, efter at en af sensorerne er aktiveret."
-              },
-              "trigger_time": {
-                "heading": "Sirenetid",
-                "description": "Tid hvor sirenen er aktiv efter udløsning."
-              }
-            }
-          },
-          "mqtt": {
-            "title": "MQTT indstillinger",
-            "description": "Dette panel kan bruges til indstilling af MQTT-grænsefladen.",
-            "fields": {
-              "state_topic": {
-                "heading": "Status topic",
-                "description": "Topic hvor status sendes til."
-              },
-              "event_topic": {
-                "heading": "Event topic",
-                "description": "Topic hvor alarm events sendes til."
-              },
-              "command_topic": {
-                "heading": "Kommando topic",
-                "description": "Topic som alarmo lytter efter tilkobling/frakobling kommandoer."
-              },
-              "require_code": {
-                "heading": "Kræv kode",
-                "description": "Kræv at koden bliver sendt med kommandoen."
-              },
-              "state_payload": {
-                "heading": "Indstil last pr tilstand",
-                "item": "Definerer en last for tilstanden ''{state}''"
-              },
-              "command_payload": {
-                "heading": "Indstil last pr kommando",
-                "item": "Definerer en last for kommando ''{command}''"
-              }
-            }
-          },
-          "areas": {
-            "title": "Områder",
-            "description": "Områder kan bruges til at opdele dit alarmsystem i flere rum.",
-            "no_items": "Der er ikke defineret områder endnu.",
-            "table": {
-              "remarks": "Kommentarer",
-              "summary": "Dette område indeholder {summary_sensors} og {summary_automations}.",
-              "summary_sensors": "{number} {number, plural,\n  en {sensor}\n  other {sensors}\n}",
-              "summary_automations": "{number} {number, plural,\n  en {automation}\n  other {automations}\n}"
-            },
-            "actions": {
-              "add": "Tilføj"
-            }
-          }
-        },
-        "dialogs": {
-          "create_area": {
-            "title": "Nyt område",
-            "fields": {
-              "copy_from": "Kopier indstillinger fra"
-            }
-          },
-          "edit_area": {
-            "title": "Redigerer område ''{area}''",
-            "name_warning": "Note: ændring af navnet ændrer også enheds id"
-          },
-          "remove_area": {
-            "title": "Fjern område?",
-            "description": "Er du sikker på at du ønsker at fjerne området? Dette område indeholder {sensors} sensorer og {automations} automationer, hvilket også vil blive fjernet."
-          },
-          "edit_master": {
-            "title": "Master indstillinger"
-          },
-          "disable_master": {
-            "title": "Deaktiver master?",
-            "description": "Er du sikker på du ønsker at fjerne alarm master? Dette område indeholder {automations} automationer, hvilket vil blive fjernet."
-          }
-        }
-      },
-      "sensors": {
-        "title": "Sensorer",
-        "cards": {
-          "sensors": {
-            "description": "Aktuelt konfigurerede sensorer. Klik på et element for at foretage ændringer.",
-            "table": {
-              "no_items": "Der er ingen sensorer der kan vises her.",
-              "no_area_warning": "Sensoren er ikke tildelt noget område.",
-              "arm_modes": "Tilkoblings tilstande",
-              "always_on": "(Altid)"
-            }
-          },
-          "add_sensors": {
-            "title": "Tilføj Sensorer",
-            "description": "Tilføj flere sensorer. Sørg for din sensor har en passende navn, så du senere kan identificere dem.",
-            "no_items": "Der er ingen tilgængelige HA-enheder, der kan konfigureres til alarmen. Sørg for at inkludere enheder af typen binary_sensor.",
-            "table": {
-              "type": "Registreret type"
-            },
-            "actions": {
-              "add_to_alarm": "tilføj til alarm",
-              "filter_supported": "Gem enheder af ukendt type"
-            }
-          },
-          "editor": {
-            "title": "Rediger Sensor",
-            "description": "Konfigurer sensor indstillinger for ''{entity}''.",
-            "fields": {
-              "area": {
-                "heading": "Område",
-                "description": "Vælg det område som indeholder denne sensor."
-              },
-              "group": {
-                "heading": "Gruppe",
-                "description": "Gruppe med andre sensorer for kombineret udløsning."
-              },
-              "device_type": {
-                "heading": "enheds type",
-                "description": "Vælg enheds typen for automatisk at tilføje de korrekte indstillinger.",
-                "choose": {
-                  "door": {
-                    "name": "Dør",
-                    "description": "En dør, åbning eller anden indgang der bruges til at komme ind/ud af huset."
-                  },
-                  "window": {
-                    "name": "Vindue",
-                    "description": "Et vindue, eller en dør som ikke bruges til at komme ind/ud af huset (f.eks. en balkon/altan)."
-                  },
-                  "motion": {
-                    "name": "Bevægelsessensor",
-                    "description": "Tilstedeværelses sensorer eller lignende enheder som har en forsinkelse imellem aktiveringer."
-                  },
-                  "tamper": {
-                    "name": "Tamper",
-                    "description": "Detektor for fjernelse af sensordæksel, glasbrudssensor mv."
-                  },
-                  "environmental": {
-                    "name": "Miljømæssige",
-                    "description": "Røg-/gassensor, lækagedetektor osv. (ikke relateret til tyverisikring)."
-                  },
-                  "other": {
-                    "name": "Generisk"
-                  }
-                }
-              },
-              "always_on": {
-                "heading": "Altid til",
-                "description": "Sensor skal altid udløse alarmen."
-              },
-              "modes": {
-                "heading": "Aktiveret tilstande",
-                "description": "Alarmtilstande hvor denne sensor er aktiv."
-              },
-              "arm_on_close": {
-                "heading": "Tilkoble efter lukning",
-                "description": "Efter deaktivering af denne sensor, springes den resterende udgangstid automatisk over."
-              },
-              "use_exit_delay": {
-                "heading": "Brug udgangstid",
-                "description": "Sensorer må være aktiv når udgangstid starter."
-              },
-              "use_entry_delay": {
-                "heading": "Brug indgangstid",
-                "description": "Sensor aktivering udløser alarmen efter indgangstiden i stedet for med det samme."
-              },
-              "allow_open": {
-                "heading": "Tillad åbning efter tilkobling",
-                "description": "Oprindelige tilstand på sensoren ignoreres ved tilkobling."
-              },
-              "auto_bypass": {
-                "heading": "Omgå automatisk",
-                "description": "Udeluk denne sensor fra alarmen, hvis den er åben under aktivering.",
-                "modes": "Tilstande hvor sensoren kan omgås"
-              },
-              "trigger_unavailable": {
-                "heading": "Udløs når den ikke er tilgængelig",
-                "description": "Når sensortilstanden bliver 'utilgængelig', vil dette aktivere sensoren."
-              }
-            },
-            "actions": {
-              "toggle_advanced": "Avancerede indstillinger",
-              "remove": "Fjern",
-              "setup_groups": "Opsæt grupper"
-            },
-            "errors": {
-              "description": "Ret venligst følgende fejl:",
-              "no_area": "Intet område er valgt",
-              "no_modes": "Der er ikke valgt tilstande, som sensoren skal være aktiv for",
-              "no_auto_bypass_modes": "Ingen tilstande er valgt for sensoren som automatisk kan omgås"
-            }
-          }
-        },
-        "dialogs": {
-          "manage_groups": {
-            "title": "Administrer sensorgrupper",
-            "description": "I en sensorgruppe skal flere sensorer aktiveres inden for et tidsrum, før alarmen udløses.",
-            "no_items": "Ingen gruppe endnu",
-            "actions": {
-              "new_group": "Ny gruppe"
-            }
-          },
-          "create_group": {
-            "title": "Ny sensorgruppe",
-            "fields": {
-              "name": {
-                "heading": "Navn",
-                "description": "Sensorgruppe navn"
-              },
-              "timeout": {
-                "heading": "Tiden er gået",
-                "description": "Tidsperioden i hvilken på hinanden følgende sensoraktiveringer udløser alarmen."
-              },
-              "sensors": {
-                "heading": "Sensorer",
-                "description": "Vælg de sensorer, som denne gruppe indeholder."
-              }
-            },
-            "errors": {
-              "invalid_name": "Ugyldigt navn angivet.",
-              "insufficient_sensors": "Der skal vælges mindst 2 sensorer."
-            }
-          },
-          "edit_group": {
-            "title": "Rediger sensorgruppe ''{name}''"
-          }
-        }
-      },
-      "codes": {
-        "title": "Koder",
-        "cards": {
-          "codes": {
-            "description": "Skift indstillinger for koden.",
-            "fields": {
-              "code_arm_required": {
-                "heading": "Brug kode ved tilkobling",
-                "description": "Kræv kode for at tilkoble alarmen"
-              },
-              "code_disarm_required": {
-                "heading": "Brug kode ved frakobling",
-                "description": "Kræv kode for at frakoble alarmen"
-              },
-              "code_format": {
-                "heading": "Kode format",
-                "description": "Indstil input typen for lovelace alarm kortet.",
-                "code_format_number": "pinkode",
-                "code_format_text": "kodeord"
-              }
-            }
-          },
-          "user_management": {
-            "title": "Brugeradministration",
-            "description": "Hver bruger har sin egen kode til at til/fra-koble alarmen.",
-            "no_items": "Der er ingen brugere endnu",
-            "actions": {
-              "new_user": "ny bruger"
-            }
-          },
-          "new_user": {
-            "title": "Opret ny bruger",
-            "description": "Brugere kan oprettes for at give adgang til at styre alarmen.",
-            "fields": {
-              "name": {
-                "heading": "Navn",
-                "description": "Brugeren navn."
-              },
-              "code": {
-                "heading": "Kode",
-                "description": "Kode til denne bruger."
-              },
-              "confirm_code": {
-                "heading": "Bekræft kode",
-                "description": "Gentag koden."
-              },
-              "can_arm": {
-                "heading": "Tillad at bruge til tilkobling",
-                "description": "Indtastning af koden tilkobler alarmen"
-              },
-              "can_disarm": {
-                "heading": "Tillad kode for frakobling",
-                "description": "Indtastning af koden frakobler alarmen"
-              },
-              "is_override_code": {
-                "heading": "Overstyringskode",
-                "description": "Indtastning af denne kode vil tilkoble alarmen uanset tilstande"
-              },
-              "area_limit": {
-                "heading": "Begrænset område",
-                "description": "Begræns brugeren til kun at styre det valgte område"
-              }
-            },
-            "errors": {
-              "no_name": "Ingen navn givet.",
-              "no_code": "Koden skal være på mindst 4 karakterer/numre.",
-              "code_mismatch": "Koderne er ikke ens."
-            }
-          },
-          "edit_user": {
-            "title": "Rediger bruger",
-            "description": "Ændre indstillinger for brugeren ''{name}''.",
-            "fields": {
-              "old_code": {
-                "heading": "Nuværende kode",
-                "description": "Nuværende kode, lad være tomt hvis uændret."
-              }
-            }
-          }
-        }
-      },
-      "actions": {
-        "title": "Handlinger",
-        "cards": {
-          "notifications": {
-            "title": "Meddelelser",
-            "description": "Ved hjælp af dette panel kan du administrere meddelelser, der skal sendes når en bestemt alarmhændelse opstår.",
-            "table": {
-              "no_items": "Der er ingen meddelelser oprettet endnu.",
-              "no_area_warning": "Handlingen er ikke tildelt noget område."
-            },
-            "actions": {
-              "new_notification": "ny meddelelse"
+            "enable_master": {
+              "heading": "Aktiver alarmmaster",
+              "description": "Opretter en enhed til at kontrollere alle områder samtidigt."
             }
           },
           "actions": {
-            "description": "Dette panel kan bruges til at ændre en enhed, når alarmtilstanden ændres.",
-            "table": {
-              "no_items": "Der er ingen handlinger oprettet endnu."
-            },
-            "actions": {
-              "new_action": "ny handling"
-            }
+            "setup_mqtt": "MQTT indstillinger",
+            "setup_master": "Master indstillinger"
+          }
+        },
+        "modes": {
+          "title": "Tilstande",
+          "description": "Dette panel kan bruges til at indstille alarmens tilkoblingstilstande.",
+          "modes": {
+            "armed_away": "Tilkobling ude bliver brugt når alle mennesker forlader huset. Alle døre og vinduer der giver adgang til huset vil blive overvåget, samt bevægelsessensorer inde i huset.",
+            "armed_home": "Tilkobling hjemme (også kendt som tilkoblet ophold), bliver brugt når alarmen aktiveret når der er mennesker i huset. Alle døre og vinduer der giver adgang til huset vil være overvåget, men ikke bevægelsessensorer inde i huset.",
+            "armed_night": "Tilkobling nat vil blive brugt når du aktiveret alarmen før du går i seng. Alle døre og vinduer der giver adgang til huset vil være overvåget og udvalgte bevægelsessensorer i huset.",
+            "armed_vacation": "Tilkobling ferie kan bruges som en forlængelse af tilkobet udetilstand i tilfælde af længerevarende fravær. Forsinkelsestider og udløsningstider kan tilpasses (efter ønske) til at være lang tid hjemmefra.",
+            "armed_custom_bypass": "En ekstra tilstand til at definere din egen sikkerhedsperimeter."
           },
-          "new_notification": {
-            "title": "Konfigurer meddelelse",
-            "description": "Modtag en besked ved til-/frakobling af alarmen, ved aktivering osv.",
-            "trigger": "Betingelse",
-            "action": "Opgave",
-            "options": "Valgmuligheder",
-            "fields": {
-              "event": {
-                "heading": "Event",
-                "description": "Hvornår skal meddelelsen sendes",
-                "choose": {
-                  "armed": {
-                    "name": "Alarm aktiveret",
-                    "description": "Alarmen er aktiveret med succes"
-                  },
-                  "disarmed": {
-                    "name": "Alarm frakoblet",
-                    "description": "Alarmen er frakoblet"
-                  },
-                  "triggered": {
-                    "name": "Alarm udløst",
-                    "description": "Alarmen er blevet udløst"
-                  },
-                  "untriggered": {
-                    "name": "Alarm ikke længere udløst",
-                    "description": "Udløst tilstanden på alarmen er slut"
-                  },
-                  "arm_failure": {
-                    "name": "Kunne ikke tilkoble",
-                    "description": "Alarmen kunne ikke tilkobles pga en eller flere åbne sensorer"
-                  },
-                  "arming": {
-                    "name": "Udgangstid startet",
-                    "description": "Udgangstiden tæller ned, klar til at forlade huset."
-                  },
-                  "pending": {
-                    "name": "Indgangstid startet",
-                    "description": "Indgangstiden tæller ned, alarmen udløses snart."
-                  }
+          "number_sensors_active": "{number} {number, plural,\n  one {sensor}\n  other {sensorer}\n} aktive",
+          "fields": {
+            "status": {
+              "heading": "Status",
+              "description": "Styrer om alarmen kan aktiveres i denne tilstand."
+            },
+            "exit_delay": {
+              "heading": "Udgangstid",
+              "description": "Når alarmen aktiveres, vil sensorerne ikke udløse alarmen inden for denne tidsperiode."
+            },
+            "entry_delay": {
+              "heading": "Indgangstid",
+              "description": "Forsinkelsestid indtil alarmen udløses, efter at en af sensorerne er aktiveret."
+            },
+            "trigger_time": {
+              "heading": "Sirenetid",
+              "description": "Tid hvor sirenen er aktiv efter udløsning."
+            }
+          }
+        },
+        "mqtt": {
+          "title": "MQTT indstillinger",
+          "description": "Dette panel kan bruges til indstilling af MQTT-grænsefladen.",
+          "fields": {
+            "state_topic": {
+              "heading": "Status topic",
+              "description": "Topic hvor status sendes til."
+            },
+            "event_topic": {
+              "heading": "Event topic",
+              "description": "Topic hvor alarm events sendes til."
+            },
+            "command_topic": {
+              "heading": "Kommando topic",
+              "description": "Topic som alarmo lytter efter tilkobling/frakobling kommandoer."
+            },
+            "require_code": {
+              "heading": "Kræv kode",
+              "description": "Kræv at koden bliver sendt med kommandoen."
+            },
+            "state_payload": {
+              "heading": "Indstil last pr tilstand",
+              "item": "Definerer en last for tilstanden ''{state}''"
+            },
+            "command_payload": {
+              "heading": "Indstil last pr kommando",
+              "item": "Definerer en last for kommando ''{command}''"
+            }
+          }
+        },
+        "areas": {
+          "title": "Områder",
+          "description": "Områder kan bruges til at opdele dit alarmsystem i flere rum.",
+          "no_items": "Der er ikke defineret områder endnu.",
+          "table": {
+            "remarks": "Kommentarer",
+            "summary": "Dette område indeholder {summary_sensors} og {summary_automations}.",
+            "summary_sensors": "{number} {number, plural,\n  one {sensor}\n  other {sensorer}\n}",
+            "summary_automations": "{number} {number, plural,\n  one {automation}\n  other {automationer}\n}"
+          },
+          "actions": {
+            "add": "Tilføj"
+          }
+        }
+      },
+      "dialogs": {
+        "create_area": {
+          "title": "Nyt område",
+          "fields": {
+            "copy_from": "Kopier indstillinger fra"
+          }
+        },
+        "edit_area": {
+          "title": "Redigerer område ''{area}''",
+          "name_warning": "Note: ændring af navnet ændrer også enheds id"
+        },
+        "remove_area": {
+          "title": "Fjern område?",
+          "description": "Er du sikker på at du ønsker at fjerne området? Dette område indeholder {sensors} sensorer og {automations} automationer, hvilket også vil blive fjernet."
+        },
+        "edit_master": {
+          "title": "Master indstillinger"
+        },
+        "disable_master": {
+          "title": "Deaktiver master?",
+          "description": "Er du sikker på du ønsker at fjerne alarm master? Dette område indeholder {automations} automationer, hvilket vil blive fjernet."
+        }
+      }
+    },
+    "sensors": {
+      "title": "Sensorer",
+      "cards": {
+        "sensors": {
+          "description": "Aktuelt konfigurerede sensorer. Klik på et element for at foretage ændringer.",
+          "table": {
+            "no_items": "Der er ingen sensorer der kan vises her.",
+            "no_area_warning": "Sensoren er ikke tildelt noget område.",
+            "arm_modes": "Tilkoblings tilstande",
+            "always_on": "(Altid)"
+          }
+        },
+        "add_sensors": {
+          "title": "Tilføj Sensorer",
+          "description": "Tilføj flere sensorer. Sørg for din sensor har en passende navn, så du senere kan identificere dem.",
+          "no_items": "Der er ingen tilgængelige HA-enheder, der kan konfigureres til alarmen. Sørg for at inkludere enheder af typen binary_sensor.",
+          "table": {
+            "type": "Registreret type"
+          },
+          "actions": {
+            "add_to_alarm": "tilføj til alarm",
+            "filter_supported": "Gem enheder af ukendt type"
+          }
+        },
+        "editor": {
+          "title": "Rediger Sensor",
+          "description": "Konfigurer sensor indstillinger for ''{entity}''.",
+          "fields": {
+            "area": {
+              "heading": "Område",
+              "description": "Vælg det område som indeholder denne sensor."
+            },
+            "group": {
+              "heading": "Gruppe",
+              "description": "Gruppe med andre sensorer for kombineret udløsning."
+            },
+            "device_type": {
+              "heading": "enheds type",
+              "description": "Vælg enheds typen for automatisk at tilføje de korrekte indstillinger.",
+              "choose": {
+                "door": {
+                  "name": "Dør",
+                  "description": "En dør, åbning eller anden indgang der bruges til at komme ind/ud af huset."
+                },
+                "window": {
+                  "name": "Vindue",
+                  "description": "Et vindue, eller en dør som ikke bruges til at komme ind/ud af huset (f.eks. en balkon/altan)."
+                },
+                "motion": {
+                  "name": "Bevægelsessensor",
+                  "description": "Tilstedeværelses sensorer eller lignende enheder som har en forsinkelse imellem aktiveringer."
+                },
+                "tamper": {
+                  "name": "Tamper",
+                  "description": "Detektor for fjernelse af sensordæksel, glasbrudssensor mv."
+                },
+                "environmental": {
+                  "name": "Miljømæssige",
+                  "description": "Røg-/gassensor, lækagedetektor osv. (ikke relateret til tyverisikring)."
+                },
+                "other": {
+                  "name": "Generisk"
                 }
-              },
-              "mode": {
-                "heading": "Tilstand",
-                "description": "Begræns handlingen til specifikke til/fra-koblings tilstande (valgfrit)"
-              },
-              "title": {
-                "heading": "Titel",
-                "description": "Titel for en meddelelse"
-              },
-              "message": {
-                "heading": "Meddelelse",
-                "description": "Indhold på meddelelse",
-                "insert_wildcard": "Indsæt wildcard",
-                "placeholders": {
-                  "armed": "Alarmen er nu {{arm_mode}}",
-                  "disarmed": "Alarmen er nu frakoblet",
-                  "triggered": "Alarmen er udløst! Årsag: {{open_sensors}}.",
-                  "untriggered": "Alarmen er ikke længere udløst.",
-                  "arm_failure": "Alarmen kan ikke tilkobles lige nu pga: {{open_sensors}}.",
-                  "arming": "Alarmen til blive tilkoblet snart, venligst forlad huset.",
-                  "pending": "Alarmen udløses snart, vær hurtig til at frakoble!"
-                }
-              },
-              "open_sensors_format": {
-                "heading": "Format for open_sensors wildcard",
-                "description": "Vælg hvilken sensorinformation der skal indsættes i meddelelsen",
-                "options": {
-                  "default": "Navne og tilstande",
-                  "short": "Kun navne"
-                }
-              },
-              "arm_mode_format": {
-                "heading": "Oversættelse for arm_mode wildcard",
-                "description": "Vælg på hvilket sprog tilkoblingstilstanden indsættes i beskeden"
-              },
-              "target": {
-                "heading": "Target",
-                "description": "Enhed meddelelsen sendes til"
-              },
-              "name": {
-                "heading": "Navn",
-                "description": "Beskrivelse af denne meddelelse",
-                "placeholders": {
-                  "armed": "Underret {target} ved tilkobling",
-                  "disarmed": "Underret {target} ved frakobling",
-                  "triggered": "Underret {target} når udløst",
-                  "untriggered": "Underret {target} når udløst tilstant stoppes",
-                  "arm_failure": "Underret {target} ved fejl",
-                  "arming": "Underret {target} når tilkobling er i gang",
-                  "pending": "Underret {target} når frakobling er i gang"
-                }
-              },
-              "delete": {
-                "heading": "Slet automatisering",
-                "description": "Fjern automatiseringen permanent"
               }
             },
-            "actions": {
-              "test": "Prøv det"
+            "always_on": {
+              "heading": "Altid til",
+              "description": "Sensor skal altid udløse alarmen."
+            },
+            "modes": {
+              "heading": "Aktiveret tilstande",
+              "description": "Alarmtilstande hvor denne sensor er aktiv."
+            },
+            "arm_on_close": {
+              "heading": "Tilkoble efter lukning",
+              "description": "Efter deaktivering af denne sensor, springes den resterende udgangstid automatisk over."
+            },
+            "use_exit_delay": {
+              "heading": "Brug udgangstid",
+              "description": "Sensorer må være aktiv når udgangstid starter."
+            },
+            "use_entry_delay": {
+              "heading": "Brug indgangstid",
+              "description": "Sensor aktivering udløser alarmen efter indgangstiden i stedet for med det samme."
+            },
+            "allow_open": {
+              "heading": "Tillad åbning efter tilkobling",
+              "description": "Oprindelige tilstand på sensoren ignoreres ved tilkobling."
+            },
+            "auto_bypass": {
+              "heading": "Omgå automatisk",
+              "description": "Udeluk denne sensor fra alarmen, hvis den er åben under aktivering.",
+              "modes": "Tilstande hvor sensoren kan omgås"
+            },
+            "trigger_unavailable": {
+              "heading": "Udløs når den ikke er tilgængelig",
+              "description": "Når sensortilstanden bliver 'utilgængelig', vil dette aktivere sensoren."
             }
           },
-          "new_action": {
-            "title": "Konfigurer handling",
-            "description": "Skift lys eller anden enhed (såsom sirener) ved til-/frakobling af alarmen, ved aktivering osv.",
-            "fields": {
-              "event": {
-                "heading": "Event",
-                "description": "Hvornår skal handlingen udføres"
-              },
-              "area": {
-                "heading": "Område",
-                "description": "Område som hændelsen gælder for, lad det stå tomt for at vælge den globale alarm."
-              },
-              "mode": {
-                "heading": "Tilstand",
-                "description": "Begræns handlingen til specifikke tilkonlingstilstande (valgfrit)"
-              },
-              "entity": {
-                "heading": "Enhed",
-                "description": "Enhed handlingen udføres på"
-              },
-              "action": {
-                "heading": "Handling",
-                "description": "Handling som skal udføres på enhed",
-                "no_common_actions": "Handlinger kan kun tildeles i YAML-tilstand for de valgte enheder."
-              },
-              "name": {
-                "heading": "Navn",
-                "description": "Beskrivelse for denne handling",
-                "placeholders": {
-                  "armed": "Sæt {entity} til {state} ved tilkobling",
-                  "disarmed": "Sæt {entity} til {state} ved frakobling",
-                  "triggered": "Sæt {entity} til {state} når alarm udløses",
-                  "untriggered": "Sæt {entity} til {state} når udløst alarm stopper",
-                  "arm_failure": "Sæt {entity} til {state} ved fejl",
-                  "arming": "Sæt {entity} til {state} når tilkobling er i gang",
-                  "pending": "Sæt {entity} til {state} når frakobling er i gang"
+          "actions": {
+            "toggle_advanced": "Avancerede indstillinger",
+            "remove": "Fjern",
+            "setup_groups": "Opsæt grupper"
+          },
+          "errors": {
+            "description": "Ret venligst følgende fejl:",
+            "no_area": "Intet område er valgt",
+            "no_modes": "Der er ikke valgt tilstande, som sensoren skal være aktiv for",
+            "no_auto_bypass_modes": "Ingen tilstande er valgt for sensoren som automatisk kan omgås"
+          }
+        }
+      },
+      "dialogs": {
+        "manage_groups": {
+          "title": "Administrer sensorgrupper",
+          "description": "I en sensorgruppe skal flere sensorer aktiveres inden for et tidsrum, før alarmen udløses.",
+          "no_items": "Ingen gruppe endnu",
+          "actions": {
+            "new_group": "Ny gruppe"
+          }
+        },
+        "create_group": {
+          "title": "Ny sensorgruppe",
+          "fields": {
+            "name": {
+              "heading": "Navn",
+              "description": "Sensorgruppe navn"
+            },
+            "timeout": {
+              "heading": "Tiden er gået",
+              "description": "Tidsperioden i hvilken på hinanden følgende sensoraktiveringer udløser alarmen."
+            },
+            "sensors": {
+              "heading": "Sensorer",
+              "description": "Vælg de sensorer, som denne gruppe indeholder."
+            }
+          },
+          "errors": {
+            "invalid_name": "Ugyldigt navn angivet.",
+            "insufficient_sensors": "Der skal vælges mindst 2 sensorer."
+          }
+        },
+        "edit_group": {
+          "title": "Rediger sensorgruppe ''{name}''"
+        }
+      }
+    },
+    "codes": {
+      "title": "Koder",
+      "cards": {
+        "codes": {
+          "description": "Skift indstillinger for koden.",
+          "fields": {
+            "code_arm_required": {
+              "heading": "Brug kode ved tilkobling",
+              "description": "Kræv kode for at tilkoble alarmen"
+            },
+            "code_disarm_required": {
+              "heading": "Brug kode ved frakobling",
+              "description": "Kræv kode for at frakoble alarmen"
+            },
+            "code_format": {
+              "heading": "Kode format",
+              "description": "Indstil input typen for lovelace alarm kortet.",
+              "code_format_number": "pinkode",
+              "code_format_text": "kodeord"
+            }
+          }
+        },
+        "user_management": {
+          "title": "Brugeradministration",
+          "description": "Hver bruger har sin egen kode til at til/fra-koble alarmen.",
+          "no_items": "Der er ingen brugere endnu",
+          "actions": {
+            "new_user": "ny bruger"
+          }
+        },
+        "new_user": {
+          "title": "Opret ny bruger",
+          "description": "Brugere kan oprettes for at give adgang til at styre alarmen.",
+          "fields": {
+            "name": {
+              "heading": "Navn",
+              "description": "Brugeren navn."
+            },
+            "code": {
+              "heading": "Kode",
+              "description": "Kode til denne bruger."
+            },
+            "confirm_code": {
+              "heading": "Bekræft kode",
+              "description": "Gentag koden."
+            },
+            "can_arm": {
+              "heading": "Tillad at bruge til tilkobling",
+              "description": "Indtastning af koden tilkobler alarmen"
+            },
+            "can_disarm": {
+              "heading": "Tillad kode for frakobling",
+              "description": "Indtastning af koden frakobler alarmen"
+            },
+            "is_override_code": {
+              "heading": "Overstyringskode",
+              "description": "Indtastning af denne kode vil tilkoble alarmen uanset tilstande"
+            },
+            "area_limit": {
+              "heading": "Begrænset område",
+              "description": "Begræns brugeren til kun at styre det valgte område"
+            }
+          },
+          "errors": {
+            "no_name": "Ingen navn givet.",
+            "no_code": "Koden skal være på mindst 4 karakterer/numre.",
+            "code_mismatch": "Koderne er ikke ens."
+          }
+        },
+        "edit_user": {
+          "title": "Rediger bruger",
+          "description": "Ændre indstillinger for brugeren ''{name}''.",
+          "fields": {
+            "old_code": {
+              "heading": "Nuværende kode",
+              "description": "Nuværende kode, lad være tomt hvis uændret."
+            }
+          }
+        }
+      }
+    },
+    "actions": {
+      "title": "Handlinger",
+      "cards": {
+        "notifications": {
+          "title": "Meddelelser",
+          "description": "Ved hjælp af dette panel kan du administrere meddelelser, der skal sendes når en bestemt alarmhændelse opstår.",
+          "table": {
+            "no_items": "Der er ingen meddelelser oprettet endnu.",
+            "no_area_warning": "Handlingen er ikke tildelt noget område."
+          },
+          "actions": {
+            "new_notification": "ny meddelelse"
+          }
+        },
+        "actions": {
+          "description": "Dette panel kan bruges til at ændre en enhed, når alarmtilstanden ændres.",
+          "table": {
+            "no_items": "Der er ingen handlinger oprettet endnu."
+          },
+          "actions": {
+            "new_action": "ny handling"
+          }
+        },
+        "new_notification": {
+          "title": "Konfigurer meddelelse",
+          "description": "Modtag en besked ved til-/frakobling af alarmen, ved aktivering osv.",
+          "trigger": "Betingelse",
+          "action": "Opgave",
+          "options": "Valgmuligheder",
+          "fields": {
+            "event": {
+              "heading": "Event",
+              "description": "Hvornår skal meddelelsen sendes",
+              "choose": {
+                "armed": {
+                  "name": "Alarm aktiveret",
+                  "description": "Alarmen er aktiveret med succes"
+                },
+                "disarmed": {
+                  "name": "Alarm frakoblet",
+                  "description": "Alarmen er frakoblet"
+                },
+                "triggered": {
+                  "name": "Alarm udløst",
+                  "description": "Alarmen er blevet udløst"
+                },
+                "untriggered": {
+                  "name": "Alarm ikke længere udløst",
+                  "description": "Udløst tilstanden på alarmen er slut"
+                },
+                "arm_failure": {
+                  "name": "Kunne ikke tilkoble",
+                  "description": "Alarmen kunne ikke tilkobles pga en eller flere åbne sensorer"
+                },
+                "arming": {
+                  "name": "Udgangstid startet",
+                  "description": "Udgangstiden tæller ned, klar til at forlade huset."
+                },
+                "pending": {
+                  "name": "Indgangstid startet",
+                  "description": "Indgangstiden tæller ned, alarmen udløses snart."
                 }
+              }
+            },
+            "mode": {
+              "heading": "Tilstand",
+              "description": "Begræns handlingen til specifikke til/fra-koblings tilstande (valgfrit)"
+            },
+            "title": {
+              "heading": "Titel",
+              "description": "Titel for en meddelelse"
+            },
+            "message": {
+              "heading": "Meddelelse",
+              "description": "Indhold på meddelelse",
+              "insert_wildcard": "Indsæt wildcard",
+              "placeholders": {
+                "armed": "Alarmen er nu {{arm_mode}}",
+                "disarmed": "Alarmen er nu frakoblet",
+                "triggered": "Alarmen er udløst! Årsag: {{open_sensors}}.",
+                "untriggered": "Alarmen er ikke længere udløst.",
+                "arm_failure": "Alarmen kan ikke tilkobles lige nu pga: {{open_sensors}}.",
+                "arming": "Alarmen til blive tilkoblet snart, venligst forlad huset.",
+                "pending": "Alarmen udløses snart, vær hurtig til at frakoble!"
+              }
+            },
+            "open_sensors_format": {
+              "heading": "Format for open_sensors wildcard",
+              "description": "Vælg hvilken sensorinformation der skal indsættes i meddelelsen",
+              "options": {
+                "default": "Navne og tilstande",
+                "short": "Kun navne"
+              }
+            },
+            "arm_mode_format": {
+              "heading": "Oversættelse for arm_mode wildcard",
+              "description": "Vælg på hvilket sprog tilkoblingstilstanden indsættes i beskeden"
+            },
+            "target": {
+              "heading": "Target",
+              "description": "Enhed meddelelsen sendes til"
+            },
+            "name": {
+              "heading": "Navn",
+              "description": "Beskrivelse af denne meddelelse",
+              "placeholders": {
+                "armed": "Underret {target} ved tilkobling",
+                "disarmed": "Underret {target} ved frakobling",
+                "triggered": "Underret {target} når udløst",
+                "untriggered": "Underret {target} når udløst tilstant stoppes",
+                "arm_failure": "Underret {target} ved fejl",
+                "arming": "Underret {target} når tilkobling er i gang",
+                "pending": "Underret {target} når frakobling er i gang"
+              }
+            },
+            "delete": {
+              "heading": "Slet automatisering",
+              "description": "Fjern automatiseringen permanent"
+            }
+          },
+          "actions": {
+            "test": "Prøv det"
+          }
+        },
+        "new_action": {
+          "title": "Konfigurer handling",
+          "description": "Skift lys eller anden enhed (såsom sirener) ved til-/frakobling af alarmen, ved aktivering osv.",
+          "fields": {
+            "event": {
+              "heading": "Event",
+              "description": "Hvornår skal handlingen udføres"
+            },
+            "area": {
+              "heading": "Område",
+              "description": "Område som hændelsen gælder for, lad det stå tomt for at vælge den globale alarm."
+            },
+            "mode": {
+              "heading": "Tilstand",
+              "description": "Begræns handlingen til specifikke tilkonlingstilstande (valgfrit)"
+            },
+            "entity": {
+              "heading": "Enhed",
+              "description": "Enhed handlingen udføres på"
+            },
+            "action": {
+              "heading": "Handling",
+              "description": "Handling som skal udføres på enhed",
+              "no_common_actions": "Handlinger kan kun tildeles i YAML-tilstand for de valgte enheder."
+            },
+            "name": {
+              "heading": "Navn",
+              "description": "Beskrivelse for denne handling",
+              "placeholders": {
+                "armed": "Sæt {entity} til {state} ved tilkobling",
+                "disarmed": "Sæt {entity} til {state} ved frakobling",
+                "triggered": "Sæt {entity} til {state} når alarm udløses",
+                "untriggered": "Sæt {entity} til {state} når udløst alarm stopper",
+                "arm_failure": "Sæt {entity} til {state} ved fejl",
+                "arming": "Sæt {entity} til {state} når tilkobling er i gang",
+                "pending": "Sæt {entity} til {state} når frakobling er i gang"
               }
             }
           }
@@ -551,4 +550,4 @@
       }
     }
   }
-  
+}
