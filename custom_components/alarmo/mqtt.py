@@ -188,6 +188,9 @@ class MqttHandler:
         command = None
         code = None
         area = None
+        bypass_open_sensors = False
+        skip_delay = False
+
         try:
             payload = json.loads(msg.payload)
             payload = {k.lower(): v for k, v in payload.items()}
@@ -212,6 +215,12 @@ class MqttHandler:
 
             if "area" in payload and payload["area"]:
                 area = payload["area"]
+
+            if ("bypass_open_sensors" in payload and payload["bypass_open_sensors"]) or ("force" in payload and payload["force"]):
+                bypass_open_sensors = payload["bypass_open_sensors"]
+
+            if const.ATTR_SKIP_DELAY in payload and payload[const.ATTR_SKIP_DELAY]:
+                skip_delay = payload[const.ATTR_SKIP_DELAY]
 
         except ValueError:
             # no JSON structure found
@@ -258,12 +267,12 @@ class MqttHandler:
         if command == command_payloads[const.COMMAND_DISARM]:
             await entity.async_alarm_disarm(code=code, skip_code=skip_code)
         elif command == command_payloads[const.COMMAND_ARM_AWAY]:
-            await entity.async_alarm_arm_away(code, skip_code)
+            await entity.async_alarm_arm_away(code, skip_code, bypass_open_sensors, skip_delay)
         elif command == command_payloads[const.COMMAND_ARM_NIGHT]:
-            await entity.async_alarm_arm_night(code, skip_code)
+            await entity.async_alarm_arm_night(code, skip_code, bypass_open_sensors, skip_delay)
         elif command == command_payloads[const.COMMAND_ARM_HOME]:
-            await entity.async_alarm_arm_home(code, skip_code)
+            await entity.async_alarm_arm_home(code, skip_code, bypass_open_sensors, skip_delay)
         elif command == command_payloads[const.COMMAND_ARM_CUSTOM_BYPASS]:
-            await entity.async_alarm_arm_custom_bypass(code, skip_code)
+            await entity.async_alarm_arm_custom_bypass(code, skip_code, bypass_open_sensors, skip_delay)
         elif command == command_payloads[const.COMMAND_ARM_VACATION]:
-            await entity.async_alarm_arm_vacation(code, skip_code)
+            await entity.async_alarm_arm_vacation(code, skip_code, bypass_open_sensors, skip_delay)

@@ -432,30 +432,30 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             context_id=context_id
         )
 
-    async def async_alarm_arm_away(self, code=None, skip_code=False):
+    async def async_alarm_arm_away(self, code=None, skip_code=False, bypass_open_sensors=False, skip_delay=False):
         """Send arm away command."""
         _LOGGER.debug("alarm_arm_away")
-        await self.async_handle_arm_request(STATE_ALARM_ARMED_AWAY, code=code, skip_code=skip_code)
+        await self.async_handle_arm_request(STATE_ALARM_ARMED_AWAY, code=code, skip_code=skip_code, bypass_open_sensors=bypass_open_sensors, skip_delay=skip_delay)
 
-    async def async_alarm_arm_home(self, code=None, skip_code=False):
+    async def async_alarm_arm_home(self, code=None, skip_code=False, bypass_open_sensors=False, skip_delay=False):
         """Send arm home command."""
         _LOGGER.debug("alarm_arm_home")
-        await self.async_handle_arm_request(STATE_ALARM_ARMED_HOME, code=code, skip_code=skip_code)
+        await self.async_handle_arm_request(STATE_ALARM_ARMED_HOME, code=code, skip_code=skip_code, bypass_open_sensors=bypass_open_sensors, skip_delay=skip_delay)
 
-    async def async_alarm_arm_night(self, code=None, skip_code=False):
+    async def async_alarm_arm_night(self, code=None, skip_code=False, bypass_open_sensors=False, skip_delay=False):
         """Send arm night command."""
         _LOGGER.debug("alarm_arm_night")
-        await self.async_handle_arm_request(STATE_ALARM_ARMED_NIGHT, code=code, skip_code=skip_code)
+        await self.async_handle_arm_request(STATE_ALARM_ARMED_NIGHT, code=code, skip_code=skip_code, bypass_open_sensors=bypass_open_sensors, skip_delay=skip_delay)
 
-    async def async_alarm_arm_custom_bypass(self, code=None, skip_code=False):
+    async def async_alarm_arm_custom_bypass(self, code=None, skip_code=False, bypass_open_sensors=False, skip_delay=False):
         """Send arm custom_bypass command."""
         _LOGGER.debug("alarm_arm_custom_bypass")
-        await self.async_handle_arm_request(STATE_ALARM_ARMED_CUSTOM_BYPASS, code=code, skip_code=skip_code)
+        await self.async_handle_arm_request(STATE_ALARM_ARMED_CUSTOM_BYPASS, code=code, skip_code=skip_code, bypass_open_sensors=bypass_open_sensors, skip_delay=skip_delay)
 
-    async def async_alarm_arm_vacation(self, code=None, skip_code=False):
+    async def async_alarm_arm_vacation(self, code=None, skip_code=False, bypass_open_sensors=False, skip_delay=False):
         """Send arm vacation command."""
         _LOGGER.debug("alarm_arm_vacation")
-        await self.async_handle_arm_request(STATE_ALARM_ARMED_VACATION, code=code, skip_code=skip_code)
+        await self.async_handle_arm_request(STATE_ALARM_ARMED_VACATION, code=code, skip_code=skip_code, bypass_open_sensors=bypass_open_sensors, skip_delay=skip_delay)
 
     async def async_alarm_trigger(self, code=None) -> None:
         """Send alarm trigger command."""
