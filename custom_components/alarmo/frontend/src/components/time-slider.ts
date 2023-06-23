@@ -14,7 +14,7 @@ export class TimeSlider extends LitElement {
   max = 100;
 
   @property({ type: Number })
-  step = 10;
+  step = 5;
 
   @property({ type: Number })
   value = 0;
@@ -93,7 +93,7 @@ export class TimeSlider extends LitElement {
   toggleUnit() {
     this.unit = this.unit == 'min' ? 'sec' : 'min';
     this.scaleFactor = this.unit == 'min' ? 1 / 60 : 1;
-    this.step = this.unit == 'min' ? 1 : 10;
+    this.step = this.unit == 'min' ? 1 : 5;
   }
 
   static styles = css`
