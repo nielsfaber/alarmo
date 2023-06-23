@@ -1,16 +1,15 @@
 import { LitElement, html } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
-import { HomeAssistant, navigate, computeDomain } from 'custom-card-helpers';
 import { loadHaForm } from '../../load-ha-elements';
 
-import { AlarmEntity, AlarmoAutomation, Dictionary, AlarmoArea, AlarmoConfig } from '../../types';
+import { AlarmEntity, AlarmoAutomation, Dictionary, AlarmoArea, AlarmoConfig, HomeAssistant } from '../../types';
 import { SubscribeMixin } from '../../subscribe-mixin';
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
 
 import { commonStyle } from '../../styles';
 import { fetchAutomations, saveAutomation, fetchAreas, fetchConfig } from '../../data/websockets';
 import { TableColumn, TableFilterConfig } from '../../components/alarmo-table';
-import { handleError, Unique, isDefined, flatten, sortAlphabetically } from '../../helpers';
+import { handleError, Unique, isDefined, flatten, sortAlphabetically, navigate } from '../../helpers';
 import { localize } from '../../../localize/localize';
 
 import './notification-editor-card.ts';

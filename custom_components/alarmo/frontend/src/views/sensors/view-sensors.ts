@@ -1,12 +1,11 @@
 import { LitElement, html } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
-import { HomeAssistant } from 'custom-card-helpers';
 import { loadHaForm } from '../../load-ha-elements';
 
 import './sensor-editor-card.ts';
 import './sensors-overview-card.ts';
 import './add-sensors-card.ts';
-import { EArmModes } from '../../types';
+import { EArmModes, HomeAssistant } from '../../types';
 import { Path } from '../../common/navigation';
 
 @customElement('alarm-view-sensors')

@@ -1,6 +1,5 @@
 import { LitElement, html, TemplateResult, CSSResultGroup, css } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
-import { HomeAssistant, navigate, computeDomain, computeEntity } from 'custom-card-helpers';
 import { mdiClose } from '@mdi/js';
 import {
   AlarmoAutomation,
@@ -10,8 +9,9 @@ import {
   Dictionary,
   AutomationAction,
   AlarmoConfig,
+  HomeAssistant,
 } from '../../types';
-import { handleError, isDefined, Unique, omit, showErrorDialog } from '../../helpers';
+import { handleError, isDefined, Unique, omit, showErrorDialog, navigate, computeEntity } from '../../helpers';
 import { saveAutomation, fetchAreas, fetchConfig, deleteAutomation } from '../../data/websockets';
 import { localize } from '../../../localize/localize';
 import {

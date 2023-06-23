@@ -1,6 +1,5 @@
 import { LitElement, html, CSSResultGroup, css } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
-import { HomeAssistant, navigate } from 'custom-card-helpers';
 import { loadHaForm } from './load-ha-elements';
 
 import './views/general/view-general.ts';
@@ -11,9 +10,10 @@ import './views/actions/view-actions.ts';
 import { commonStyle } from './styles';
 import { VERSION } from './const';
 import { fetchUsers } from './data/websockets';
-import { AlarmoUser, Dictionary } from './types';
+import { AlarmoUser, Dictionary, HomeAssistant } from './types';
 import { localize } from '../localize/localize';
 import { exportPath, getPath, Path } from './common/navigation';
+import { navigate } from './helpers';
 
 @customElement('alarm-panel')
 export class MyAlarmPanel extends LitElement {

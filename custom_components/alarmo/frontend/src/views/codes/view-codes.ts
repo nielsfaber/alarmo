@@ -1,9 +1,8 @@
 import { LitElement, html } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
-import { HomeAssistant, navigate } from 'custom-card-helpers';
 
-import { prettyPrint, handleError, sortAlphabetically, pick } from '../../helpers';
-import { AlarmoConfig, Dictionary, AlarmoUser } from '../../types';
+import { prettyPrint, handleError, sortAlphabetically, pick, navigate } from '../../helpers';
+import { AlarmoConfig, Dictionary, AlarmoUser, HomeAssistant } from '../../types';
 
 import './user-editor-card.ts';
 import '../../components/settings-row.ts';

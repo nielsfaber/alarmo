@@ -1,14 +1,14 @@
 import { LitElement, html, css, CSSResultGroup } from 'lit';
 import { property, customElement, state } from 'lit/decorators.js';
-import { HomeAssistant, fireEvent } from 'custom-card-helpers';
 import { mdiClose } from '@mdi/js';
 import { saveArea, deleteArea, fetchAreas, fetchSensors, fetchAutomations } from '../data/websockets';
-import { AlarmoArea, Dictionary, AlarmoSensor, AlarmoAutomation } from '../types';
+import { AlarmoArea, Dictionary, AlarmoSensor, AlarmoAutomation, HomeAssistant } from '../types';
 import { commonStyle } from '../styles';
 import { localize } from '../../localize/localize';
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
 import { SubscribeMixin } from '../subscribe-mixin';
 import { handleError } from '../helpers';
+import { fireEvent } from '../fire_event';
 
 import './confirm-delete-dialog';
 

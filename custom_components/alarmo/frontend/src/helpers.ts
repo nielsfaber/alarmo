@@ -1,17 +1,13 @@
 import { TemplateResult, html } from 'lit';
-import { HomeAssistant, stateIcon, fireEvent } from 'custom-card-helpers';
 import { HassEntity } from 'home-assistant-js-websocket';
 import { platform, AlarmStates, AlarmCommands } from './const';
-import { Dictionary, EArmModes, AlarmoModeConfig } from './types';
+import { Dictionary, EArmModes, AlarmoModeConfig, HomeAssistant } from './types';
+import { fireEvent } from './fire_event';
 
 export function getDomain(entity: string | HassEntity) {
   const entity_id: string = typeof entity == 'string' ? entity : entity.entity_id;
 
   return String(entity_id.split('.').shift());
-}
-
-export function computeIcon(entity: HassEntity) {
-  return stateIcon(entity);
 }
 
 export function prettyPrint(input: string) {
@@ -175,4 +171,120 @@ export function sortAlphabetically(a: string | { name: string }, b: string | { n
   const stringVal = (s: string | { name: string }) =>
     typeof s === 'object' ? stringVal(s.name) : s.trim().toLowerCase();
   return stringVal(a) < stringVal(b) ? -1 : 1;
+}
+
+export const navigate = (
+  _node: any,
+  path: string,
+  replace: boolean = false
+) => {
+  if (replace) {
+    history.replaceState(null, "", path);
+  } else {
+    history.pushState(null, "", path);
+  }
+  fireEvent(window, "location-changed", {
+    replace
+  });
+};
+
+export function computeDomain(entityId: string): string {
+  return entityId.substr(0, entityId.indexOf("."));
+}
+
+export function computeEntity(entityId: string): string {
+  return entityId.substr(entityId.indexOf(".") + 1);
+}
+
+export function domainIcon(domain: string, state?: string): string {
+  const fixedIcons = {
+    alert: "mdi:alert",
+    automation: "mdi:playlist-play",
+    calendar: "mdi:calendar",
+    camera: "mdi:video",
+    climate: "mdi:thermostat",
+    configurator: "mdi:settings",
+    conversation: "mdi:text-to-speech",
+    device_tracker: "mdi:account",
+    fan: "mdi:fan",
+    group: "mdi:google-circles-communities",
+    history_graph: "mdi:chart-line",
+    homeassistant: "mdi:home-assistant",
+    homekit: "mdi:home-automation",
+    image_processing: "mdi:image-filter-frames",
+    input_boolean: "mdi:drawing",
+    input_datetime: "mdi:calendar-clock",
+    input_number: "mdi:ray-vertex",
+    input_select: "mdi:format-list-bulleted",
+    input_text: "mdi:textbox",
+    light: "mdi:lightbulb",
+    mailbox: "mdi:mailbox",
+    notify: "mdi:comment-alert",
+    person: "mdi:account",
+    plant: "mdi:flower",
+    proximity: "mdi:apple-safari",
+    remote: "mdi:remote",
+    scene: "mdi:google-pages",
+    script: "mdi:file-document",
+    sensor: "mdi:eye",
+    simple_alarm: "mdi:bell",
+    sun: "mdi:white-balance-sunny",
+    switch: "mdi:flash",
+    timer: "mdi:timer",
+    updater: "mdi:cloud-upload",
+    vacuum: "mdi:robot-vacuum",
+    water_heater: "mdi:thermometer",
+    weblink: "mdi:open-in-new"
+  };
+
+  if (domain in fixedIcons) {
+    return fixedIcons[domain];
+  }
+
+  switch (domain) {
+    case "alarm_control_panel":
+      switch (state) {
+        case "armed_home":
+          return "mdi:bell-plus";
+        case "armed_night":
+          return "mdi:bell-sleep";
+        case "disarmed":
+          return "mdi:bell-outline";
+        case "triggered":
+          return "mdi:bell-ring";
+        default:
+          return "mdi:bell";
+      }
+
+    case "binary_sensor":
+      return state && state === "off"
+        ? "mdi:radiobox-blank"
+        : "mdi:checkbox-marked-circle";
+
+    case "cover":
+      return state === "closed" ? "mdi:window-closed" : "mdi:window-open";
+
+    case "lock":
+      return state && state === "unlocked" ? "mdi:lock-open" : "mdi:lock";
+
+    case "media_player":
+      return state && state !== "off" && state !== "idle"
+        ? "mdi:cast-connected"
+        : "mdi:cast";
+
+    case "zwave":
+      switch (state) {
+        case "dead":
+          return "mdi:emoticon-dead";
+        case "sleeping":
+          return "mdi:sleep";
+        case "initializing":
+          return "mdi:timer-sand";
+        default:
+          return "mdi:z-wave";
+      }
+
+    default:
+      return "mdi:bookmark";
+  }
 }

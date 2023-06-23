@@ -1,11 +1,10 @@
 import { LitElement, html } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import { HomeAssistant, fireEvent } from 'custom-card-helpers';
 import { mdiPencil } from '@mdi/js';
 
 import { prettyPrint, sortAlphabetically } from '../../helpers';
-import { AlarmoConfig, Dictionary, AlarmoArea, AlarmoSensor, AlarmoAutomation } from '../../types';
+import { AlarmoConfig, Dictionary, AlarmoArea, AlarmoSensor, AlarmoAutomation, HomeAssistant } from '../../types';
 
 import '../../components/settings-row.ts';
 import '../../components/alarmo-table.ts';
@@ -18,6 +17,7 @@ import { UnsubscribeFunc } from 'home-assistant-js-websocket';
 import { fetchAreas, fetchSensors, fetchAutomations } from '../../data/websockets';
 import { TableData, TableColumn } from '../../components/alarmo-table';
 import { exportPath } from '../../common/navigation';
+import { fireEvent } from '../../fire_event';
 
 @customElement('area-config-card')
 export class AreaConfigCard extends SubscribeMixin(LitElement) {

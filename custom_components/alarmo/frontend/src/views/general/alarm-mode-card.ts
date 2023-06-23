@@ -1,11 +1,10 @@
 import { LitElement, html, CSSResultGroup, css } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
-import { HomeAssistant } from 'custom-card-helpers';
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
 
 import { commonStyle } from '../../styles';
 import { localize } from '../../../localize/localize';
-import { AlarmoModeConfig, AlarmoConfig, EArmModes, Dictionary, AlarmoArea, AlarmoSensor } from '../../types';
+import { AlarmoModeConfig, AlarmoConfig, EArmModes, Dictionary, AlarmoArea, AlarmoSensor, HomeAssistant } from '../../types';
 import { fetchAreas, fetchSensors, saveArea } from '../../data/websockets';
 import { handleError } from '../../helpers';
 import { SubscribeMixin } from '../../subscribe-mixin';

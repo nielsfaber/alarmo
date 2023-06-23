@@ -1,8 +1,8 @@
 import { LitElement, html, css, CSSResultGroup } from 'lit';
 import { property, customElement, state } from 'lit/decorators.js';
-import { HomeAssistant } from 'custom-card-helpers';
 import { mdiClose } from '@mdi/js';
 import { commonStyle } from '../styles';
+import { HomeAssistant } from '../types';
 
 @customElement('confirm-delete-dialog')
 export class ConfirmDeleteDialog extends LitElement {

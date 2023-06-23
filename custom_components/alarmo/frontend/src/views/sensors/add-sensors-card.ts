@@ -1,4 +1,3 @@
-import { HomeAssistant } from 'custom-card-helpers';
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators';
@@ -9,7 +8,7 @@ import { fetchAreas, fetchSensors, saveSensor } from '../../data/websockets';
 import { handleError, prettyPrint } from '../../helpers';
 import { commonStyle } from '../../styles';
 import { SubscribeMixin } from '../../subscribe-mixin';
-import { AlarmoArea, AlarmoSensor, Dictionary, EArmModes } from '../../types';
+import { AlarmoArea, AlarmoSensor, Dictionary, EArmModes, HomeAssistant } from '../../types';
 
 import '../../components/alarmo-table.ts';
 import { ESensorTypes } from '../../const';

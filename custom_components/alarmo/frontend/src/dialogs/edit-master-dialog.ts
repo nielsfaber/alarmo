@@ -1,9 +1,9 @@
 import { LitElement, html, css, CSSResultGroup } from 'lit';
 import { property, customElement, state } from 'lit/decorators.js';
-import { HomeAssistant } from 'custom-card-helpers';
 import { mdiClose } from '@mdi/js';
 import { localize } from '../../localize/localize';
 import { fetchConfig, saveConfig } from '../data/websockets';
+import { HomeAssistant } from '../types';
 
 @customElement('edit-master-dialog')
 export class EditMasterDialog extends LitElement {

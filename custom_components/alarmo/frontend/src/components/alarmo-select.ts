@@ -11,10 +11,10 @@ import {
   render,
 } from 'lit';
 import { property, customElement, state, query } from 'lit/decorators.js';
-import { fireEvent } from 'custom-card-helpers';
 import { mdiClose, mdiMenuUp, mdiMenuDown } from '@mdi/js';
 import { IsEqual, isDefined } from '../helpers';
 import { directive, Directive, DirectiveResult, PartInfo, PartType } from 'lit/node_modules/lit-html/directive';
+import { fireEvent } from '../fire_event';
 
 export type Option = {
   name: string;

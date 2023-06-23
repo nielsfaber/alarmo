@@ -1,14 +1,13 @@
 import { LitElement, html } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
-import { HomeAssistant, navigate, fireEvent } from 'custom-card-helpers';
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
 
 import { fetchConfig, saveConfig, fetchAreas, fetchAutomations, deleteAutomation } from '../../data/websockets';
 import { SubscribeMixin } from '../../subscribe-mixin';
 import { localize } from '../../../localize/localize';
-import { pick, handleError } from '../../helpers';
+import { pick, handleError, navigate } from '../../helpers';
 import { loadHaForm } from '../../load-ha-elements';
-import { AlarmoConfig, Dictionary, AlarmoArea, AlarmoAutomation } from '../../types';
+import { AlarmoConfig, Dictionary, AlarmoArea, AlarmoAutomation, HomeAssistant } from '../../types';
 import { commonStyle } from '../../styles';
 import { exportPath, Path } from '../../common/navigation';
 
@@ -19,6 +18,7 @@ import '../../components/time-slider';
 import '../../components/settings-row.ts';
 import '../../dialogs/edit-master-dialog.ts';
 import '../../dialogs/confirm-delete-dialog.ts';
+import { fireEvent } from '../../fire_event';
 
 @customElement('alarm-view-general')
 export class AlarmViewGeneral extends SubscribeMixin(LitElement) {

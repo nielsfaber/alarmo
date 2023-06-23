@@ -1,9 +1,8 @@
 import { LitElement, html, css, CSSResultGroup } from 'lit';
 import { property, customElement, state } from 'lit/decorators.js';
-import { HomeAssistant } from 'custom-card-helpers';
 import { mdiClose } from '@mdi/js';
 import { fetchSensors, fetchSensorGroups, saveSensorGroup, deleteSensorGroup } from '../data/websockets';
-import { Dictionary, AlarmoSensor, SensorGroup } from '../types';
+import { Dictionary, AlarmoSensor, SensorGroup, HomeAssistant } from '../types';
 import { dialogStyle } from '../styles';
 import { localize } from '../../localize/localize';
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';

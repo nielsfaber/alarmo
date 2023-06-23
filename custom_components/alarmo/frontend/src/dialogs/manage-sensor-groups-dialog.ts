@@ -1,15 +1,15 @@
 import { LitElement, html, css, CSSResultGroup } from 'lit';
 import { property, customElement, state } from 'lit/decorators.js';
-import { fireEvent, HomeAssistant } from 'custom-card-helpers';
 import { mdiClose, mdiChevronRight } from '@mdi/js';
 import { fetchSensors, fetchSensorGroups } from '../data/websockets';
-import { Dictionary, AlarmoSensor, SensorGroup } from '../types';
+import { Dictionary, AlarmoSensor, SensorGroup, HomeAssistant } from '../types';
 import { dialogStyle } from '../styles';
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
 import { SubscribeMixin } from '../subscribe-mixin';
+import { localize } from '../../localize/localize';
+import { fireEvent } from '../fire_event';
 
 import './create-sensor-group-dialog';
-import { localize } from '../../localize/localize';
 
 @customElement('manage-sensor-groups-dialog')
 export class ManageSensorGroupsDialog extends SubscribeMixin(LitElement) {

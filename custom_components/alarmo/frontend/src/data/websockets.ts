@@ -1,4 +1,3 @@
-import { HomeAssistant } from 'custom-card-helpers';
 import {
   AlarmoConfig,
   AlarmoModeConfig,
@@ -9,6 +8,7 @@ import {
   AlarmoAutomation,
   AlarmoArea,
   SensorGroup,
+  HomeAssistant,
 } from '../types';
 
 export const fetchConfig = (hass: HomeAssistant): Promise<AlarmoConfig> =>

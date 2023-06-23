@@ -1,9 +1,8 @@
 import { LitElement, html } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
-import { HomeAssistant, navigate } from 'custom-card-helpers';
 import { mdiClose } from '@mdi/js';
 import { loadHaForm } from '../../load-ha-elements';
-import { AlarmoConfig, MqttConfig, AlarmoArea, Dictionary } from '../../types';
+import { AlarmoConfig, MqttConfig, AlarmoArea, Dictionary, HomeAssistant } from '../../types';
 import { commonStyle } from '../../styles';
 
 import '../../components/settings-row.ts';
@@ -13,7 +12,7 @@ import { UnsubscribeFunc } from 'home-assistant-js-websocket';
 import { fetchConfig, saveConfig, fetchAreas } from '../../data/websockets';
 import { SubscribeMixin } from '../../subscribe-mixin';
 import { localize } from '../../../localize/localize';
-import { handleError, prettyPrint, filterState, commandToState, Assign } from '../../helpers';
+import { handleError, prettyPrint, filterState, commandToState, Assign, navigate } from '../../helpers';
 import { AlarmStates, AlarmCommands } from '../../const';
 import { exportPath } from '../../common/navigation';
 

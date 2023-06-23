@@ -1,12 +1,11 @@
 import { LitElement, html, CSSResultGroup, css } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
-import { HomeAssistant, navigate } from 'custom-card-helpers';
 import { mdiClose } from '@mdi/js';
 import { commonStyle } from '../../styles';
-import { AlarmoArea, AlarmoUser, Dictionary } from '../../types';
+import { AlarmoArea, AlarmoUser, Dictionary, HomeAssistant } from '../../types';
 import { fetchUsers, saveUser, deleteUser, fetchAreas } from '../../data/websockets';
 import { localize } from '../../../localize/localize';
-import { omit, showErrorDialog, handleError, sortAlphabetically } from '../../helpers';
+import { omit, showErrorDialog, handleError, sortAlphabetically, navigate } from '../../helpers';
 import { exportPath } from '../../common/navigation';
 
 @customElement('user-editor-card')

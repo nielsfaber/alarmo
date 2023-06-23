@@ -1,7 +1,8 @@
 import { LitElement, html, TemplateResult, css, PropertyValues, CSSResultGroup } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
-import { fireEvent, HomeAssistant } from 'custom-card-helpers';
+import { fireEvent } from '../fire_event';
 import { isDefined, IsEqual } from '../helpers';
+import { HomeAssistant } from '../types';
 
 export type Option = {
   value: string;

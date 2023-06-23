@@ -1,12 +1,11 @@
 import { LitElement, html } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
-import { fireEvent, HomeAssistant, navigate } from 'custom-card-helpers';
 import { mdiClose } from '@mdi/js';
 import { commonStyle } from '../../styles';
-import { AlarmoSensor, EArmModes, Dictionary, AlarmoArea, SensorGroup } from '../../types';
+import { AlarmoSensor, EArmModes, Dictionary, AlarmoArea, SensorGroup, HomeAssistant } from '../../types';
 import { fetchSensors, saveSensor, deleteSensor, fetchAreas, fetchSensorGroups } from '../../data/websockets';
 import { localize } from '../../../localize/localize';
-import { Unique, Without, handleError, showErrorDialog, prettyPrint, computeName } from '../../helpers';
+import { Unique, Without, handleError, showErrorDialog, prettyPrint, computeName, navigate } from '../../helpers';
 import { HassEntity, UnsubscribeFunc } from 'home-assistant-js-websocket';
 import { sensorConfigByType, getSensorTypeOptions } from '../../data/sensors';
 import { EArmModeIcons, ESensorTypes } from '../../const';
@@ -17,6 +16,7 @@ import '../../dialogs/error-dialog';
 import '../../dialogs/manage-sensor-groups-dialog';
 import '../../components/alarmo-select';
 import { exportPath } from '../../common/navigation';
+import { fireEvent } from '../../fire_event';
 @customElement('sensor-editor-card')
 export class SensorEditorCard extends SubscribeMixin(LitElement) {
   @property()

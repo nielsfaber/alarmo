@@ -1,9 +1,8 @@
 import { mdiFilterVariant, mdiClose } from '@mdi/js';
-import { fireEvent, HomeAssistant } from 'custom-card-helpers';
 import { LitElement, html, TemplateResult, css, PropertyValues } from 'lit';
 import { property, customElement, state, query } from 'lit/decorators.js';
 
-import { Dictionary } from '../types';
+import { Dictionary, HomeAssistant } from '../types';
 import { localize } from '../../localize/localize';
 
 import './alarmo-chip-set';

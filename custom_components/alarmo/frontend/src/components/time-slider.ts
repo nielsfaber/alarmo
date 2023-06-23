@@ -1,7 +1,7 @@
 import { LitElement, html, css } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 import { localize } from '../../localize/localize';
-import { HomeAssistant } from 'custom-card-helpers';
+import { HomeAssistant } from '../types';
 
 @customElement('time-slider')
 export class TimeSlider extends LitElement {

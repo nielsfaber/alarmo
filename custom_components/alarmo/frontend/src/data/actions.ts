@@ -1,9 +1,8 @@
 import { localize } from '../../localize/localize';
-import { EArmModes, AlarmoArea, EAlarmEvent, Dictionary, AlarmoConfig } from '../types';
+import { EArmModes, AlarmoArea, EAlarmEvent, Dictionary, AlarmoConfig, HomeAssistant } from '../types';
 import { EArmModeIcons } from '../const';
 
-import { computeDomain, computeEntity, HomeAssistant, domainIcon } from 'custom-card-helpers';
-import { Unique, isDefined, sortAlphabetically } from '../helpers';
+import { Unique, isDefined, sortAlphabetically, computeDomain, computeEntity, domainIcon } from '../helpers';
 
 export const computeArmModeDisplay = (val: EArmModes, hass: HomeAssistant) => {
   switch (val) {
