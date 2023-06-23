@@ -5,7 +5,6 @@ import re
 from homeassistant.core import (
     HomeAssistant,
     callback,
-    SERVICE_CALL_LIMIT,
 )
 
 from homeassistant.const import (
@@ -220,7 +219,6 @@ class AutomationHandler:
                         service_data,
                         blocking=True,
                         context={},
-                        limit=SERVICE_CALL_LIMIT,
                     )
                 )
             except HomeAssistantError as e:
