@@ -295,11 +295,11 @@ export const getAutomationEntities = (hass: HomeAssistant, additionalEntities?: 
   return entities;
 };
 
-export const getMediaPlayerEntities = (hass: HomeAssistant) => {
-  let entities = [...Object.keys(hass.states).filter(e => computeDomain(e) == 'media_player')];
+export const getEntitiesByDomain = (hass: HomeAssistant, ...domains: string[]) => {
+  let entities = [...Object.keys(hass.states).filter(e => domains.includes(computeDomain(e)))];
   entities.sort(sortAlphabetically);
   return entities;
-};
+}
 
 export const getWildcardOptions = (event?: EAlarmEvent, alarmoConfig?: AlarmoConfig) => {
   let options: { name: string; value: string }[] = [];

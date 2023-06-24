@@ -30,7 +30,7 @@ import {
   getOpenSensorsWildCardOptions,
   getArmModeWildCardOptions,
   computeEntityDisplay,
-  getMediaPlayerEntities,
+  getEntitiesByDomain,
 } from '../../data/actions';
 
 import { EAutomationTypes } from '../../const';
@@ -243,7 +243,7 @@ export class NotificationEditorCard extends LitElement {
                         </span>
 
                         <alarmo-select
-                          .items=${computeEntityDisplay(getMediaPlayerEntities(this.hass), this.hass)}
+                          .items=${computeEntityDisplay(getEntitiesByDomain(this.hass, 'media_player', 'tts'), this.hass)}
                           label=${localize('panels.actions.cards.new_action.fields.entity.heading', this.hass.language)}
                           .value=${this.config.actions[0].data?.entity_id || ''}
                           @value-changed=${this._setEntity}
@@ -354,7 +354,7 @@ export class NotificationEditorCard extends LitElement {
                   @value-changed=${this._setYaml}
                 ></ha-yaml-editor>
 
-                ${this.errors.service || this.errors.title || this.errors.message
+                ${this.errors.service || this.errors.title || this.errors.message || this.errors.entity
                   ? html`
                       <span class="error-message">
                         ${this.hass.localize(
@@ -574,7 +574,7 @@ export class NotificationEditorCard extends LitElement {
       actionConfig.service &&
       computeDomain(actionConfig.service) == 'tts' &&
       (!Object.keys(actionConfig.data || {}).includes('entity_id') ||
-        !getMediaPlayerEntities(this.hass).includes(actionConfig.data!.entity_id))
+        !getEntitiesByDomain(this.hass, 'media_player', 'tts').includes(actionConfig.data!.entity_id))
     )
       this.errors = { ...this.errors, entity: true };
 
