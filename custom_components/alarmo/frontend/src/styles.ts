@@ -39,7 +39,7 @@ export const commonStyle = css`
     right: 0px;
   }
 
-  mwc-button.active {
+  mwc-button.active:not([disabled]) {
     background: var(--primary-color);
     --mdc-theme-primary: var(--text-primary-color);
     border-radius: 4px;
@@ -49,10 +49,6 @@ export const commonStyle = css`
   }
   mwc-button.success {
     --mdc-theme-primary: var(--success-color);
-  }
-
-  mwc-button.disabled.active {
-    opacity: 0.5;
   }
 
   div.entity-row {

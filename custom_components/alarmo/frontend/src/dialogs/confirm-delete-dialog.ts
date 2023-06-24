@@ -24,13 +24,11 @@ export class ConfirmDeleteDialog extends LitElement {
     if (!this._params) return html``;
     return html`
       <ha-dialog open .heading=${true} @closed=${this.closeDialog} @close-dialog=${this.closeDialog}>
-        <div slot="heading">
-          <ha-header-bar>
-            <ha-icon-button slot="navigationIcon" dialogAction="cancel" .path=${mdiClose}>
-            </ha-icon-button>
-            <span slot="title">${this._params.title}</span>
-          </ha-header-bar>
-        </div>
+        <ha-dialog-header slot="heading">
+          <ha-icon-button slot="navigationIcon" dialogAction="cancel" .path=${mdiClose}>
+          </ha-icon-button>
+          <span slot="title">${this._params.title}</span>
+        </ha-dialog-header>
         <div class="wrapper">
           ${this._params.description}
         </div>
