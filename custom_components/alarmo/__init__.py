@@ -2,6 +2,7 @@
 import logging
 import bcrypt
 import base64
+import re
 
 from homeassistant.core import (
     callback,
@@ -297,11 +298,7 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                 return
             action = event.data.get("actionName") if "actionName" in event.data else event.data.get("action")
 
-            if action not in [
-                const.EVENT_ACTION_FORCE_ARM,
-                const.EVENT_ACTION_RETRY_ARM,
-                const.EVENT_ACTION_DISARM
-            ]:
+            if action not in const.EVENT_ACTIONS:
                 return
 
             if self.hass.data[const.DOMAIN]["master"]:
@@ -313,6 +310,9 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                 return
 
             arm_mode = alarm_entity._arm_mode
+            res = re.search(r"^ALARMO_ARM_", action)
+            if res:
+                arm_mode = action.replace("ALARMO_", "").lower().replace("arm", "armed")
             if not arm_mode:
                 _LOGGER.info("Cannot process the push action, since the arm mode is not known.")
                 return
@@ -326,6 +326,9 @@ class AlarmoCoordinator(DataUpdateCoordinator):
             elif action == const.EVENT_ACTION_DISARM:
                 _LOGGER.info("Received request for disarming")
                 await alarm_entity.async_alarm_disarm(code=None, skip_code=True)
+            else:
+                _LOGGER.info("Received request for arming with mode {}".format(arm_mode))
+                await alarm_entity.async_handle_arm_request(arm_mode, skip_code=True)
 
         self._subscriptions.append(
             self.hass.bus.async_listen(const.PUSH_EVENT, async_handle_push_event)

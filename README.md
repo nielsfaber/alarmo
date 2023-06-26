@@ -501,7 +501,7 @@ The following actions are defined in Alarmo and can be used in actionable notifi
 | `ALARMO_RETRY_ARM` | Repeats the command that failed before.<br>Will only succeed in case the issue blocking the arming before has been restored.     | Failed to arm                 |
 | `ALARMO_FORCE_ARM` | Repeats the command that failed before.<br>The sensor/sensors that failed, shall be ignored (bypassed) while the alarm is armed. | Failed to arm                 |
 | `ALARMO_DISARM`    | Disarm the alarm.                                                                                                                | Armed, Leave, Entry, Triggered |
-
+| `ALARMO_ARM_AWAY`<br> `ALARMO_ARM_HOME`<br> `ALARMO_ARM_NIGHT`<br> `ALARMO_ARM_VACATION`<br> `ALARMO_ARM_CUSTOM_BYPASS`    | Arm the alarm in the corresponding mode.                                                                                                                | None (intended for automations outside of alarmo). |
 **Set up notification with actions**
 
 In the Alarmo notifications editor, create a notification and select an event.
