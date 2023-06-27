@@ -1,10 +1,10 @@
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
-import { html, LitElement } from 'lit';
+import { html, LitElement, PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators';
 
 import { localize } from '../../../localize/localize';
 import { TableColumn, TableData, TableFilterConfig } from '../../components/alarmo-table';
-import { ESensorIcons, ESensorTypes } from '../../const';
+import { ESensorIcons, ESensorIconsActive, ESensorTypes } from '../../const';
 import { fetchAreas, fetchSensors, saveSensor } from '../../data/websockets';
 import { computeName, handleError, navigate, sortAlphabetically } from '../../helpers';
 import { commonStyle } from '../../styles';
@@ -57,6 +57,14 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
     if (this.path && this.path.length == 2 && this.path[0] == 'filter') this.selectedArea = this.path[1];
   }
 
+  shouldUpdate(changedProps: PropertyValues) {
+    const oldHass = changedProps.get('hass') as HomeAssistant | undefined;
+    if (oldHass && changedProps.size == 1) {
+      return Object.keys(this.sensors).some(id => oldHass.states[id] !== this.hass.states[id]);
+    }
+    return true;
+  }
+
   render() {
     if (!this.hass || !this.areas || !this.sensors) return html``;
 
@@ -95,7 +103,7 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
         renderer: (data: AlarmoSensor) => {
           const stateObj = this.hass.states[data.entity_id];
           const type = Object.keys(ESensorTypes).find(e => ESensorTypes[e] == data.type) as ESensorTypes;
-          const icon = stateObj ? ESensorIcons[type] : 'hass:help-circle-outline';
+          const icon = stateObj ? stateObj.state === "on" ? ESensorIconsActive[type] : ESensorIcons[type] : 'hass:help-circle-outline';
           return data.area == noArea
             ? html`
                 ${warningTooltip()}

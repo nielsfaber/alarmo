@@ -43,12 +43,21 @@ export enum ESensorTypes {
 }
 
 export enum ESensorIcons {
-  Door = 'hass:door-closed',
-  Window = 'hass:window-closed',
-  Motion = 'hass:motion-sensor',
-  Tamper = 'hass:vibrate',
-  Environmental = 'hass:fire',
-  Other = 'hass:contactless-payment-circle-outline',
+  Door = 'mdi:door-closed',
+  Window = 'mdi:window-closed',
+  Motion = 'mdi:motion-sensor-off',
+  Tamper = 'mdi:crop-portrait',
+  Environmental = 'mdi:fire',
+  Other = 'mdi:check-circle',
+}
+
+export enum ESensorIconsActive {
+  Door = 'mdi:door-open',
+  Window = 'mdi:window-open',
+  Motion = 'mdi:motion-sensor',
+  Tamper = 'mdi:vibrate',
+  Environmental = 'mdi:fire-alert',
+  Other = 'mdi:alert-circle',
 }
 
 export enum EAutomationTypes {
