@@ -239,15 +239,15 @@ class SensorHandler:
 
             if not res and target_state in const.ARM_MODES:
                 # sensor is active while arming
-                if sensor_config[ATTR_ALLOW_OPEN] and sensor_state == STATE_OPEN:
-                    # sensor is permitted to be open during/after arming
-                    continue
-                elif bypass_open_sensors or (
+                if bypass_open_sensors or (
                     sensor_config[ATTR_AUTO_BYPASS] and
                     target_state in sensor_config[ATTR_AUTO_BYPASS_MODES]
                 ):
                     # sensor may be bypassed
                     bypassed_sensors.append(entity)
+                elif sensor_config[ATTR_ALLOW_OPEN] and sensor_state == STATE_OPEN:
+                    # sensor is permitted to be open during/after arming
+                    continue
                 else:
                     open_sensors[entity] = sensor_state
 

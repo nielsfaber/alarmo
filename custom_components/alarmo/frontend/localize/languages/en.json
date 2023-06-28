@@ -241,8 +241,8 @@
               "description": "Sensor activation triggers the alarm after the entry delay rather than directly."
             },
             "allow_open": {
-              "heading": "Allow open after arming",
-              "description": "Initial state of the sensor is ignored upon arming."
+              "heading": "Allow open initially",
+              "description": "Open state while arming is ignored (subsequent sensor activation will trigger alarm)."
             },
             "auto_bypass": {
               "heading": "Bypass automatically",

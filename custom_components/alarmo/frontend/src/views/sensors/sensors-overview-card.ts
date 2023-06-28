@@ -59,7 +59,7 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
 
   shouldUpdate(changedProps: PropertyValues) {
     const oldHass = changedProps.get('hass') as HomeAssistant | undefined;
-    if (oldHass && changedProps.size == 1) {
+    if (oldHass && changedProps.size == 1 && this.sensors) {
       return Object.keys(this.sensors).some(id => oldHass.states[id] !== this.hass.states[id]);
     }
     return true;

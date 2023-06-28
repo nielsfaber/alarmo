@@ -210,8 +210,7 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
                   ></ha-switch>
                 </settings-row>
 
-                ${(!this.data.type || [ESensorTypes.Motion, ESensorTypes.Window, ESensorTypes.Other].includes(this.data.type)) &&
-                this.data.use_exit_delay
+                ${this.data.type == ESensorTypes.Motion && this.data.use_exit_delay
                   ? html`
                       <settings-row .narrow=${this.narrow} nested>
                         <span slot="heading">
@@ -319,6 +318,26 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
               `
             : ''}
 
+        ${(!this.data.type || [ESensorTypes.Window, ESensorTypes.Door, ESensorTypes.Other].includes(this.data.type))
+          ? html`
+              <settings-row .narrow=${this.narrow}>
+                <span slot="heading">
+                  ${localize('panels.sensors.cards.editor.fields.allow_open.heading', this.hass.language)}
+                </span>
+                <span slot="description">
+                  ${localize('panels.sensors.cards.editor.fields.allow_open.description', this.hass.language)}
+                </span>
+
+                <ha-switch
+                  ?checked=${this.data.allow_open}
+                  ?disabled=${this.data.always_on || this.data.arm_on_close}
+                  @change=${(ev: Event) =>
+                    this._SetData({ allow_open: (ev.target as HTMLInputElement).checked })}
+                ></ha-switch>
+              </settings-row>
+            `
+          : ''}
+
           <settings-row .narrow=${this.narrow}>
             <span slot="heading">
               ${localize('panels.sensors.cards.editor.fields.trigger_unavailable.heading', this.hass.language)}
@@ -382,7 +401,7 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
           break;
         case 'use_exit_delay':
           this.data = { ...this.data, use_exit_delay: val == true };
-          if (val) this.data = { ...this.data, allow_open: false };
+          if(this.data.type === ESensorTypes.Motion && !val) this.data = {...this.data, allow_open: false};
           break;
         case 'arm_on_close':
           this.data = { ...this.data, arm_on_close: val == true };
@@ -390,7 +409,7 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
           break;
         case 'allow_open':
           this.data = { ...this.data, allow_open: val == true };
-          if (val) this.data = { ...this.data, arm_on_close: false, always_on: false, use_exit_delay: true };
+          if (val) this.data = { ...this.data, arm_on_close: false, always_on: false };
           break;
         case 'auto_bypass':
           this.data = { ...this.data, auto_bypass: val == true };
