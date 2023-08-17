@@ -60,10 +60,10 @@
           "title": "Modi",
           "description": "Mit diesem Panel können die Scharfschaltmodi des Alarms eingestellt werden.",
           "modes": {
-            "armed_away": "Armed away wird verwendet, wenn alle Personen das Haus verlassen haben. Alle Türen und Fenster, die den Zugang zum Haus ermöglichen, werden bewacht, ebenso wie die Bewegungsmelder im Haus.",
-            "armed_home": "Armed home (auch bekannt als armed stay) wird verwendet, wenn der Alarm ausgelöst wird, während sich Personen im Haus befinden. Alle Türen und Fenster, die den Zugang zum Haus ermöglichen, werden bewacht, aber nicht die Bewegungsmelder im Haus.",
-            "armed_night": "Armed night wird verwendet, wenn der Alarm vor dem Schlafengehen eingestellt wird. Alle Türen und Fenster, die den Zugang zum Haus ermöglichen, werden überwacht, und ausgewählte Bewegungssensoren (im Erdgeschoss) im Haus.",
-            "armed_vacation": "Armed vacation kann als Erweiterung des bewaffneten Abwesenheitsmodus bei längerer Abwesenheit verwendet werden. Die Verzögerungszeiten und Auslösereaktionen können (wie gewünscht) an die Abwesenheit angepasst werden.",
+            "armed_away": "ABWESEND wird verwendet, wenn alle Personen das Haus verlassen haben. Alle Türen und Fenster, die den Zugang zum Haus ermöglichen, werden bewacht, ebenso wie die Bewegungsmelder im Haus.",
+            "armed_home": "ZUHAUSE wird verwendet, wenn der Alarm ausgelöst wird, während sich Personen im Haus befinden. Alle Türen und Fenster, die den Zugang zum Haus ermöglichen, werden bewacht, aber nicht die Bewegungsmelder im Haus.",
+            "armed_night": "NACHT wird verwendet, wenn der Alarm vor dem Schlafengehen eingestellt wird. Alle Türen und Fenster, die den Zugang zum Haus ermöglichen, werden überwacht, und ausgewählte Bewegungssensoren (im Erdgeschoss) im Haus.",
+            "armed_vacation": "URLAUB kann als Erweiterung von Abwesend bei längerer Abwesenheit verwendet werden. Die Verzögerungszeiten und Auslösereaktionen können (wie gewünscht) an die Abwesenheit angepasst werden.",
             "armed_custom_bypass": "Ein zusätzlicher Modus, um Ihren eigenen Sicherheitsbereich zu definieren."
           },
           "number_sensors_active": "{number} {number, plural,\n one {Sensor}\n other {Sensoren}\n} aktiv",
@@ -196,7 +196,7 @@
               "description": "Wählen Sie einen Gerätetyp, um die entsprechenden Einstellungen automatisch anzuwenden.",
               "choose": {
                 "door": {
-                  "name": "Tü",
+                  "name": "Tür",
                   "description": "Eine Tür, ein Tor oder ein anderer Eingang, die/das/der zum Betreten/Verlassen der Wohnung verwendet wird."
                 },
                 "window": {
@@ -241,8 +241,8 @@
               "description": "Die Sensoraktivierung löst den Alarm nach der Auslöseverzögerung aus und nicht direkt."
             },
             "allow_open": {
-              "heading": "Öffnen nach Scharfschaltung zulassen",
-              "description": "Der Ausgangszustand des Sensors wird beim Scharfschalten ignoriert."
+              "heading": "Offen bei Scharfschaltung zulassen",
+              "description": "Der Zustand OFFEN während der Scharfschaltung wird ignoriert (eine nachfolgende Sensoraktivierung löst den Alarm aus)."
             },
             "auto_bypass": {
               "heading": "Automatische Umgehung",
