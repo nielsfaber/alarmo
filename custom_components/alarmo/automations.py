@@ -217,7 +217,7 @@ class AutomationHandler:
                         domain,
                         service,
                         service_data,
-                        blocking=True,
+                        blocking=False,
                         context={},
                     )
                 )
