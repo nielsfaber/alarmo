@@ -60,11 +60,11 @@
           "title": "Modi",
           "description": "Mit diesem Panel können die Scharfschaltmodi des Alarms eingestellt werden.",
           "modes": {
-            "armed_away": "ABWESEND wird verwendet, wenn alle Personen das Haus verlassen haben. Alle Türen und Fenster, die den Zugang zum Haus ermöglichen, werden bewacht, ebenso wie die Bewegungsmelder im Haus.",
-            "armed_home": "ZUHAUSE wird verwendet, wenn der Alarm ausgelöst wird, während sich Personen im Haus befinden. Alle Türen und Fenster, die den Zugang zum Haus ermöglichen, werden bewacht, aber nicht die Bewegungsmelder im Haus.",
-            "armed_night": "NACHT wird verwendet, wenn der Alarm vor dem Schlafengehen eingestellt wird. Alle Türen und Fenster, die den Zugang zum Haus ermöglichen, werden überwacht, und ausgewählte Bewegungssensoren (im Erdgeschoss) im Haus.",
-            "armed_vacation": "URLAUB kann als Erweiterung von Abwesend bei längerer Abwesenheit verwendet werden. Die Verzögerungszeiten und Auslösereaktionen können (wie gewünscht) an die Abwesenheit angepasst werden.",
-            "armed_custom_bypass": "Ein zusätzlicher Modus, um Ihren eigenen Sicherheitsbereich zu definieren."
+            "armed_away": "Abwesend wird verwendet, wenn alle Personen das Haus verlassen haben. Alle Türen und Fenster, die den Zugang zum Haus ermöglichen, werden bewacht, ebenso wie die Bewegungsmelder im Haus.",
+            "armed_home": "Zuhause wird verwendet, wenn der Alarm ausgelöst wird, während sich Personen im Haus befinden. Alle Türen und Fenster, die den Zugang zum Haus ermöglichen, werden bewacht, aber nicht die Bewegungsmelder im Haus.",
+            "armed_night": "Nacht wird verwendet, wenn der Alarm vor dem Schlafengehen eingestellt wird. Alle Türen und Fenster, die den Zugang zum Haus ermöglichen, werden überwacht, und ausgewählte Bewegungssensoren (im Erdgeschoss) im Haus.",
+            "armed_vacation": "Urlaub kann als Erweiterung von Abwesend bei längerer Abwesenheit verwendet werden. Die Verzögerungszeiten und Auslösereaktionen können (wie gewünscht) an die Abwesenheit angepasst werden.",
+            "armed_custom_bypass": "Individuell: ein zusätzlicher Modus, um Ihren eigenen Sicherheitsbereich zu definieren."
           },
           "number_sensors_active": "{number} {number, plural,\n one {Sensor}\n other {Sensoren}\n} aktiv",
           "fields": {
