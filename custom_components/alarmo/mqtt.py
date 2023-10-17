@@ -58,7 +58,7 @@ class MqttHandler:
         @callback
         def async_alarm_state_changed(area_id: str, old_state: str, new_state: str):
 
-            if not self._config[ATTR_MQTT][const.ATTR_ENABLED]:
+            if not self._config[ATTR_MQTT][const.ATTR_ENABLED] or not new_state:
                 return
 
             topic = self._config[ATTR_MQTT][CONF_STATE_TOPIC]

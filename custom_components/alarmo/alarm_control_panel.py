@@ -121,6 +121,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
         self.expiration = None
         self.area_id = None
         self._revert_state = None
+        self._ready_to_arm_modes = []
 
     @property
     def device_info(self) -> dict:
@@ -250,6 +251,25 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             self.expiration = None
 
     @property
+    def ready_to_arm_modes(self):
+        """Get arm modes which are ready for arming (no blocking sensors)."""
+
+        if not self._ready_to_arm_modes:
+            return None
+        else:
+            return list(map(lambda e: const.STATE_TO_ARM_MODE[e], self._ready_to_arm_modes))
+
+    @ready_to_arm_modes.setter
+    def ready_to_arm_modes(self, value):
+        """Set arm modes which are ready for arming (no blocking sensors)."""
+        if value == self._ready_to_arm_modes:
+            return
+        _LOGGER.debug("ready_to_arm_modes updated to {}".format(", ".join(value).replace("armed_","")))
+        self._ready_to_arm_modes = value
+        async_dispatcher_send(self.hass, "alarmo_state_updated", self.area_id, None, None)
+        self.async_write_ha_state()
+
+    @property
     def extra_state_attributes(self):
         """Return the data of the entity."""
 
@@ -258,6 +278,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             "open_sensors": self.open_sensors,
             "bypassed_sensors": self.bypassed_sensors,
             "delay": self.delay,
+            "ready_to_arm_modes": self.ready_to_arm_modes,
         }
 
     def _validate_code(self, code, state):
@@ -954,6 +975,12 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
             if item.bypassed_sensors:
                 bypassed_sensors.extend(item.bypassed_sensors)
         self.bypassed_sensors = bypassed_sensors
+
+        # calculate ready for arm modes
+        modes_list = const.ARM_MODES
+        for item in self.hass.data[const.DOMAIN]["areas"].values():
+            modes_list = list(filter(lambda x: x in item._ready_to_arm_modes, modes_list))
+        self._ready_to_arm_modes = modes_list
 
         self.async_write_ha_state()
 
