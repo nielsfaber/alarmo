@@ -124,7 +124,7 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
   }
 
   getSensorsByMode(mode: EArmModes) {
-    return Object.values(this.sensors).filter(e => e.modes.includes(mode) || e.always_on).length;
+    return Object.values(this.sensors).filter(e => e.area == this.selectedArea && (e.modes.includes(mode) || e.always_on)).length;
   }
 
   renderModeConfig(mode: EArmModes) {
