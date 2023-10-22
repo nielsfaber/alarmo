@@ -14,7 +14,6 @@ import { exportPath, Path } from '../../common/navigation';
 import './alarm-mode-card';
 import './mqtt-config-card.ts';
 import './area-config-card.ts';
-import '../../components/time-slider';
 import '../../components/settings-row.ts';
 import '../../dialogs/edit-master-dialog.ts';
 import '../../dialogs/confirm-delete-dialog.ts';

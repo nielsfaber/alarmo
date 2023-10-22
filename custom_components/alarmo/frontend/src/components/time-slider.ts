@@ -3,6 +3,23 @@ import { property, customElement } from 'lit/decorators.js';
 import { localize } from '../../localize/localize';
 import { HomeAssistant } from '../types';
 
+export enum ETimeUnits {
+  Seconds = 'sec',
+  Minutes = 'min'
+}
+
+const round = (val: number, step: number) => {
+  return Math.round(val / step) * step;
+}
+
+const calcStepSize = (min: number, max: number) => {
+  const stepSizes = [10/60, 15/60, 20/60, 30/60, 1, 2, 5];
+  let range = max - min;
+  let step = range / 12;
+  step = stepSizes.reduce((prev, curr) => Math.abs(curr - step) < Math.abs(prev - step) ? curr : prev);
+  return step;
+}
+
 @customElement('time-slider')
 export class TimeSlider extends LitElement {
   hass?: HomeAssistant;
@@ -14,15 +31,12 @@ export class TimeSlider extends LitElement {
   max = 100;
 
   @property({ type: Number })
-  step = 5;
-
-  @property({ type: Number })
   value = 0;
 
   @property() scaleFactor = 1;
 
-  @property({ type: String })
-  unit = '';
+  @property({ type: ETimeUnits })
+  unit = ETimeUnits.Minutes;
 
   @property({ type: Boolean })
   disabled = false;
@@ -30,10 +44,22 @@ export class TimeSlider extends LitElement {
   @property({ type: String })
   zeroValue?: string;
 
+  _min: number = 0;
+  _max: number = 0;
+  _step: number = 0;
+
   firstUpdated() {
-    if (this.value > 0 && this.value < 60) this.unit = 'sec';
-    if (this.unit == 'min') this.scaleFactor = 1 / 60;
-    if (this.unit == 'min') this.step = 1;
+    this.setUnit(this.value > 0 && this.value <= 60 ? ETimeUnits.Seconds : ETimeUnits.Minutes);
+  }
+
+  private setUnit(unit: ETimeUnits) {
+    this.unit = unit;
+    this.scaleFactor = this.unit == ETimeUnits.Minutes ? 1 / 60 : 1;
+    this._step = calcStepSize(this.min * this.scaleFactor, (ETimeUnits.Minutes ? this.max : 60) * this.scaleFactor);
+    let min = this.min * this.scaleFactor;
+    if(min < this._step) min = this._step;
+    this._min = round(min, this._step);
+    this._max = (unit == ETimeUnits.Minutes ? round(this.max, this._step) : 60)  * this.scaleFactor;
   }
 
   render() {
@@ -53,7 +79,7 @@ export class TimeSlider extends LitElement {
   }
 
   getValue() {
-    const value = Number(Math.round(this.value * this.scaleFactor));
+    const value = round(this.value * this.scaleFactor, this._step);
     if (!value && this.zeroValue) {
       return this.zeroValue;
     }
@@ -62,9 +88,9 @@ export class TimeSlider extends LitElement {
 
   getUnit() {
     switch (this.unit) {
-      case 'sec':
+      case ETimeUnits.Seconds:
         return localize('components.time_slider.seconds', this.hass!.language);
-      case 'min':
+      case ETimeUnits.Minutes:
         return localize('components.time_slider.minutes', this.hass!.language);
       default:
         return '';
@@ -72,13 +98,14 @@ export class TimeSlider extends LitElement {
   }
 
   getSlider() {
+    const val = round(this.value * this.scaleFactor, this._step);
     return html`
       <ha-slider
         pin
-        min=${Math.round(this.min * this.scaleFactor)}
-        max=${Math.round(this.max * this.scaleFactor)}
-        step=${this.step}
-        value=${Math.round(this.value * this.scaleFactor)}
+        min=${this._min}
+        max=${this._max}
+        step=${this._step}
+        value=${val}
         ?disabled=${this.disabled}
         @change=${this.updateValue}
       ></ha-slider>
@@ -87,13 +114,11 @@ export class TimeSlider extends LitElement {
 
   updateValue(e: Event) {
     const value = Number((e.target as HTMLInputElement).value);
-    this.value = Math.round(value / this.scaleFactor);
+    this.value = round(value, this._step) / this.scaleFactor;
   }
 
   toggleUnit() {
-    this.unit = this.unit == 'min' ? 'sec' : 'min';
-    this.scaleFactor = this.unit == 'min' ? 1 / 60 : 1;
-    this.step = this.unit == 'min' ? 1 : 5;
+    this.setUnit(this.unit == ETimeUnits.Minutes ? ETimeUnits.Seconds : ETimeUnits.Minutes);
   }
 
   static styles = css`

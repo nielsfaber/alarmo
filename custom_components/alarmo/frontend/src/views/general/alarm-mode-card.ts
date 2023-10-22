@@ -15,6 +15,7 @@ import '../../components/alarmo-select';
 import '../../components/alarmo-collapsible';
 
 import { exportPath } from '../../common/navigation';
+import { ETimeUnits } from '../../components/time-slider';
 
 @customElement('alarm-mode-card')
 export class AlarmModeCard extends SubscribeMixin(LitElement) {
@@ -165,8 +166,7 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
         </span>
         <time-slider
           .hass=${this.hass}
-          unit="sec"
-          max="180"
+          max="300"
           zeroValue=${localize('components.time_slider.none', this.hass.language)}
           value=${config?.exit_time || 0}
           @change=${(ev: Event) =>
@@ -185,8 +185,7 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
         </span>
         <time-slider
           .hass=${this.hass}
-          unit="sec"
-          max="180"
+          max="300"
           zeroValue=${localize('components.time_slider.none', this.hass.language)}
           value=${config?.entry_time || 0}
           @change=${(ev: Event) =>
@@ -205,7 +204,6 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
         </span>
         <time-slider
           .hass=${this.hass}
-          unit="min"
           max="3600"
           zeroValue=${localize('components.time_slider.infinite', this.hass.language)}
           value=${config?.trigger_time || 0}
