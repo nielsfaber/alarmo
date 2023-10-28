@@ -316,6 +316,10 @@
               "heading": "Usa codice di disattivazione",
               "description": "Richiedi un codice per disattivare l'allarme"
             },
+            "code_mode_change_required": {
+              "heading": "Richiede il codice per cambiare modalità",
+              "description": "È necessario fornire un codice valido per modificare la modalità di inserimento attiva."
+            },
             "code_format": {
               "heading": "Formato del codice",
               "description": "Imposta il tipo di codice da digitare nella card di Lovelace.",

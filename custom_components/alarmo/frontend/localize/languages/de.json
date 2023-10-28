@@ -316,6 +316,10 @@
               "heading": "Entschärfungscode verwenden",
               "description": "Unscharfschaltung erfordert einen Code"
             },
+            "code_mode_change_required": {
+              "heading": "Code verwenden zum Umschalten des Modus",
+              "description": "Um den aktiven Scharfschaltmodus zu ändern, ist ein gültiger Code erforderlich."
+            },
             "code_format": {
               "heading": "Code-Format",
               "description": "Legt den Eingabetyp für die Lovelace-Alarmkarte fest.",

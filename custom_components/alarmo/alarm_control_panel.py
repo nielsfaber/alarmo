@@ -195,6 +195,8 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
         """Whether the code is required for arm actions."""
         if not self._config or ATTR_CODE_ARM_REQUIRED not in self._config:
             return True  # assume code is needed (conservative approach)
+        elif self._state != STATE_ALARM_DISARMED:
+            return self._config[const.ATTR_CODE_DISARM_REQUIRED]
         else:
             return self._config[ATTR_CODE_ARM_REQUIRED]
 
@@ -281,13 +283,24 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             "ready_to_arm_modes": self.ready_to_arm_modes,
         }
 
-    def _validate_code(self, code, state):
+    def _validate_code(self, code, to_state):
         """Validate given code."""
 
-        if state == STATE_ALARM_DISARMED and not self._config[const.ATTR_CODE_DISARM_REQUIRED]:
+        if to_state == STATE_ALARM_DISARMED and not self._config[const.ATTR_CODE_DISARM_REQUIRED]:
             self._changed_by = None
             return (True, None)
-        elif state != STATE_ALARM_DISARMED and not self._config[ATTR_CODE_ARM_REQUIRED]:
+        elif (
+            to_state != STATE_ALARM_DISARMED and
+            self._state == STATE_ALARM_DISARMED and 
+            not self._config[ATTR_CODE_ARM_REQUIRED]
+        ):
+            self._changed_by = None
+            return (True, None)
+        elif (
+            to_state != STATE_ALARM_DISARMED and
+            self._state != STATE_ALARM_DISARMED and 
+            not self._config[const.ATTR_CODE_MODE_CHANGE_REQUIRED]
+        ):
             self._changed_by = None
             return (True, None)
         elif not code or len(code) < 1:
@@ -306,11 +319,11 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             # user is not allowed to operate this area
             _LOGGER.debug("User {} has no permission to arm/disarm this area.".format(res[ATTR_NAME]))
             return (False, const.EVENT_INVALID_CODE_PROVIDED)
-        elif state == STATE_ALARM_DISARMED and not res["can_disarm"]:
+        elif to_state == STATE_ALARM_DISARMED and not res["can_disarm"]:
             # user is not allowed to disarm the alarm
             _LOGGER.debug("User {} has no permission to disarm the alarm.".format(res[ATTR_NAME]))
             return (False, const.EVENT_INVALID_CODE_PROVIDED)
-        elif state in const.ARM_MODES and not res["can_arm"]:
+        elif to_state in const.ARM_MODES and not res["can_arm"]:
             # user is not allowed to arm the alarm
             _LOGGER.debug("User {} has no permission to arm the alarm.".format(res[ATTR_NAME]))
             return (False, const.EVENT_INVALID_CODE_PROVIDED)

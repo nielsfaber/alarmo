@@ -316,6 +316,10 @@
               "heading": "Brug kode ved frakobling",
               "description": "Kræv kode for at frakoble alarmen"
             },
+            "code_mode_change_required": {
+              "heading": "Kræv kode for at skifte tilstand",
+              "description": "En gyldig kode skal angives for at ændre aktiveringstilstanden."
+            },
             "code_format": {
               "heading": "Kode format",
               "description": "Indstil input typen for lovelace alarm kortet.",

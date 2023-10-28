@@ -316,6 +316,10 @@
               "heading": "Použite deaktivačný kód",
               "description": "Vyžaduje sa kód na vypnutie alarmu"
             },
+            "code_mode_change_required": {
+              "heading": "Vyžadovať kód pre režim prepínania",
+              "description": "Ak chcete zmeniť aktívny režim stráženia, musíte zadať platný kód."
+            },
             "code_format": {
               "heading": "Formát kódu",
               "description": "Nastaví typ vstupu pre kartu alarmu Lovelace.",

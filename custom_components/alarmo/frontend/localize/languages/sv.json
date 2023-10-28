@@ -316,6 +316,10 @@
               "heading": "Använd avlarmningskod",
               "description": "Kräv en kod för att inaktivera larmet"
             },
+            "code_mode_change_required": {
+              "heading": "Kräv kod för att byta läge",
+              "description": "En giltig kod måste tillhandahållas för att ändra aktiveringsläget."
+            },
             "code_format": {
               "heading": "Kodformat",
               "description": "Ändra inmatningstyp för Lovelace alarm kortet.",

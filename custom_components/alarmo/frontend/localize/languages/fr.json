@@ -316,6 +316,10 @@
               "heading": "Utiliser un code pour la désactivation",
               "description": "Code requis pour la désactivation de l'alarme"
             },
+            "code_mode_change_required": {
+              "heading": "Exiger un code pour changer de mode",
+              "description": "Un code valide doit être fourni pour changer le mode d'armement qui est actife."
+            },
             "code_format": {
               "heading": "Format du code",
               "description": "Définit le type d'entrée pour la carte d'alarme Lovelace.",

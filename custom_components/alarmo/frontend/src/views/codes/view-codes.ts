@@ -43,7 +43,7 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
       return;
     }
     const config = await fetchConfig(this.hass);
-    this.data = pick(config, ['code_arm_required', 'code_disarm_required', 'code_format']);
+    this.data = pick(config, ['code_arm_required', 'code_disarm_required', 'code_mode_change_required', 'code_format']);
 
     const users = await fetchUsers(this.hass);
     this.users = users;
@@ -65,6 +65,8 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
         ></user-editor-card>
       `;
     } else {
+      const codesInUse = this.data.code_arm_required || this.data.code_disarm_required || this.data.code_mode_change_required;
+
       return html`
         <ha-card header="${localize('panels.codes.title', this.hass.language)}">
           <div class="card-content">${localize('panels.codes.cards.codes.description', this.hass.language)}</div>
@@ -101,32 +103,46 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
 
           <settings-row .narrow=${this.narrow}>
             <span slot="heading">
+              ${localize('panels.codes.cards.codes.fields.code_mode_change_required.heading', this.hass.language)}
+            </span>
+            <span slot="description">
+              ${localize('panels.codes.cards.codes.fields.code_mode_change_required.description', this.hass.language)}
+            </span>
+            <ha-switch
+              ?checked=${this.data.code_mode_change_required}
+              @change=${(ev: Event) => {
+                this.saveData({ code_mode_change_required: (ev.target as HTMLInputElement).checked });
+              }}
+            ></ha-switch>
+          </settings-row>
+
+          <settings-row .narrow=${this.narrow}>
+            <span slot="heading">
               ${localize('panels.codes.cards.codes.fields.code_format.heading', this.hass.language)}
             </span>
             <span slot="description">
               ${localize('panels.codes.cards.codes.fields.code_format.description', this.hass.language)}
             </span>
             <mwc-button
-              class="${this.data.code_format == 'number' ? 'active' : ''} ${!this.data.code_arm_required &&
-              !this.data.code_disarm_required
+              class="${this.data.code_format == 'number' ? 'active' : ''} ${!codesInUse
                 ? 'disabled'
                 : ''}"
               @click=${() => {
                 this.saveData({ code_format: 'number' });
               }}
-              ?disabled=${!this.data.code_arm_required && !this.data.code_disarm_required}
+              ?disabled=${!codesInUse}
             >
               ${localize('panels.codes.cards.codes.fields.code_format.code_format_number', this.hass.language)}
             </mwc-button>
             <mwc-button
-              class="${this.data.code_format == 'text' ? 'active' : ''} ${!this.data.code_arm_required &&
-              !this.data.code_disarm_required
+              class="${this.data.code_format == 'text' ? 'active' : ''} ${!codesInUse
                 ? 'disabled'
-                : ''}"
+                : ''
+              }"
               @click=${() => {
                 this.saveData({ code_format: 'text' });
               }}
-              ?disabled=${!this.data.code_arm_required && !this.data.code_disarm_required}
+              ?disabled=${!codesInUse}
             >
               ${localize('panels.codes.cards.codes.fields.code_format.code_format_text', this.hass.language)}
             </mwc-button>

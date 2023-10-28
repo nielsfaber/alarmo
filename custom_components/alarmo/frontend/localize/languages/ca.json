@@ -310,11 +310,15 @@
           "fields": {
             "code_arm_required": {
               "heading": "Utilitzeu un codi d'activació",
-              "description": "Requereix un codi per activar l'alarma"
+              "description": "Requereix un codi per activar l'alarma."
             },
             "code_disarm_required": {
               "heading": "Utilitzeu un codi de desactivació",
-              "description": "Requereix un codi per desactivar l'alarma"
+              "description": "Requereix un codi per desactivar l'alarma."
+            },
+            "code_mode_change_required": {
+              "heading": "Requerir un codi para cambiar de modo",
+              "description": "Se necesita un codi válido para cambiar el modo de armado que está activo."
             },
             "code_format": {
               "heading": "Format del codi",

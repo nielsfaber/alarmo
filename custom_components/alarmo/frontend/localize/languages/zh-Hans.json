@@ -316,6 +316,10 @@
               "heading": "使用解除警戒密码",
               "description": "需要密码才能解除警报器"
             },
+            "code_mode_change_required": {
+              "heading": "切换模式需要代码",
+              "description": "必须提供有效的代码才能更改处于活动状态的手臂模式。"
+            },
             "code_format": {
               "heading": "密码格式",
               "description": "设置 Lovelace Alarm Card 的输入类型。",

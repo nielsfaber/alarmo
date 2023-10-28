@@ -106,6 +106,7 @@ EVENT_TRIGGER_TIME_EXPIRED = "trigger_time_expired"
 ATTR_MODES = "modes"
 ATTR_ARM_MODE = "arm_mode"
 ATTR_CODE_DISARM_REQUIRED = "code_disarm_required"
+ATTR_CODE_MODE_CHANGE_REQUIRED = "code_mode_change_required"
 ATTR_REMOVE = "remove"
 ATTR_OLD_CODE = "old_code"
 

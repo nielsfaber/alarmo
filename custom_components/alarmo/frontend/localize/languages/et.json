@@ -316,6 +316,10 @@
               "heading": "Valvest vabastamise kood",
               "description": "Valvest vabastamiseks tulem sisestada kood"
             },
+            "code_mode_change_required": {
+              "heading": "Nõua režiimi vahetamiseks koodi",
+              "description": "Aktiivse valverežiimi muutmiseks tuleb esitada kehtiv kood."
+            },
             "code_format": {
               "heading": "Koodi vorming",
               "description": "Kasutajaliidese koodi tüübid.",

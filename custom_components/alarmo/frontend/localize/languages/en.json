@@ -309,12 +309,16 @@
           "description": "Change settings for the code.",
           "fields": {
             "code_arm_required": {
-              "heading": "Use arm code",
-              "description": "Require a code for arming the alarm"
+              "heading": "Require code for arming",
+              "description": "A valid code must be provided to arm the alarm."
             },
             "code_disarm_required": {
-              "heading": "Use disarm code",
-              "description": "Require a code for disarming the alarm"
+              "heading": "Require code for disarming",
+              "description": "A valid code must be provided to disarm the alarm."
+            },
+            "code_mode_change_required": {
+              "heading": "Require code for switching mode",
+              "description": "A valid code must be provided to change the arm mode which is active."
             },
             "code_format": {
               "heading": "Code format",

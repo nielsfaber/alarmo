@@ -316,6 +316,10 @@
               "heading": "Použít kód k deaktivaci alarmu",
               "description": "Vyžadovat kód pro deaktivaci alarmu"
             },
+            "code_mode_change_required": {
+              "heading": "Vyžadovat kód pro přepínání režimu",
+              "description": "Pro změnu aktivního režimu aktivace je nutné zadat platný kód."
+            },
             "code_format": {
               "heading": "Formát kódu",
               "description": "Nastaví typ klávesnice pro kartu alarmu v Lovelace.",

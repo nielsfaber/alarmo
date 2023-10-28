@@ -57,8 +57,8 @@
           }
         },
         "modes": {
-          "title": "Modi",
-          "description": "Dit paneel kan worden gebruikt om de inschakelmodi van het alarm in te stellen.",
+          "title": "Beveiligingsmodi",
+          "description": "Dit paneel kan worden gebruikt om de beveiligingsmodi van het alarm in te stellen.",
           "modes": {
             "armed_away": "De afwezigheidsmodus wordt gebruikt als alle mensen het huis hebben verlaten. Alle deuren en ramen die toegang geven tot het huis worden bewaakt, evenals bewegingssensoren in het huis.",
             "armed_home": "De thuismodus wordt gebruikt bij het instellen van het alarm terwijl er mensen in huis zijn. Alle deuren en ramen die toegang geven tot het huis worden bewaakt, maar bewegingssensoren in het huis worden niet gebruikt.",
@@ -309,12 +309,16 @@
           "description": "Wijzig de instellingen voor de code.",
           "fields": {
             "code_arm_required": {
-              "heading": "Gebruik inschakel code",
-              "description": "Vereist een code voor het inschakelen van het alarm"
+              "heading": "Vereis code voor inschakelen",
+              "description": "Een correcte code moet worden ingevoerd om het alarm te kunnen inschakelen."
             },
             "code_disarm_required": {
-              "heading": "Gebruik uitschakelcode",
-              "description": "Vereist een code om het alarm uit te schakelen"
+              "heading": "Vereis code voor uitschakelen",
+              "description": "Een correcte code moet worden ingevoerd om het alarm te kunnen uitschakelen."
+            },
+            "code_mode_change_required": {
+              "heading": "Vereis code voor mode omschakeling",
+              "description": "Een correcte code moet worden ingevoerd om de actieve beveiligingsmodus te veranderen."
             },
             "code_format": {
               "heading": "Code opmaak",

@@ -316,6 +316,10 @@
               "heading": "Usar código de desarmado",
               "description": "Requiere un código para desarmar la alarma."
             },
+            "code_mode_change_required": {
+              "heading": "Requerir código para cambiar de modo",
+              "description": "Se necesita un código válido para cambiar el modo de armado que está activo."
+            },
             "code_format": {
               "heading": "Formato del código",
               "description": "Establece el tipo de entrada para la tarjeta de la alarma.",
