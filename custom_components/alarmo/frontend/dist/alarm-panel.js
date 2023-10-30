@@ -257,7 +257,7 @@ function ce(e,t){return(({finisher:e,descriptor:t})=>(a,i)=>{var s;if(void 0===i
   ha-dialog div.description {
     margin-bottom: 10px;
   }
-`,Hi=()=>{const e=e=>{let t={};for(var a=0;a<e.length;a+=2){const i=e[a],s=a<e.length?e[a+1]:void 0;t=Object.assign(Object.assign({},t),{[i]:s})}return t},t=window.location.pathname.split("/");let a={page:t[2]||"general",params:{}};if(t.length>3){let i=t.slice(3);if(t.includes("filter")){const t=i.findIndex(e=>"filter"==e),s=i.slice(t+1);i=i.slice(0,t),a=Object.assign(Object.assign({},a),{filter:e(s)})}i.length&&(i.length%2&&(a=Object.assign(Object.assign({},a),{subpage:i.shift()})),i.length&&(a=Object.assign(Object.assign({},a),{params:e(i)})))}return a},Ki=(e,...t)=>{let a={page:e,params:{}};t.forEach(e=>{"string"==typeof e?a=Object.assign(Object.assign({},a),{subpage:e}):"params"in e?a=Object.assign(Object.assign({},a),{params:e.params}):"filter"in e&&(a=Object.assign(Object.assign({},a),{filter:e.filter}))});const i=e=>{let t=Object.keys(e);t=t.filter(t=>e[t]),t.sort();let a="";return t.forEach(t=>{let i=e[t];a=a.length?`${a}/${t}/${i}`:`${t}/${i}`}),a};let s="/alarmo/"+a.page;return a.subpage&&(s=`${s}/${a.subpage}`),i(a.params).length&&(s=`${s}/${i(a.params)}`),a.filter&&(s=`${s}/filter/${i(a.filter)}`),s};var Zi;!function(e){e.Seconds="sec",e.Minutes="min"}(Zi||(Zi={}));const Qi=(e,t)=>Math.round(e/t)*t;let Yi=class extends ne{constructor(){super(...arguments),this.min=0,this.max=100,this.value=0,this.scaleFactor=1,this.unit=Zi.Minutes,this.disabled=!1,this._min=0,this._max=0,this._step=0}firstUpdated(){this.setUnit(this.value>0&&this.value<=60?Zi.Seconds:Zi.Minutes)}setUnit(e){this.unit=e,this.scaleFactor=this.unit==Zi.Minutes?1/60:1,this._step=((e,t)=>{let a=(t-e)/12;return a=[10/60,.25,20/60,.5,1,2,5].reduce((e,t)=>Math.abs(t-a)<Math.abs(e-a)?t:e),a})(this.min*this.scaleFactor,(Zi.Minutes?this.max:60)*this.scaleFactor);let t=this.min*this.scaleFactor;t<this._step&&(t=this._step),this._min=Qi(t,this._step),this._max=(e==Zi.Minutes?Qi(this.max,this._step):60)*this.scaleFactor}render(){return q`
+`,Hi=()=>{const e=e=>{let t={};for(var a=0;a<e.length;a+=2){const i=e[a],s=a<e.length?e[a+1]:void 0;t=Object.assign(Object.assign({},t),{[i]:s})}return t},t=window.location.pathname.split("/");let a={page:t[2]||"general",params:{}};if(t.length>3){let i=t.slice(3);if(t.includes("filter")){const t=i.findIndex(e=>"filter"==e),s=i.slice(t+1);i=i.slice(0,t),a=Object.assign(Object.assign({},a),{filter:e(s)})}i.length&&(i.length%2&&(a=Object.assign(Object.assign({},a),{subpage:i.shift()})),i.length&&(a=Object.assign(Object.assign({},a),{params:e(i)})))}return a},Ki=(e,...t)=>{let a={page:e,params:{}};t.forEach(e=>{"string"==typeof e?a=Object.assign(Object.assign({},a),{subpage:e}):"params"in e?a=Object.assign(Object.assign({},a),{params:e.params}):"filter"in e&&(a=Object.assign(Object.assign({},a),{filter:e.filter}))});const i=e=>{let t=Object.keys(e);t=t.filter(t=>e[t]),t.sort();let a="";return t.forEach(t=>{let i=e[t];a=a.length?`${a}/${t}/${i}`:`${t}/${i}`}),a};let s="/alarmo/"+a.page;return a.subpage&&(s=`${s}/${a.subpage}`),i(a.params).length&&(s=`${s}/${i(a.params)}`),a.filter&&(s=`${s}/filter/${i(a.filter)}`),s};var Zi;!function(e){e.Seconds="sec",e.Minutes="min"}(Zi||(Zi={}));const Qi=(e,t)=>Math.round(e/t)*t;let Yi=class extends ne{constructor(){super(...arguments),this.min=0,this.max=100,this.value=0,this.step=0,this.scaleFactor=1,this.unit=Zi.Minutes,this.disabled=!1,this._min=0,this._max=0,this._step=0}firstUpdated(){this.value>0&&this.value<60?this.setUnit(Zi.Seconds):this.setUnit(Zi.Minutes)}setUnit(e){this.unit=e,this.scaleFactor=this.unit==Zi.Minutes?1/60:1,this._step=((e,t)=>{let a=(t-e)/12;return a=[10/60,.25,20/60,.5,1,2,5].reduce((e,t)=>Math.abs(t-a)<Math.abs(e-a)?t:e),a})(this.min*this.scaleFactor,(Zi.Minutes?this.max:60)*this.scaleFactor),this.step&&this._step>this.step*this.scaleFactor&&(this._step=this.step*this.scaleFactor);let t=this.min*this.scaleFactor;t<this._step&&(t=this._step),this._min=this.min?Qi(t,this._step):0,this._max=(e==Zi.Minutes?Qi(this.max,this._step):60)*this.scaleFactor}render(){return q`
       <div class="container">
         <div class="prefix">
           <slot name="prefix"></slot>
@@ -322,7 +322,7 @@ function ce(e,t){return(({finisher:e,descriptor:t})=>(a,i)=>{var s;if(void 0===i
     .disabled {
       color: var(--disabled-text-color);
     }
-  `,t([de({type:Number})],Yi.prototype,"min",void 0),t([de({type:Number})],Yi.prototype,"max",void 0),t([de({type:Number})],Yi.prototype,"value",void 0),t([de()],Yi.prototype,"scaleFactor",void 0),t([de({type:Zi})],Yi.prototype,"unit",void 0),t([de({type:Boolean})],Yi.prototype,"disabled",void 0),t([de({type:String})],Yi.prototype,"zeroValue",void 0),Yi=t([re("time-slider")],Yi);var Wi="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z",Xi="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z";
+  `,t([de({type:Number})],Yi.prototype,"min",void 0),t([de({type:Number})],Yi.prototype,"max",void 0),t([de({type:Number})],Yi.prototype,"value",void 0),t([de({type:Number})],Yi.prototype,"step",void 0),t([de()],Yi.prototype,"scaleFactor",void 0),t([de({type:Zi})],Yi.prototype,"unit",void 0),t([de({type:Boolean})],Yi.prototype,"disabled",void 0),t([de({type:String})],Yi.prototype,"zeroValue",void 0),Yi=t([re("time-slider")],Yi);var Wi="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z",Xi="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z";
 /**
      * @license
      * Copyright 2017 Google LLC
@@ -626,6 +626,7 @@ const Ji=2,es=6,ts=e=>(...t)=>({_$litDirective$:e,values:t});class as{constructo
         <time-slider
           .hass=${this.hass}
           max="3600"
+          step="60"
           zeroValue=${vi("components.time_slider.infinite",this.hass.language)}
           value=${(null==t?void 0:t.trigger_time)||0}
           @change=${t=>this.saveData(e,{trigger_time:Number(t.target.value)})}
@@ -3133,7 +3134,7 @@ class vs extends as{constructor(e){if(super(e),this.vt=U,e.type!==Ji)throw Error
             ${vi("title",this.hass.language)}
           </div>
           <div class="version">
-            v${"1.9.11"}
+            v${"1.9.12"}
           </div>
         </div>
 
