@@ -773,7 +773,6 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
                         await self.async_update_state(STATE_ALARM_DISARMED)
                     else:
                         self.open_sensors = None
-                        self.bypassed_sensors = None
                         await self.async_arm(self.arm_mode, bypass_open_sensors=False, skip_delay=True)
 
                     async_dispatcher_send(
