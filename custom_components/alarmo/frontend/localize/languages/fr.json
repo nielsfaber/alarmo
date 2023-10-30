@@ -318,7 +318,7 @@
             },
             "code_mode_change_required": {
               "heading": "Exiger un code pour changer de mode",
-              "description": "Un code valide doit être fourni pour changer le mode d'armement qui est actife."
+              "description": "Un code valide doit être fourni pour changer le mode d'armement en cours."
             },
             "code_format": {
               "heading": "Format du code",
