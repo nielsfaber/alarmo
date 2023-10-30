@@ -287,6 +287,15 @@ class SensorHandler:
         alarm_entity = self.hass.data[const.DOMAIN]["areas"][sensor_config["area"]]
         alarm_state = alarm_entity.state
 
+        if (
+            alarm_entity.arm_mode and
+            alarm_entity.arm_mode not in sensor_config[const.ATTR_MODES] and
+            not sensor_config[ATTR_ALWAYS_ON]
+        ):
+            # sensor is not active in this arm mode, ignore
+            self.update_ready_to_arm_status(sensor_config["area"])
+            return
+
         res = sensor_state_allowed(new_state, sensor_config, alarm_state)
 
         if sensor_config[ATTR_ARM_ON_CLOSE] and alarm_state == STATE_ALARM_ARMING:
