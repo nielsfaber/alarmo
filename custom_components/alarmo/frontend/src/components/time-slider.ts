@@ -33,6 +33,9 @@ export class TimeSlider extends LitElement {
   @property({ type: Number })
   value = 0;
 
+  @property({ type: Number })
+  step = 0;
+
   @property() scaleFactor = 1;
 
   @property({ type: ETimeUnits })
@@ -49,16 +52,18 @@ export class TimeSlider extends LitElement {
   _step: number = 0;
 
   firstUpdated() {
-    this.setUnit(this.value > 0 && this.value <= 60 ? ETimeUnits.Seconds : ETimeUnits.Minutes);
+    if(this.value > 0 && this.value < 60) this.setUnit(ETimeUnits.Seconds);
+    else this.setUnit(ETimeUnits.Minutes);
   }
 
   private setUnit(unit: ETimeUnits) {
     this.unit = unit;
     this.scaleFactor = this.unit == ETimeUnits.Minutes ? 1 / 60 : 1;
     this._step = calcStepSize(this.min * this.scaleFactor, (ETimeUnits.Minutes ? this.max : 60) * this.scaleFactor);
+    if(this.step && this._step > this.step * this.scaleFactor) this._step = this.step * this.scaleFactor;
     let min = this.min * this.scaleFactor;
     if(min < this._step) min = this._step;
-    this._min = round(min, this._step);
+    this._min = this.min ? round(min, this._step) : 0;
     this._max = (unit == ETimeUnits.Minutes ? round(this.max, this._step) : 60)  * this.scaleFactor;
   }
 

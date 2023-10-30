@@ -205,6 +205,7 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
         <time-slider
           .hass=${this.hass}
           max="3600"
+          step="60"
           zeroValue=${localize('components.time_slider.infinite', this.hass.language)}
           value=${config?.trigger_time || 0}
           @change=${(ev: Event) =>
