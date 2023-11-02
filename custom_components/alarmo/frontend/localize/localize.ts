@@ -10,6 +10,7 @@ import * as it from './languages/it.json';
 import * as nl from './languages/nl.json';
 import * as sk from './languages/sk.json';
 import * as sv from './languages/sv.json';
+import * as vi from './languages/vi.json';
 import * as zh_Hans from './languages/zh-Hans.json';
 import * as ru from './languages/ru.json';
 
@@ -28,6 +29,7 @@ var languages: any = {
   nl: nl,
   sk: sk,
   sv: sv,
+  vi: vi,
   'zh-Hans': zh_Hans,
   ru: ru,
 };
