@@ -103,8 +103,8 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
               min="10"
               max="900"
               .value=${this.data.timeout}
-              @change=${(ev: Event) =>
-                (this.data = { ...this.data, timeout: Number((ev.target as HTMLInputElement).value) })}
+              @value-changed=${(ev: CustomEvent) =>
+                (this.data = { ...this.data, timeout: (ev.detail as any).value})}
             ></time-slider>
           </settings-row>
         </div>

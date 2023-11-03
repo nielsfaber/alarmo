@@ -169,9 +169,9 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
           max="300"
           zeroValue=${localize('components.time_slider.none', this.hass.language)}
           value=${config?.exit_time || 0}
-          @change=${(ev: Event) =>
+          @value-changed=${(ev: CustomEvent) =>
             this.saveData(mode, {
-              exit_time: Number((ev.target as HTMLInputElement).value),
+              exit_time: (ev.detail as any).value,
             })}
           ?disabled=${!config?.enabled}
         ></time-slider>
@@ -188,9 +188,9 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
           max="300"
           zeroValue=${localize('components.time_slider.none', this.hass.language)}
           value=${config?.entry_time || 0}
-          @change=${(ev: Event) =>
+          @value-changed=${(ev: CustomEvent) =>
             this.saveData(mode, {
-              entry_time: Number((ev.target as HTMLInputElement).value),
+              entry_time: (ev.detail as any).value,
             })}
           ?disabled=${!config?.enabled}
         ></time-slider>
@@ -208,9 +208,9 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
           step="60"
           zeroValue=${localize('components.time_slider.infinite', this.hass.language)}
           value=${config?.trigger_time || 0}
-          @change=${(ev: Event) =>
+          @value-changed=${(ev: CustomEvent) =>
             this.saveData(mode, {
-              trigger_time: Number((ev.target as HTMLInputElement).value),
+              trigger_time: (ev.detail as any).value,
             })}
           ?disabled=${!config?.enabled}
         ></time-slider>

@@ -2,6 +2,7 @@ import { LitElement, html, css } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 import { localize } from '../../localize/localize';
 import { HomeAssistant } from '../types';
+import { fireEvent } from '../fire_event';
 
 export enum ETimeUnits {
   Seconds = 'sec',
@@ -106,7 +107,7 @@ export class TimeSlider extends LitElement {
     const val = round(this.value * this.scaleFactor, this._step);
     return html`
       <ha-slider
-        pin
+        labeled
         min=${this._min}
         max=${this._max}
         step=${this._step}
@@ -120,6 +121,7 @@ export class TimeSlider extends LitElement {
   updateValue(e: Event) {
     const value = Number((e.target as HTMLInputElement).value);
     this.value = round(value, this._step) / this.scaleFactor;
+    fireEvent(this, 'value-changed', { value: this.value });
   }
 
   toggleUnit() {
