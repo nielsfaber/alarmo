@@ -111,7 +111,7 @@
               "item": "Definiere Payload für den Zustand ''{state}''"
             },
             "command_payload": {
-              "heading": "Konfiguriere Payload pror Kommando",
+              "heading": "Konfiguriere Payload pro Kommando",
               "item": "Definiere Payload für das Kommando ''{command}''"
             }
           }
