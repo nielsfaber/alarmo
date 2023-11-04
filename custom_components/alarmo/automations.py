@@ -211,7 +211,7 @@ class AutomationHandler:
                         service_data[ATTR_MESSAGE] = service_data[ATTR_MESSAGE].replace("{{changed_by}}", changed_by)
 
                     if "{{delay}}" in service_data[ATTR_MESSAGE]:
-                        delay = alarm_entity.delay if alarm_entity.delay else ""
+                        delay = str(alarm_entity.delay) if alarm_entity.delay else ""
                         service_data[ATTR_MESSAGE] = service_data[ATTR_MESSAGE].replace("{{delay}}", delay)
 
                 domain, service = action[ATTR_SERVICE].split(".")
