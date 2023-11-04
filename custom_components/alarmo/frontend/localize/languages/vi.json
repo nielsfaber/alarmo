@@ -1,0 +1,557 @@
+{
+  "common": {
+    "modes_short": {
+      "armed_away": "Đi vắng",
+      "armed_home": "Ở nhà",
+      "armed_night": "Ban đêm",
+      "armed_custom_bypass": "Tùy chỉnh",
+      "armed_vacation": "Đi nghỉ"
+    },
+    "enabled": "Đang bật",
+    "disabled": "Đang tắt"
+  },
+  "components": {
+    "time_slider": {
+      "seconds": "giây",
+      "minutes": "phút",
+      "infinite": "vô hạn",
+      "none": "không có"
+    },
+    "editor": {
+      "ui_mode": "Chế độ giao diện",
+      "yaml_mode": "Chế độ YAML",
+      "edit_in_yaml": "Soạn bằng YAML"
+    },
+    "table": {
+      "filter": {
+        "label": "Lọc mục",
+        "item": "Lọc theo {name}",
+        "hidden_items": "{number} {number, plural,\n  one {mục}\n  other {mục}\n} bị ẩn"
+      }
+    }
+  },
+  "title": "Bảng điều khiển báo động",
+  "panels": {
+    "general": {
+      "title": "Tổng quan",
+      "cards": {
+        "general": {
+          "description": "Bảng điều khiển này đặt một số thiết lập toàn cục cho hệ thống báo động.",
+          "fields": {
+            "disarm_after_trigger": {
+              "heading": "Tắt bảo vệ sau khi báo động",
+              "description": "Sau khi đã hết thời gian kích hoạt báo động, tắt bảo vệ thay vì trở lại trạng thái bảo vệ trước đó."
+            },
+            "enable_mqtt": {
+              "heading": "Bật MQTT",
+              "description": "Cho phép quản lý bảng điều khiển báo động qua MQTT."
+            },
+            "enable_master": {
+              "heading": "Bật báo động tổng",
+              "description": "Tạo một thực thể để quản lý đồng thời mọi khu vực."
+            }
+          },
+          "actions": {
+            "setup_mqtt": "Cấu hình MQTT",
+            "setup_master": "Cấu hình báo động tổng"
+          }
+        },
+        "modes": {
+          "title": "Chế độ",
+          "description": "Bảng điều khiển này dùng để cài đặt các chế độ bảo vệ của hệ thống.",
+          "modes": {
+            "armed_away": "Bảo vệ khi đi vắng được dùng khi mọi người đã rời khỏi nhà. Tất cả cửa lớn và cửa sổ dẫn vào nhà, cũng như các cảm biến chuyển động trong nhà, sẽ được theo dõi.",
+            "armed_home": "Bảo vệ khi ở nhà được dùng để thiết lập báo động khi có người ở nhà. Tất cả cửa lớn và cửa sổ dẫn vào nhà, nhưng không theo dõi cảm biến chuyển động trong nhà, sẽ được theo dõi.",
+            "armed_night": "Bảo vệ vào ban đêm được dùng để thiết lập báo động trước khi đi ngủ. Tất cả cửa lớn và cửa sổ dẫn vào nhà, và một số cảm biến chuyển động (tầng dưới) trong nhà, sẽ được theo dõi.",
+            "armed_vacation": "Bảo vệ khi đi nghỉ có thể được coi là mở rộng của chế độ bảo vệ khi đi vắng khi bạn vắng nhà trong thời gian dài. Thời gian đếm giờ và phản ứng khi có kích hoạt sẽ được thay đổi (nếu muốn) khi ở xa nhà.",
+            "armed_custom_bypass": "Chế độ bổ sung để xác định phạm vi an ninh riêng của bạn."
+          },
+          "number_sensors_active": "{number} {number, plural,\n  one {cảm biến}\n  other {cảm biến}\n} đang hoạt động",
+          "fields": {
+            "status": {
+              "heading": "Tình trạng",
+              "description": "Quyết định xem hệ thống có bảo vệ trong chế độ này không."
+            },
+            "exit_delay": {
+              "heading": "Đếm giờ đi ra",
+              "description": "Khi đang bật bảo vệ, trong khoảng thời gian này các cảm biến sẽ chưa kích hoạt báo động."
+            },
+            "entry_delay": {
+              "heading": "Đếm giờ đi vào",
+              "description": "Thời gian đếm lùi từ khi cảm biến bị kích hoạt cho đến khi báo động."
+            },
+            "trigger_time": {
+              "heading": "Thời gian kích hoạt báo động",
+              "description": "Thời gian duy trì trạng thái báo động sau khi bị kích hoạt."
+            }
+          }
+        },
+        "mqtt": {
+          "title": "Cấu hình MQTT",
+          "description": "Bảng điều khiển này dùng để cấu hình giao diện MQTT.",
+          "fields": {
+            "state_topic": {
+              "heading": "Chủ đề trạng thái",
+              "description": "Chủ đề đăng tải cập nhật trạng thái"
+            },
+            "event_topic": {
+              "heading": "Chủ đề sự kiện",
+              "description": "Chủ đề đăng tải sự kiện báo động"
+            },
+            "command_topic": {
+              "heading": "Chủ đề câu lệnh",
+              "description": "Chủ đề để Alarmo lắng nghe lệnh bật/tắt bảo vệ."
+            },
+            "require_code": {
+              "heading": "Yêu cầu mã",
+              "description": "Yêu cầu phải gửi mã cùng với câu lệnh."
+            },
+            "state_payload": {
+              "heading": "Cấu hình phụ tải trong mỗi trạng thái",
+              "item": "Định nghĩa phụ tải cho trạng thái ''{state}''"
+            },
+            "command_payload": {
+              "heading": "Cấu hình phụ tải trong mỗi câu lệnh",
+              "item": "Định nghĩa phụ tải cho câu lệnh ''{command}''"
+            }
+          }
+        },
+        "areas": {
+          "title": "Khu vực",
+          "description": "Khu vực có thể dùng để chia hệ thống báo động làm nhiều phần.",
+          "no_items": "Hiện chưa xác định khu vực.",
+          "table": {
+            "remarks": "Lưu ý",
+            "summary": "Khu vực này có {summary_sensors} và {summary_automations}.",
+            "summary_sensors": "{number} {number, plural,\n  one {cảm biến}\n  other {cảm biến}\n}",
+            "summary_automations": "{number} {number, plural,\n  one {tự động hóa}\n  other {tự động hóa}\n}"
+          },
+          "actions": {
+            "add": "Thêm"
+          }
+        }
+      },
+      "dialogs": {
+        "create_area": {
+          "title": "Khu vực mới",
+          "fields": {
+            "copy_from": "Chép thiết lập từ"
+          }
+        },
+        "edit_area": {
+          "title": "Sửa khu vực ''{area}''",
+          "name_warning": "Ghi chú: đổi tên sẽ làm đổi mã thực thể"
+        },
+        "remove_area": {
+          "title": "Xóa khu vực?",
+          "description": "Bạn có chắc chắn muốn xóa khu vực này? Khu vực này có {sensors} cảm biến và {automations} tự động hóa, sẽ đều bị xóa theo."
+        },
+        "edit_master": {
+          "title": "Cấu hình báo động tổng"
+        },
+        "disable_master": {
+          "title": "Tắt báo động tổng?",
+          "description": "Bạn có chắc chắn muốn xóa báo động tổng không? Khu vực này có {sensors} cảm biến và {automations} tự động hóa, sẽ đều bị xóa theo."
+        }
+      }
+    },
+    "sensors": {
+      "title": "Cảm biến",
+      "cards": {
+        "sensors": {
+          "description": "Cảm biến đã được cấu hình. Nhấn vào mục để thay đổi.",
+          "table": {
+            "no_items": "Không có cảm biến nào.",
+            "no_area_warning": "Chưa gán cảm biến vào bất kỳ khu vực nào.",
+            "arm_modes": "Chế độ bảo vệ",
+            "always_on": "(Luôn luôn)"
+          }
+        },
+        "add_sensors": {
+          "title": "Thêm cảm biến",
+          "description": "Bổ sung cảm biến. Hãy đảm bảo cảm biến của bạn có tên phù hợp để dễ nhận ra.",
+          "no_items": "Không có thực thể HA sẵn có nào có thể cấu hình cho hệ thống báo động. Hãy đảm bảo đưa vào thực thể thuộc kiểu binary_sensor.",
+          "table": {
+            "type": "Kiểu được phát hiện"
+          },
+          "actions": {
+            "add_to_alarm": "thêm vào hệ thống",
+            "filter_supported": "Ẩn mục không rõ kiểu"
+          }
+        },
+        "editor": {
+          "title": "Sửa cảm biến",
+          "description": "Cấu hình thiết lập cảm biến ''{entity}''.",
+          "fields": {
+            "area": {
+              "heading": "Khu vực",
+              "description": "Chọn một khu vực để đưa cảm biến này vào."
+            },
+            "group": {
+              "heading": "Nhóm",
+              "description": "Gom chung với các cảm biến khác để kích hoạt chung."
+            },
+            "device_type": {
+              "heading": "Kiểu thiết bị",
+              "description": "Chọn một kiểu thiết bị để tự động áp dụng thiết lập phù hợp.",
+              "choose": {
+                "door": {
+                  "name": "Cửa lớn",
+                  "description": "Cửa ra vào, cổng hoặc nơi khác dùng để ra vào nhà."
+                },
+                "window": {
+                  "name": "Cửa sổ",
+                  "description": "Cửa sổ, hoặc cửa lớn nhưng không dùng để ra vào nhà, như ban công chẳng hạn."
+                },
+                "motion": {
+                  "name": "Chuyển động",
+                  "description": "Cảm biến hiện diện hoặc thiết bị tương tự có thời gian nghỉ giữa các lần kích hoạt."
+                },
+                "tamper": {
+                  "name": "Phá hoại",
+                  "description": "Bộ phát hiện mở nắp cảm biến, cảm biến vỡ kính, v.v."
+                },
+                "environmental": {
+                  "name": "Môi trường",
+                  "description": "Cảm biến khói/khí đốt, phát hiện rò rỉ, v.v. (không liên quan đến chống trộm)."
+                },
+                "other": {
+                  "name": "Chung chung"
+                }
+              }
+            },
+            "always_on": {
+              "heading": "Luôn bật",
+              "description": "Cảm biến luôn kích hoạt báo động."
+            },
+            "modes": {
+              "heading": "Chế độ được bật",
+              "description": "Các chế độ báo động có kích hoạt cảm biến này."
+            },
+            "arm_on_close": {
+              "heading": "Bảo vệ sau khi đóng",
+              "description": "Sau khi tắt kích hoạt cảm biến này, đếm giờ đi ra sẽ được tự động bỏ qua."
+            },
+            "use_exit_delay": {
+              "heading": "Dùng đếm giờ đi ra",
+              "description": "Cảm biến được phép hoạt động khi bắt đầu đếm giờ đi ra."
+            },
+            "use_entry_delay": {
+              "heading": "Dùng đếm giờ đi vào",
+              "description": "Kích hoạt cảm biến sẽ kích hoạt báo động sau khi đã hết thời gian đếm giờ đi vào, chứ không kích hoạt ngay."
+            },
+            "allow_open": {
+              "heading": "Cho phép mở lúc đầu",
+              "description": "Trạng thái mở lúc bật bảo vệ sẽ được bỏ qua (những lần kích hoạt cảm biến sau đó sẽ kích hoạt báo động)."
+            },
+            "auto_bypass": {
+              "heading": "Tự động bỏ qua",
+              "description": "Bỏ qua cảm biến này không kích hoạt báo động nếu nó đang mở khi bắt đầu bảo vệ.",
+              "modes": "Các chế độ mà cảm biến này có thể được bỏ qua"
+            },
+            "trigger_unavailable": {
+              "heading": "Báo động khi không khả dụng",
+              "description": "Khi trạng thái của cảm biến trở thành 'không khả dụng', nó sẽ kích hoạt cảm biến."
+            }
+          },
+          "actions": {
+            "toggle_advanced": "Thiết lập nâng cao",
+            "remove": "Xóa",
+            "setup_groups": "Cài đặt nhóm"
+          },
+          "errors": {
+            "description": "Vui lòng sửa các lỗi sau:",
+            "no_area": "Chưa chọn khu vực",
+            "no_modes": "Chưa chọn chế độ để bật cảm biến",
+            "no_auto_bypass_modes": "Chưa chọn chế độ để cảm biến được tự động bỏ qua"
+          }
+        }
+      },
+      "dialogs": {
+        "manage_groups": {
+          "title": "Quản lý nhóm cảm biến",
+          "description": "Trong một nhóm cảm biến, các cảm biến này phải được kích hoạt trong cùng khoảng thời gian thì mới kích hoạt báo động.",
+          "no_items": "Chưa có nhóm",
+          "actions": {
+            "new_group": "Nhóm mới"
+          }
+        },
+        "create_group": {
+          "title": "Nhóm cảm biến mới",
+          "fields": {
+            "name": {
+              "heading": "Tên",
+              "description": "Tên của nhóm cảm biến"
+            },
+            "timeout": {
+              "heading": "Thời hạn",
+              "description": "Khoảng thời gian các cảm biến phải lần lượt được kích hoạt thì mới kích hoạt báo động."
+            },
+            "sensors": {
+              "heading": "Cảm biến",
+              "description": "Chọn cảm biến để đưa vào nhóm này."
+            }
+          },
+          "errors": {
+            "invalid_name": "Đã cung cấp tên không hợp lệ.",
+            "insufficient_sensors": "Phải chọn ít nhất 2 cảm biến."
+          }
+        },
+        "edit_group": {
+          "title": "Sửa nhóm cảm biến ''{name}''"
+        }
+      }
+    },
+    "codes": {
+      "title": "Mã",
+      "cards": {
+        "codes": {
+          "description": "Thay đổi thiết lập mã.",
+          "fields": {
+            "code_arm_required": {
+              "heading": "Yêu cầu nhập mã để bật",
+              "description": "Phải nhập mã đúng để bật hệ thống báo động."
+            },
+            "code_disarm_required": {
+              "heading": "Yêu cầu nhập mã để tắt",
+              "description": "Phải nhập mã đúng để tắt hệ thống báo động."
+            },
+            "code_mode_change_required": {
+              "heading": "Yêu cầu nhập mã để chuyển chế độ",
+              "description": "Phải nhập mã đúng để thay đổi chế độ bảo vệ đang hoạt động."
+            },
+            "code_format": {
+              "heading": "Định dạng mã",
+              "description": "Thiết lập kiểu nhập liệu cho thẻ bảo vệ Lovelace.",
+              "code_format_number": "mã số",
+              "code_format_text": "mật khẩu"
+            }
+          }
+        },
+        "user_management": {
+          "title": "Quản lý người dùng",
+          "description": "Mỗi người dùng sẽ có một mã riêng để bật/tắt hệ thống báo động.",
+          "no_items": "Chưa có người dùng nào",
+          "actions": {
+            "new_user": "người dùng mới"
+          }
+        },
+        "new_user": {
+          "title": "Tạo người dùng mới",
+          "description": "Người dùng phải được tạo để cấp quyền vận hành hệ thống báo động.",
+          "fields": {
+            "name": {
+              "heading": "Tên",
+              "description": "Tên người dùng."
+            },
+            "code": {
+              "heading": "Mã",
+              "description": "Mã dành cho người dùng này."
+            },
+            "confirm_code": {
+              "heading": "Xác nhận mã",
+              "description": "Lặp lại mã."
+            },
+            "can_arm": {
+              "heading": "Cho phép nhập mã để bật",
+              "description": "Nhập mã này để bật bảo vệ"
+            },
+            "can_disarm": {
+              "heading": "Cho phép nhập mã để tắt",
+              "description": "Nhập mã này để tắt bảo vệ"
+            },
+            "is_override_code": {
+              "heading": "Có phải mã vượt quyền không",
+              "description": "Nhập mã này sẽ buộc hệ thống phải bật bảo vệ ngay"
+            },
+            "area_limit": {
+              "heading": "Khu vực giới hạn",
+              "description": "Giới hạn chỉ cho phép người dùng điều khiển các khu vực cụ thể"
+            }
+          },
+          "errors": {
+            "no_name": "Chưa cung cấp tên.",
+            "no_code": "Mã cần có ít nhất 4 ký tự/ký số.",
+            "code_mismatch": "Mã không trùng khớp."
+          }
+        },
+        "edit_user": {
+          "title": "Sửa người dùng",
+          "description": "Thay đổi cấu hình cho người dùng ''{name}''.",
+          "fields": {
+            "old_code": {
+              "heading": "Mã hiện tại",
+              "description": "Mã hiện tại, để trống khi không thay đổi."
+            }
+          }
+        }
+      }
+    },
+    "actions": {
+      "title": "Hành động",
+      "cards": {
+        "notifications": {
+          "title": "Thông báo",
+          "description": "Khi dùng bảng điều khiển này, bạn có thể quản lý thông báo gửi đi khi có một sự kiện báo động xảy ra.",
+          "table": {
+            "no_items": "Chưa tạo thông báo nào.",
+            "no_area_warning": "Chưa gán hành động vào khu vực nào cả."
+          },
+          "actions": {
+            "new_notification": "thông báo mới"
+          }
+        },
+        "actions": {
+          "description": "Bảng điều khiển này có thể dùng để bật tắt thiết bị khi trạng thái báo động thay đổi.",
+          "table": {
+            "no_items": "Chưa tạo hành động nào."
+          },
+          "actions": {
+            "new_action": "hành động mới"
+          }
+        },
+        "new_notification": {
+          "title": "Cấu hình thông báo",
+          "description": "Nhận thông báo khi bật/tắt hệ thống báo động, khi bị kích hoạt, v.v.",
+          "trigger": "Điều kiện",
+          "action": "Nhiệm vụ",
+          "options": "Tùy chọn",
+          "fields": {
+            "event": {
+              "heading": "Sự kiện",
+              "description": "Khi nào thì gửi thông báo",
+              "choose": {
+                "armed": {
+                  "name": "Hệ thống báo động được bật",
+                  "description": "Hệ thống báo động đã được bật thành công"
+                },
+                "disarmed": {
+                  "name": "Hệ thống báo động được tắt",
+                  "description": "Hệ thống báo động đã được tắt"
+                },
+                "triggered": {
+                  "name": "Hệ thống báo động bị kích hoạt",
+                  "description": "Hệ thống báo động bị kích hoạt"
+                },
+                "untriggered": {
+                  "name": "Hệ thống báo động không còn bị kích hoạt",
+                  "description": "Trạng thái kích hoạt của hệ thống đã kết thúc"
+                },
+                "arm_failure": {
+                  "name": "Bật bảo vệ thất bại",
+                  "description": "Bật hệ thống báo động thất bại do một hay nhiều cảm biến đang mở"
+                },
+                "arming": {
+                  "name": "Bắt đầu đếm giờ đi ra",
+                  "description": "Bắt đầu đếm giờ đi ra, hãy sẵn sàng rời khỏi nhà."
+                },
+                "pending": {
+                  "name": "Bắt đầu đếm giờ đi vào",
+                  "description": "Bắt đầu đếm giờ đi vào, báo động sẽ sớm bị kích hoạt."
+                }
+              }
+            },
+            "mode": {
+              "heading": "Chế độ",
+              "description": "Giới hạn hành động chỉ trong một số chế độ bảo vệ (tùy chọn)"
+            },
+            "title": {
+              "heading": "Tiêu đề",
+              "description": "Tiêu đề của tin nhắn thông báo"
+            },
+            "message": {
+              "heading": "Thông báo",
+              "description": "Nội dung tin nhắn thông báo",
+              "insert_wildcard": "Nhập mẫu",
+              "placeholders": {
+                "armed": "Hệ thống báo động chuyển sang {{arm_mode}}",
+                "disarmed": "Hệ thống báo động giờ đã TẮT",
+                "triggered": "Hệ thống báo động bị kích hoạt! {{open_sensors}}.",
+                "untriggered": "Hệ thống báo động không còn bị kích hoạt.",
+                "arm_failure": "Hệ thống báo động không bật bảo vệ được, lý do: {{open_sensors}}.",
+                "arming": "Hệ thống báo động sẽ sớm được bật, vui lòng rời khởi nhà.",
+                "pending": "Hệ thống báo động sắp bị kích hoạt, hãy tắt nó nhanh!"
+              }
+            },
+            "open_sensors_format": {
+              "heading": "Định dạng cho mẫu open_sensors",
+              "description": "Chọn thông tin cảm biến nào để chèn vào thông báo",
+              "options": {
+                "default": "Tên và trạng thái",
+                "short": "Chỉ tên"
+              }
+            },
+            "arm_mode_format": {
+              "heading": "Bản dịch cho mẫu arm_mode",
+              "description": "Chọn ngôn ngữ chế độ bảo vệ sẽ chèn vào thông báo"
+            },
+            "target": {
+              "heading": "Mục tiêu",
+              "description": "Thiết bị để gửi thông báo tới"
+            },
+            "name": {
+              "heading": "Tên",
+              "description": "Miêu tả của thông báo này",
+              "placeholders": {
+                "armed": "Thông báo đến {target} khi bật bảo vệ",
+                "disarmed": "Thông báo đến {target} khi tắt bảo vệ",
+                "triggered": "Thông báo đến {target} khi kích hoạt báo động",
+                "untriggered": "Thông báo đến {target} khi dừng báo động",
+                "arm_failure": "Thông báo đến {target} khi thất bại",
+                "arming": "Thông báo đến {target} khi đi ra",
+                "pending": "Thông báo đến {target} khi đi vào"
+              }
+            },
+            "delete": {
+              "heading": "Xóa tự động hóa",
+              "description": "Xóa vĩnh viễn tự động hóa này"
+            }
+          },
+          "actions": {
+            "test": "Chạy thử"
+          }
+        },
+        "new_action": {
+          "title": "Cấu hình hành động",
+          "description": "Bật đèn hoặc thiết bị (như chuông báo động) khi bật/tắt hệ thống báo động, khi bị kích hoạt, v.v.",
+          "fields": {
+            "event": {
+              "heading": "Sự kiện",
+              "description": "Khi nào nên thực hiện hành động"
+            },
+            "area": {
+              "heading": "Khu vực",
+              "description": "Khu vực áp dụng sự kiện, để trống để áp dụng cho toàn bộ hệ thống."
+            },
+            "mode": {
+              "heading": "Chế độ",
+              "description": "Giới hạn hành động chỉ cho những chế độ bảo vệ cụ thể (tùy chọn)"
+            },
+            "entity": {
+              "heading": "Thực thể",
+              "description": "Thực thể bị hành động tác động"
+            },
+            "action": {
+              "heading": "Hành động",
+              "description": "Hành động tác động lên thực thể",
+              "no_common_actions": "Hành động chỉ có thể được gán trong chế độ YAML đối với thực thể đã chọn."
+            },
+            "name": {
+              "heading": "Tên",
+              "description": "Miêu tả hành động này",
+              "placeholders": {
+                "armed": "Đặt {entity} thành {state} khi bật bảo vệ",
+                "disarmed": "Đặt {entity} thành {state} khi tắt bảo vệ",
+                "triggered": "Đặt {entity} thành {state} khi kích hoạt báo động",
+                "untriggered": "Đặt {entity} thành {state} khi dừng báo động",
+                "arm_failure": "Đặt {entity} thành {state} khi thất bại",
+                "arming": "Đặt {entity} thành {state} khi đi ra",
+                "pending": "Đặt {entity} thành {state} khi đi vào"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
