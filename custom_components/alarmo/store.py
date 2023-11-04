@@ -280,7 +280,7 @@ class MigratableStore(Store):
 
         if old_major_version <= 5 or (old_major_version == 6 and old_minor_version < 2):
             data["config"] = attr.asdict(Config(
-                **data["config"],
+                **omit(data["config"], ["code_mode_change_required"]),
                 code_mode_change_required=data["config"]["code_arm_required"]
             ))
 
