@@ -100,19 +100,19 @@
             },
             "command_topic": {
               "heading": "Kommando-Topic",
-              "description": "Topicauf das Alarmo bei Scharf-/Unscharfschaltbefehlen hört"
+              "description": "Topic, auf das Alarmo bei Scharf-/Unscharfschaltbefehlen hört"
             },
             "require_code": {
-              "heading": "Require code",
-              "description": "Require the code to be sent with the command."
+              "heading": "Code notwendig",
+              "description": "Code muss mit dem Befehl gesendet werden"
             },
             "state_payload": {
-              "heading": "Configure payload per state",
-              "item": "Define a payload for state ''{state}''"
+              "heading": "Konfiguriere Payload pro Zustand",
+              "item": "Definiere Payload für den Zustand ''{state}''"
             },
             "command_payload": {
-              "heading": "Configure payload per command",
-              "item": "Define a payload for command ''{command}''"
+              "heading": "Konfiguriere Payload pro Kommando",
+              "item": "Definiere Payload für das Kommando ''{command}''"
             }
           }
         },
@@ -124,7 +124,7 @@
             "remarks": "Bemerkungen",
             "summary": "Dieser Bereich enthält {summary_sensors} und {summary_automations}.",
             "summary_sensors": "{number} {number, plural,\n  one {Sensor}\n  other {Sensoren}\n}",
-            "summary_automations": "{number} {number, plural,\n  one {Automation}\n  other {Automationen}\n}"
+            "summary_automations": "{number} {number, plural,\n  one {Aktion}\n  other {Aktionen}\n}"
           },
           "actions": {
             "add": "Hinzufügen"
@@ -144,14 +144,14 @@
         },
         "remove_area": {
           "title": "Bereich entfernen?",
-          "description": "Sind Sie sicher, dass Sie diesen Bereich entfernen möchten? Dieser Bereich enthält {sensors} Sensoren und {automations} Automationen, die ebenfalls entfernt werden."
+          "description": "Sind Sie sicher, dass Sie diesen Bereich entfernen möchten? Dieser Bereich enthält {sensors} Sensoren und {automations} Aktionen, die ebenfalls entfernt werden."
         },
         "edit_master": {
           "title": "Master-Konfiguration"
         },
         "disable_master": {
           "title": "Master deaktivieren?",
-          "description": "Sind Sie sicher, dass Sie den Alarmmaster entfernen möchten? Dieser Bereich enthält {automations} Automatisierungen, die mit dieser Aktion entfernt werden."
+          "description": "Sind Sie sicher, dass Sie den Alarmmaster entfernen möchten? Dieser Bereich enthält {automations} Aktionen, die ebenfalls entfernt werden."
         }
       }
     },
@@ -164,7 +164,7 @@
             "no_items": "Hier gibt es keine Sensoren, die angezeigt werden sollen.",
             "no_area_warning": "Der Sensor ist keinem Bereich zugeordnet.",
             "arm_modes": "Aktivierungsmodi",
-            "always_on": "(Always)"
+            "always_on": "(Immer)"
           }
         },
         "add_sensors": {
