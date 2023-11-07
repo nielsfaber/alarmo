@@ -210,6 +210,10 @@ class AutomationHandler:
                         changed_by = alarm_entity.changed_by if alarm_entity.changed_by else ""
                         service_data[ATTR_MESSAGE] = service_data[ATTR_MESSAGE].replace("{{changed_by}}", changed_by)
 
+                    if "{{delay}}" in service_data[ATTR_MESSAGE]:
+                        delay = str(alarm_entity.delay) if alarm_entity.delay else ""
+                        service_data[ATTR_MESSAGE] = service_data[ATTR_MESSAGE].replace("{{delay}}", delay)
+
                 domain, service = action[ATTR_SERVICE].split(".")
 
                 await self.hass.async_create_task(
