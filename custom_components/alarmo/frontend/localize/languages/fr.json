@@ -30,7 +30,7 @@
       }
     }
   },
-  "title": "Configuration de l' alarme",
+  "title": "Configuration de l'alarme",
   "panels": {
     "general": {
       "title": "Généraux",
@@ -92,11 +92,11 @@
           "fields": {
             "state_topic": {
               "heading": "Etat des données",
-              "description": "Donnée sur laquelle les mises à jour d'état sont publiées"
+              "description": "Donnée sur laquelle les mises à jour d'état sont publiées."
             },
             "event_topic": {
               "heading": "Evènement de données",
-              "description": "Donnée sur laquelle les évènements d'état sont publiés"
+              "description": "Donnée sur laquelle les évènements d'état sont publiés."
             },
             "command_topic": {
               "heading": "Commande de données",
@@ -144,14 +144,14 @@
         },
         "remove_area": {
           "title": "Suppression de zone?",
-          "description": "Etes vous sur de vouloir supprimer cette zone? Cette zone contient {sensors} des capteurs et {automations} automatisations, qui seront également supprimés."
+          "description": "Êtes-vous sur de vouloir supprimer cette zone? Cette zone contient {sensors} des capteurs et {automations} automatisations, qui seront également supprimés."
         },
         "edit_master": {
           "title": "Configuration principale"
         },
         "disable_master": {
           "title": "Désactiver la configuration principale?",
-          "description": "Etes vous sur de vouloir supprimer la configuration principale? Cette zone contient {automations} automatisations, qui seront également supprimées."
+          "description": "Êtes-vous sur de vouloir supprimer la configuration principale? Cette zone contient {automations} automatisations, qui seront également supprimées."
         }
       }
     },
@@ -185,7 +185,7 @@
           "fields": {
             "area": {
               "heading": "Zone",
-              "description": "Selectionner une zone contenant ce capteur."
+              "description": "Sélectionner une zone contenant ce capteur."
             },
             "group": {
               "heading": "Groupe",
@@ -350,7 +350,7 @@
             },
             "confirm_code": {
               "heading": "Confirmation du code",
-              "description": "Répèter le  code."
+              "description": "Répèter le code."
             },
             "can_arm": {
               "heading": "Demande de code pour l'activation",
@@ -366,7 +366,7 @@
             },
             "area_limit": {
               "heading": "Zones Restreintes",
-              "description": "L'utilisateur ne peut contrôler uniquement les zones sélectionnées"
+              "description": "L'utilisateur ne peut contrôler uniquement les zones sélectionnées."
             }
           },
           "errors": {
@@ -377,7 +377,7 @@
         },
         "edit_user": {
           "title": "Editer l'utilisateur",
-          "description": "Changer la  configuration pour l'utilisateur ''{name}''.",
+          "description": "Changer la configuration pour l'utilisateur ''{name}''.",
           "fields": {
             "old_code": {
               "heading": "Code utilisé",
@@ -392,7 +392,7 @@
       "cards": {
         "notifications": {
           "title": "Notifications",
-          "description": "À l'aide de ce panneau, vous pouvez gérer les notifications à envoyer lors d'un évènement d'alarme",
+          "description": "À l'aide de ce panneau, vous pouvez gérer les notifications à envoyer lors d'un évènement d'alarme.",
           "table": {
             "no_items": "Il n'y a aucune notification de créée.",
             "no_area_warning": "L'action n'est affectée à aucune zone."
@@ -418,28 +418,28 @@
           "options": "Options",
           "fields": {
             "event": {
-              "heading": "Evènement",
-              "description": "Détermine quand la notification doit être envoyée",
+              "heading": "Évènement",
+              "description": "Détermine quand la notification doit être envoyée.",
               "choose": {
                 "armed": {
-                  "name": "Alarme activée ",
-                  "description": "l'alarme s'est correctement activée"
+                  "name": "Alarme activée",
+                  "description": "L'alarme s'est correctement activée."
                 },
                 "disarmed": {
                   "name": "Alarme désactivée",
-                  "description": "L'alarme est désactivée"
+                  "description": "L'alarme est désactivée."
                 },
                 "triggered": {
                   "name": "Alarme déclenchée",
-                  "description": "L'alarme est déclenchée"
+                  "description": "L'alarme est déclenchée."
                 },
                 "untriggered": {
                   "name": "L'alarme n'est plus déclenchée",
-                  "description": "Le temps de déclenchement de l'alarme est terminé"
+                  "description": "Le temps de déclenchement de l'alarme est terminé."
                 },
                 "arm_failure": {
                   "name": "Armement impossible",
-                  "description": "L'armement est impossible dû à un ou plusieurs capteurs"
+                  "description": "L'armement est impossible dû à un ou plusieurs capteurs."
                 },
                 "arming": {
                   "name": "Délai de sortie activé",
@@ -474,7 +474,7 @@
               }
             },
             "open_sensors_format": {
-              "heading": "Format pour les  'open_sensors wildcard'",
+              "heading": "Format pour les 'open_sensors wildcard'",
               "description": "Choisissez les informations du capteur à insérer dans le message",
               "options": {
                 "default": "Noms et états",
@@ -517,7 +517,7 @@
           "fields": {
             "event": {
               "heading": "Evènement",
-              "description": "Détermine quand l'action doit être exécutée"
+              "description": "Détermine quand l'action doit être exécutée."
             },
             "area": {
               "heading": "Zone",
@@ -525,11 +525,11 @@
             },
             "mode": {
               "heading": "Mode",
-              "description": "Limite l'action à un mode spécifique (optionnel)"
+              "description": "Limite l'action à un mode spécifique (optionnel)."
             },
             "entity": {
               "heading": "Entité",
-              "description": "Entité sur laquelle effectuer une action"
+              "description": "Entité sur laquelle effectuer une action."
             },
             "action": {
               "heading": "Action",
