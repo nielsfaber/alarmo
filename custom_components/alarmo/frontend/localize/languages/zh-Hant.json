@@ -1,0 +1,557 @@
+{
+  "common": {
+    "modes_short": {
+      "armed_away": "離家警戒",
+      "armed_home": "在家警戒",
+      "armed_night": "夜間警戒",
+      "armed_custom_bypass": "自定義警戒",
+      "armed_vacation": "度假警戒"
+    },
+    "enabled": "已啟用",
+    "disabled": "已禁用"
+  },
+  "components": {
+    "time_slider": {
+      "seconds": "秒",
+      "minutes": "分",
+      "infinite": "無限",
+      "none": "無"
+    },
+    "editor": {
+      "ui_mode": "UI模式",
+      "yaml_mode": "YAML模式",
+      "edit_in_yaml": "在YAML中編輯"
+    },
+    "table": {
+      "filter": {
+        "label": "過濾項目",
+        "item": "通過{name}過濾",
+        "hidden_items": "{number} {number, plural,\n  one {項目}\n  other {項目}\n} 已隱藏"
+      }
+    }
+  },
+  "title": "警戒面板",
+  "panels": {
+    "general": {
+      "title": "通用",
+      "cards": {
+        "general": {
+          "description": "該面板定義了警戒的一些全局設置。",
+          "fields": {
+            "disarm_after_trigger": {
+              "heading": "觸發後解除警戒",
+              "description": "觸發超時後解除警報，而不是返回到警戒狀態。"
+            },
+            "enable_mqtt": {
+              "heading": "啟用MQTT",
+              "description": "允許通過MQTT控制警戒面板。"
+            },
+            "enable_master": {
+              "heading": "啟用警戒主控",
+              "description": "創建一個實體，用於同時控制所有區域。"
+            }
+          },
+          "actions": {
+            "setup_mqtt": "MQTT配置",
+            "setup_master": "主控配置"
+          }
+        },
+        "modes": {
+          "title": "模式",
+          "description": "該面板可用於設置報警器的警戒模式。",
+          "modes": {
+            "armed_away": "當所有的人離開房子時，將使用離家警戒。所有接入房屋的門窗傳感器都將被監聽狀態，包括有動作傳感器。",
+            "armed_home": "當有人在家時，設置警戒時將使用在家警戒（也稱為停留警戒）。所有接入房屋的門窗傳感器都將被監聽狀態，但房屋的動作傳感器不受監聽。",
+            "armed_night": "在睡覺前設置警報時，將使用夜間警報。所有接入房屋的門窗傳感器都將被監聽狀態，並且指定的動作傳感器（例如：樓梯）也將被監聽。",
+            "armed_vacation": "度假警戒可以作為離家警戒模式的拓展，以應對長時間的離家情況。延遲時間和觸發反應可以根據離家的時間按需調整。",
+            "armed_custom_bypass": "一個額外的模式，用於定義你自己的警戒模式。"
+          },
+          "number_sensors_active": "{number} {number, plural,\n  one {傳感器}\n  other {傳感器}\n} 激活",
+          "fields": {
+            "status": {
+              "heading": "狀態",
+              "description": "控制警報器是否可以在此模式下警戒。"
+            },
+            "exit_delay": {
+              "heading": "離開延遲",
+              "description": "當開啟警戒時，在這個時間段內，傳感器還不會觸發警報。"
+            },
+            "entry_delay": {
+              "heading": "進入延遲",
+              "description": "在其中一個傳感器被觸發後，直到觸發警報的延遲時間。"
+            },
+            "trigger_time": {
+              "heading": "觸發時間",
+              "description": "警戒在激活後保持在觸發狀態的時間。"
+            }
+          }
+        },
+        "mqtt": {
+          "title": "MQTT配置",
+          "description": "該面板可用於配置MQTT接口。",
+          "fields": {
+            "state_topic": {
+              "heading": "狀態主題（Topic）",
+              "description": "更新狀態發布的主題"
+            },
+            "event_topic": {
+              "heading": "事件主題（Topic）",
+              "description": "警戒事件發布的主題"
+            },
+            "command_topic": {
+              "heading": "指令主題（Topic）",
+              "description": "Alarmo 監聽警戒或者解除警戒的主題"
+            },
+            "require_code": {
+              "heading": "需要密碼",
+              "description": "需要密碼和指令一起發送"
+            },
+            "state_payload": {
+              "heading": "配置每個狀態的有效載荷",
+              "item": "定義狀態的有效載荷 ''{state}''"
+            },
+            "command_payload": {
+              "heading": "配置每個指令的有效載荷",
+              "item": "定義指令的有效載荷 ''{command}''"
+            }
+          }
+        },
+        "areas": {
+          "title": "區域",
+          "description": "區域可用於將您的報警系統劃分為多個區間。",
+          "no_items": "目前還沒有定義任何區域。",
+          "table": {
+            "remarks": "備註",
+            "summary": "當前區域包含 {summary_sensors} 和 {summary_automations}.",
+            "summary_sensors": "{number} {number, plural,\n  one {傳感器}\n  other {傳感器}\n}",
+            "summary_automations": "{number} {number, plural,\n  one {自動化}\n  other {自動化}\n}"
+          },
+          "actions": {
+            "add": "添加"
+          }
+        }
+      },
+      "dialogs": {
+        "create_area": {
+          "title": "新區域",
+          "fields": {
+            "copy_from": "覆制設置，從"
+          }
+        },
+        "edit_area": {
+          "title": "編輯區域 ''{area}''",
+          "name_warning": "註意：改變名稱將改變實體ID。"
+        },
+        "remove_area": {
+          "title": "刪除區域?",
+          "description": "你確定要刪除區域嗎? 當前區域包含 {sensors} 傳感器和 {automations} 自動化, 也會一起刪除。"
+        },
+        "edit_master": {
+          "title": "主控配置"
+        },
+        "disable_master": {
+          "title": "禁用主控?",
+          "description": "你確定你要刪除警報器主控嗎? 當前區域包含 {automations} 自動化, 也會一起刪除。"
+        }
+      }
+    },
+    "sensors": {
+      "title": "傳感器",
+      "cards": {
+        "sensors": {
+          "description": "目前配置的傳感器。點擊一個項目來進行修改。",
+          "table": {
+            "no_items": "這裏沒有要顯示的傳感器。",
+            "no_area_warning": "傳感器沒有被分配到任何區域。",
+            "arm_modes": "警戒模式",
+            "always_on": "(一直開啟)"
+          }
+        },
+        "add_sensors": {
+          "title": "添加傳感器",
+          "description": "添加更多的傳感器。確保你的傳感器有一個合適的名字，這樣你就可以識別它們。",
+          "no_items": "沒有可用的HA實體可以被配置為報警器。請確保包含 binary_sensor 類型的實體。",
+          "table": {
+            "type": "檢測到的類型"
+          },
+          "actions": {
+            "add_to_alarm": "添加到報警器",
+            "filter_supported": "隱藏未知類型的項目"
+          }
+        },
+        "editor": {
+          "title": "編輯傳感器",
+          "description": "配置傳感器 ''{entity}'' 的設置。",
+          "fields": {
+            "area": {
+              "heading": "區域",
+              "description": "選擇一個包含該傳感器的區域。"
+            },
+            "group": {
+              "heading": "群組",
+              "description": "與其他傳感器分組進行聯合觸發。"
+            },
+            "device_type": {
+              "heading": "設備類型",
+              "description": "選擇一個設備類型來自動應用適當的設置。",
+              "choose": {
+                "door": {
+                  "name": "門",
+                  "description": "用於進入/離開房屋的門或其他入口。"
+                },
+                "window": {
+                  "name": "窗",
+                  "description": "窗戶或不用於進入房屋的門，如陽台。"
+                },
+                "motion": {
+                  "name": "動作",
+                  "description": "存在傳感器或類似裝置，在激活之間有一個延遲。"
+                },
+                "tamper": {
+                  "name": "篡改",
+                  "description": "移除傳感器蓋的探測器，玻璃破碎傳感器等。"
+                },
+                "environmental": {
+                  "name": "環境",
+                  "description": "煙霧/氣體傳感器、泄漏探測器等（與防盜不相關）。"
+                },
+                "other": {
+                  "name": "通用"
+                }
+              }
+            },
+            "always_on": {
+              "heading": "總是開啟",
+              "description": "傳感器應始終觸發警報。"
+            },
+            "modes": {
+              "heading": "啟用的模式",
+              "description": "該傳感器處於活動狀態的警戒模式。"
+            },
+            "arm_on_close": {
+              "heading": "關閉後警戒",
+              "description": "該傳感器停用後，剩余的離開延遲將被自動跳過。"
+            },
+            "use_exit_delay": {
+              "heading": "使用離開延遲",
+              "description": "當離開延遲開始時，傳感器被允許處於活動狀態。"
+            },
+            "use_entry_delay": {
+              "heading": "使用進入延遲",
+              "description": "傳感器的激活會在進入延遲後觸發警報，而不是直接觸發。"
+            },
+            "allow_open": {
+              "heading": "允許在警戒後打開",
+              "description": "在警戒時，傳感器的初始狀態將被忽略。"
+            },
+            "auto_bypass": {
+              "heading": "自動旁路",
+              "description": "如果該傳感器在警戒時被觸發，則將其排除在報警之外。",
+              "modes": "可繞過傳感器的模式"
+            },
+            "trigger_unavailable": {
+              "heading": "不可用時觸發",
+              "description": "當傳感器狀態變成\"不可用\"時，將激活傳感器。"
+            }
+          },
+          "actions": {
+            "toggle_advanced": "高級設定",
+            "remove": "刪除",
+            "setup_groups": "配置群組"
+          },
+          "errors": {
+            "description": "請修正以下錯誤：",
+            "no_area": "沒有選擇任何區域",
+            "no_modes": "沒有選擇傳感器應處於活動狀態的模式",
+            "no_auto_bypass_modes": "沒有選擇任何模式的傳感器可能會被自動繞過。"
+          }
+        }
+      },
+      "dialogs": {
+        "manage_groups": {
+          "title": "管理傳感器群組",
+          "description": "在一個傳感器群組中，多個傳感器必須在一個時間段內被觸發，才能觸發警報。",
+          "no_items": "無群組",
+          "actions": {
+            "new_group": "新群組"
+          }
+        },
+        "create_group": {
+          "title": "新傳感器群組",
+          "fields": {
+            "name": {
+              "heading": "名稱",
+              "description": "傳感器群組的名稱"
+            },
+            "timeout": {
+              "heading": "超時",
+              "description": "連續的傳感器激活觸發報警的時間段。"
+            },
+            "sensors": {
+              "heading": "傳感器",
+              "description": "選擇該群組所包含的傳感器。"
+            }
+          },
+          "errors": {
+            "invalid_name": "提供的名稱無效。",
+            "insufficient_sensors": "至少需要選擇2個傳感器。"
+          }
+        },
+        "edit_group": {
+          "title": "編輯傳感器群組''{name}''"
+        }
+      }
+    },
+    "codes": {
+      "title": "密碼",
+      "cards": {
+        "codes": {
+          "description": "更改密碼的設置。",
+          "fields": {
+            "code_arm_required": {
+              "heading": "使用警戒密碼",
+              "description": "需要密碼才能啟用警報器"
+            },
+            "code_disarm_required": {
+              "heading": "使用解除警戒密碼",
+              "description": "需要密碼才能解除警報器"
+            },
+            "code_mode_change_required": {
+              "heading": "切換模式需要代碼",
+              "description": "必須提供有效的代碼才能更改處於活動狀態的手臂模式。"
+            },
+            "code_format": {
+              "heading": "密碼格式",
+              "description": "設置 Lovelace Alarm Card 的輸入類型。",
+              "code_format_number": "PIN碼",
+              "code_format_text": "密碼"
+            }
+          }
+        },
+        "user_management": {
+          "title": "用戶管理",
+          "description": "每個用戶都有自己的密碼來啟用/解除警報。",
+          "no_items": "無用戶",
+          "actions": {
+            "new_user": "新用戶"
+          }
+        },
+        "new_user": {
+          "title": "創建新用戶",
+          "description": "可以創建用戶以提供操作警報器的權限。",
+          "fields": {
+            "name": {
+              "heading": "名稱",
+              "description": "該用戶的名稱。"
+            },
+            "code": {
+              "heading": "密碼",
+              "description": "該用戶的密碼"
+            },
+            "confirm_code": {
+              "heading": "確認密碼",
+              "description": "重覆輸入密碼。"
+            },
+            "can_arm": {
+              "heading": "允許密碼用於警戒",
+              "description": "輸入此密碼可激活警戒"
+            },
+            "can_disarm": {
+              "heading": "允許密碼用於解除警戒",
+              "description": "輸入此密碼可解除警戒"
+            },
+            "is_override_code": {
+              "heading": "是覆蓋密碼",
+              "description": "輸入此密碼將強制激活警戒。"
+            },
+            "area_limit": {
+              "heading": "限制區域",
+              "description": "限制用戶只控制選定的區域"
+            }
+          },
+          "errors": {
+            "no_name": "沒有提供名稱。",
+            "no_code": "密碼應至少有4個字符/數字。",
+            "code_mismatch": "密碼不匹配。"
+          }
+        },
+        "edit_user": {
+          "title": "編輯用戶",
+          "description": "為用戶 ''{name}'' 變更配置。",
+          "fields": {
+            "old_code": {
+              "heading": "當前密碼",
+              "description": "當前密碼，留空表示保持不變。"
+            }
+          }
+        }
+      }
+    },
+    "actions": {
+      "title": "動作",
+      "cards": {
+        "notifications": {
+          "title": "提醒",
+          "description": "使用此面板，你可以管理當某個報警事件發生時要發送的通知。",
+          "table": {
+            "no_items": "目前還沒有創建任何通知。",
+            "no_area_warning": "動作沒有被分配到任何領域。"
+          },
+          "actions": {
+            "new_notification": "新通知"
+          }
+        },
+        "actions": {
+          "description": "當報警狀態改變時，這個面板可以用來切換設備。",
+          "table": {
+            "no_items": "目前還沒有創建任何動作。"
+          },
+          "actions": {
+            "new_action": "新動作"
+          }
+        },
+        "new_notification": {
+          "title": "配置通知",
+          "description": "在啟動/解除警報時、激活時等收到通知。",
+          "trigger": "條件",
+          "action": "任務",
+          "options": "選項",
+          "fields": {
+            "event": {
+              "heading": "事件",
+              "description": "應在何時發送通知",
+              "choose": {
+                "armed": {
+                  "name": "警報器已警戒",
+                  "description": "警報器已成功警戒"
+                },
+                "disarmed": {
+                  "name": "警報器已解除警戒",
+                  "description": "警報器已解除警戒"
+                },
+                "triggered": {
+                  "name": "警報器已觸發",
+                  "description": "警報器已觸發"
+                },
+                "untriggered": {
+                  "name": "警報器不再被觸發",
+                  "description": "警報器的觸發狀態已經結束"
+                },
+                "arm_failure": {
+                  "name": "警戒失敗",
+                  "description": "由於一個或多個傳感器打開，警報器的警戒失敗。"
+                },
+                "arming": {
+                  "name": "離開延遲開始",
+                  "description": "離開延遲開始，準備離開房屋。"
+                },
+                "pending": {
+                  "name": "進入延遲開始",
+                  "description": "進入延遲開始，警報將很快觸發。"
+                }
+              }
+            },
+            "mode": {
+              "heading": "模式",
+              "description": "將動作限制在特定的警戒模式（可選）。"
+            },
+            "title": {
+              "heading": "標題",
+              "description": "通知信息的標題"
+            },
+            "message": {
+              "heading": "信息",
+              "description": "通知信息的內容",
+              "insert_wildcard": "插入通配符",
+              "placeholders": {
+                "armed": "報警器被設置為 {{arm_mode}}",
+                "disarmed": "警報器現在是關閉的。",
+                "triggered": "警報被觸發了! 因為：{{open_sensors}}.",
+                "untriggered": "警報器不再被觸發。",
+                "arm_failure": "警報器現在無法啟動，因為： {{open_sensors}}.",
+                "arming": "警報器很快就會警戒，請離開房屋。",
+                "pending": "警報器即將觸發，請迅速解除警報!"
+              }
+            },
+            "open_sensors_format": {
+              "heading": "open_sensors通配符的格式",
+              "description": "選擇在信息中插入哪些傳感器信息",
+              "options": {
+                "default": "名稱和狀態",
+                "short": "僅名稱"
+              }
+            },
+            "arm_mode_format": {
+              "heading": "警戒模式通配符的翻譯",
+              "description": "選擇在信息中插入警戒模式的語言"
+            },
+            "target": {
+              "heading": "目標",
+              "description": "要發送通知的設備"
+            },
+            "name": {
+              "heading": "名稱",
+              "description": "該通知的描述",
+              "placeholders": {
+                "armed": "警戒時通知 {target}",
+                "disarmed": "解除警戒時通知 {target}",
+                "triggered": "觸發警報時通知 {target}",
+                "untriggered": "警報解除時通知 {target}",
+                "arm_failure": "警戒失敗時通知 {target}",
+                "arming": "警戒延遲開始時通知 {target}",
+                "pending": "警報即將觸發時通知 {target}"
+              }
+            },
+            "delete": {
+              "heading": "刪除自動化",
+              "description": "永久性地刪除這個自動化"
+            }
+          },
+          "actions": {
+            "test": "測試"
+          }
+        },
+        "new_action": {
+          "title": "配置動作",
+          "description": "在啟動/解除警報時，在激活時，切換燈光或設備（如警笛）。",
+          "fields": {
+            "event": {
+              "heading": "事件",
+              "description": "什麽時候應該執行該動作"
+            },
+            "area": {
+              "heading": "區域",
+              "description": "事件適用的區域，留空選擇全局報警。"
+            },
+            "mode": {
+              "heading": "模式",
+              "description": "將動作限制在特定的警戒模式（可選）。"
+            },
+            "entity": {
+              "heading": "實體",
+              "description": "要執行動作的實體"
+            },
+            "action": {
+              "heading": "動作",
+              "description": "對實體執行的動作",
+              "no_common_actions": "動作只能在YAML模式下為選定的實體分配。"
+            },
+            "name": {
+              "heading": "名稱",
+              "description": "該動作的描述",
+              "placeholders": {
+                "armed": "警戒時將 {entity} 設置為 {state}。",
+                "disarmed": "解除警戒時將 {entity} 設置為 {state}。",
+                "triggered": "觸發警報時將 {entity} 設置為 {state}。",
+                "untriggered": "警報解除時將 {entity} 設置為 {state}。",
+                "arm_failure": "警戒失敗時將 {entity} 設置為 {state}。",
+                "arming": "警戒延遲開始時將 {entity} 設置為 {state}。",
+                "pending": "警報即將觸發時將 {entity} 設置為 {state}。"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
