@@ -39,6 +39,7 @@ async def async_register_panel(hass):
         sidebar_icon=PANEL_ICON,
         require_admin=True,
         config={},
+        config_panel_domain=DOMAIN,
     )
 
 
