@@ -481,7 +481,7 @@ By adding the wildcard in a message (including the brackets) it will be automati
 | `{{bypassed_sensors}}` | List of sensors which are bypassed                             | *Bedroom window*   | Armed                                 |
 | `{{arm_mode}}`         | Current arming mode.                                           | *Armed Away*       | Leave<br> Armed                       |
 | `{{changed_by}}`       | User who's code has been entered.                              | *Niels*            | Armed<br> Disarmed                    |
-
+| `{{delay}}`            | Delay in seconds until armed or the alarm is triggered         | *30*               | Arming<br> Pending                    |
 
 ##### Actionable notifications
 This function adds buttons to a push message, that can be clicked to interact with Alarmo.

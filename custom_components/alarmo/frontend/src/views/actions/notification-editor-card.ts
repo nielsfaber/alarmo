@@ -783,6 +783,7 @@ export class NotificationEditorCard extends LitElement {
     message = message.replace('{{bypassed_sensors}}', 'Some Bypassed Sensor');
     message = message.replace(/{{arm_mode(\|[^}]+)?}}/, 'Armed away');
     message = message.replace('{{changed_by}}', 'Some Example User');
+    message = message.replace('{{delay}}', '30');
 
     this.hass
       .callService(domain, service, {

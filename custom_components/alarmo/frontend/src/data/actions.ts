@@ -355,6 +355,15 @@ export const getWildcardOptions = (event?: EAlarmEvent, alarmoConfig?: AlarmoCon
         value: '{{arm_mode}}',
       },
     ];
+  
+    if (!event || [EAlarmEvent.Arming, EAlarmEvent.Pending].includes(event))
+    options = [
+      ...options,
+      {
+        name: 'Delay',
+        value: '{{delay}}',
+      },
+    ];
 
   return options;
 };
