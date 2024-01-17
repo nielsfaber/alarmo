@@ -15,9 +15,7 @@ from homeassistant.const import (
     STATE_ALARM_ARMED_VACATION
 )
 
-from homeassistant.components.alarm_control_panel import (
-    FORMAT_NUMBER as CODE_FORMAT_NUMBER,
-)
+from homeassistant.components.alarm_control_panel import CodeFormat
 
 from .const import DOMAIN
 
@@ -89,7 +87,7 @@ class Config:
     code_arm_required = attr.ib(type=bool, default=False)
     code_mode_change_required = attr.ib(type=bool, default=False)
     code_disarm_required = attr.ib(type=bool, default=False)
-    code_format = attr.ib(type=str, default=CODE_FORMAT_NUMBER)
+    code_format = attr.ib(type=str, default=CodeFormat.NUMBER)
     disarm_after_trigger = attr.ib(type=bool, default=False)
     master = attr.ib(type=MasterConfig, default=MasterConfig())
     mqtt = attr.ib(type=MqttConfig, default=MqttConfig())
