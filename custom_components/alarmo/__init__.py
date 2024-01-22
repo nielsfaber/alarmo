@@ -356,6 +356,7 @@ class AlarmoCoordinator(DataUpdateCoordinator):
         return result["group_id"] if result else None
 
     def assign_sensor_to_group(self, entity_id: str, group_id: str):
+        updated = False
         old_group = self.async_get_group_for_sensor(entity_id)
         if old_group and group_id != old_group:
             # remove sensor from group
@@ -366,17 +367,19 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                 })
             else:
                 self.store.async_delete_sensor_group(old_group)
+            updated = True
         if group_id:
             # add sensor to group
-            el = self.store.async_get_sensor_group(group_id)
-            if not el:
+            group = self.store.async_get_sensor_group(group_id)
+            if not group:
                 _LOGGER.error("Failed to assign entity {} to group {}".format(entity_id, group_id))
-                return
-            self.store.async_update_sensor_group(group_id, {
-                ATTR_ENTITIES: el[ATTR_ENTITIES] + [entity_id]
-            })
-
-        async_dispatcher_send(self.hass, "alarmo_sensors_updated")
+            elif entity_id not in group[ATTR_ENTITIES]:
+                self.store.async_update_sensor_group(group_id, {
+                    ATTR_ENTITIES: group[ATTR_ENTITIES] + [entity_id]
+                })
+                updated = True
+        if updated:
+            async_dispatcher_send(self.hass, "alarmo_sensors_updated")
 
     def async_update_sensor_group_config(self, group_id: str = None, data: dict = {}):
         if const.ATTR_REMOVE in data:

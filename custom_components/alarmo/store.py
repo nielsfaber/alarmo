@@ -30,7 +30,7 @@ _LOGGER = logging.getLogger(__name__)
 DATA_REGISTRY = f"{DOMAIN}_storage"
 STORAGE_KEY = f"{DOMAIN}.storage"
 STORAGE_VERSION_MAJOR = 6
-STORAGE_VERSION_MINOR = 2
+STORAGE_VERSION_MINOR = 3
 SAVE_DELAY = 10
 
 
@@ -281,6 +281,17 @@ class MigratableStore(Store):
                 **omit(data["config"], ["code_mode_change_required"]),
                 code_mode_change_required=data["config"]["code_arm_required"]
             ))
+
+        if old_major_version <= 5 or (old_major_version == 6 and old_minor_version < 3):
+            data["sensor_groups"] = [
+                attr.asdict(SensorGroupEntry(
+                    **{
+                        **omit(sensorGroup, ["entities"]),
+                        "entities": list(set(sensorGroup["entities"]))
+                    }
+                ))
+                for sensorGroup in data["sensor_groups"]
+            ]
 
         return data
 
