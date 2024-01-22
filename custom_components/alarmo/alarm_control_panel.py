@@ -196,7 +196,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
         if not self._config or ATTR_CODE_ARM_REQUIRED not in self._config:
             return True  # assume code is needed (conservative approach)
         elif self._state != STATE_ALARM_DISARMED:
-            return self._config[const.ATTR_CODE_DISARM_REQUIRED]
+            return self._config[const.ATTR_CODE_MODE_CHANGE_REQUIRED]
         else:
             return self._config[ATTR_CODE_ARM_REQUIRED]
 
