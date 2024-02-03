@@ -40,7 +40,7 @@
           "fields": {
             "disarm_after_trigger": {
               "heading": "Désactivation après déclenchement",
-              "description": "Lors que le temps de fonctionnement de la sirène est écoulé, désactive l'alarme au lieu de la réactiver."
+              "description": "Lorsque le temps de fonctionnement de la sirène est écoulé, désactive l'alarme au lieu de la réactiver."
             },
             "enable_mqtt": {
               "heading": "Utilisation avec MQTT",
@@ -82,7 +82,7 @@
             },
             "trigger_time": {
               "heading": "Temps de fonctionnement avant réarmement",
-              "description": "Temps pendant lequel l'alarme restera dans l'état déclenché après intrusion"
+              "description": "Temps pendant lequel l'alarme restera dans l'état déclenché après intrusion."
             }
           }
         },
@@ -92,15 +92,15 @@
           "fields": {
             "state_topic": {
               "heading": "Etat des données",
-              "description": "Donnée sur laquelle les mises à jour d'état sont publiées."
+              "description": "Topic sur lequel les mises à jour d'état sont publiées."
             },
             "event_topic": {
               "heading": "Evènement de données",
-              "description": "Donnée sur laquelle les évènements d'état sont publiés."
+              "description": "Topic sur lequel les évènements d'état sont publiés."
             },
             "command_topic": {
               "heading": "Commande de données",
-              "description": "Donnée sur laquelle les commandes d'armement / désarmement sont envoyées."
+              "description": "Topic sur lequel les commandes d'armement / désarmement sont envoyées."
             },
             "require_code": {
               "heading": "Code requis",
@@ -108,11 +108,11 @@
             },
             "state_payload": {
               "heading": "Configurer une valeur par état",
-              "item": "Définir une valeur par état ''{state}''"
+              "item": "Définir une valeur pour l'état ''{state}''."
             },
             "command_payload": {
               "heading": "Configurer une valeur par commande",
-              "item": "Définir une valeur par commande ''{command}''"
+              "item": "Définir une valeur pour la commande ''{command}''."
             }
           }
         },
@@ -122,7 +122,7 @@
           "no_items": "Il n'y a pas encore de zone définie.",
           "table": {
             "remarks": "Remarque",
-            "summary": "Cette zone contient des {summary_sensors} et {summary_automations}.",
+            "summary": "Cette zone contient {summary_sensors} et {summary_automations}.",
             "summary_sensors": "{number} {number, plural,\n  one {capteur}\n  other {capteurs}\n}",
             "summary_automations": "{number} {number, plural,\n  one {automatisation}\n  other {automatisations}\n}"
           },
@@ -140,18 +140,18 @@
         },
         "edit_area": {
           "title": "Editer la zone ''{area}''",
-          "name_warning": "Note: Changer le nom, changera l'entity ID"
+          "name_warning": "Note : Changer le nom, changera l'entity ID"
         },
         "remove_area": {
-          "title": "Suppression de zone?",
-          "description": "Êtes-vous sur de vouloir supprimer cette zone? Cette zone contient {sensors} des capteurs et {automations} automatisations, qui seront également supprimés."
+          "title": "Suppression de zone ?",
+          "description": "Êtes-vous sur de vouloir supprimer cette zone ? Cette zone contient {sensors} capteur(s) et {automations} automatisation(s), qui seront également supprimés."
         },
         "edit_master": {
           "title": "Configuration principale"
         },
         "disable_master": {
-          "title": "Désactiver la configuration principale?",
-          "description": "Êtes-vous sur de vouloir supprimer la configuration principale? Cette zone contient {automations} automatisations, qui seront également supprimées."
+          "title": "Désactiver la configuration principale ?",
+          "description": "Êtes-vous sur de vouloir supprimer la configuration principale ? Cette zone contient {automations} automatisation(s), qui seront également supprimées."
         }
       }
     },
@@ -209,7 +209,7 @@
                 },
                 "tamper": {
                   "name": "Effraction",
-                  "description": "Détection d'arrachage du capteur, capteur de bris de verre, etc.."
+                  "description": "Détection d'arrachage du capteur, capteur de bris de verre, etc."
                 },
                 "environmental": {
                   "name": "Détecteur Environmental",
@@ -247,7 +247,7 @@
             "auto_bypass": {
               "heading": "Bypass automatique",
               "description": "Exclut ce capteur de l'alarme s'il est ouvert lors de l'armement.",
-              "modes": "Modes dans lesquels le capteur peut être  ignoré"
+              "modes": "Modes dans lesquels le capteur peut être ignoré"
             },
             "trigger_unavailable": {
               "heading": "Déclenchement lorsqu'il n'est pas disponible",
@@ -260,7 +260,7 @@
             "setup_groups": "Configuration de Groupe"
           },
           "errors": {
-            "description": "Veuillez corriger les erreurs suivantes:",
+            "description": "Veuillez corriger les erreurs suivantes :",
             "no_area": "Aucune zone n'est sélectionnée",
             "no_modes": "Aucun mode sélectionné pour lequel le capteur doit être actif",
             "no_auto_bypass_modes": "Aucun mode n'est sélectionné car le capteur peut être automatiquement ignoré"
@@ -402,7 +402,7 @@
           }
         },
         "actions": {
-          "description": "Ce panneau est  utilisé pour changer d'état les appareils de votre choix.",
+          "description": "Ce panneau est utilisé pour changer d'état les appareils de votre choix.",
           "table": {
             "no_items": "Il n'y a aucune action de créée."
           },
@@ -466,11 +466,11 @@
               "placeholders": {
                 "armed": "L'alarme est réglée sur {{arm_mode}}",
                 "disarmed": "L'alarme est maintenant désactivée",
-                "triggered": "L'alarme est déclenchée! En cause: {{open_sensors}}.",
+                "triggered": "L'alarme s'est déclenchée ! Cause : {{open_sensors}}.",
                 "untriggered": "L'alarme n'est plus déclenchée.",
-                "arm_failure": "L'alarme n'a pas pu être armée pour le moment, en cause: {{open_sensors}}.",
+                "arm_failure": "L'alarme n'a pas pu être armée pour le moment, à cause de : {{open_sensors}}.",
                 "arming": "L'alarme sera bientôt armée, veuillez quitter la maison.",
-                "pending": "L'alarme est sur le point de se déclencher, désarmez-la rapidement!"
+                "pending": "L'alarme est sur le point de se déclencher, désarmez-la rapidement !"
               }
             },
             "open_sensors_format": {
@@ -493,13 +493,13 @@
               "heading": "Nom",
               "description": "Description de la notification",
               "placeholders": {
-                "armed": "Notification à l'armement de : {target}",
-                "disarmed": "Notification au désarmement de : {target}",
-                "triggered": "Notification au déclenchement de : {target}",
-                "untriggered": "Notification {target}, quand le temps de déclenchement est terminé",
-                "arm_failure": "Notification en cas d'échec de : {target}",
-                "arming": "Notification en quittant de : {target}",
-                "pending": "Notification au retour de : {target}"
+                "armed": "Notifie {target} à l'armement",
+                "disarmed": "Notifie {target} au désarmement",
+                "triggered": "Notifie {target} au déclenchement",
+                "untriggered": "Notifie {target} quand le temps de déclenchement est terminé",
+                "arm_failure": "Notifie {target} en cas d'échec de l'armement",
+                "arming": "Notifie {target} lors du départ de la maison",
+                "pending": "Notifie {target} lors du retour à la maison"
               }
             },
             "delete": {
@@ -538,7 +538,7 @@
             },
             "name": {
               "heading": "Nom",
-              "description": "Description de  l'action",
+              "description": "Description de l'action",
               "placeholders": {
                 "armed": "Mettre {entity} à {state} lors de l'armement",
                 "disarmed": "Mettre {entity} à {state} lors du désarmement",
