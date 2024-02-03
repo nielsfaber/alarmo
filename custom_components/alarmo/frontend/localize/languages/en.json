@@ -475,7 +475,7 @@
             },
             "open_sensors_format": {
               "heading": "Format for open_sensors wildcard",
-              "description": "Choose which sensor information in inserted in the message",
+              "description": "Choose which sensor information is inserted in the message",
               "options": {
                 "default": "Names and states",
                 "short": "Names only"
