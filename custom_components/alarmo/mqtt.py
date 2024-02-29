@@ -33,7 +33,7 @@ class MqttHandler:
         self._subscribed_topics = []
         self._subscriptions = []
 
-        async def async_update_config(_args=None):
+        def update_config(_args=None):
             """mqtt config updated, reload the configuration."""
             old_config = self._config
             new_config = self.hass.data[const.DOMAIN]["coordinator"].store.async_get_config()
@@ -46,14 +46,14 @@ class MqttHandler:
 
             if not old_config or old_config[ATTR_MQTT][CONF_COMMAND_TOPIC] != new_config[ATTR_MQTT][CONF_COMMAND_TOPIC]:
                 # re-subscribing is only needed if the command topic has changed
-                await self._async_subscribe_topics()
+                self.hass.async_add_job(self._async_subscribe_topics())
 
             _LOGGER.debug("MQTT config was (re)loaded")
 
         self._subscriptions.append(
-            async_dispatcher_connect(hass, "alarmo_config_updated", async_update_config)
+            async_dispatcher_connect(hass, "alarmo_config_updated", update_config)
         )
-        self.hass.async_add_job(async_update_config)
+        update_config()
 
         @callback
         def async_alarm_state_changed(area_id: str, old_state: str, new_state: str):
