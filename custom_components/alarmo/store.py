@@ -3,7 +3,6 @@ import time
 import attr
 from collections import OrderedDict
 from typing import MutableMapping, cast
-from homeassistant.loader import bind_hass
 from homeassistant.core import (callback, HomeAssistant)
 from homeassistant.helpers.storage import Store
 
@@ -674,7 +673,6 @@ class AlarmoStorage:
         return new
 
 
-@bind_hass
 async def async_get_registry(hass: HomeAssistant) -> AlarmoStorage:
     """Return alarmo storage instance."""
     task = hass.data.get(DATA_REGISTRY)
