@@ -183,6 +183,10 @@
           "title": "Rediger Sensor",
           "description": "Konfigurer sensor indstillinger for ''{entity}''.",
           "fields": {
+            "entity": {
+              "heading": "Entitet",
+              "description": "Entitet tilknyttet denne sensor"
+            },
             "area": {
               "heading": "Område",
               "description": "Vælg det område som indeholder denne sensor."

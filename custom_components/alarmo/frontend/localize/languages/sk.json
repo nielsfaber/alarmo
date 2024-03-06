@@ -183,6 +183,10 @@
           "title": "Upraviť senzor",
           "description": "Konfigurácia nastavení senzorov ''{entity}''.",
           "fields": {
+            "entity": {
+              "heading": "Entita",
+              "description": "Entita spojená s týmto senzorom"
+            },
             "area": {
               "heading": "Oblasť",
               "description": "Vyberte oblasť, ktorá obsahuje tento senzor."

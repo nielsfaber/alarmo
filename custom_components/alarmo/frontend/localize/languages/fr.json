@@ -183,6 +183,10 @@
           "title": "Editer un capteur",
           "description": "Configurer les paramètres du capteur ''{entity}''.",
           "fields": {
+            "entity": {
+              "heading": "Entité",
+              "description": "Entité associée à ce capteur"
+            },
             "area": {
               "heading": "Zone",
               "description": "Sélectionner une zone contenant ce capteur."

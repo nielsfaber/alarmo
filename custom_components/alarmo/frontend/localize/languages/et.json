@@ -183,6 +183,10 @@
           "title": "Andurite sätted",
           "description": "Muuda olemi ''{entity}'' sätteid.",
           "fields": {
+            "entity": {
+              "heading": "Olem",
+              "description": "Selle anduriga seotud olem"
+            },
             "area": {
               "heading": "Ala",
               "description": "Vali ala kus see andur asub."

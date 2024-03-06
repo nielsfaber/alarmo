@@ -11,9 +11,9 @@ import { commonStyle } from '../../styles';
 import { SubscribeMixin } from '../../subscribe-mixin';
 import { AlarmoArea, AlarmoSensor, Dictionary, EArmModes, HomeAssistant } from '../../types';
 import { getModesList, modesByArea } from '../../common/modes';
-
-import '../../components/alarmo-table.ts';
 import { exportPath } from '../../common/navigation';
+
+import '../../components/alarmo-table';
 
 const noArea = 'no_area';
 
@@ -80,9 +80,7 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
           .columns=${this.tableColumns()}
           .data=${this.getTableData()}
           .filters=${this.getTableFilterOptions()}
-          @row-click=${(ev: CustomEvent) => {
-            navigate(this, exportPath('sensors', { params: { edit: ev.detail.id } }), true);
-          }}
+          @row-click=${(ev: CustomEvent) => navigate(this, exportPath('sensors', { params: { edit: ev.detail.id } }), true)}
         >
           ${localize('panels.sensors.cards.sensors.table.no_items', this.hass.language)}
         </alarmo-table>
@@ -112,11 +110,11 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
             : html`
                 <simple-tooltip animation-delay="0">
                   ${stateObj
-                    ? localize(
-                        `panels.sensors.cards.editor.fields.device_type.choose.${data.type}.name`,
-                        this.hass!.language
-                      )
-                    : this.hass.localize('state_badge.default.entity_not_found')}
+                ? localize(
+                  `panels.sensors.cards.editor.fields.device_type.choose.${data.type}.name`,
+                  this.hass!.language
+                )
+                : this.hass.localize('state_badge.default.entity_not_found')}
                 </simple-tooltip>
                 <ha-icon icon="${icon}" class="${!data.enabled ? 'disabled' : ''}"></ha-icon>
               `;
@@ -142,8 +140,8 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
           ${data.area == noArea ? warningTooltip() : ''}
           <span class="${!data.enabled ? 'disabled' : ''}">
             ${data.always_on
-              ? localize('panels.sensors.cards.sensors.table.always_on', this.hass!.language)
-              : data.modes.length
+            ? localize('panels.sensors.cards.sensors.table.always_on', this.hass!.language)
+            : data.modes.length
               ? data.modes.map(e => localize(`common.modes_short.${e}`, this.hass!.language)).join(', ')
               : this.hass.localize('state_attributes.climate.preset_mode.none')}
           </span>
@@ -156,8 +154,8 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
         renderer: (data: AlarmoSensor) => html`
           <ha-switch
             @click=${(ev: Event) => {
-              ev.stopPropagation();
-            }}
+            ev.stopPropagation();
+          }}
             ?checked=${data.enabled}
             @change=${(ev: Event) => this.toggleEnabled(ev, data.entity_id)}
           ></ha-switch>

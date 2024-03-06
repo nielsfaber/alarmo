@@ -65,6 +65,7 @@ from .sensors import (
     ATTR_TIMEOUT,
     ATTR_EVENT_COUNT,
     ATTR_ENTITIES,
+    ATTR_NEW_ENTITY_ID,
     SENSOR_TYPES,
 )
 
@@ -229,7 +230,8 @@ class AlarmoSensorView(HomeAssistantView):
                 vol.Optional(ATTR_GROUP): vol.Any(
                     cv.string,
                     None
-                )
+                ),
+                vol.Optional(ATTR_NEW_ENTITY_ID): cv.string
             }
         )
     )

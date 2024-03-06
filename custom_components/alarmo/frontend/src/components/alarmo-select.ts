@@ -112,10 +112,10 @@ export class AlarmoSelect extends LitElement {
           @click=${this._toggleOpen}
         ></ha-svg-icon>
         ${this.clearable && hasValue
-          ? html`
+        ? html`
               <ha-svg-icon class="clear-button" @click=${this._clearValue} .path=${mdiClose}></ha-svg-icon>
             `
-          : ''}
+        : ''}
       </vaadin-combo-box-light>
     `;
   }
@@ -137,10 +137,10 @@ export class AlarmoSelect extends LitElement {
           <ha-icon icon="${item.icon}" slot="graphic"></ha-icon>
           <span>${item.name}</span>
           ${hasDescription
-            ? html`
+          ? html`
                 <span slot="secondary">${item.description}</span>
               `
-            : ''}
+          : ''}
         </mwc-list-item>
       `;
     } else {
@@ -154,10 +154,10 @@ export class AlarmoSelect extends LitElement {
         <mwc-list-item .twoline=${hasDescription}>
           <span>${item.name}</span>
           ${hasDescription
-            ? html`
+          ? html`
                 <span slot="secondary">${item.description}</span>
               `
-            : ''}
+          : ''}
         </mwc-list-item>
       `;
     }

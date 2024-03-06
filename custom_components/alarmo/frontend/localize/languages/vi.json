@@ -183,6 +183,10 @@
           "title": "Sửa cảm biến",
           "description": "Cấu hình thiết lập cảm biến ''{entity}''.",
           "fields": {
+            "entity": {
+              "heading": "Thực thể",
+              "description": "Thực thể được liên kết với cảm biến này"
+            },
             "area": {
               "heading": "Khu vực",
               "description": "Chọn một khu vực để đưa cảm biến này vào."

@@ -35,7 +35,8 @@ from .websockets import async_register_websockets
 from .sensors import (
     SensorHandler,
     ATTR_GROUP,
-    ATTR_ENTITIES
+    ATTR_ENTITIES,
+    ATTR_NEW_ENTITY_ID,
 )
 from .automations import AutomationHandler
 from .mqtt import MqttHandler
@@ -219,6 +220,16 @@ class AlarmoCoordinator(DataUpdateCoordinator):
         if ATTR_GROUP in data:
             group = data[ATTR_GROUP]
             del data[ATTR_GROUP]
+
+        if ATTR_NEW_ENTITY_ID in data:
+            # delete old sensor entry when changing the entity_id
+            new_entity_id = data[ATTR_NEW_ENTITY_ID]
+            del data[ATTR_NEW_ENTITY_ID]
+            self.store.async_delete_sensor(entity_id)
+            self.assign_sensor_to_group(new_entity_id, group)
+            self.assign_sensor_to_group(entity_id, None)
+            entity_id = new_entity_id
+
         if const.ATTR_REMOVE in data:
             self.store.async_delete_sensor(entity_id)
             self.assign_sensor_to_group(entity_id, None)

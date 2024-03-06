@@ -183,6 +183,10 @@
           "title": "Justera Sensor",
           "description": "Justera inställningarna för sensor ''{entity}''.",
           "fields": {
+            "entity": {
+              "heading": "Entitet",
+              "description": "Entitet associerad med denna sensor"
+            },
             "area": {
               "heading": "Område",
               "description": "Välj ett område som innehåller denna sensor."

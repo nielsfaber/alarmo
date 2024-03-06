@@ -1,13 +1,13 @@
 import { LitElement, html } from 'lit';
-import { property, customElement } from 'lit/decorators.js';
-import { mdiClose } from '@mdi/js';
+import { property, customElement, state } from 'lit/decorators.js';
+import { mdiClose, mdiLock, mdiLockOpen } from '@mdi/js';
 import { commonStyle } from '../../styles';
 import { AlarmoSensor, EArmModes, Dictionary, AlarmoArea, SensorGroup, HomeAssistant } from '../../types';
 import { fetchSensors, saveSensor, deleteSensor, fetchAreas, fetchSensorGroups } from '../../data/websockets';
 import { localize } from '../../../localize/localize';
-import { Unique, Without, handleError, showErrorDialog, prettyPrint, computeName, navigate } from '../../helpers';
+import { Unique, Without, handleError, showErrorDialog, prettyPrint, computeName, navigate, omit } from '../../helpers';
 import { HassEntity, UnsubscribeFunc } from 'home-assistant-js-websocket';
-import { sensorConfigByType, getSensorTypeOptions } from '../../data/sensors';
+import { sensorConfigByType, getSensorTypeOptions, getConfigurableSensors } from '../../data/sensors';
 import { EArmModeIcons, ESensorTypes } from '../../const';
 import { Option } from '../../components/alarmo-select';
 import { SubscribeMixin } from '../../subscribe-mixin';
@@ -37,6 +37,11 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
   areas!: Dictionary<AlarmoArea>;
   sensorGroups!: Dictionary<SensorGroup>;
 
+  sensorsList: Option[] = [];
+
+  @state()
+  entityIdUnlocked = false;
+
   public hassSubscribe(): Promise<UnsubscribeFunc>[] {
     this._fetchData();
     return [this.hass!.connection.subscribeMessage(() => this._fetchData(), { type: 'alarmo_config_updated' })];
@@ -55,10 +60,26 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
     this.data = Object.keys(sensors).includes(this.item) ? sensors[this.item] : undefined;
     if (this.data && !this.data?.area && Object.keys(areas).length == 1)
       this.data = { ...this.data, area: Object.keys(this.areas)[0] };
+      
+    let sensorsList = getConfigurableSensors(this.hass, Object.keys(sensors), true);
+    this.sensorsList = sensorsList.map(e => Object({ ...e, description: e.id, value: e.id }));
+
+    if(!this.hass.states[this.item]) this.entityIdUnlocked = true;
   }
 
   render() {
     if (!this.data) return html``;
+    let sensorsList = [...this.sensorsList];
+    if(!sensorsList.find(e => e.value == this.data!.entity_id)) {
+      sensorsList = [<Option>{
+        value: this.data!.entity_id,
+        description: this.data!.entity_id,
+        name: computeName(this.hass.states[this.item]),
+        icon: 'hass:help-circle-outline',
+      }, ...sensorsList];
+    }
+
+
     const stateObj = this.hass.states[this.data.entity_id] as HassEntity | undefined;
     return html`
       <ha-card>
@@ -74,6 +95,37 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
             computeName(this.hass.states[this.item])
           )}
         </div>
+
+        <settings-row .narrow=${this.narrow} .large=${true}>
+          <span slot="heading">
+            ${localize('panels.sensors.cards.editor.fields.entity.heading', this.hass.language)}
+          </span>
+          <span slot="description">
+            ${localize('panels.sensors.cards.editor.fields.entity.description', this.hass.language)}
+          </span>
+
+          <div style="display: flex; flex-direction: row">
+            <alarmo-select
+              style="flex: 1"
+              .items=${sensorsList}
+              .value=${this.data!.entity_id}
+              label="${localize('panels.sensors.cards.editor.fields.entity.heading', this.hass.language)}"
+              @value-changed=${(ev: Event) => {(this.data = { ...this.data!, new_entity_id: (ev.target as HTMLInputElement).value })}}
+              ?disabled=${!this.entityIdUnlocked}
+              ?icons=${true}
+              ?invalid=${this.hass.states[this.data.new_entity_id || this.data.entity_id] === undefined}
+            ></alarmo-select>
+
+            <ha-icon-button
+              .path=${this.entityIdUnlocked ? mdiLock : mdiLockOpen}
+              @click=${() => {this.entityIdUnlocked = !this.entityIdUnlocked}}
+              style="--mdc-icon-size: 20px; --mdc-icon-button-size: 48px"
+            >
+
+            </ha-icon-button>
+          </div>
+        </settings-row>
+
 
         ${Object.keys(this.areas).length > 1
           ? html`
@@ -462,6 +514,8 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
   private saveClick(ev: Event) {
     if (!this.data) return;
     const errors: string[] = [];
+
+    if(this.data.new_entity_id && this.data.new_entity_id == this.data.entity_id) this.data = omit(this.data, 'new_entity_id');
 
     this.data = {
       ...this.data,

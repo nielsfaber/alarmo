@@ -183,6 +183,10 @@
           "title": "Editar sensor",
           "description": "Configurando los ajustes del sensor de ''{entity}''.",
           "fields": {
+            "entity": {
+              "heading": "Entidad",
+              "description": "Entidad asociada a este sensor"
+            },
             "area": {
               "heading": "Área",
               "description": "Seleccione un área que contenga este sensor."

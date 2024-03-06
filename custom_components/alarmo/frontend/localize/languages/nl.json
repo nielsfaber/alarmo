@@ -183,6 +183,10 @@
           "title": "Wijzig Sensor",
           "description": "Configureren van de sensorinstellingen van ''{entity}''.",
           "fields": {
+            "entity": {
+              "heading": "Entiteit",
+              "description": "Entiteit die verwant is aan deze sensor"
+            },
             "area": {
               "heading": "Gebied",
               "description": "Selecteer een gebied dat deze sensor bevat."

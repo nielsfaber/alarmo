@@ -111,6 +111,7 @@ export type AlarmoSensor = {
   area?: string;
   enabled: boolean;
   group?: string | null;
+  new_entity_id?: string;
 };
 
 export type AlarmoUser = {

@@ -183,6 +183,10 @@
           "title": "Upravit Senzor",
           "description": "Nastavení senzoru entity ''{entity}''.",
           "fields": {
+            "entity": {
+              "heading": "Entita",
+              "description": "Entidad asociada a este sensor"
+            },
             "area": {
               "heading": "Zóna",
               "description": "Vyberte zónu do které má senzor patřit."

@@ -183,6 +183,10 @@
           "title": "編輯傳感器",
           "description": "配置傳感器 ''{entity}'' 的設置。",
           "fields": {
+            "entity": {
+              "heading": "實體",
+              "description": "與該感測器關聯的實體"
+            },
             "area": {
               "heading": "區域",
               "description": "選擇一個包含該傳感器的區域。"

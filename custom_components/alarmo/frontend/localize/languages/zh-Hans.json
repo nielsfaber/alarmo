@@ -183,6 +183,10 @@
           "title": "编辑传感器",
           "description": "配置传感器 ''{entity}'' 的设置。",
           "fields": {
+            "entity": {
+              "heading": "实体",
+              "description": "与该传感器关联的实体"
+            },
             "area": {
               "heading": "区域",
               "description": "选择一个包含该传感器的区域。"
