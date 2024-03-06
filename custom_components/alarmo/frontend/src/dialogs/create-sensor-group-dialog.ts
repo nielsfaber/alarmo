@@ -62,7 +62,21 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
   render() {
     if (!this._params) return html``;
     return html`
-      <ha-dialog open @closed=${this.closeDialog} @close-dialog=${this.closeDialog} .heading=${this.renderHeader()}>
+      <ha-dialog open .heading=${true} @closed=${this.closeDialog} @close-dialog=${this.closeDialog}>
+      <ha-dialog-header slot="heading">
+          <ha-icon-button slot="navigationIcon" dialogAction="close" .path=${mdiClose}>
+          </ha-icon-button>
+          <span slot="title">
+            ${this.data.group_id
+            ? localize(
+                'panels.sensors.dialogs.edit_group.title',
+                this.hass.language,
+                '{name}',
+                this.sensorGroups[this.data.group_id!].name
+              )
+            : localize('panels.sensors.dialogs.create_group.title', this.hass.language)}
+          </span>
+        </ha-dialog-header>
         <div class="wrapper">
           <settings-row dialog>
             <span slot="heading">
@@ -119,27 +133,6 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
             `
           : ''}
       </ha-dialog>
-    `;
-  }
-
-  renderHeader() {
-    return html`
-      <span class="header_title">
-        ${this.data.group_id
-          ? localize(
-              'panels.sensors.dialogs.edit_group.title',
-              this.hass.language,
-              '{name}',
-              this.sensorGroups[this.data.group_id!].name
-            )
-          : localize('panels.sensors.dialogs.create_group.title', this.hass.language)}
-      </span>
-      <ha-icon-button
-        .label=${this.hass.localize('ui.dialogs.generic.close')}
-        .path=${mdiClose}
-        dialogAction="close"
-        class="header_button"
-      ></ha-icon-button>
     `;
   }
 

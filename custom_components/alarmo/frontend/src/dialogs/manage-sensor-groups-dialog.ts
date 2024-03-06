@@ -49,7 +49,12 @@ export class ManageSensorGroupsDialog extends SubscribeMixin(LitElement) {
   render() {
     if (!this._params) return html``;
     return html`
-      <ha-dialog open .heading=${this.renderHeader()} @closed=${this.closeDialog} @close-dialog=${this.closeDialog}>
+      <ha-dialog open .heading=${true} @closed=${this.closeDialog} @close-dialog=${this.closeDialog}>
+        <ha-dialog-header slot="heading">
+          <ha-icon-button slot="navigationIcon" dialogAction="close" .path=${mdiClose}>
+          </ha-icon-button>
+          <span slot="title">${localize('panels.sensors.dialogs.manage_groups.title', this.hass.language)}</span>
+        </ha-dialog-header>
         <div class="wrapper">
           <div class="description">
             ${localize('panels.sensors.dialogs.manage_groups.description', this.hass.language)}
@@ -65,19 +70,6 @@ export class ManageSensorGroupsDialog extends SubscribeMixin(LitElement) {
           ${localize('panels.sensors.dialogs.manage_groups.actions.new_group', this.hass.language)}
         </mwc-button>
       </ha-dialog>
-    `;
-  }
-
-  renderHeader() {
-    return html`
-      <span class="header_title">${localize('panels.sensors.dialogs.manage_groups.title', this.hass.language)}</span>
-      <ha-icon-button
-        .label=${this.hass.localize('ui.dialogs.generic.close')}
-        .path=${mdiClose}
-        dialogAction="close"
-        class="header_button"
-      >
-      </ha-icon-button>
     `;
   }
 
