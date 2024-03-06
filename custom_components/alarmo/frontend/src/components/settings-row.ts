@@ -75,6 +75,7 @@ export class SettingsRow extends LitElement {
       }
       .info {
         flex: 1 0 60px;
+        margin-bottom: 4px;
       }
       :host([large]) .info,
       :host([narrow]) .info {
@@ -89,6 +90,7 @@ export class SettingsRow extends LitElement {
       }
       .secondary {
         color: var(--secondary-text-color);
+        margin-top: 4px;
       }
       :host(:not([large]):not([narrow])):not([dialog])) ::slotted(*) {
         max-width: 66%;
