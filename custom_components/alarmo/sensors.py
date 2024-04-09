@@ -163,9 +163,6 @@ class SensorHandler:
     def async_watch_sensor_states(self, area_id: str = None, old_state: str = None, state: str = None):
         """watch sensors based on the state of the alarm entities."""
 
-        if not state:
-            return
-
         sensors_list = []
         for area in self.hass.data[const.DOMAIN]["areas"].keys():
             sensors_list.extend(self.active_sensors_for_alarm_state(area))
@@ -434,4 +431,4 @@ class SensorHandler:
         prev_arm_modes = alarm_entity._ready_to_arm_modes
 
         if arm_modes != prev_arm_modes:
-            alarm_entity.ready_to_arm_modes = arm_modes
+            alarm_entity.update_ready_to_arm_modes(arm_modes)

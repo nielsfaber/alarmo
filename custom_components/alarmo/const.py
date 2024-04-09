@@ -102,6 +102,7 @@ EVENT_COMMAND_NOT_ALLOWED = "command_not_allowed"
 EVENT_INVALID_CODE_PROVIDED = "invalid_code_provided"
 EVENT_NO_CODE_PROVIDED = "no_code_provided"
 EVENT_TRIGGER_TIME_EXPIRED = "trigger_time_expired"
+EVENT_READY_TO_ARM_MODES_CHANGED = "ready_to_arm_modes_changed"
 
 ATTR_MODES = "modes"
 ATTR_ARM_MODE = "arm_mode"

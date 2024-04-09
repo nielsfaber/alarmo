@@ -253,25 +253,6 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             self.expiration = None
 
     @property
-    def ready_to_arm_modes(self):
-        """Get arm modes which are ready for arming (no blocking sensors)."""
-
-        if not self._ready_to_arm_modes:
-            return None
-        else:
-            return list(map(lambda e: const.STATE_TO_ARM_MODE[e], self._ready_to_arm_modes))
-
-    @ready_to_arm_modes.setter
-    def ready_to_arm_modes(self, value):
-        """Set arm modes which are ready for arming (no blocking sensors)."""
-        if value == self._ready_to_arm_modes:
-            return
-        _LOGGER.debug("ready_to_arm_modes updated to {}".format(", ".join(value).replace("armed_","")))
-        self._ready_to_arm_modes = value
-        async_dispatcher_send(self.hass, "alarmo_state_updated", self.area_id, None, None)
-        self.async_write_ha_state()
-
-    @property
     def extra_state_attributes(self):
         """Return the data of the entity."""
 
@@ -280,7 +261,6 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             "open_sensors": self.open_sensors,
             "bypassed_sensors": self.bypassed_sensors,
             "delay": self.delay,
-            "ready_to_arm_modes": self.ready_to_arm_modes,
         }
 
     def _validate_code(self, code, to_state):
@@ -812,6 +792,16 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
             self.hass, cb_func, now + delay
         )
 
+    def update_ready_to_arm_modes(self, value):
+        """Set arm modes which are ready for arming (no blocking sensors)."""
+        if value == self._ready_to_arm_modes:
+            return
+        _LOGGER.debug("ready_to_arm_modes for {} updated to {}".format(self.name, ", ".join(value).replace("armed_","")))
+        self._ready_to_arm_modes = value
+        async_dispatcher_send(self.hass, "alarmo_event", const.EVENT_READY_TO_ARM_MODES_CHANGED, self.area_id, {
+            const.ATTR_MODES: value
+        })
+
 
 class AlarmoMasterEntity(AlarmoBaseEntity):
     """Defines a base alarm_control_panel entity."""
@@ -868,7 +858,8 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
             if not area_id or event not in [
                 const.EVENT_FAILED_TO_ARM,
                 const.EVENT_TRIGGER,
-                const.EVENT_TRIGGER_TIME_EXPIRED
+                const.EVENT_TRIGGER_TIME_EXPIRED,
+                const.EVENT_READY_TO_ARM_MODES_CHANGED
             ]:
                 return
             if event == const.EVENT_FAILED_TO_ARM and self._target_state is not None:
@@ -891,6 +882,8 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
             if event == const.EVENT_TRIGGER_TIME_EXPIRED:
                 if self.hass.data[const.DOMAIN]["areas"][area_id].state == STATE_ALARM_DISARMED:
                     await self.async_alarm_disarm(skip_code=True)
+            if event == const.EVENT_READY_TO_ARM_MODES_CHANGED:
+                self.update_ready_to_arm_modes()
 
         async_dispatcher_connect(self.hass, "alarmo_event", async_handle_event)
 
@@ -988,11 +981,7 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
                 bypassed_sensors.extend(item.bypassed_sensors)
         self.bypassed_sensors = bypassed_sensors
 
-        # calculate ready for arm modes
-        modes_list = const.ARM_MODES
-        for item in self.hass.data[const.DOMAIN]["areas"].values():
-            modes_list = list(filter(lambda x: x in item._ready_to_arm_modes, modes_list))
-        self._ready_to_arm_modes = modes_list
+        self.update_ready_to_arm_modes()
 
         self.async_write_ha_state()
 
@@ -1082,3 +1071,16 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
         for item in self.hass.data[const.DOMAIN]["areas"].values():
             if item.state != self._revert_state:
                 await item.async_trigger(skip_delay=skip_delay)
+
+    def update_ready_to_arm_modes(self):
+        """Set arm modes which are ready for arming (no blocking sensors)."""
+        modes_list = const.ARM_MODES
+        for item in self.hass.data[const.DOMAIN]["areas"].values():
+            modes_list = list(filter(lambda x: x in item._ready_to_arm_modes, modes_list))
+        if modes_list == self._ready_to_arm_modes:
+            return
+        self._ready_to_arm_modes = modes_list
+        _LOGGER.debug("ready_to_arm_modes for master updated to {}".format(", ".join(modes_list).replace("armed_","")))
+        async_dispatcher_send(self.hass, "alarmo_event", const.EVENT_READY_TO_ARM_MODES_CHANGED, self.area_id, {
+            const.ATTR_MODES: modes_list
+        })
