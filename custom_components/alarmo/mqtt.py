@@ -46,7 +46,7 @@ class MqttHandler:
 
             if not old_config or old_config[ATTR_MQTT][CONF_COMMAND_TOPIC] != new_config[ATTR_MQTT][CONF_COMMAND_TOPIC]:
                 # re-subscribing is only needed if the command topic has changed
-                self.hass.async_add_job(self._async_subscribe_topics())
+                self.hass.add_job(self._async_subscribe_topics())
 
             _LOGGER.debug("MQTT config was (re)loaded")
 
