@@ -23,7 +23,7 @@ class EventHandler:
         self._subscription()
 
     @callback
-    async def async_handle_event(self, event: str, area_id: str, args: dict = {}):
+    def async_handle_event(self, event: str, area_id: str, args: dict = {}):
         """handle event"""
 
         if event in [
@@ -48,7 +48,7 @@ class EventHandler:
                 data["sensors"] = list(data["open_sensors"].keys())
                 del data["open_sensors"]
 
-            self.hass.bus.fire("alarmo_failed_to_arm", data)
+            self.hass.bus.async_fire("alarmo_failed_to_arm", data)
 
         elif event in [
             const.EVENT_ARM,
@@ -63,4 +63,4 @@ class EventHandler:
                 data["mode"] = const.STATE_TO_ARM_MODE[data["arm_mode"]]
                 del data["arm_mode"]
 
-            self.hass.bus.fire("alarmo_command_success", data)
+            self.hass.bus.async_fire("alarmo_command_success", data)

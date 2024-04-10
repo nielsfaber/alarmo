@@ -11,7 +11,6 @@ from homeassistant.components.websocket_api import (
 _LOGGER = logging.getLogger(__name__)
 
 
-@callback
 @decorators.websocket_command({
     vol.Required("type"): "alarmo_updated",
 })
@@ -20,7 +19,7 @@ async def handle_subscribe_updates(hass, connection, msg):
     """Handle subscribe updates."""
 
     @callback
-    def async_handle_event(event: str, area_id: str, args: dict = {}):
+    def handle_event(event: str, area_id: str, args: dict = {}):
         """Forward events to websocket."""
         data = dict(**args, **{
             "event": event,
@@ -37,7 +36,7 @@ async def handle_subscribe_updates(hass, connection, msg):
     connection.subscriptions[msg["id"]] = async_dispatcher_connect(
         hass,
         "alarmo_event",
-        async_handle_event
+        handle_event
     )
     connection.send_result(msg["id"])
 

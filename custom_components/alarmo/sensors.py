@@ -129,6 +129,7 @@ class SensorHandler:
         self._group_events = {}
         self._startup_complete = False
 
+        @callback
         def async_update_sensor_config():
             """sensor config updated, reload the configuration."""
             self._config = self.hass.data[const.DOMAIN]["coordinator"].store.async_get_sensors()
@@ -265,7 +266,7 @@ class SensorHandler:
         return (open_sensors, bypassed_sensors)
 
     @callback
-    async def async_sensor_state_changed(self, entity, old_state, new_state):
+    def async_sensor_state_changed(self, entity, old_state, new_state):
         """Callback fired when a sensor state has changed."""
 
         old_state = parse_sensor_state(old_state)
@@ -317,7 +318,7 @@ class SensorHandler:
         if sensor_config[ATTR_ALWAYS_ON]:
             # immediate trigger due to always on sensor
             _LOGGER.info("Alarm is triggered due to an always-on sensor: {}".format(entity))
-            await alarm_entity.async_trigger(
+            alarm_entity.async_trigger(
                 skip_delay=True,
                 open_sensors=open_sensors
             )
@@ -325,12 +326,12 @@ class SensorHandler:
         elif alarm_state == STATE_ALARM_ARMING:
             # sensor triggered while arming, abort arming
             _LOGGER.debug("Arming was aborted due to a sensor being active: {}".format(entity))
-            await alarm_entity.async_arm_failure(open_sensors)
+            alarm_entity.async_arm_failure(open_sensors)
 
         elif alarm_state in const.ARM_MODES:
             # standard alarm trigger
             _LOGGER.info("Alarm is triggered due to sensor: {}".format(entity))
-            await alarm_entity.async_trigger(
+            alarm_entity.async_trigger(
                 skip_delay=(not sensor_config[ATTR_USE_ENTRY_DELAY]),
                 open_sensors=open_sensors
             )
@@ -338,7 +339,7 @@ class SensorHandler:
         elif alarm_state == STATE_ALARM_PENDING:
             # immediate trigger while in pending state
             _LOGGER.info("Alarm is triggered due to sensor: {}".format(entity))
-            await alarm_entity.async_trigger(
+            alarm_entity.async_trigger(
                 skip_delay=True,
                 open_sensors=open_sensors
             )
@@ -349,12 +350,12 @@ class SensorHandler:
         """start timer for automatical arming"""
 
         @callback
-        async def timer_finished(now):
+        def timer_finished(now):
             _LOGGER.debug("timer finished")
             sensor_config = self._config[entity]
             alarm_entity = self.hass.data[const.DOMAIN]["areas"][sensor_config["area"]]
             if alarm_entity.state == STATE_ALARM_ARMING:
-                await alarm_entity.async_arm(alarm_entity.arm_mode, skip_delay=True)
+                alarm_entity.async_arm(alarm_entity.arm_mode, skip_delay=True)
         now = dt_util.utcnow()
 
         if entity in self._arm_timers:

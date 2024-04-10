@@ -330,16 +330,16 @@ class AlarmoCoordinator(DataUpdateCoordinator):
 
             if action == const.EVENT_ACTION_FORCE_ARM:
                 _LOGGER.info("Received request for force arming")
-                await alarm_entity.async_handle_arm_request(arm_mode, skip_code=True, bypass_open_sensors=True)
+                alarm_entity.async_handle_arm_request(arm_mode, skip_code=True, bypass_open_sensors=True)
             elif action == const.EVENT_ACTION_RETRY_ARM:
                 _LOGGER.info("Received request for retry arming")
-                await alarm_entity.async_handle_arm_request(arm_mode, skip_code=True)
+                alarm_entity.async_handle_arm_request(arm_mode, skip_code=True)
             elif action == const.EVENT_ACTION_DISARM:
                 _LOGGER.info("Received request for disarming")
-                await alarm_entity.async_alarm_disarm(code=None, skip_code=True)
+                alarm_entity.async_alarm_disarm(code=None, skip_code=True)
             else:
                 _LOGGER.info("Received request for arming with mode {}".format(arm_mode))
-                await alarm_entity.async_handle_arm_request(arm_mode, skip_code=True)
+                alarm_entity.async_handle_arm_request(arm_mode, skip_code=True)
 
         self._subscriptions.append(
             self.hass.bus.async_listen(const.PUSH_EVENT, async_handle_push_event)

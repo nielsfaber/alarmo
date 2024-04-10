@@ -476,7 +476,7 @@ def websocket_get_ready_to_arm_modes(hass, connection, msg):
         item = hass.data[const.DOMAIN]["master"]
 
     data = {
-        "modes": item._ready_to_arm_modes
+        "modes": item._ready_to_arm_modes if item else None
     }
     connection.send_result(msg["id"], data)
 
