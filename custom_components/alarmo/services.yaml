@@ -1,11 +1,7 @@
 
 arm:
-  name: Arm
-  description: "Arm an Alarmo entity with custom settings."
   fields:
     entity_id:
-      name: Entity ID
-      description: Name of entity that should be armed.
       example: "alarm_control_panel.alarm"
       required: true
       selector:
@@ -13,20 +9,17 @@ arm:
           integration: alarmo
           domain: alarm_control_panel
     code:
-      name: Code
-      description: Code to arm the alarm with.
       example: "1234"
       required: false
       selector:
         text:
     mode:
-      name: Mode
-      description: "Mode to arm the alarm in."
       example: "away"
       required: false
       default: away
       selector:
         select:
+          translation_key: "arm_mode"
           options:
             - away
             - night
@@ -34,28 +27,20 @@ arm:
             - vacation
             - custom
     skip_delay:
-      name: Skip Delay
-      description: "Skip the exit delay."
-      example: true
+      example: false
       required: false
       default: false
       selector:
         boolean:
     force:
-      name: Force
-      description: "Automatically bypass all sensors that prevent the arming operation."
-      example: true
+      example: false
       required: false
       default: false
       selector:
         boolean:
 disarm:
-  name: Disarm
-  description: "Disarm an Alarmo entity."
   fields:
     entity_id:
-      name: Entity ID
-      description: Name of entity that should be disarmed.
       example: "alarm_control_panel.alarm"
       required: true
       selector:
@@ -63,30 +48,20 @@ disarm:
           integration: alarmo
           domain: alarm_control_panel
     code:
-      name: Code
-      description: Code to disarm the alarm with.
       example: "1234"
       required: false
       selector:
         text:
 enable_user:
-  name: Enable User
-  description: "Allow a user to arm/disarm alarmo."
   fields:
     name:
-      name: Name
-      description: Name of the user to enable.
       example: "Frank"
       required: true
       selector:
         text:
 disable_user:
-  name: Disable User
-  description: "Block a user from arming/disarming alarmo."
   fields:
     name:
-      name: Name
-      description: Name of the user to disable.
       example: "Frank"
       required: true
       selector:

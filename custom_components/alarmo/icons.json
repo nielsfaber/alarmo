@@ -1,0 +1,8 @@
+{
+  "services": {
+    "arm": "mdi:shield-lock",
+    "disarm": "mdi:shield-off",
+    "enable_user": "mdi:account-lock-open",
+    "disable_user": "mdi:account-lock-closed"
+  }
+}

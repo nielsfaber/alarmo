@@ -141,11 +141,6 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
         return f"{self.entity_id}"
 
     @property
-    def icon(self):
-        """Return icon."""
-        return "mdi:shield-home"
-
-    @property
     def name(self):
         """Return the friendly name to use for this entity."""
         return self._name

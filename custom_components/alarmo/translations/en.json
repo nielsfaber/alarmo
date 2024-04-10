@@ -1,0 +1,75 @@
+{
+  "services": {
+    "arm": {
+      "name": "Arm",
+      "description": "Arm an Alarmo entity with custom settings.",
+      "fields": {
+        "entity_id": {
+          "name": "Entity ID",
+          "description": "Alarm entity that should be armed."
+        },
+        "code": {
+          "name": "Code",
+          "description": "Code to use for the arming."
+        },
+        "mode": {
+          "name": "Mode",
+          "description": "Mode to arm the alarm in."
+        },
+        "skip_delay": {
+          "name": "Skip Delay",
+          "description": "Skip the exit delay."
+        },
+        "force": {
+          "name": "Force",
+          "description": "Automatically bypass all sensors that prevent the arming operation."
+        }
+      }
+    },
+    "disarm": {
+      "name": "Disarm",
+      "description": "Disarm an Alarmo entity.",
+      "fields": {
+        "entity_id": {
+          "name": "Entity ID",
+          "description": "Alarm entity that should be disarmed."
+        },
+        "code": {
+          "name": "Code",
+          "description": "Code to use for the disarming."
+        }
+      }
+    },
+    "enable_user": {
+      "name": "Enable User",
+      "description": "Allow a user to arm/disarm alarmo.",
+      "fields": {
+        "name": {
+          "name": "Name",
+          "description": "Name of the user to enable."
+        }
+      }
+    },
+    "disable_user": {
+      "name": "Disable User",
+      "description": "Block a user from arming/disarming alarmo.",
+      "fields": {
+        "name": {
+          "name": "Name",
+          "description": "Name of the user to disable."
+        }
+      }
+    }
+  },
+  "selector": {
+    "arm_mode": {
+      "options": {
+        "away": "Armed Away",
+        "night": "Armed Night",
+        "home": "Armed Home",
+        "vacation": "Armed Vacation",
+        "custom": "Armed Custom Bypass"
+      }
+    }
+  }
+}
