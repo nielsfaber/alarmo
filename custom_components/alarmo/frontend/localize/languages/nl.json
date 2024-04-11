@@ -525,7 +525,7 @@
             },
             "area": {
               "heading": "Gebied",
-              "description": "Het gebied waarop de gebeurtenis van toepassing is, laat leeg om het algemene alarm te selecteren."
+              "description": "Het gebied waarop de gebeurtenis van toepassing is."
             },
             "mode": {
               "heading": "Mode",

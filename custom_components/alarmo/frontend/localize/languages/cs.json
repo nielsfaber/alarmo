@@ -525,7 +525,7 @@
             },
             "area": {
               "heading": "Zóna",
-              "description": "Pro kterou zónu se má akce provést, pro globální alarm nechte prázdné."
+              "description": "Pro kterou zónu se má akce provést."
             },
             "mode": {
               "heading": "Režim",

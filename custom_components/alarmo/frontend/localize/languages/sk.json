@@ -525,7 +525,7 @@
             },
             "area": {
               "heading": "Oblasť",
-              "description": "Oblasť, pre ktorú sa udalosť vzťahuje, ponechajte prázdne, aby ste vybrali globálny alarm."
+              "description": "Oblasť, pre ktorú sa udalosť vzťahuje."
             },
             "mode": {
               "heading": "Režim",

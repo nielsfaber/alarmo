@@ -525,7 +525,7 @@
             },
             "area": {
               "heading": "Area",
-              "description": "Area for which the event applies, leave empty to select the global alarm."
+              "description": "Alarm area for which the event applies."
             },
             "mode": {
               "heading": "Mode",

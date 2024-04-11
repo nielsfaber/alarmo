@@ -525,7 +525,7 @@
             },
             "area": {
               "heading": "Område",
-              "description": "Område som hændelsen gælder for, lad det stå tomt for at vælge den globale alarm."
+              "description": "Område som hændelsen gælder for."
             },
             "mode": {
               "heading": "Tilstand",

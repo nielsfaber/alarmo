@@ -525,7 +525,7 @@
             },
             "area": {
               "heading": "Khu vực",
-              "description": "Khu vực áp dụng sự kiện, để trống để áp dụng cho toàn bộ hệ thống."
+              "description": "Khu vực áp dụng sự kiện."
             },
             "mode": {
               "heading": "Chế độ",

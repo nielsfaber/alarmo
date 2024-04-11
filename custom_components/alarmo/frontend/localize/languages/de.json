@@ -525,7 +525,7 @@
             },
             "area": {
               "heading": "Bereich",
-              "description": "Bereich, für den das Ereignis gilt; leer lassen, um den globalen Alarm auszuwählen."
+              "description": "Bereich, für den das Ereignis gilt."
             },
             "mode": {
               "heading": "Modus",

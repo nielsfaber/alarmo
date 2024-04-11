@@ -525,7 +525,7 @@
             },
             "area": {
               "heading": "區域",
-              "description": "事件適用的區域，留空選擇全局報警。"
+              "description": "事件適用的區域。"
             },
             "mode": {
               "heading": "模式",

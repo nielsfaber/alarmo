@@ -525,7 +525,7 @@
             },
             "area": {
               "heading": "Zone",
-              "description": "Zone pour laquelle l'évènement s'applique, laissez vide pour sélectionner l'alarme globale."
+              "description": "Zone pour laquelle l'évènement s'applique."
             },
             "mode": {
               "heading": "Mode",

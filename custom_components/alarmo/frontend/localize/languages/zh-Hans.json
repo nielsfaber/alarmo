@@ -525,7 +525,7 @@
             },
             "area": {
               "heading": "区域",
-              "description": "事件适用的区域，留空选择全局报警。"
+              "description": "事件适用的区域。"
             },
             "mode": {
               "heading": "模式",

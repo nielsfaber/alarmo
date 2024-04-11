@@ -525,7 +525,7 @@
             },
             "area": {
               "heading": "Area",
-              "description": "Area nella quale l'evento avviene, lascia vuoti per selezionare l'intero allarme."
+              "description": "Area nella quale l'evento avviene."
             },
             "mode": {
               "heading": "Modalità",

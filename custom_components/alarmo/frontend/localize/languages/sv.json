@@ -525,7 +525,7 @@
             },
             "area": {
               "heading": "Område",
-              "description": "Område som detta event ska appliceras på, lämna tomt om det ska gälla globalt."
+              "description": "Område som detta event ska appliceras på."
             },
             "mode": {
               "heading": "Läge",
