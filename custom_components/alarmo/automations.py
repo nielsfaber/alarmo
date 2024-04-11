@@ -16,6 +16,7 @@ from homeassistant.const import (
 
 from homeassistant.components.notify import ATTR_MESSAGE
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
+from homeassistant.helpers.translation import async_get_translations
 
 from homeassistant.components.binary_sensor.device_condition import (
     ENTITY_CONDITIONS,
@@ -245,7 +246,8 @@ class AutomationHandler:
         ):
             translations = self._sensorTranslationCache
         else:
-            translations = await self.hass.helpers.translation.async_get_translations(
+            translations = await async_get_translations(
+                self.hass,
                 language,
                 "device_automation",
                 ["binary_sensor"]
@@ -294,7 +296,8 @@ class AutomationHandler:
         ):
             translations = self._alarmTranslationCache
         else:
-            translations = await self.hass.helpers.translation.async_get_translations(
+            translations = await async_get_translations(
+                self.hass,
                 language,
                 "entity_component",
                 ["alarm_control_panel"]
