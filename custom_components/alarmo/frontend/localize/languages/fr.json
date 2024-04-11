@@ -291,6 +291,10 @@
               "heading": "Laps de temps",
               "description": "Période de temps pendant laquelle les activations consécutives du capteur déclenchent l'alarme."
             },
+            "event_count": {
+              "heading": "nombre d'événements",
+              "description": "Nombre de capteurs différents qui doivent être activés pour déclencher l'alarme."
+            },
             "sensors": {
               "heading": "Capteurs",
               "description": "Sélectionnez les capteurs qui sont contenus dans ce groupe."

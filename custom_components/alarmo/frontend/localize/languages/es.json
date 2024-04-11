@@ -291,6 +291,10 @@
               "heading": "Tiempo muerto",
               "description": "Período de tiempo durante el cual las activaciones consecutivas del sensor activan la alarma."
             },
+            "event_count": {
+              "heading": "Nombre",
+              "description": "Cantidad de sensores diferentes que deben activarse para activar la alarma."
+            },
             "sensors": {
               "heading": "Sensores",
               "description": "Seleccione los sensores que están contenidos en este grupo."

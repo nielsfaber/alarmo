@@ -291,6 +291,10 @@
               "heading": "Time-out",
               "description": "Time period during which consecutive sensor activations triggers the alarm."
             },
+            "event_count": {
+              "heading": "Kogus",
+              "description": "Erinevate andurite arv, mis tuleb häire käivitamiseks aktiveerida."
+            },
             "sensors": {
               "heading": "Sensors",
               "description": "Select the sensors which are contained by this group."

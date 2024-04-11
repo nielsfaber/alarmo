@@ -291,6 +291,10 @@
               "heading": "超時",
               "description": "連續的傳感器激活觸發報警的時間段。"
             },
+            "event_count": {
+              "heading": "數位",
+              "description": "需要啟動才能觸發警報的不同感測器的數量。"
+            },
             "sensors": {
               "heading": "傳感器",
               "description": "選擇該群組所包含的傳感器。"

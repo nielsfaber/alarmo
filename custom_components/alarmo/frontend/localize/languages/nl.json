@@ -291,6 +291,10 @@
               "heading": "Time-out",
               "description": "Tijdsperiode waarin meerdere sensoren moeten worden geactiveerd om het alarm te activeren."
             },
+            "event_count": {
+              "heading": "Aantal",
+              "description": "Aantal verschillende sensoren dat moet worden geactiveerd om het alarm te activeren."
+            },
             "sensors": {
               "heading": "Sensoren",
               "description": "Selecteer de sensoren die deel moeten uitmaken van deze groep."

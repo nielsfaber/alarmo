@@ -19,7 +19,7 @@ export interface ServiceCallRequest {
 export interface HomeAssistant {
   connection: Connection;
   language: string;
-    panels: {
+  panels: {
     [name: string]: {
       component_name: string;
       config: { [key: string]: any } | null;
@@ -186,4 +186,5 @@ export type SensorGroup = {
   name: string;
   entities: string[];
   timeout: number;
+  event_count: number;
 };

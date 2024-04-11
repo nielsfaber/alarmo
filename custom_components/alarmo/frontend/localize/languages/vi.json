@@ -291,6 +291,10 @@
               "heading": "Thời hạn",
               "description": "Khoảng thời gian các cảm biến phải lần lượt được kích hoạt thì mới kích hoạt báo động."
             },
+            "event_count": {
+              "heading": "Số lượng",
+              "description": "Số lượng cảm biến khác nhau cần được kích hoạt để kích hoạt báo động."
+            },
             "sensors": {
               "heading": "Cảm biến",
               "description": "Chọn cảm biến để đưa vào nhóm này."

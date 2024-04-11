@@ -291,6 +291,10 @@
               "heading": "Čas vypršal",
               "description": "Časové obdobie, počas ktorého po sebe idúce aktivácie senzora spustia alarm."
             },
+            "event_count": {
+              "heading": "Číslo",
+              "description": "Množstvo rôznych senzorov, ktoré je potrebné aktivovať na spustenie alarmu."
+            },
             "sensors": {
               "heading": "Senzory",
               "description": "Vyberte snímače, ktoré sú obsiahnuté v tejto skupine."

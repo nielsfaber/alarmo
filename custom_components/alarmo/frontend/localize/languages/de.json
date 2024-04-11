@@ -291,6 +291,10 @@
               "heading": "Time-out",
               "description": "Zeitspanne, in der aufeinanderfolgende Sensoraktivierungen den Alarm auslösen."
             },
+            "event_count": {
+              "heading": "Menge",
+              "description": "Anzahl verschiedener Sensoren, die aktiviert werden müssen, um den Alarm auszulösen."
+            },
             "sensors": {
               "heading": "Sensoren",
               "description": "Wählen Sie die Sensoren aus, die in dieser Gruppe enthalten sind."

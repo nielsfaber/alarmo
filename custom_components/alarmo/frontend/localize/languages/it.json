@@ -291,6 +291,10 @@
               "heading": "Time-out",
               "description": "Periodo di tempo durante il quale l'attivazione consecutiva innesca l'allarme."
             },
+            "event_count": {
+              "heading": "Numero",
+              "description": "Quantità di sensori diversi che devono essere attivati per attivare l'allarme."
+            },
             "sensors": {
               "heading": "Sensori",
               "description": "Seleziona i sensori che fanno parte di questo gruppo."

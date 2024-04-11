@@ -291,6 +291,10 @@
               "heading": "超时",
               "description": "连续的传感器激活触发报警的时间段。"
             },
+            "event_count": {
+              "heading": "数字",
+              "description": "需要激活才能触发警报的不同传感器的数量。"
+            },
             "sensors": {
               "heading": "传感器",
               "description": "选择该群组所包含的传感器。"

@@ -291,6 +291,10 @@
               "heading": "Time-out",
               "description": "Tidsperiod för de sammankopplade sensorernas aktivitet ska utlösa larmet."
             },
+            "event_count": {
+              "heading": "Siffra",
+              "description": "Mängd olika sensorer som behöver aktiveras för att utlösa larmet."
+            },
             "sensors": {
               "heading": "Sensorer",
               "description": "Välj sensorer som tillhöra gruppen."

@@ -291,6 +291,10 @@
               "heading": "Tiden er gået",
               "description": "Tidsperioden i hvilken på hinanden følgende sensoraktiveringer udløser alarmen."
             },
+            "event_count": {
+              "heading": "Tælle",
+              "description": "Antal forskellige sensorer, der skal aktiveres for at udløse alarmen."
+            },
             "sensors": {
               "heading": "Sensorer",
               "description": "Vælg de sensorer, som denne gruppe indeholder."

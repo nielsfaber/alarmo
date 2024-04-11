@@ -291,6 +291,10 @@
               "heading": "Časový úsek",
               "description": "Časový úsek ve kterém musí být aktivovány senzory aby byl alarm spuštěn."
             },
+            "event_count": {
+              "heading": "Počet",
+              "description": "Množství různých senzorů, které je třeba aktivovat ke spuštění poplachu."
+            },
             "sensors": {
               "heading": "Senzory",
               "description": "Vyberte senzory, které mají být v této skupině."
