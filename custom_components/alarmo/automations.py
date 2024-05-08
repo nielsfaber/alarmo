@@ -168,52 +168,15 @@ class AutomationHandler:
                 if ATTR_ENTITY_ID in action and action[ATTR_ENTITY_ID]:
                     service_data[ATTR_ENTITY_ID] = action[ATTR_ENTITY_ID]
 
-                if (
-                    self._config[automation_id][CONF_TYPE] == const.ATTR_NOTIFICATION
-                    and ATTR_MESSAGE in service_data
-                ):
-                    res = re.search(r'{{open_sensors(\|lang=([^}]+))?(\|format=short)?}}', service_data[ATTR_MESSAGE])
-                    if res:
-                        lang = res.group(2) if res.group(2) else "en"
-                        names_only = True if res.group(3) else False
-
-                        open_sensors = ""
-                        if alarm_entity.open_sensors:
-                            parts = []
-                            for (entity_id, status) in alarm_entity.open_sensors.items():
-                                if names_only:
-                                    parts.append(friendly_name_for_entity_id(entity_id, self.hass))
-                                else:
-                                    parts.append(await self.async_get_open_sensor_string(entity_id, status, lang))
-                            open_sensors = ", ".join(parts)
-
-                        service_data[ATTR_MESSAGE] = service_data[ATTR_MESSAGE].replace(res.group(0), open_sensors)
-
-                    if "{{bypassed_sensors}}" in service_data[ATTR_MESSAGE]:
-                        bypassed_sensors = ""
-                        if alarm_entity.bypassed_sensors and len(alarm_entity.bypassed_sensors):
-                            parts = []
-                            for entity_id in alarm_entity.bypassed_sensors:
-                                name = friendly_name_for_entity_id(entity_id, self.hass)
-                                parts.append(name)
-                            bypassed_sensors = ", ".join(parts)
-
-                        service_data[ATTR_MESSAGE] = service_data[ATTR_MESSAGE].replace("{{bypassed_sensors}}", bypassed_sensors)
-
-                    res = re.search(r'{{arm_mode(\|lang=([^}]+))?}}', service_data[ATTR_MESSAGE])
-                    if res:
-                        lang = res.group(2) if res.group(2) else "en"
-                        arm_mode = await self.async_get_arm_mode_string(alarm_entity.arm_mode, lang)
-
-                        service_data[ATTR_MESSAGE] = service_data[ATTR_MESSAGE].replace(res.group(0), arm_mode)
-
-                    if "{{changed_by}}" in service_data[ATTR_MESSAGE]:
-                        changed_by = alarm_entity.changed_by if alarm_entity.changed_by else ""
-                        service_data[ATTR_MESSAGE] = service_data[ATTR_MESSAGE].replace("{{changed_by}}", changed_by)
-
-                    if "{{delay}}" in service_data[ATTR_MESSAGE]:
-                        delay = str(alarm_entity.delay) if alarm_entity.delay else ""
-                        service_data[ATTR_MESSAGE] = service_data[ATTR_MESSAGE].replace("{{delay}}", delay)
+                if self._config[automation_id][CONF_TYPE] == const.ATTR_NOTIFICATION:
+                    # replace wildcards within service_data struct
+                    for key, val in service_data.items():
+                        if type(val) is str:
+                            service_data[key] = await self.replace_wildcards_in_string(val, alarm_entity)
+                        elif type(val) is dict:
+                            for subkey, subval in service_data[key].items():
+                                if type(subval) is str:
+                                    service_data[key][subkey] = await self.replace_wildcards_in_string(subval, alarm_entity)
 
                 domain, service = action[ATTR_SERVICE].split(".")
 
@@ -236,6 +199,57 @@ class AutomationHandler:
                 result.append(automation_id)
 
         return result
+
+    async def replace_wildcards_in_string(self, input: str, alarm_entity: AlarmoBaseEntity):
+        """look for wildcards in string and replace them with content."""
+
+        # process wildcard '{{open_sensors}}'
+        res = re.search(r'{{open_sensors(\|lang=([^}]+))?(\|format=short)?}}', input)
+        if res:
+            lang = res.group(2) if res.group(2) else "en"
+            names_only = True if res.group(3) else False
+
+            open_sensors = ""
+            if alarm_entity.open_sensors:
+                parts = []
+                for (entity_id, status) in alarm_entity.open_sensors.items():
+                    if names_only:
+                        parts.append(friendly_name_for_entity_id(entity_id, self.hass))
+                    else:
+                        parts.append(await self.async_get_open_sensor_string(entity_id, status, lang))
+                open_sensors = ", ".join(parts)
+            input = input.replace(res.group(0), open_sensors)
+
+        # process wildcard '{{bypassed_sensors}}'
+        if "{{bypassed_sensors}}" in input:
+            bypassed_sensors = ""
+            if alarm_entity.bypassed_sensors and len(alarm_entity.bypassed_sensors):
+                parts = []
+                for entity_id in alarm_entity.bypassed_sensors:
+                    name = friendly_name_for_entity_id(entity_id, self.hass)
+                    parts.append(name)
+                bypassed_sensors = ", ".join(parts)
+            input = input.replace("{{bypassed_sensors}}", bypassed_sensors)
+
+        # process wildcard '{{arm_mode}}'
+        res = re.search(r'{{arm_mode(\|lang=([^}]+))?}}', input)
+        if res:
+            lang = res.group(2) if res.group(2) else "en"
+            arm_mode = await self.async_get_arm_mode_string(alarm_entity.arm_mode, lang)
+
+            input = input.replace(res.group(0), arm_mode)
+
+        # process wildcard '{{changed_by}}'
+        if "{{changed_by}}" in input:
+            changed_by = alarm_entity.changed_by if alarm_entity.changed_by else ""
+            input = input.replace("{{changed_by}}", changed_by)
+
+        # process wildcard '{{delay}}'
+        if "{{delay}}" in input:
+            delay = str(alarm_entity.delay) if alarm_entity.delay else ""
+            input = input.replace("{{delay}}", delay)
+        
+        return input
 
     async def async_get_open_sensor_string(self, entity_id: str, state: str, language: str):
         """get translation for sensor states"""
