@@ -591,6 +591,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
 
         if state in const.ARM_MODES:
             self._arm_mode = state
+            self._revert_state = None
         elif old_state == STATE_ALARM_DISARMED and state == STATE_ALARM_TRIGGERED:
             self._arm_mode = None
 
@@ -765,6 +766,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
                         self.async_update_state(STATE_ALARM_DISARMED)
                     else:
                         self.open_sensors = None
+                        self._revert_state = STATE_ALARM_DISARMED
                         self.async_arm(self.arm_mode, bypass_open_sensors=False, skip_delay=True)
 
                     dispatcher_send(
