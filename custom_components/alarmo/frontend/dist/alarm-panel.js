@@ -1583,6 +1583,7 @@ class ms extends Xn{constructor(e){if(super(e),this.et=V,e.type!==Qn)throw Error
             ></time-slider>
           </settings-row>
 
+          ${this.data.entities.length>2?Te`
           <settings-row dialog>
             <span slot="heading">
               ${mn("panels.sensors.dialogs.create_group.fields.event_count.heading",this.hass.language)}
@@ -1598,6 +1599,7 @@ class ms extends Xn{constructor(e){if(super(e),this.et=V,e.type!==Qn)throw Error
               .value=${String(this.data.event_count>this.data.entities.length?this.data.entities.length:this.data.event_count)}
             ></alarmo-select>
           </settings-row>
+          `:""}
         </div>
         <mwc-button slot="secondaryAction" @click=${this.saveClick}>
           ${this.hass.localize("ui.common.save")}
@@ -3144,7 +3146,7 @@ class ms extends Xn{constructor(e){if(super(e),this.et=V,e.type!==Qn)throw Error
             ${mn("title",this.hass.language)}
           </div>
           <div class="version">
-            v${"1.10.0"}
+            v${"1.10.1"}
           </div>
         </div>
 
