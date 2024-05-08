@@ -9,7 +9,7 @@ from homeassistant.core import (
 )
 
 from homeassistant.helpers.event import (
-    async_track_state_change,
+    async_track_state_change_event,
     async_track_point_in_time,
 )
 
@@ -172,7 +172,7 @@ class SensorHandler:
             self._state_listener()
 
         if len(sensors_list):
-            self._state_listener = async_track_state_change(
+            self._state_listener = async_track_state_change_event(
                 self.hass, sensors_list, self.async_sensor_state_changed
             )
         else:
@@ -266,11 +266,12 @@ class SensorHandler:
         return (open_sensors, bypassed_sensors)
 
     @callback
-    def async_sensor_state_changed(self, entity, old_state, new_state):
+    def async_sensor_state_changed(self, event):
         """Callback fired when a sensor state has changed."""
 
-        old_state = parse_sensor_state(old_state)
-        new_state = parse_sensor_state(new_state)
+        entity = event.data["entity_id"]
+        old_state = parse_sensor_state(event.data["old_state"])
+        new_state = parse_sensor_state(event.data["new_state"])
         sensor_config = self._config[entity]
         if old_state == STATE_UNKNOWN:
             # sensor is unknown at startup, state which comes after is considered as initial state
