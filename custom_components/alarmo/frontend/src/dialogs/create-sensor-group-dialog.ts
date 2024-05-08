@@ -125,6 +125,8 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
             ></time-slider>
           </settings-row>
 
+          ${this.data.entities.length > 2 
+          ? html`
           <settings-row dialog>
             <span slot="heading">
               ${localize('panels.sensors.dialogs.create_group.fields.event_count.heading', this.hass.language)}
@@ -140,6 +142,9 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
               .value=${String(this.data.event_count > this.data.entities.length ? this.data.entities.length : this.data.event_count)}
             ></alarmo-select>
           </settings-row>
+          `
+          : ''
+          }
         </div>
         <mwc-button slot="secondaryAction" @click=${this.saveClick}>
           ${this.hass.localize('ui.common.save')}
