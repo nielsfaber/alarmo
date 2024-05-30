@@ -307,21 +307,18 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             self._changed_by = res[ATTR_NAME]
             return (True, res)
 
-    @callback
-    def async_service_disarm_handler(self, code, context_id=None):
+    async def async_service_disarm_handler(self, code, context_id=None):
         """handle external disarm request from alarmo.disarm service"""
         _LOGGER.debug("Service alarmo.disarm was called")
 
-        self.async_alarm_disarm(
+        await self.async_alarm_disarm(
             code=code,
             context_id=context_id
         )
 
-    @callback
-    def async_alarm_disarm(self, **kwargs):
+    async def async_alarm_disarm(self, code, **kwargs):
         """Send disarm command."""
         _LOGGER.debug("alarm_disarm")
-        code = kwargs.get("code", None)
         skip_code = kwargs.get("skip_code", False)
         context_id = kwargs.get("context_id", None)
 
