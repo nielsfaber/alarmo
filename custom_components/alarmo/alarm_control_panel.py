@@ -610,7 +610,9 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
         else:
             # when disarmed, only update the attributes
             if self._revert_state in const.ARM_MODES:
+                prev_arm_mode = self._arm_mode
                 self._arm_mode = self._revert_state
+                self._revert_state = prev_arm_mode
 
             self.schedule_update_ha_state()
 
@@ -1043,6 +1045,7 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
         open_sensors = {}
         for item in self.hass.data[const.DOMAIN]["areas"].values():
             if (item.state in const.ARM_MODES and item.arm_mode != arm_mode) or item.state == STATE_ALARM_DISARMED:
+                item._revert_state = item._state if item._state in const.ARM_MODES else STATE_ALARM_DISARMED
                 res = item.async_arm(
                     arm_mode,
                     skip_delay=skip_delay,
@@ -1077,13 +1080,13 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
         """handle arm failure."""
         self.open_sensors = open_sensors
         command = self._target_state.replace("armed", "arm")
-        self._target_state = None
 
         for item in self.hass.data[const.DOMAIN]["areas"].values():
             if item.state != self._revert_state and self._revert_state:
                 item.async_update_state(self._revert_state)
 
-        self._revert_state = None
+        self._revert_state = self._target_state
+        self._target_state = None
         dispatcher_send(
             self.hass,
             "alarmo_event",
