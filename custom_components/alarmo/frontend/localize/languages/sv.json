@@ -497,6 +497,10 @@
               "heading": "Mål",
               "description": "Enhet att skicka push-meddelandet till"
             },
+            "media_player_entity": {
+              "heading": "Mediasoitinkohde",
+              "description": "Mediasoittimet viestin toistamiseen."
+            },
             "name": {
               "heading": "Namn",
               "description": "Beskrivning av notifikationen",

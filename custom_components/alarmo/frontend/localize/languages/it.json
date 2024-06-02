@@ -497,6 +497,10 @@
               "heading": "Destinatario",
               "description": "Dispositivo a cui inviare il messaggio di notifica"
             },
+            "media_player_entity": {
+              "heading": "Entità lettore multimediale",
+              "description": "Lettori multimediali per riprodurre il messaggio."
+            },
             "name": {
               "heading": "Nome",
               "description": "Descrizione della notifica",

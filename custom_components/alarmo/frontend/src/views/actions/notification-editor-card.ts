@@ -135,7 +135,7 @@ export class NotificationEditorCard extends LitElement {
           </settings-row>
 
           ${Object.keys(this.areas).length > 1
-            ? html`
+        ? html`
                 <settings-row .narrow=${this.narrow} .large=${true}>
                   <span slot="heading">
                     ${localize('panels.actions.cards.new_action.fields.area.heading', this.hass.language)}
@@ -147,8 +147,8 @@ export class NotificationEditorCard extends LitElement {
                   <alarmo-select
                     .hass=${this.hass}
                     .items=${getAreaOptions(this.areas, this.alarmoConfig!).map(e =>
-                      computeAreaDisplay(e, this.areas, this.alarmoConfig!)
-                    )}
+          computeAreaDisplay(e, this.areas, this.alarmoConfig!)
+        )}
                     clearable=${true}
                     label=${localize('panels.actions.cards.new_action.fields.area.heading', this.hass.language)}
                     .value=${this.config.triggers[0].area}
@@ -157,7 +157,7 @@ export class NotificationEditorCard extends LitElement {
                   ></alarmo-select>
                 </settings-row>
               `
-            : ''}
+        : ''}
 
           <settings-row .narrow=${this.narrow} .large=${true} last>
             <span slot="heading">
@@ -170,8 +170,8 @@ export class NotificationEditorCard extends LitElement {
             <alarmo-selector
               .hass=${this.hass}
               .items=${getArmModeOptions(this.config.triggers[0].area, this.areas).map(e =>
-                computeArmModeDisplay(e, this.hass)
-              )}
+          computeArmModeDisplay(e, this.hass)
+        )}
               label=${localize('panels.actions.cards.new_action.fields.mode.heading', this.hass.language)}
               .value=${this.config.triggers[0].modes || []}
               @value-changed=${this._setModes}
@@ -185,7 +185,7 @@ export class NotificationEditorCard extends LitElement {
       <ha-card>
         <div class="card-content">
           ${this.viewMode == ViewMode.UI
-            ? html`
+        ? html`
                 <settings-row .narrow=${this.narrow} .large=${true} first>
                   <span slot="heading">
                     ${localize('panels.actions.cards.new_notification.fields.target.heading', this.hass.language)}
@@ -208,32 +208,32 @@ export class NotificationEditorCard extends LitElement {
                 </settings-row>
 
                 ${!this.config.actions[0].service || computeDomain(this.config.actions[0].service) == 'notify'
-                  ? html`
+            ? html`
                       <settings-row .narrow=${this.narrow}>
                         <span slot="heading">
                           ${localize('panels.actions.cards.new_notification.fields.title.heading', this.hass.language)}
                         </span>
                         <span slot="description">
                           ${localize(
-                            'panels.actions.cards.new_notification.fields.title.description',
-                            this.hass.language
-                          )}
+              'panels.actions.cards.new_notification.fields.title.description',
+              this.hass.language
+            )}
                         </span>
 
                         <ha-textfield
                           label="${localize(
-                            'panels.actions.cards.new_notification.fields.title.heading',
-                            this.hass.language
-                          )}"
+              'panels.actions.cards.new_notification.fields.title.heading',
+              this.hass.language
+            )}"
                           .value=${this.config.actions[0].data?.title || ''}
                           @input=${this._setTitle}
                           ?invalid=${this.errors.title}
                         ></ha-textfield>
                       </settings-row>
                     `
-                  : ''}
+            : ''}
                 ${this.config.actions[0].service && computeDomain(this.config.actions[0].service) == 'tts'
-                  ? html`
+            ? html`
                       <settings-row .narrow=${this.narrow} .large=${true} first>
                         <span slot="heading">
                           ${localize('panels.actions.cards.new_action.fields.entity.heading', this.hass.language)}
@@ -243,7 +243,7 @@ export class NotificationEditorCard extends LitElement {
                         </span>
 
                         <alarmo-select
-                          .items=${computeEntityDisplay(getEntitiesByDomain(this.hass, 'media_player', 'tts'), this.hass)}
+                          .items=${computeEntityDisplay(this.config.actions[0].service == 'tts.speak' ? getEntitiesByDomain(this.hass, 'tts') : getEntitiesByDomain(this.hass, 'media_player', 'tts'), this.hass)}
                           label=${localize('panels.actions.cards.new_action.fields.entity.heading', this.hass.language)}
                           .value=${this.config.actions[0].data?.entity_id || ''}
                           @value-changed=${this._setEntity}
@@ -252,7 +252,30 @@ export class NotificationEditorCard extends LitElement {
                         ></alarmo-select>
                       </settings-row>
                     `
-                  : ''}
+            : ''}
+
+                  
+                ${this.config.actions[0].service && this.config.actions[0].service == 'tts.speak'
+            ? html`
+                      <settings-row .narrow=${this.narrow} .large=${true}>
+                        <span slot="heading">
+                          ${localize('panels.actions.cards.new_notification.fields.media_player_entity.heading', this.hass.language)}
+                        </span>
+                        <span slot="description">
+                          ${localize('panels.actions.cards.new_notification.fields.media_player_entity.description', this.hass.language)}
+                        </span>
+
+                        <alarmo-select
+                          .items=${computeEntityDisplay(getEntitiesByDomain(this.hass, 'media_player'), this.hass)}
+                          label=${localize('panels.actions.cards.new_notification.fields.media_player_entity.heading', this.hass.language)}
+                          .value=${this.config.actions[0].data?.media_player_entity_id || ''}
+                          @value-changed=${this._setMediaPlayerEntity}
+                          .icons=${true}
+                          ?invalid=${this.errors.media_player_entity}
+                        ></alarmo-select>
+                      </settings-row>
+                    `
+            : ''}
 
                 <settings-row .narrow=${this.narrow} .large=${true} last>
                   <span slot="heading">
@@ -265,9 +288,9 @@ export class NotificationEditorCard extends LitElement {
                   <ha-textarea
                     id="message"
                     label="${localize(
-                      'panels.actions.cards.new_notification.fields.message.heading',
-                      this.hass.language
-                    )}"
+              'panels.actions.cards.new_notification.fields.message.heading',
+              this.hass.language
+            )}"
                     placeholder=${this._messagePlaceholder()}
                     .value=${this.config.actions[0].data?.message || ''}
                     @input=${(ev: Event) => this._setMessage((ev.target as HTMLInputElement).value)}
@@ -275,13 +298,13 @@ export class NotificationEditorCard extends LitElement {
                   ></ha-textarea>
 
                   ${this.config.triggers[0].event
-                    ? html`
+            ? html`
                         <div style="margin-top: 10px">
                           <span style="padding-right: 10px">
                             ${localize(
-                              'panels.actions.cards.new_notification.fields.message.insert_wildcard',
-                              this.hass.language
-                            )}:
+              'panels.actions.cards.new_notification.fields.message.insert_wildcard',
+              this.hass.language
+            )}:
                           </span>
                           <alarmo-chip-set
                             .items=${getWildcardOptions(this.config.triggers[0].event, this.alarmoConfig)}
@@ -289,24 +312,24 @@ export class NotificationEditorCard extends LitElement {
                           ></alarmo-chip-set>
                         </div>
                       `
-                    : ''}
+            : ''}
                 </settings-row>
 
                 ${this._getOpenSensorsFormat() !== null
-                  ? html`
+            ? html`
                       <settings-row .narrow=${this.narrow} .large=${true}>
                         <span slot="heading">
                           ${localize(
-                            'panels.actions.cards.new_notification.fields.open_sensors_format.heading',
-                            this.hass.language
-                          )}
+              'panels.actions.cards.new_notification.fields.open_sensors_format.heading',
+              this.hass.language
+            )}
                         </span>
 
                         <span slot="description">
                           ${localize(
-                            'panels.actions.cards.new_notification.fields.open_sensors_format.description',
-                            this.hass.language
-                          )}
+              'panels.actions.cards.new_notification.fields.open_sensors_format.description',
+              this.hass.language
+            )}
                         </span>
 
                         <alarmo-select
@@ -316,25 +339,25 @@ export class NotificationEditorCard extends LitElement {
                         ></alarmo-select>
                       </settings-row>
                     `
-                  : ''}
+            : ''}
                 ${this._getArmModeFormat() !== null &&
-                (getArmModeWildCardOptions(this.hass).length > 1 ||
-                  (getArmModeWildCardOptions(this.hass).length == 1 &&
-                    getArmModeWildCardOptions(this.hass)[0].value != this._getArmModeFormat()))
-                  ? html`
+            (getArmModeWildCardOptions(this.hass).length > 1 ||
+              (getArmModeWildCardOptions(this.hass).length == 1 &&
+                getArmModeWildCardOptions(this.hass)[0].value != this._getArmModeFormat()))
+            ? html`
                       <settings-row .narrow=${this.narrow} .large=${true}>
                         <span slot="heading">
                           ${localize(
-                            'panels.actions.cards.new_notification.fields.arm_mode_format.heading',
-                            this.hass.language
-                          )}
+              'panels.actions.cards.new_notification.fields.arm_mode_format.heading',
+              this.hass.language
+            )}
                         </span>
 
                         <span slot="description">
                           ${localize(
-                            'panels.actions.cards.new_notification.fields.arm_mode_format.description',
-                            this.hass.language
-                          )}
+              'panels.actions.cards.new_notification.fields.arm_mode_format.description',
+              this.hass.language
+            )}
                         </span>
 
                         <alarmo-select
@@ -344,9 +367,9 @@ export class NotificationEditorCard extends LitElement {
                         ></alarmo-select>
                       </settings-row>
                     `
-                  : ''}
+            : ''}
               `
-            : html`
+        : html`
                 <h2>${localize('components.editor.edit_in_yaml', this.hass.language)}</h2>
 
                 <ha-yaml-editor
@@ -354,19 +377,19 @@ export class NotificationEditorCard extends LitElement {
                   @value-changed=${this._setYaml}
                 ></ha-yaml-editor>
 
-                ${this.errors.service || this.errors.title || this.errors.message || this.errors.entity
-                  ? html`
+                ${this.errors.service || this.errors.title || this.errors.message || this.errors.entity || this.errors.media_player_entity
+            ? html`
                       <span class="error-message">
                         ${this.hass.localize(
-                          'ui.errors.config.key_missing',
-                          'key',
-                          Object.entries(this.errors).find(
-                            ([k, v]) => v && ['service', 'title', 'message', 'entity'].includes(k)
-                          )![0]
-                        )}
+              'ui.errors.config.key_missing',
+              'key',
+              Object.entries(this.errors).find(
+                ([k, v]) => v && ['service', 'title', 'message', 'entity', 'media_player_entity'].includes(k)
+              )![0]
+            )}
                       </span>
                     `
-                  : ''}
+            : ''}
               `}
         </div>
 
@@ -374,8 +397,8 @@ export class NotificationEditorCard extends LitElement {
           <mwc-button @click=${this._toggleYamlMode}>
             <ha-icon icon="hass:shuffle-variant"></ha-icon>
             ${this.viewMode == ViewMode.Yaml
-              ? localize('components.editor.ui_mode', this.hass.language)
-              : localize('components.editor.yaml_mode', this.hass.language)}
+        ? localize('components.editor.ui_mode', this.hass.language)
+        : localize('components.editor.yaml_mode', this.hass.language)}
           </mwc-button>
         </div>
 
@@ -408,7 +431,7 @@ export class NotificationEditorCard extends LitElement {
           </settings-row>
 
           ${this.item?.automation_id
-            ? html`
+        ? html`
                 <settings-row .narrow=${this.narrow}>
                   <span slot="heading">
                     ${localize('panels.actions.cards.new_notification.fields.delete.heading', this.hass.language)}
@@ -424,7 +447,7 @@ export class NotificationEditorCard extends LitElement {
                   </div>
                 </settings-row>
               `
-            : ''}
+        : ''}
         </div>
       </ha-card>
 
@@ -516,6 +539,21 @@ export class NotificationEditorCard extends LitElement {
     if (Object.keys(this.errors).includes('entity')) this._validateConfig();
   }
 
+  private _setMediaPlayerEntity(ev: Event) {
+    ev.stopPropagation();
+    const value = (ev.target as HTMLInputElement).value;
+    let actionConfig = this.config.actions;
+    Object.assign(actionConfig, {
+      [0]: {
+        ...actionConfig[0],
+        service: actionConfig[0].service || '',
+        data: { ...(actionConfig[0].data || {}), media_player_entity_id: value },
+      },
+    });
+    this.config = { ...this.config, actions: actionConfig };
+    if (Object.keys(this.errors).includes('media_player_entity')) this._validateConfig();
+  }
+
   private _setMessage(value: string) {
     let actionConfig = this.config.actions;
     Object.assign(actionConfig, {
@@ -577,6 +615,13 @@ export class NotificationEditorCard extends LitElement {
         !getEntitiesByDomain(this.hass, 'media_player', 'tts').includes(actionConfig.data!.entity_id))
     )
       this.errors = { ...this.errors, entity: true };
+
+    if (actionConfig.service && actionConfig.service == 'tts.speak') {
+      if (!this.errors.entity && !getEntitiesByDomain(this.hass, 'tts').includes(actionConfig.data!.entity_id))
+        this.errors = { ...this.errors, entity: true };
+      if (!Object.keys(actionConfig.data || {}).includes('media_player_entity_id') || !getEntitiesByDomain(this.hass, 'media_player').includes(actionConfig.data!.media_player_entity_id))
+        this.errors = { ...this.errors, media_player_entity: true };
+    }
 
     if (!isValidString(actionConfig.data?.message)) this.errors = { ...this.errors, message: true };
 

@@ -497,6 +497,10 @@
               "heading": "Mục tiêu",
               "description": "Thiết bị để gửi thông báo tới"
             },
+            "media_player_entity": {
+              "heading": "Media Player Entity",
+              "description": "Trình phát đa phương tiện để phát tin nhắn trên"
+            },
             "name": {
               "heading": "Tên",
               "description": "Miêu tả của thông báo này",

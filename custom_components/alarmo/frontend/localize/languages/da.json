@@ -497,6 +497,10 @@
               "heading": "Target",
               "description": "Enhed meddelelsen sendes til"
             },
+            "media_player_entity": {
+              "heading": "Medieafspillerenhed",
+              "description": "Medieafspiller til at afspille beskeden på"
+            },
             "name": {
               "heading": "Navn",
               "description": "Beskrivelse af denne meddelelse",

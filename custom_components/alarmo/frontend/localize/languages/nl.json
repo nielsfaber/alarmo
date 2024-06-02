@@ -497,6 +497,10 @@
               "heading": "Doel",
               "description": "Apparaat om het push-bericht naar te sturen"
             },
+            "media_player_entity": {
+              "heading": "Mediaspeler entiteit",
+              "description": "Mediaspeler om het bericht af te spelen."
+            },
             "name": {
               "heading": "Naam",
               "description": "Beschrijving voor deze notificatie",

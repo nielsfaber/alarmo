@@ -497,6 +497,10 @@
               "heading": "目標",
               "description": "要發送通知的設備"
             },
+            "media_player_entity": {
+              "heading": "媒體播放器實體",
+              "description": "用於播放訊息的媒體播放器。"
+            },
             "name": {
               "heading": "名稱",
               "description": "該通知的描述",
