@@ -160,10 +160,10 @@ export const computeServiceDisplay = (hass: HomeAssistant, ...services: (string 
           const stateObj = hass.states[`device_tracker.${domainService.replace('mobile_app_', '')}`];
           data = stateObj
             ? {
-                ...data,
-                name: stateObj.attributes.friendly_name || computeEntity(stateObj.entity_id),
-                icon: stateObj.attributes.icon || 'hass:cellphone-text',
-              }
+              ...data,
+              name: stateObj.attributes.friendly_name || computeEntity(stateObj.entity_id),
+              icon: stateObj.attributes.icon || 'hass:cellphone-text',
+            }
             : { ...data, icon: 'hass:comment-alert' };
           break;
         case 'tts':
@@ -211,7 +211,7 @@ export const computeEntityDisplay = (entity_id: string[], hass: HomeAssistant) =
     const output = {
       value: e,
       name: e in hass.states ? hass.states[e].attributes.friendly_name || computeEntity(e) : e,
-      icon: e in hass.states ? hass.states[e].attributes.icon || domainIcon(computeDomain(e)) : undefined,
+      icon: e in hass.states ? hass.states[e].attributes.icon || domainIcon(computeDomain(e)) : domainIcon(computeDomain(e)),
       description: e,
     };
     return output;
@@ -285,7 +285,12 @@ export const computeActions = (
 };
 
 export const getAutomationEntities = (hass: HomeAssistant, additionalEntities?: string[]) => {
-  let entities = [...Object.keys(hass.states).filter(e => computeActions(e, hass).length)];
+  let entities = [...Object.keys(hass.states).filter(e => computeDomain(e) != 'script' && computeActions(e, hass).length)];
+
+  const scriptEntities = Object.keys(hass.services.script || {})
+    .filter(e => !['turn_on', 'turn_off', 'reload', 'toggle'].includes(e))
+    .map(e => `script.${e}`);
+  entities = [...entities, ...scriptEntities];
 
   if (additionalEntities && additionalEntities.length) {
     entities = [...entities, ...additionalEntities.filter(e => !entities.includes(e))];
@@ -355,8 +360,8 @@ export const getWildcardOptions = (event?: EAlarmEvent, alarmoConfig?: AlarmoCon
         value: '{{arm_mode}}',
       },
     ];
-  
-    if (!event || [EAlarmEvent.Arming, EAlarmEvent.Pending].includes(event))
+
+  if (!event || [EAlarmEvent.Arming, EAlarmEvent.Pending].includes(event))
     options = [
       ...options,
       {
@@ -432,7 +437,7 @@ export const getArmModeWildCardOptions = (hass: HomeAssistant) => {
 };
 
 export const isValidString = (input: any) => {
-  return typeof input == 'string' && input.trim().length;
+  return typeof input == 'string' && input.trim().length > 0;
 };
 
 export const isValidService = (input: any, hass: HomeAssistant) => {
@@ -444,7 +449,7 @@ export const isValidService = (input: any, hass: HomeAssistant) => {
 };
 
 export const isValidEntity = (input: any, hass: HomeAssistant) => {
-  return isValidString(input) && hass.states[input];
+  return isValidString(input) && (hass.states[input] || (computeDomain(input) == 'script' && hass.services.script[computeEntity(input)]));
 };
 
 export const isObject = (input: any) => typeof input === 'object' && input !== null && !Array.isArray(input);
