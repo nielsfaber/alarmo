@@ -318,10 +318,9 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
         )
 
     @callback
-    def async_alarm_disarm(self, **kwargs):
+    def alarm_disarm(self, code, **kwargs):
         """Send disarm command."""
         _LOGGER.debug("alarm_disarm")
-        code = kwargs.get("code", None)
         skip_code = kwargs.get("skip_code", False)
         context_id = kwargs.get("context_id", None)
 
