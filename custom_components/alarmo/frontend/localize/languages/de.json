@@ -497,6 +497,10 @@
               "heading": "Ziel",
               "description": "Gerät, an das die Benachrichtigung gesendet werden soll"
             },
+            "media_player_entity": {
+              "heading": "Mediaplayer-Entität",
+              "description": "Mediaplayer zum Abspielen der Nachricht."
+            },
             "name": {
               "heading": "Name",
               "description": "Beschreibung für diese Meldung",

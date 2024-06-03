@@ -497,6 +497,10 @@
               "heading": "Objetivo",
               "description": "Dispositivo al que enviar el mensaje push."
             },
+            "media_player_entity": {
+              "heading": "Entidad de reproductor multimedia",
+              "description": "Reproductores multimedia para reproducir el mensaje."
+            },
             "name": {
               "heading": "Nombre",
               "description": "Descripción de esta notificación.",

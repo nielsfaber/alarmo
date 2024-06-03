@@ -497,6 +497,10 @@
               "heading": "Přijemce",
               "description": "Na které zařízení má být notifikace odeslána"
             },
+            "media_player_entity": {
+              "heading": "Entita přehrávače médií",
+              "description": "Přehrávače médií pro přehrání zprávy."
+            },
             "name": {
               "heading": "Jméno",
               "description": "Popis této notifikace",

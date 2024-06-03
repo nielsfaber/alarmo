@@ -497,6 +497,10 @@
               "heading": "Cible",
               "description": "Appareil recevant le message"
             },
+            "media_player_entity": {
+              "heading": "Entité du lecteur multimédia",
+              "description": "Lecteurs multimédias pour lire le message."
+            },
             "name": {
               "heading": "Nom",
               "description": "Description de la notification",

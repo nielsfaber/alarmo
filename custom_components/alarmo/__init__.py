@@ -322,7 +322,7 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                 _LOGGER.info("Cannot process the push action, since there are multiple areas.")
                 return
 
-            arm_mode = alarm_entity._arm_mode
+            arm_mode = alarm_entity._revert_state if alarm_entity._revert_state in const.ARM_MODES else alarm_entity._arm_mode
             res = re.search(r"^ALARMO_ARM_", action)
             if res:
                 arm_mode = action.replace("ALARMO_", "").lower().replace("arm", "armed")

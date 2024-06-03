@@ -497,6 +497,10 @@
               "heading": "Destinatari",
               "description": "Dispositiu al qual enviar el missatge"
             },
+            "media_player_entity": {
+              "heading": "Entitat de reproductor multimèdia",
+              "description": "Reproductor multimèdia a reproduir el missatge."
+            },
             "name": {
               "heading": "Nom",
               "description": "Descripció d'aquesta notificació",

@@ -497,6 +497,10 @@
               "heading": "Cieľ",
               "description": "Zariadenie, do ktorého sa má odoslať upozornenie"
             },
+            "media_player_entity": {
+              "heading": "Entita prehrávača médií",
+              "description": "Prehrávače médií na prehrávanie správy."
+            },
             "name": {
               "heading": "Názov",
               "description": "Popis tohto upozornenia",

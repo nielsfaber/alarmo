@@ -497,6 +497,10 @@
               "heading": "Saaja",
               "description": "Seade millele edastada teavitus"
             },
+            "media_player_entity": {
+              "heading": "Meediamängija olem",
+              "description": "Meediamängijad sõnumi esitamiseks."
+            },
             "name": {
               "heading": "Nimi",
               "description": "Teavituse kirjeldus",

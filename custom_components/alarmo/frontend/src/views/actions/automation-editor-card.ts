@@ -137,7 +137,7 @@ export class AutomationEditorCard extends LitElement {
           </settings-row>
 
           ${Object.keys(this.areas).length > 1
-            ? html`
+        ? html`
                 <settings-row .narrow=${this.narrow} .large=${true}>
                   <span slot="heading">
                     ${localize('panels.actions.cards.new_action.fields.area.heading', this.hass.language)}
@@ -149,8 +149,8 @@ export class AutomationEditorCard extends LitElement {
                   <alarmo-select
                     .hass=${this.hass}
                     .items=${getAreaOptions(this.areas, this.alarmoConfig!).map(e =>
-                      computeAreaDisplay(e, this.areas, this.alarmoConfig!)
-                    )}
+          computeAreaDisplay(e, this.areas, this.alarmoConfig!)
+        )}
                     clearable=${true}
                     label=${localize('panels.actions.cards.new_action.fields.area.heading', this.hass.language)}
                     .value=${this.config.triggers[0].area}
@@ -159,7 +159,7 @@ export class AutomationEditorCard extends LitElement {
                   ></alarmo-select>
                 </settings-row>
               `
-            : ''}
+        : ''}
 
           <settings-row .narrow=${this.narrow} .large=${true} last>
             <span slot="heading">
@@ -172,8 +172,8 @@ export class AutomationEditorCard extends LitElement {
             <alarmo-selector
               .hass=${this.hass}
               .items=${getArmModeOptions(this.config.triggers[0].area, this.areas).map(e =>
-                computeArmModeDisplay(e, this.hass)
-              )}
+          computeArmModeDisplay(e, this.hass)
+        )}
               label=${localize('panels.actions.cards.new_action.fields.mode.heading', this.hass.language)}
               .value=${this.config.triggers[0].modes || []}
               @value-changed=${this._setModes}
@@ -187,7 +187,7 @@ export class AutomationEditorCard extends LitElement {
       <ha-card>
         <div class="card-content">
           ${this.viewMode == ViewMode.UI
-            ? html`
+        ? html`
                 <settings-row .narrow=${this.narrow} .large=${true} first>
                   <span slot="heading">
                     ${localize('panels.actions.cards.new_action.fields.entity.heading', this.hass.language)}
@@ -208,7 +208,7 @@ export class AutomationEditorCard extends LitElement {
                 </settings-row>
 
                 ${this._getEntities().length
-                  ? html`
+            ? html`
                       <settings-row .narrow=${this.narrow} .large=${true}>
                         <span slot="heading">
                           ${localize('panels.actions.cards.new_action.fields.action.heading', this.hass.language)}
@@ -219,23 +219,23 @@ export class AutomationEditorCard extends LitElement {
 
                         <div>
                           ${this.renderActions() ||
-                            localize(
-                              'panels.actions.cards.new_action.fields.action.no_common_actions',
-                              this.hass.language
-                            )}
+              localize(
+                'panels.actions.cards.new_action.fields.action.no_common_actions',
+                this.hass.language
+              )}
                         </div>
                         ${this.errors.service
-                          ? html`
+                ? html`
                               <span class="error-message">
                                 ${this.hass.localize('ui.common.error_required', this.hass.language)}
                               </span>
                             `
-                          : ''}
+                : ''}
                       </settings-row>
                     `
-                  : ''}
+            : ''}
               `
-            : html`
+        : html`
                 <h2>${localize('components.editor.edit_in_yaml', this.hass.language)}</h2>
 
                 <ha-yaml-editor
@@ -244,16 +244,16 @@ export class AutomationEditorCard extends LitElement {
                 ></ha-yaml-editor>
 
                 ${this.errors.service || this.errors.entity_id
-                  ? html`
+            ? html`
                       <span class="error-message">
                         ${this.hass.localize(
-                          'ui.errors.config.key_missing',
-                          'key',
-                          Object.entries(this.errors).find(([k, v]) => v && ['service', 'entity_id'].includes(k))![0]
-                        )}
+              'ui.errors.config.key_missing',
+              'key',
+              Object.entries(this.errors).find(([k, v]) => v && ['service', 'entity_id'].includes(k))![0]
+            )}
                       </span>
                     `
-                  : ''}
+            : ''}
               `}
         </div>
 
@@ -261,8 +261,8 @@ export class AutomationEditorCard extends LitElement {
           <mwc-button @click=${this._toggleYamlMode}>
             <ha-icon icon="hass:shuffle-variant"></ha-icon>
             ${this.viewMode == ViewMode.Yaml
-              ? localize('components.editor.ui_mode', this.hass.language)
-              : localize('components.editor.yaml_mode', this.hass.language)}
+        ? localize('components.editor.ui_mode', this.hass.language)
+        : localize('components.editor.yaml_mode', this.hass.language)}
           </mwc-button>
         </div>
 
@@ -295,7 +295,7 @@ export class AutomationEditorCard extends LitElement {
           </settings-row>
 
           ${this.item?.automation_id
-            ? html`
+        ? html`
                 <settings-row .narrow=${this.narrow}>
                   <span slot="heading">
                     ${localize('panels.actions.cards.new_notification.fields.delete.heading', this.hass.language)}
@@ -311,7 +311,7 @@ export class AutomationEditorCard extends LitElement {
                   </div>
                 </settings-row>
               `
-            : ''}
+        : ''}
         </div>
       </ha-card>
 
