@@ -312,7 +312,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
         """handle external disarm request from alarmo.disarm service"""
         _LOGGER.debug("Service alarmo.disarm was called")
 
-        self.async_alarm_disarm(
+        self.alarm_disarm(
             code=code,
             context_id=context_id
         )
@@ -911,7 +911,7 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
                 )
             if event == const.EVENT_TRIGGER_TIME_EXPIRED:
                 if self.hass.data[const.DOMAIN]["areas"][area_id].state == STATE_ALARM_DISARMED:
-                    self.async_alarm_disarm(skip_code=True)
+                    self.alarm_disarm(skip_code=True)
             if event == const.EVENT_READY_TO_ARM_MODES_CHANGED:
                 self.update_ready_to_arm_modes()
 
@@ -1017,18 +1017,17 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
         self.schedule_update_ha_state()
 
     @callback
-    def async_alarm_disarm(self, **kwargs):
+    def alarm_disarm(self, code=None, **kwargs):
         """Send disarm command."""
-        code = kwargs.get("code", None)
         skip_code = kwargs.get("skip_code", False)
         context_id = kwargs.get("context_id", None)
 
         """Send disarm command."""
-        res = super().async_alarm_disarm(code=code, skip_code=skip_code)
+        res = super().alarm_disarm(code=code, skip_code=skip_code)
         if res:
             for item in self.hass.data[const.DOMAIN]["areas"].values():
                 if item.state != STATE_ALARM_DISARMED:
-                    item.async_alarm_disarm(code=code, skip_code=skip_code)
+                    item.alarm_disarm(code=code, skip_code=skip_code)
 
             dispatcher_send(self.hass, "alarmo_event", const.EVENT_DISARM, self.area_id, {
                 const.ATTR_CONTEXT_ID: context_id
