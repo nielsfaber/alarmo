@@ -97,6 +97,7 @@ class HistoryHandler:
         # proof: the mapping between the integer value and its meaning might change in future Alarmo versions
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS AlarmoHistoricalEvents (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             timestamp INTEGER,
             event_name TEXT,
             area_id INTEGER,
@@ -143,7 +144,7 @@ class HistoryHandler:
 
     def query_events(self, timestamp_start: datetime, timestamp_end: datetime):
         """Query events based on time criteria."""
-        
+
         with sqlite3.connect(const.DATABASE_NAME) as conn:
             cursor = conn.cursor()
 
