@@ -16,6 +16,6 @@
   "documentation": "https://github.com/nielsfaber/alarmo",
   "iot_class": "local_push",
   "issue_tracker": "https://github.com/nielsfaber/alarmo/issues",
-  "requirements": [ "aiofiles==23.2.1", "aiosqlite"],
+  "requirements": ["aiosqlite==0.20.0"],
   "version": "v0.0.0"
 }

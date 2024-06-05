@@ -2,8 +2,6 @@ import time
 import logging
 import sqlite3
 from datetime import datetime
-import aiofiles as aiof
-import attr
 import json
 import aiosqlite
 
@@ -15,8 +13,9 @@ from . import const
 _LOGGER = logging.getLogger(__name__)
 
 
-# @attr.s(slots=True, frozen=True)
 class AlarmoHistoricalEvent:
+    """An event produced by Alarmo at some point in time."""
+
     def __init__(
         self, event_name: str, area_id: int, open_sensors: list, timestamp=None
     ):
