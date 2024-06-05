@@ -75,6 +75,9 @@ Alarmo consists of 3 parts:
 
 
 ## Installation
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=nielsfaber&repository=alarmo&category=integration)
+
 <details>
 <summary>Click to show installation instructions</summary>
 <ol>
@@ -82,9 +85,9 @@ Alarmo consists of 3 parts:
 <ul>
 <li><u>Using HACS:</u><br>
 In the HACS panel, go to integrations and click the big orange '+' button. 
-Search for 'Alarmo' and click \'Install this repository in HACS'.</li>
+Search for 'Alarmo' and click 'Install this repository in HACS'.</li>
 <li><u>Manually:</u><br>
-Download the [latest release](https://github.com/nielsfaber/alarmo/releases) as a zip file and extract it into the `custom_components` folder in your HA installation.</li>
+Download the <a href="https://github.com/nielsfaber/alarmo/releases">latest release</a> as a zip file and extract it into the `custom_components` folder in your HA installation.</li>
 </ul>
 <li>Restart HA to load the integration into HA.</li>
 <li>Go to Configuration -> Integrations and click the big orange '+' button. Look for Alarmo and click to add it.</li>
