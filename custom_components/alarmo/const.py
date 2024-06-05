@@ -1,4 +1,5 @@
 """Store constants."""
+
 import datetime
 import voluptuous as vol
 
@@ -57,7 +58,7 @@ ARM_MODES = [
     STATE_ALARM_ARMED_HOME,
     STATE_ALARM_ARMED_NIGHT,
     STATE_ALARM_ARMED_CUSTOM_BYPASS,
-    STATE_ALARM_ARMED_VACATION
+    STATE_ALARM_ARMED_VACATION,
 ]
 
 ARM_MODE_TO_STATE = {
@@ -65,7 +66,7 @@ ARM_MODE_TO_STATE = {
     "home": STATE_ALARM_ARMED_HOME,
     "night": STATE_ALARM_ARMED_NIGHT,
     "custom": STATE_ALARM_ARMED_CUSTOM_BYPASS,
-    "vacation": STATE_ALARM_ARMED_VACATION
+    "vacation": STATE_ALARM_ARMED_VACATION,
 }
 
 STATE_TO_ARM_MODE = {
@@ -73,7 +74,7 @@ STATE_TO_ARM_MODE = {
     STATE_ALARM_ARMED_HOME: "home",
     STATE_ALARM_ARMED_NIGHT: "night",
     STATE_ALARM_ARMED_CUSTOM_BYPASS: "custom",
-    STATE_ALARM_ARMED_VACATION: "vacation"
+    STATE_ALARM_ARMED_VACATION: "vacation",
 }
 
 COMMAND_ARM_NIGHT = "arm_night"
@@ -89,7 +90,7 @@ COMMANDS = [
     COMMAND_ARM_NIGHT,
     COMMAND_ARM_HOME,
     COMMAND_ARM_CUSTOM_BYPASS,
-    COMMAND_ARM_VACATION
+    COMMAND_ARM_VACATION,
 ]
 
 EVENT_DISARM = "disarm"
@@ -167,7 +168,7 @@ EVENT_ACTIONS = [
     EVENT_ACTION_ARM_HOME,
     EVENT_ACTION_ARM_NIGHT,
     EVENT_ACTION_ARM_VACATION,
-    EVENT_ACTION_ARM_CUSTOM_BYPASS
+    EVENT_ACTION_ARM_CUSTOM_BYPASS,
 ]
 
 MODES_TO_SUPPORTED_FEATURES = {
@@ -175,7 +176,7 @@ MODES_TO_SUPPORTED_FEATURES = {
     STATE_ALARM_ARMED_HOME: AlarmControlPanelEntityFeature.ARM_HOME,
     STATE_ALARM_ARMED_NIGHT: AlarmControlPanelEntityFeature.ARM_NIGHT,
     STATE_ALARM_ARMED_CUSTOM_BYPASS: AlarmControlPanelEntityFeature.ARM_CUSTOM_BYPASS,
-    STATE_ALARM_ARMED_VACATION: AlarmControlPanelEntityFeature.ARM_VACATION
+    STATE_ALARM_ARMED_VACATION: AlarmControlPanelEntityFeature.ARM_VACATION,
 }
 
 SERVICE_ARM = "arm"
@@ -185,21 +186,23 @@ SERVICE_ARM_SCHEMA = vol.Schema(
     {
         vol.Required(ATTR_ENTITY_ID): cv.entity_id,
         vol.Optional(CONF_CODE, default=""): cv.string,
-        vol.Optional(CONF_MODE, default=STATE_ALARM_ARMED_AWAY): vol.In([
-            "away",
-            "home",
-            "night",
-            "custom",
-            "vacation",
-            STATE_ALARM_ARMED_AWAY,
-            STATE_ALARM_ARMED_HOME,
-            STATE_ALARM_ARMED_NIGHT,
-            STATE_ALARM_ARMED_CUSTOM_BYPASS,
-            STATE_ALARM_ARMED_VACATION,
-        ]),
+        vol.Optional(CONF_MODE, default=STATE_ALARM_ARMED_AWAY): vol.In(
+            [
+                "away",
+                "home",
+                "night",
+                "custom",
+                "vacation",
+                STATE_ALARM_ARMED_AWAY,
+                STATE_ALARM_ARMED_HOME,
+                STATE_ALARM_ARMED_NIGHT,
+                STATE_ALARM_ARMED_CUSTOM_BYPASS,
+                STATE_ALARM_ARMED_VACATION,
+            ]
+        ),
         vol.Optional(ATTR_SKIP_DELAY, default=False): cv.boolean,
         vol.Optional(ATTR_FORCE, default=False): cv.boolean,
-        vol.Optional(ATTR_CONTEXT_ID): int
+        vol.Optional(ATTR_CONTEXT_ID): int,
     }
 )
 
@@ -207,7 +210,7 @@ SERVICE_DISARM_SCHEMA = vol.Schema(
     {
         vol.Required(ATTR_ENTITY_ID): cv.entity_id,
         vol.Optional(CONF_CODE, default=""): cv.string,
-        vol.Optional(ATTR_CONTEXT_ID): int
+        vol.Optional(ATTR_CONTEXT_ID): int,
     }
 )
 
@@ -218,3 +221,6 @@ SERVICE_TOGGLE_USER_SCHEMA = vol.Schema(
         vol.Required(ATTR_NAME, default=""): cv.string,
     }
 )
+
+CURRENT_SCHEMA_VERSION = 1
+DATABASE_NAME = "alarmo_events.db"
