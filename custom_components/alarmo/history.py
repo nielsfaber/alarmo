@@ -48,10 +48,13 @@ class HistoryHandler:
     def __init__(self, hass):
         """Class constructor."""
         self.hass = hass
+
+        # start a subscription to the alarmo_event bus
         self._subscription = async_dispatcher_connect(
             self.hass, "alarmo_event", self.async_handle_event
         )
 
+        self.num_events_since_last_purge = 0
         self.setup_database()
 
     def __del__(self):
@@ -68,16 +71,16 @@ class HistoryHandler:
             cursor.execute("SELECT version FROM SchemaVersion")
             row = cursor.fetchone()
             current_version = row[0]
-            if current_version == const.CURRENT_SCHEMA_VERSION:
+            if current_version == const.DATABASE_CURR_SCHEMA_VER:
                 _LOGGER.info(
                     f"Alarmo HistoryHandler: the database schema version is the current one; no migration required"
                 )
-            elif current_version < const.CURRENT_SCHEMA_VERSION:
+            elif current_version < const.DATABASE_CURR_SCHEMA_VER:
                 self.migrate_database(current_version, connection)
 
         except sqlite3.OperationalError as ex:
             _LOGGER.info(
-                f"Alarmo HistoryHandler: no schema version detected... setting schema to version {const.CURRENT_SCHEMA_VERSION}"
+                f"Alarmo HistoryHandler: no schema version detected... setting schema to version {const.DATABASE_CURR_SCHEMA_VER}"
             )
 
             # ensure the SchemaVersion table exists
@@ -89,7 +92,7 @@ class HistoryHandler:
 
             # if there is no schema version set, set the current one
             cursor.execute(
-                f"INSERT OR IGNORE INTO SchemaVersion (version) VALUES ({const.CURRENT_SCHEMA_VERSION})"
+                f"INSERT OR IGNORE INTO SchemaVersion (version) VALUES ({const.DATABASE_CURR_SCHEMA_VER})"
             )
 
         # NOTE: for the 'event_name' it would be possible to use also an INTEGER type; this might result in
@@ -114,7 +117,7 @@ class HistoryHandler:
     def migrate_database(self, version_on_disk: int, connection):
         """Perform an Alarmo database migration."""
         _LOGGER.info(
-            f"Alarmo HistoryHandler: migrating database schema from  {version_on_disk} to {const.CURRENT_SCHEMA_VERSION}"
+            f"Alarmo HistoryHandler: migrating database schema from  {version_on_disk} to {const.DATABASE_CURR_SCHEMA_VER}"
         )
         # if version_on_disk < fist_version_adding_column_xyz:
         #     cursor = connection.cursor()
@@ -129,6 +132,30 @@ class HistoryHandler:
         # no migration defined as this is the first version... but it's future-proof :)
         pass
 
+    async def purge_old_events(self, ):
+        """Remove the eldest events stored in the database if the retention period has been exceeded."""
+        async with aiosqlite.connect(const.DATABASE_NAME) as db:
+            # Count the total number of rows in the table
+            async with db.execute('SELECT COUNT(*) FROM AlarmoHistoricalEvents') as cursor:
+                row = await cursor.fetchone()
+                total_rows = row[0]
+
+            # Calculate the number of rows to delete
+            rows_to_delete = total_rows - const.DATABASE_MAX_EVENTS
+
+            if rows_to_delete > 0:
+                _LOGGER.info(f"Alarmo HistoryHandler: cleaning {rows_to_delete} old events from the database to honor the max_events setting")
+                # Delete the oldest rows
+                async with db.execute('''
+                    DELETE FROM AlarmoHistoricalEvents 
+                    WHERE id IN (
+                        SELECT id FROM AlarmoHistoricalEvents
+                        ORDER BY timestamp ASC
+                        LIMIT ?
+                    )
+                ''', (rows_to_delete,)):
+                    await db.commit()
+
     @callback
     def async_handle_event(self, event: str, area_id: str, args: dict = {}):
         """Handle an Alarmo event by storing it into the database."""
@@ -141,6 +168,12 @@ class HistoryHandler:
 
             # write into database
             self.hass.async_create_task(AlarmoHistoricalEvent.insert_alarm_event(ev))
+
+        self.num_events_since_last_purge += 1
+        if self.num_events_since_last_purge > const.DATABASE_CHECK_PURGE_EVERY_N_EVENTS:
+            # every once in a while, check if the number of events stored in the database is too large:
+            self.hass.async_create_task(self.purge_old_events())
+            self.num_events_since_last_purge = 0
 
     def query_events(self, timestamp_start: datetime, timestamp_end: datetime):
         """Query events based on time criteria."""
