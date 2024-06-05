@@ -132,20 +132,18 @@ class HistoryHandler:
     def async_handle_event(self, event: str, area_id: str, args: dict = {}):
         """Handle an Alarmo event by storing it into the database."""
 
+        # note that EVENT_READY_TO_ARM_MODES_CHANGED are probably not interesting for the user
+        # and they are generated after each arm/disarm/trigger event...
         if event not in [const.EVENT_READY_TO_ARM_MODES_CHANGED]:
             # create the event
             ev = AlarmoHistoricalEvent(event, area_id, args.get("open_sensors", []))
 
             # write into database
             self.hass.async_create_task(AlarmoHistoricalEvent.insert_alarm_event(ev))
-            # print(f"FMON: event={event} area_id={area_id} args={args}")
-        else:
-            # filter out : EVENT_READY_TO_ARM_MODES_CHANGED
-            # print(f"FMON: filtered out event={event} area_id={area_id} args={args}")
-            pass
 
     def query_events(self, timestamp_start: datetime, timestamp_end: datetime):
         """Query events based on time criteria."""
+        
         with sqlite3.connect(const.DATABASE_NAME) as conn:
             cursor = conn.cursor()
 
