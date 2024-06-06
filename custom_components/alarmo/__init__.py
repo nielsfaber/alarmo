@@ -336,7 +336,7 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                 alarm_entity.async_handle_arm_request(arm_mode, skip_code=True)
             elif action == const.EVENT_ACTION_DISARM:
                 _LOGGER.info("Received request for disarming")
-                alarm_entity.async_alarm_disarm(code=None, skip_code=True)
+                alarm_entity.alarm_disarm(None, skip_code=True)
             else:
                 _LOGGER.info("Received request for arming with mode {}".format(arm_mode))
                 alarm_entity.async_handle_arm_request(arm_mode, skip_code=True)

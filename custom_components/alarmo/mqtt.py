@@ -266,7 +266,7 @@ class MqttHandler:
         _LOGGER.debug("Received command {}".format(command))
 
         if command == command_payloads[const.COMMAND_DISARM]:
-            await entity.async_alarm_disarm(code=code, skip_code=skip_code)
+            entity.alarm_disarm(code, skip_code=skip_code)
         elif command == command_payloads[const.COMMAND_ARM_AWAY]:
             await entity.async_alarm_arm_away(code, skip_code, bypass_open_sensors, skip_delay)
         elif command == command_payloads[const.COMMAND_ARM_NIGHT]:
