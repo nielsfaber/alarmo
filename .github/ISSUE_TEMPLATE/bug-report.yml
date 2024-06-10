@@ -11,7 +11,7 @@ body:
     id: checklist
     attributes:
       label: Checklist
-      description: Before opening a bug report, please check the following:
+      description: "Before opening a bug report, please check the following:"
       options:
         - label: I am using the latest version of Alarmo (latest version can be found [here](https://github.com/nielsfaber/alarmo/releases/latest))
           required: true
