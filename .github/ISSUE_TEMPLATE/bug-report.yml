@@ -5,8 +5,11 @@ body:
   - type: markdown
     attributes:
       value: |
-        Before opening a bug report, please check for similar existing issues (both open and closed) before posting.
+        Before opening a bug report, please check the following:
         
+        - [ ] I am using the latest version of Alarmo (latest version can be found [here](https://github.com/nielsfaber/alarmo/releases/latest))
+        - [ ] I checked for similar existing requests (both open and closed) before posting.
+                
         ---
         
         Thank you for taking the effort to fill in all relevant details.
