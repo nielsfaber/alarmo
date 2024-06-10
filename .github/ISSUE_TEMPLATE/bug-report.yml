@@ -5,15 +5,18 @@ body:
   - type: markdown
     attributes:
       value: |
-        Before opening a bug report, please check the following:
-        
-        - [ ] I am using the latest version of Alarmo (latest version can be found [here](https://github.com/nielsfaber/alarmo/releases/latest))
-        - [ ] I checked for similar existing requests (both open and closed) before posting.
-                
-        ---
-        
         Thank you for taking the effort to fill in all relevant details.
         Please make sure to include sufficient information for me to reproduce the issue, otherwise I can't help you.
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Before opening a bug report, please check the following:
+      options:
+        - label: I am using the latest version of Alarmo (latest version can be found [here](https://github.com/nielsfaber/alarmo/releases/latest))
+          required: true
+        - label: I checked for similar existing requests (both open and closed) before posting.
+          required: true
   - type: input
     id: alarmo-version
     attributes:
