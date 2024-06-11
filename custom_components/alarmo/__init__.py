@@ -41,6 +41,7 @@ from .sensors import (
 from .automations import AutomationHandler
 from .mqtt import MqttHandler
 from .event import EventHandler
+from .history import HistoryHandler
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -144,6 +145,7 @@ class AlarmoCoordinator(DataUpdateCoordinator):
         self.hass.data[const.DOMAIN]["automation_handler"] = AutomationHandler(self.hass)
         self.hass.data[const.DOMAIN]["mqtt_handler"] = MqttHandler(self.hass)
         self.hass.data[const.DOMAIN]["event_handler"] = EventHandler(self.hass)
+        self.hass.data[const.DOMAIN]["history_handler"] = HistoryHandler(self.hass)
 
         areas = self.store.async_get_areas()
         config = self.store.async_get_config()
