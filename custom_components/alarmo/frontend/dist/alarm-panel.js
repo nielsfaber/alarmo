@@ -3167,7 +3167,7 @@ class ms extends Xn{constructor(e){if(super(e),this.et=V,e.type!==Qn)throw Error
             ${mn("title",this.hass.language)}
           </div>
           <div class="version">
-            v${"1.10.3"}
+            v${"1.10.4"}
           </div>
         </div>
 
