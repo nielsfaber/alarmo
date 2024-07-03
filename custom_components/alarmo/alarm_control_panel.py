@@ -254,6 +254,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
 
         return {
             "arm_mode": self.arm_mode,
+            "next_state": self.next_state,
             "open_sensors": self.open_sensors,
             "bypassed_sensors": self.bypassed_sensors,
             "delay": self.delay,
@@ -534,6 +535,27 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
                     supported_features = supported_features | const.MODES_TO_SUPPORTED_FEATURES[mode]
 
             return supported_features
+
+    @property
+    def next_state(self):
+        """Return the state after transition (countdown) state."""
+        next_state = self.state
+        if self._state == STATE_ALARM_ARMING:
+            next_state = self.arm_mode
+        elif self._state == STATE_ALARM_PENDING:
+            next_state = STATE_ALARM_TRIGGERED
+        elif self._state == STATE_ALARM_TRIGGERED:
+            if (
+                not self._config
+                or not self._arm_mode
+                or not self._config[const.ATTR_MODES][self._arm_mode]["trigger_time"]
+            ):
+                next_state = STATE_ALARM_TRIGGERED
+            elif self._config[const.ATTR_DISARM_AFTER_TRIGGER] or not self.arm_mode:
+                next_state = STATE_ALARM_DISARMED
+            else:
+                next_state = self.arm_mode
+        return next_state
 
     async def async_added_to_hass(self):
         """Connect to dispatcher listening for entity data notifications."""
@@ -851,6 +873,22 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
             for item in self.hass.data[const.DOMAIN]["areas"].values()
         ]
         return functools.reduce(operator.and_, supported_features)
+
+    @property
+    def next_state(self):
+        """Return the state after transition (countdown) state."""
+        next_states = list(set([
+            item.next_state
+            for item in self.hass.data[const.DOMAIN]["areas"].values()
+        ]))
+
+        next_state = self.state
+        if len(next_states)==1:
+            next_state = next_states[0]
+        elif STATE_ALARM_TRIGGERED in next_states:
+            next_state = STATE_ALARM_TRIGGERED
+
+        return next_state
 
     async def async_added_to_hass(self):
         """Connect to dispatcher listening for entity data notifications."""
