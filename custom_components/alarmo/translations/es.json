@@ -1,0 +1,75 @@
+{
+  "services": {
+    "arm": {
+      "name": "Armar",
+      "description": "Armar una entidad Alarmo con configuraciones personalizadas.",
+      "fields": {
+        "entity_id": {
+          "name": "ID de entidad",
+          "description": "Entidad de alarma que debe ser armada."
+        },
+        "code": {
+          "name": "Código",
+          "description": "Código a usar para el armado."
+        },
+        "mode": {
+          "name": "Modo",
+          "description": "Modo para armar la alarma."
+        },
+        "skip_delay": {
+          "name": "Saltar Retardo",
+          "description": "Saltar el retardo de salida."
+        },
+        "force": {
+          "name": "Forzar",
+          "description": "Ignorar automáticamente todos los sensores que impiden la operación de armado."
+        }
+      }
+    },
+    "disarm": {
+      "name": "Desarmar",
+      "description": "Desarmar una entidad Alarmo.",
+      "fields": {
+        "entity_id": {
+          "name": "ID de entidad",
+          "description": "Entidad de alarma que debe ser desarmada."
+        },
+        "code": {
+          "name": "Código",
+          "description": "Código a usar para el desarme."
+        }
+      }
+    },
+    "enable_user": {
+      "name": "Habilitar Usuario",
+      "description": "Permitir a un usuario armar/desarmar Alarmo.",
+      "fields": {
+        "name": {
+          "name": "Nombre",
+          "description": "Nombre del usuario a habilitar."
+        }
+      }
+    },
+    "disable_user": {
+      "name": "Deshabilitar Usuario",
+      "description": "Bloquear a un usuario para que no pueda armar/desarmar Alarmo.",
+      "fields": {
+        "name": {
+          "name": "Nombre",
+          "description": "Nombre del usuario a deshabilitar."
+        }
+      }
+    }
+  },
+  "selector": {
+    "arm_mode": {
+      "options": {
+        "away": "Armado Fuera",
+        "night": "Armado Noche",
+        "home": "Armado Hogar",
+        "vacation": "Armado Vacaciones",
+        "custom": "Armado Bypass Personalizado"
+      }
+    }
+  }
+}
