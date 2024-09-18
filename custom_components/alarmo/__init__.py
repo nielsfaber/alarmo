@@ -1,7 +1,6 @@
 """The Alarmo Integration."""
 import logging
-import bcrypt
-import base64
+import argon2
 import re
 
 from homeassistant.core import (
@@ -125,6 +124,7 @@ class AlarmoCoordinator(DataUpdateCoordinator):
         self.hass = hass
         self.entry = entry
         self.store = store
+        self.ph = argon2.PasswordHasher()
         self._subscriptions = []
 
         self._subscriptions.append(
@@ -249,11 +249,7 @@ class AlarmoCoordinator(DataUpdateCoordinator):
         if ATTR_CODE in data and data[ATTR_CODE]:
             data[const.ATTR_CODE_FORMAT] = "number" if data[ATTR_CODE].isdigit() else "text"
             data[const.ATTR_CODE_LENGTH] = len(data[ATTR_CODE])
-            hashed = bcrypt.hashpw(
-                data[ATTR_CODE].encode("utf-8"), bcrypt.gensalt(rounds=12)
-            )
-            hashed = base64.b64encode(hashed)
-            data[ATTR_CODE] = hashed.decode()
+            data[ATTR_CODE] = self.ph.hash(data[ATTR_CODE].encode("utf-8"))
 
         if not user_id:
             self.store.async_create_user(data)
@@ -283,9 +279,14 @@ class AlarmoCoordinator(DataUpdateCoordinator):
             elif not user[ATTR_CODE] and not code:
                 return user
             elif user[ATTR_CODE]:
-                hash = base64.b64decode(user[ATTR_CODE])
-                if bcrypt.checkpw(code.encode("utf-8"), hash):
+                try:
+                    hash = user[ATTR_CODE]
+                    self.ph.verify(hash, code.encode("utf-8"))
+                    if self.ph.check_needs_rehash(hash):
+                        user[ATTR_CODE] = self.ph.hash(code.encode("utf-8"))
                     return user
+                except:
+                    pass
 
         return
 

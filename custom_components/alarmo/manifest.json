@@ -1,21 +1,13 @@
 {
   "domain": "alarmo",
   "name": "Alarmo",
-  "after_dependencies": [
-    "mqtt",
-    "notify"
-  ],
-  "codeowners": [
-    "@nielsfaber"
-  ],
+  "after_dependencies": ["mqtt", "notify"],
+  "codeowners": ["@nielsfaber"],
   "config_flow": true,
-  "dependencies": [
-    "http",
-    "panel_custom"
-  ],
+  "dependencies": ["http", "panel_custom"],
   "documentation": "https://github.com/nielsfaber/alarmo",
   "iot_class": "local_push",
   "issue_tracker": "https://github.com/nielsfaber/alarmo/issues",
-  "requirements": [],
+  "requirements": ["argon2-cffi==23.1.0"],
   "version": "v0.0.0"
 }
