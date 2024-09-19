@@ -260,6 +260,7 @@ class AlarmoUserView(HomeAssistantView):
                 vol.Optional(ATTR_NAME): cv.string,
                 vol.Optional(const.ATTR_ENABLED): cv.boolean,
                 vol.Optional(ATTR_CODE): cv.string,
+                vol.Optional(const.ATTR_CODE_HASHING_ALGORITHM): cv.string,
                 vol.Optional(const.ATTR_OLD_CODE): cv.string,
                 vol.Optional(const.ATTR_CAN_ARM): cv.boolean,
                 vol.Optional(const.ATTR_CAN_DISARM): cv.boolean,

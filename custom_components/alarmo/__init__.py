@@ -1,6 +1,8 @@
 """The Alarmo Integration."""
 import logging
-import argon2
+import hashlib
+import bcrypt
+import base64
 import re
 
 from homeassistant.core import (
@@ -124,7 +126,6 @@ class AlarmoCoordinator(DataUpdateCoordinator):
         self.hass = hass
         self.entry = entry
         self.store = store
-        self.ph = argon2.PasswordHasher()
         self._subscriptions = []
 
         self._subscriptions.append(
@@ -249,7 +250,9 @@ class AlarmoCoordinator(DataUpdateCoordinator):
         if ATTR_CODE in data and data[ATTR_CODE]:
             data[const.ATTR_CODE_FORMAT] = "number" if data[ATTR_CODE].isdigit() else "text"
             data[const.ATTR_CODE_LENGTH] = len(data[ATTR_CODE])
-            data[ATTR_CODE] = self.ph.hash(data[ATTR_CODE].encode("utf-8"))
+            data[const.ATTR_CODE_HASHING_ALGORITHM] = "sha256"
+            h = hashlib.sha256(data[ATTR_CODE].encode("utf-8"))
+            data[ATTR_CODE] = h.hexdigest()
 
         if not user_id:
             self.store.async_create_user(data)
@@ -279,15 +282,16 @@ class AlarmoCoordinator(DataUpdateCoordinator):
             elif not user[ATTR_CODE] and not code:
                 return user
             elif user[ATTR_CODE]:
-                try:
-                    hash = user[ATTR_CODE]
-                    self.ph.verify(hash, code.encode("utf-8"))
-                    if self.ph.check_needs_rehash(hash):
-                        user[ATTR_CODE] = self.ph.hash(code.encode("utf-8"))
+                h = hashlib.sha256(code.encode("utf-8"))
+                hashed_code = h.hexdigest()
+                if const.ATTR_CODE_HASHING_ALGORITHM in user and user[const.ATTR_CODE_HASHING_ALGORITHM] == "sha256":
+                    if user[ATTR_CODE] == hashed_code:
+                        return user
+                elif bcrypt.checkpw(code.encode("utf-8"), base64.b64decode(user[ATTR_CODE])):
+                    user[const.ATTR_CODE_HASHING_ALGORITHM] = "sha256"
+                    user[ATTR_CODE] = hashed_code
+                    self.store.async_update_user(user_id, user)
                     return user
-                except:
-                    pass
-
         return
 
     def async_update_automation_config(self, automation_id: str = None, data: dict = {}):

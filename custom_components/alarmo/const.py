@@ -127,6 +127,7 @@ ATTR_IS_OVERRIDE_CODE = "is_override_code"
 ATTR_AREA_LIMIT = "area_limit"
 ATTR_CODE_FORMAT = "code_format"
 ATTR_CODE_LENGTH = "code_length"
+ATTR_CODE_HASHING_ALGORITHM = "code_hashing_algorithm"
 
 ATTR_AUTOMATION_ID = "automation_id"
 
