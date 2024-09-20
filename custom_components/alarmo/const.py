@@ -104,7 +104,6 @@ EVENT_NO_CODE_PROVIDED = "no_code_provided"
 EVENT_TRIGGER_TIME_EXPIRED = "trigger_time_expired"
 EVENT_READY_TO_ARM_MODES_CHANGED = "ready_to_arm_modes_changed"
 
-HASH_ALGORITHM_SHA256 = "sha256"
 HASH_ALGORITHM_BLAKE3 = "blake3"
 
 ATTR_MODES = "modes"
