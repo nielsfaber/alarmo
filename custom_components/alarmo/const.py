@@ -104,6 +104,9 @@ EVENT_NO_CODE_PROVIDED = "no_code_provided"
 EVENT_TRIGGER_TIME_EXPIRED = "trigger_time_expired"
 EVENT_READY_TO_ARM_MODES_CHANGED = "ready_to_arm_modes_changed"
 
+HASH_ALGORITHM_SHA256 = "sha256"
+HASH_ALGORITHM_BLAKE3 = "blake3"
+
 ATTR_MODES = "modes"
 ATTR_ARM_MODE = "arm_mode"
 ATTR_CODE_DISARM_REQUIRED = "code_disarm_required"
@@ -127,7 +130,8 @@ ATTR_IS_OVERRIDE_CODE = "is_override_code"
 ATTR_AREA_LIMIT = "area_limit"
 ATTR_CODE_FORMAT = "code_format"
 ATTR_CODE_LENGTH = "code_length"
-ATTR_CODE_HASHING_ALGORITHM = "code_hashing_algorithm"
+ATTR_CODE_SALT = "code_salt"
+ATTR_CODE_HASH_ALGORITHM = "code_hash_algorithm"
 
 ATTR_AUTOMATION_ID = "automation_id"
 

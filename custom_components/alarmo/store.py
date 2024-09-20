@@ -124,7 +124,8 @@ class UserEntry:
     is_override_code = attr.ib(type=bool, default=False)
     code_format = attr.ib(type=str, default="")
     code_length = attr.ib(type=int, default=0)
-    code_hashing_algorithm = attr.ib(type=str, default="")
+    code_salt = attr.ib(type=str, default="")
+    code_hash_algorithm = attr.ib(type=str, default="")
     area_limit = attr.ib(type=list, default=[])
 
 

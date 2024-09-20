@@ -16,6 +16,6 @@
   "documentation": "https://github.com/nielsfaber/alarmo",
   "iot_class": "local_push",
   "issue_tracker": "https://github.com/nielsfaber/alarmo/issues",
-  "requirements": [],
+  "requirements": ["blake3==0.4.1"],
   "version": "v0.0.0"
 }
