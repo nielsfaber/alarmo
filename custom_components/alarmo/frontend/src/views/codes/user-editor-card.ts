@@ -57,23 +57,23 @@ export class UserEditorCard extends LitElement {
         <div class="card-header">
           <div class="name">
             ${this.item
-              ? localize('panels.codes.cards.edit_user.title', this.hass.language)
-              : localize('panels.codes.cards.new_user.title', this.hass.language)}
+        ? localize('panels.codes.cards.edit_user.title', this.hass.language)
+        : localize('panels.codes.cards.new_user.title', this.hass.language)}
           </div>
           <ha-icon-button .path=${mdiClose} @click=${this.cancelClick}></ha-icon-button>
         </div>
         <div class="card-content">
           ${this.item
-            ? localize(
-                'panels.codes.cards.edit_user.description',
-                this.hass.language,
-                '{name}',
-                this.users![this.item].name
-              )
-            : localize('panels.codes.cards.new_user.description', this.hass.language)}
+        ? localize(
+          'panels.codes.cards.edit_user.description',
+          this.hass.language,
+          '{name}',
+          this.users![this.item].name
+        )
+        : localize('panels.codes.cards.new_user.description', this.hass.language)}
         </div>
 
-        <settings-row .narrow=${this.narrow}>
+        <alarmo-settings-row .narrow=${this.narrow}>
           <span slot="heading">${localize('panels.codes.cards.new_user.fields.name.heading', this.hass.language)}</span>
           <span slot="description">
             ${localize('panels.codes.cards.new_user.fields.name.description', this.hass.language)}
@@ -85,11 +85,11 @@ export class UserEditorCard extends LitElement {
             value=${this.data.name}
             @input=${(ev: Event) => (this.data = { ...this.data!, name: (ev.target as HTMLInputElement).value })}
           ></ha-textfield>
-        </settings-row>
+        </alarmo-settings-row>
 
         ${this.item
-          ? html`
-              <settings-row .narrow=${this.narrow}>
+        ? html`
+              <alarmo-settings-row .narrow=${this.narrow}>
                 <span slot="heading">
                   ${localize('panels.codes.cards.edit_user.fields.old_code.heading', this.hass.language)}
                 </span>
@@ -103,15 +103,15 @@ export class UserEditorCard extends LitElement {
                   type="password"
                   value=${this.data.old_code || ''}
                   @input=${(ev: Event) =>
-                    (this.data = { ...this.data!, old_code: String((ev.target as HTMLInputElement).value).trim() })}
+            (this.data = { ...this.data!, old_code: String((ev.target as HTMLInputElement).value).trim() })}
                 ></ha-textfield>
-              </settings-row>
+              </alarmo-settings-row>
             `
-          : ''}
+        : ''}
         ${this.item && !this.data.old_code?.length
-          ? ''
-          : html`
-              <settings-row .narrow=${this.narrow}>
+        ? ''
+        : html`
+              <alarmo-settings-row .narrow=${this.narrow}>
                 <span slot="heading">
                   ${localize('panels.codes.cards.new_user.fields.code.heading', this.hass.language)}
                 </span>
@@ -125,11 +125,11 @@ export class UserEditorCard extends LitElement {
                   type="password"
                   value=${this.data.code}
                   @input=${(ev: Event) =>
-                    (this.data = { ...this.data!, code: String((ev.target as HTMLInputElement).value).trim() })}
+            (this.data = { ...this.data!, code: String((ev.target as HTMLInputElement).value).trim() })}
                 ></ha-textfield>
-              </settings-row>
+              </alarmo-settings-row>
 
-              <settings-row .narrow=${this.narrow}>
+              <alarmo-settings-row .narrow=${this.narrow}>
                 <span slot="heading">
                   ${localize('panels.codes.cards.new_user.fields.confirm_code.heading', this.hass.language)}
                 </span>
@@ -144,10 +144,10 @@ export class UserEditorCard extends LitElement {
                   value=${this.repeatCode || ''}
                   @input=${(ev: Event) => (this.repeatCode = String((ev.target as HTMLInputElement).value).trim())}
                 ></ha-textfield>
-              </settings-row>
+              </alarmo-settings-row>
             `}
 
-        <settings-row .narrow=${this.narrow}>
+        <alarmo-settings-row .narrow=${this.narrow}>
           <span slot="heading">
             ${localize('panels.codes.cards.new_user.fields.can_arm.heading', this.hass.language)}
           </span>
@@ -159,9 +159,9 @@ export class UserEditorCard extends LitElement {
             ?checked=${this.data.can_arm}
             @change=${(ev: Event) => (this.data = { ...this.data!, can_arm: (ev.target as HTMLInputElement).checked })}
           ></ha-switch>
-        </settings-row>
+        </alarmo-settings-row>
 
-        <settings-row .narrow=${this.narrow}>
+        <alarmo-settings-row .narrow=${this.narrow}>
           <span slot="heading">
             ${localize('panels.codes.cards.new_user.fields.can_disarm.heading', this.hass.language)}
           </span>
@@ -172,13 +172,13 @@ export class UserEditorCard extends LitElement {
           <ha-switch
             ?checked=${this.data.can_disarm}
             @change=${(ev: Event) =>
-              (this.data = { ...this.data!, can_disarm: (ev.target as HTMLInputElement).checked })}
+        (this.data = { ...this.data!, can_disarm: (ev.target as HTMLInputElement).checked })}
           ></ha-switch>
-        </settings-row>
+        </alarmo-settings-row>
 
         ${this.getAreaOptions().length >= 2
-          ? html`
-              <settings-row .narrow=${this.narrow}>
+        ? html`
+              <alarmo-settings-row .narrow=${this.narrow}>
                 <span slot="heading">
                   ${localize('panels.codes.cards.new_user.fields.area_limit.heading', this.hass.language)}
                 </span>
@@ -188,12 +188,12 @@ export class UserEditorCard extends LitElement {
 
                 <div class="checkbox-list">
                   ${this.getAreaOptions().map(e => {
-                    const checked = (this.data.area_limit || []).includes(e.value) || !this.data.area_limit?.length;
-                    return html`
+          const checked = (this.data.area_limit || []).includes(e.value) || !this.data.area_limit?.length;
+          return html`
                       <div>
                         <ha-checkbox
                           @change=${(ev: Event) =>
-                            this.toggleSelectArea(e.value, (ev.target as HTMLInputElement).checked)}
+              this.toggleSelectArea(e.value, (ev.target as HTMLInputElement).checked)}
                           ?disabled=${checked && (this.data.area_limit || []).length <= 1}
                           ?checked=${checked}
                         ></ha-checkbox>
@@ -202,13 +202,13 @@ export class UserEditorCard extends LitElement {
                         </span>
                       </div>
                     `;
-                  })}
+        })}
                 </div>
-              </settings-row>
+              </alarmo-settings-row>
             `
-          : ''}
+        : ''}
 
-        <settings-row .narrow=${this.narrow}>
+        <alarmo-settings-row .narrow=${this.narrow}>
           <span slot="heading">
             ${localize('panels.codes.cards.new_user.fields.is_override_code.heading', this.hass.language)}
           </span>
@@ -219,9 +219,9 @@ export class UserEditorCard extends LitElement {
           <ha-switch
             ?checked=${this.data.is_override_code}
             @change=${(ev: Event) =>
-              (this.data = { ...this.data!, is_override_code: (ev.target as HTMLInputElement).checked })}
+        (this.data = { ...this.data!, is_override_code: (ev.target as HTMLInputElement).checked })}
           ></ha-switch>
-        </settings-row>
+        </alarmo-settings-row>
 
         <div class="card-actions">
           <mwc-button @click=${this.saveClick}>
@@ -229,12 +229,12 @@ export class UserEditorCard extends LitElement {
           </mwc-button>
 
           ${this.item
-            ? html`
+        ? html`
                 <mwc-button class="warning" @click=${this.deleteClick}>
                   ${this.hass.localize('ui.common.delete')}
                 </mwc-button>
               `
-            : ''}
+        : ''}
         </div>
       </ha-card>
     `;
@@ -260,8 +260,8 @@ export class UserEditorCard extends LitElement {
         ? areaLimit
         : [...areaLimit, id]
       : areaLimit.includes(id)
-      ? areaLimit.filter(e => e != id)
-      : areaLimit;
+        ? areaLimit.filter(e => e != id)
+        : areaLimit;
     this.data = { ...this.data, area_limit: areaLimit };
   }
 

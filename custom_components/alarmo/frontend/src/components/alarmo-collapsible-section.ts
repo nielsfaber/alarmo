@@ -2,8 +2,8 @@ import { LitElement, html, css, CSSResultGroup } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 import { mdiChevronDown, mdiChevronUp, mdiChevronRight } from '@mdi/js';
 
-@customElement('collapsible-section')
-export class CollapsibleSection extends LitElement {
+@customElement('alarmo-collapsible-section')
+export class AlarmoCollapsibleSection extends LitElement {
   @property({ type: Boolean, reflect: true })
   public narrow!: boolean;
 

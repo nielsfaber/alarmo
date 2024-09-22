@@ -1,8 +1,8 @@
 import { LitElement, html, css, CSSResultGroup, TemplateResult } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 
-@customElement('settings-row')
-export class SettingsRow extends LitElement {
+@customElement('alarmo-settings-row')
+export class AlarmoSettingsRow extends LitElement {
   @property({ type: Boolean, reflect: true })
   public narrow!: boolean;
 
