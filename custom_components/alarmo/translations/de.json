@@ -1,0 +1,75 @@
+{
+  "services": {
+    "arm": {
+      "name": "Scharf",
+      "description": "Eine Alarmo-Entität mit benutzerdefinierten Einstellungen scharf schalten.",
+      "fields": {
+        "entity_id": {
+          "name": "Entitäts-ID",
+          "description": "Alarmentität, die scharf geschaltet werden soll."
+        },
+        "code": {
+          "name": "Code",
+          "description": "Code, der für das Scharfschalten verwendet werden soll."
+        },
+        "mode": {
+          "name": "Modus",
+          "description": "Modus, in dem der Alarm scharf geschaltet werden soll."
+        },
+        "skip_delay": {
+          "name": "Verzögerung überspringen",
+          "description": "Die Ausgangsverzögerung überspringen."
+        },
+        "force": {
+          "name": "Erzwingen",
+          "description": "Automatisch alle Sensoren umgehen, die den Scharfschaltungsvorgang verhindern."
+        }
+      }
+    },
+    "disarm": {
+      "name": "Unscharf",
+      "description": "Eine Alarmo-Entität unscharf schalten.",
+      "fields": {
+        "entity_id": {
+          "name": "Entitäts-ID",
+          "description": "Alarmentität, die unscharf geschaltet werden soll."
+        },
+        "code": {
+          "name": "Code",
+          "description": "Code, der für das Unscharfschalten verwendet werden soll."
+        }
+      }
+    },
+    "enable_user": {
+      "name": "Benutzer aktivieren",
+      "description": "Einem Benutzer erlauben, Alarmo scharf/unscharf zu schalten.",
+      "fields": {
+        "name": {
+          "name": "Name",
+          "description": "Name des zu aktivierenden Benutzers."
+        }
+      }
+    },
+    "disable_user": {
+      "name": "Benutzer deaktivieren",
+      "description": "Einem Benutzer das Scharf/Unscharfschalten von Alarmo verbieten.",
+      "fields": {
+        "name": {
+          "name": "Name",
+          "description": "Name des zu deaktivierenden Benutzers."
+        }
+      }
+    }
+  },
+  "selector": {
+    "arm_mode": {
+      "options": {
+        "away": "Abwesend scharf",
+        "night": "Nachts scharf",
+        "home": "Zuhause scharf",
+        "vacation": "Urlaub scharf",
+        "custom": "Benutzerdefinierter Modus scharf"
+      }
+    }
+  }
+}
