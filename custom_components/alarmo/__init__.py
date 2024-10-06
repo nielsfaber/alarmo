@@ -1,5 +1,7 @@
 """The Alarmo Integration."""
 import logging
+import secrets
+import blake3
 import bcrypt
 import base64
 import re
@@ -249,11 +251,11 @@ class AlarmoCoordinator(DataUpdateCoordinator):
         if ATTR_CODE in data and data[ATTR_CODE]:
             data[const.ATTR_CODE_FORMAT] = "number" if data[ATTR_CODE].isdigit() else "text"
             data[const.ATTR_CODE_LENGTH] = len(data[ATTR_CODE])
-            hashed = bcrypt.hashpw(
-                data[ATTR_CODE].encode("utf-8"), bcrypt.gensalt(rounds=12)
-            )
-            hashed = base64.b64encode(hashed)
-            data[ATTR_CODE] = hashed.decode()
+            data[const.ATTR_CODE_HASH_ALGORITHM] = const.HASH_ALGORITHM_BLAKE3
+            salt = secrets.token_bytes()
+            data[const.ATTR_CODE_SALT] = salt.hex()
+            hasher = blake3.blake3(data[ATTR_CODE].encode("utf-8")).update(salt)
+            data[ATTR_CODE] = hasher.hexdigest()
 
         if not user_id:
             self.store.async_create_user(data)
@@ -277,16 +279,25 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                 user_id: self.store.async_get_user(user_id)
             }
 
+        hasher = blake3.blake3()
         for (user_id, user) in users.items():
+            hasher.reset()
             if not user[const.ATTR_ENABLED]:
                 continue
             elif not user[ATTR_CODE] and not code:
                 return user
             elif user[ATTR_CODE]:
-                hash = base64.b64decode(user[ATTR_CODE])
-                if bcrypt.checkpw(code.encode("utf-8"), hash):
+                if user[const.ATTR_CODE_HASH_ALGORITHM] == const.HASH_ALGORITHM_BLAKE3:
+                    hashed_code = hasher.update(code.encode("utf-8")).update(bytes.fromhex(user[const.ATTR_CODE_SALT])).hexdigest()
+                    if user[ATTR_CODE] == hashed_code:
+                        return user
+                elif bcrypt.checkpw(code.encode("utf-8"), base64.b64decode(user[ATTR_CODE])):
+                    user[const.ATTR_CODE_HASH_ALGORITHM] = const.HASH_ALGORITHM_BLAKE3
+                    salt = secrets.token_bytes()
+                    user[const.ATTR_CODE_SALT] = salt.hex()
+                    user[ATTR_CODE] = hasher.update(code.encode("utf-8")).update(salt).hexdigest()
+                    self.store.async_update_user(user_id, user)
                     return user
-
         return
 
     def async_update_automation_config(self, automation_id: str = None, data: dict = {}):
