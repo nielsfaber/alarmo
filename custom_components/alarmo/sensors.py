@@ -25,6 +25,8 @@ from homeassistant.const import (
     STATE_CLOSED,
     STATE_ON,
     STATE_OFF,
+    STATE_LOCKED,
+    STATE_UNLOCKED,
     STATE_ALARM_PENDING,
     STATE_ALARM_ARMING,
     STATE_ALARM_TRIGGERED,
@@ -32,9 +34,6 @@ from homeassistant.const import (
     ATTR_LAST_TRIP_TIME,
     ATTR_NAME,
 )
-
-
-from homeassistant.components.lock import LockState
 
 from . import const
 
@@ -53,8 +52,8 @@ ATTR_EVENT_COUNT = "event_count"
 ATTR_ENTITIES = "entities"
 ATTR_NEW_ENTITY_ID = "new_entity_id"
 
-SENSOR_STATES_OPEN = [STATE_ON, STATE_OPEN, LockState.UNLOCKED]
-SENSOR_STATES_CLOSED = [STATE_OFF, STATE_CLOSED, LockState.LOCKED]
+SENSOR_STATES_OPEN = [STATE_ON, STATE_OPEN, STATE_UNLOCKED]
+SENSOR_STATES_CLOSED = [STATE_OFF, STATE_CLOSED, STATE_LOCKED]
 
 
 SENSOR_TYPE_DOOR = "door"
@@ -264,7 +263,7 @@ class SensorHandler:
                 else:
                     open_sensors[entity] = sensor_state
 
-        return (open_sensors, bypassed_sensors)
+        return (open_sensors, bypassed_sensors, sensors_list)
 
     @callback
     def async_sensor_state_changed(self, event):
@@ -426,7 +425,7 @@ class SensorHandler:
             arm_modes.remove(alarm_entity.arm_mode)
 
         def arm_mode_is_ready(mode):
-            (blocking_sensors, _bypassed_sensors) = self.validate_arming_event(area_id, mode)
+            (blocking_sensors, _bypassed_sensors, _active_sensors) = self.validate_arming_event(area_id, mode)
             result = not(len(blocking_sensors))
             return result
 

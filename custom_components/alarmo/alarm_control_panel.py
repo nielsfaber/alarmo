@@ -118,6 +118,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
         self._changed_by = None
         self._open_sensors = {}
         self._bypassed_sensors = []
+        self.active_sensors = []
         self._delay = None
         self.expiration = None
         self.area_id = None
@@ -257,6 +258,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             "next_state": self.next_state,
             "open_sensors": self.open_sensors,
             "bypassed_sensors": self.bypassed_sensors,
+            "active_sensors": self.active_sensors,
             "delay": self.delay,
         }
 
@@ -352,6 +354,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
         else:
             self.open_sensors = None
             self.bypassed_sensors = None
+            self.active_sensors = None
             self.async_update_state(STATE_ALARM_DISARMED)
             if self.changed_by:
                 _LOGGER.info("Alarm '{}' is disarmed by {}.".format(self.name, self.changed_by))
@@ -438,6 +441,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             self._revert_state = STATE_ALARM_DISARMED
             self.open_sensors = None
             self.bypassed_sensors = None
+            self.active_sensors = None
 
         self.async_arm(
             arm_mode,
@@ -504,6 +508,8 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
                 self.open_sensors = state.attributes["open_sensors"]
             if "bypassed_sensors" in state.attributes:
                 self._bypassed_sensors = state.attributes["bypassed_sensors"]
+            if "actve_sensors" in state.attributes:
+                self.active_sensors = state.attributes["active_sensors"]
 
     async def async_will_remove_from_hass(self):
         await super().async_will_remove_from_hass()
@@ -624,6 +630,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
     def async_arm_failure(self, open_sensors: dict, context_id=None):
         """handle arm failure."""
         self._open_sensors = open_sensors
+        self.active_sensors = None
         command = self._arm_mode.replace("armed", "arm")
 
         if self._state != self._revert_state and self._revert_state:
@@ -662,11 +669,14 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
         if skip_delay or not exit_delay:
             # immediate arm event
 
-            (open_sensors, bypassed_sensors) = self.hass.data[const.DOMAIN]["sensor_handler"].validate_arming_event(
+            (open_sensors, bypassed_sensors, active_sensors) = self.hass.data[const.DOMAIN]["sensor_handler"].validate_arming_event(
                 area_id=self.area_id,
                 target_state=arm_mode,
                 bypass_open_sensors=bypass_open_sensors
             )
+            
+            if active_sensors:
+                self.active_sensors = active_sensors
 
             if open_sensors:
                 # there where errors -> abort the arm
@@ -701,7 +711,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
 
         else:  # normal arm event (from disarmed via arming)
 
-            (open_sensors, _bypassed_sensors) = self.hass.data[const.DOMAIN]["sensor_handler"].validate_arming_event(
+            (open_sensors, _bypassed_sensors, _active_sensors) = self.hass.data[const.DOMAIN]["sensor_handler"].validate_arming_event(
                 area_id=self.area_id,
                 target_state=arm_mode,
                 use_delay=True,
@@ -790,6 +800,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
                     self.async_clear_timer()
                     if self._config[const.ATTR_DISARM_AFTER_TRIGGER] or not self.arm_mode:
                         self.bypassed_sensors = None
+                        self.active_sensors = None
                         self.async_update_state(STATE_ALARM_DISARMED)
                     else:
                         self.open_sensors = None
