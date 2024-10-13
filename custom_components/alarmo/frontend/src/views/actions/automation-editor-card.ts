@@ -117,7 +117,7 @@ export class AutomationEditorCard extends LitElement {
       <div class="section-header">${localize('panels.actions.cards.new_notification.trigger', this.hass.language)}</div>
       <ha-card>
         <div class="card-content">
-          <settings-row .narrow=${this.narrow} .large=${true} first>
+          <alarmo-settings-row .narrow=${this.narrow} .large=${true} first>
             <span slot="heading">
               ${localize('panels.actions.cards.new_action.fields.event.heading', this.hass.language)}
             </span>
@@ -134,11 +134,11 @@ export class AutomationEditorCard extends LitElement {
               @value-changed=${this._setEvent}
               ?invalid=${this.errors.event}
             ></alarmo-select>
-          </settings-row>
+          </alarmo-settings-row>
 
           ${Object.keys(this.areas).length > 1
         ? html`
-                <settings-row .narrow=${this.narrow} .large=${true}>
+                <alarmo-settings-row .narrow=${this.narrow} .large=${true}>
                   <span slot="heading">
                     ${localize('panels.actions.cards.new_action.fields.area.heading', this.hass.language)}
                   </span>
@@ -157,11 +157,11 @@ export class AutomationEditorCard extends LitElement {
                     @value-changed=${this._setArea}
                     ?invalid=${this.errors.area}
                   ></alarmo-select>
-                </settings-row>
+                </alarmo-settings-row>
               `
         : ''}
 
-          <settings-row .narrow=${this.narrow} .large=${true} last>
+          <alarmo-settings-row .narrow=${this.narrow} .large=${true} last>
             <span slot="heading">
               ${localize('panels.actions.cards.new_notification.fields.mode.heading', this.hass.language)}
             </span>
@@ -179,7 +179,7 @@ export class AutomationEditorCard extends LitElement {
               @value-changed=${this._setModes}
               ?invalid=${this.errors.modes}
             ></alarmo-selector>
-          </settings-row>
+          </alarmo-settings-row>
         </div>
       </ha-card>
 
@@ -188,7 +188,7 @@ export class AutomationEditorCard extends LitElement {
         <div class="card-content">
           ${this.viewMode == ViewMode.UI
         ? html`
-                <settings-row .narrow=${this.narrow} .large=${true} first>
+                <alarmo-settings-row .narrow=${this.narrow} .large=${true} first>
                   <span slot="heading">
                     ${localize('panels.actions.cards.new_action.fields.entity.heading', this.hass.language)}
                   </span>
@@ -205,11 +205,11 @@ export class AutomationEditorCard extends LitElement {
                     @value-changed=${this._setEntity}
                     ?invalid=${this.errors.entity_id}
                   ></alarmo-selector>
-                </settings-row>
+                </alarmo-settings-row>
 
                 ${this._getEntities().length
             ? html`
-                      <settings-row .narrow=${this.narrow} .large=${true}>
+                      <alarmo-settings-row .narrow=${this.narrow} .large=${true}>
                         <span slot="heading">
                           ${localize('panels.actions.cards.new_action.fields.action.heading', this.hass.language)}
                         </span>
@@ -231,7 +231,7 @@ export class AutomationEditorCard extends LitElement {
                               </span>
                             `
                 : ''}
-                      </settings-row>
+                      </alarmo-settings-row>
                     `
             : ''}
               `
@@ -277,7 +277,7 @@ export class AutomationEditorCard extends LitElement {
       <div class="section-header">${localize('panels.actions.cards.new_notification.options', this.hass.language)}</div>
       <ha-card>
         <div class="card-content">
-          <settings-row .narrow=${this.narrow} .large=${true} first>
+          <alarmo-settings-row .narrow=${this.narrow} .large=${true} first>
             <span slot="heading">
               ${localize('panels.actions.cards.new_action.fields.name.heading', this.hass.language)}
             </span>
@@ -292,11 +292,11 @@ export class AutomationEditorCard extends LitElement {
               @input=${this._setName}
               ?invalid=${this.errors.name}
             ></ha-textfield>
-          </settings-row>
+          </alarmo-settings-row>
 
           ${this.item?.automation_id
         ? html`
-                <settings-row .narrow=${this.narrow}>
+                <alarmo-settings-row .narrow=${this.narrow}>
                   <span slot="heading">
                     ${localize('panels.actions.cards.new_notification.fields.delete.heading', this.hass.language)}
                   </span>
@@ -309,7 +309,7 @@ export class AutomationEditorCard extends LitElement {
                       ${this.hass.localize('ui.common.delete')}
                     </mwc-button>
                   </div>
-                </settings-row>
+                </alarmo-settings-row>
               `
         : ''}
         </div>

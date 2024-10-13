@@ -13,6 +13,7 @@ import { Option } from '../components/alarmo-select';
 
 import '../components/alarmo-chip-set';
 import '../components/alarmo-select';
+import '../components/alarmo-time-slider';
 
 @customElement('create-sensor-group-dialog')
 export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
@@ -81,7 +82,7 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
           </span>
         </ha-dialog-header>
         <div class="wrapper">
-          <settings-row dialog>
+          <alarmo-settings-row dialog>
             <span slot="heading">
               ${localize('panels.sensors.dialogs.create_group.fields.name.heading', this.hass.language)}
             </span>
@@ -94,9 +95,9 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
         (this.data = { ...this.data, name: String((ev.target as HTMLInputElement).value).trim() })}
               value="${this.data.name}"
             ></ha-textfield>
-          </settings-row>
+          </alarmo-settings-row>
 
-          <settings-row large dialog>
+          <alarmo-settings-row large dialog>
             <span slot="heading">
               ${localize('panels.sensors.dialogs.create_group.fields.sensors.heading', this.hass.language)}
             </span>
@@ -106,28 +107,28 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
             <div>
               ${this.renderSensorOptions()}
             </div>
-          </settings-row>
+          </alarmo-settings-row>
 
-          <settings-row dialog>
+          <alarmo-settings-row dialog>
             <span slot="heading">
               ${localize('panels.sensors.dialogs.create_group.fields.timeout.heading', this.hass.language)}
             </span>
             <span slot="description">
               ${localize('panels.sensors.dialogs.create_group.fields.timeout.description', this.hass.language)}
             </span>
-            <time-slider
+            <alarmo-time-slider
               .hass=${this.hass}
               min="10"
               max="900"
               .value=${this.data.timeout}
               @value-changed=${(ev: CustomEvent) =>
         (this.data = { ...this.data, timeout: (ev.detail as any).value })}
-            ></time-slider>
-          </settings-row>
+            ></alarmo-time-slider>
+          </alarmo-settings-row>
 
-          ${this.data.entities.length > 2 
-          ? html`
-          <settings-row dialog>
+          ${this.data.entities.length > 2
+        ? html`
+          <alarmo-settings-row dialog>
             <span slot="heading">
               ${localize('panels.sensors.dialogs.create_group.fields.event_count.heading', this.hass.language)}
             </span>
@@ -141,10 +142,10 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
               @value-changed=${(ev: CustomEvent) => { this.data = { ...this.data, event_count: Number(ev.detail.value) } }}
               .value=${String(this.data.event_count > this.data.entities.length ? this.data.entities.length : this.data.event_count)}
             ></alarmo-select>
-          </settings-row>
+          </alarmo-settings-row>
           `
-          : ''
-          }
+        : ''
+      }
         </div>
         <mwc-button slot="secondaryAction" @click=${this.saveClick}>
           ${this.hass.localize('ui.common.save')}

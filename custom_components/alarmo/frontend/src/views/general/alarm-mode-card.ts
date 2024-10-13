@@ -10,12 +10,12 @@ import { handleError } from '../../helpers';
 import { SubscribeMixin } from '../../subscribe-mixin';
 import { EArmModeIcons } from '../../const';
 
-import '../../components/time-slider';
+import '../../components/alarmo-time-slider';
 import '../../components/alarmo-select';
 import '../../components/alarmo-collapsible';
 
 import { exportPath } from '../../common/navigation';
-import { ETimeUnits } from '../../components/time-slider';
+import { ETimeUnits } from '../../components/alarmo-time-slider';
 
 @customElement('alarm-mode-card')
 export class AlarmModeCard extends SubscribeMixin(LitElement) {
@@ -73,7 +73,7 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
           </div>
 
           ${Object.keys(this.areas).length > 1
-            ? html`
+        ? html`
                 <alarmo-select
                   .items=${Object.values(this.areas).map(e => Object({ value: e.area_id, name: e.name }))}
                   value=${this.selectedArea}
@@ -81,7 +81,7 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
                   @value-changed=${(ev: Event) => this.selectArea((ev.target as HTMLInputElement).value)}
                 ></alarmo-select>
               `
-            : ''}
+        : ''}
         </div>
         <div class="card-content">
           ${localize('panels.general.cards.modes.description', this.hass.language)}
@@ -89,8 +89,8 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
 
         <alarmo-collapsible-group>
           ${Object.entries(EArmModes).map(
-            ([k, mode]) =>
-              html`
+          ([k, mode]) =>
+            html`
                 <alarmo-collapsible-item>
                   <alarmo-collapsible-header>
                     <ha-icon slot="icon" icon="${EArmModeIcons[k]}"></ha-icon>
@@ -99,18 +99,18 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
                     </span>
                     <span slot="description">
                       ${this.data[mode]?.enabled
-                        ? html`
+                ? html`
                             ${localize('common.enabled', this.hass.language)},
                             <a href="${exportPath('sensors', { filter: { area: this.selectedArea, mode: mode } })}">
                               ${localize(
-                                'panels.general.cards.modes.number_sensors_active',
-                                this.hass!.language,
-                                'number',
-                                this.getSensorsByMode(mode)
-                              )}
+                  'panels.general.cards.modes.number_sensors_active',
+                  this.hass!.language,
+                  'number',
+                  this.getSensorsByMode(mode)
+                )}
                             </a>
                           `
-                        : localize('common.disabled', this.hass.language)}
+                : localize('common.disabled', this.hass.language)}
                     </span>
                   </alarmo-collapsible-header>
                   <alarmo-collapsible-body>
@@ -118,7 +118,7 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
                   </alarmo-collapsible-body>
                 </alarmo-collapsible-item>
               `
-          )}
+        )}
         </alarmo-collapsible-group>
       </ha-card>
     `;
@@ -136,7 +136,7 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
         <ha-icon icon="mdi:information-outline"></ha-icon>
         ${localize(`panels.general.cards.modes.modes.${mode}`, this.hass.language)}
       </div>
-      <settings-row .narrow=${this.narrow}>
+      <alarmo-settings-row .narrow=${this.narrow}>
         <span slot="heading">
           ${localize('panels.general.cards.modes.fields.status.heading', this.hass.language)}
         </span>
@@ -156,65 +156,65 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
             ${localize('common.disabled', this.hass.language)}
           </mwc-button>
         </div>
-      </settings-row>
-      <settings-row .narrow=${this.narrow}>
+      </alarmo-settings-row>
+      <alarmo-settings-row .narrow=${this.narrow}>
         <span slot="heading">
           ${localize('panels.general.cards.modes.fields.exit_delay.heading', this.hass.language)}
         </span>
         <span slot="description">
           ${localize('panels.general.cards.modes.fields.exit_delay.description', this.hass.language)}
         </span>
-        <time-slider
+        <alarmo-time-slider
           .hass=${this.hass}
           max="300"
           zeroValue=${localize('components.time_slider.none', this.hass.language)}
           value=${config?.exit_time || 0}
           @value-changed=${(ev: CustomEvent) =>
-            this.saveData(mode, {
-              exit_time: (ev.detail as any).value,
-            })}
+        this.saveData(mode, {
+          exit_time: (ev.detail as any).value,
+        })}
           ?disabled=${!config?.enabled}
-        ></time-slider>
-      </settings-row>
-      <settings-row .narrow=${this.narrow}>
+        ></alarmo-time-slider>
+      </alarmo-settings-row>
+      <alarmo-settings-row .narrow=${this.narrow}>
         <span slot="heading">
           ${localize('panels.general.cards.modes.fields.entry_delay.heading', this.hass.language)}
         </span>
         <span slot="description">
           ${localize('panels.general.cards.modes.fields.entry_delay.description', this.hass.language)}
         </span>
-        <time-slider
+        <alarmo-time-slider
           .hass=${this.hass}
           max="300"
           zeroValue=${localize('components.time_slider.none', this.hass.language)}
           value=${config?.entry_time || 0}
           @value-changed=${(ev: CustomEvent) =>
-            this.saveData(mode, {
-              entry_time: (ev.detail as any).value,
-            })}
+        this.saveData(mode, {
+          entry_time: (ev.detail as any).value,
+        })}
           ?disabled=${!config?.enabled}
-        ></time-slider>
-      </settings-row>
-      <settings-row .narrow=${this.narrow}>
+        ></alarmo-time-slider>
+      </alarmo-settings-row>
+      <alarmo-settings-row .narrow=${this.narrow}>
         <span slot="heading">
           ${localize('panels.general.cards.modes.fields.trigger_time.heading', this.hass.language)}
         </span>
         <span slot="description">
           ${localize('panels.general.cards.modes.fields.trigger_time.description', this.hass.language)}
         </span>
-        <time-slider
+        <alarmo-time-slider
           .hass=${this.hass}
           max="3600"
           step="60"
           zeroValue=${localize('components.time_slider.infinite', this.hass.language)}
           value=${config?.trigger_time || 0}
           @value-changed=${(ev: CustomEvent) =>
-            this.saveData(mode, {
-              trigger_time: (ev.detail as any).value,
-            })}
+        this.saveData(mode, {
+          trigger_time: (ev.detail as any).value,
+        })}
           ?disabled=${!config?.enabled}
-        ></time-slider>
-      </settings-row>
+        ></alarmo-time-slider>
+      </alarmo-settings-row>
     `;
   }
 

@@ -15,6 +15,8 @@ import { SubscribeMixin } from '../../subscribe-mixin';
 import '../../dialogs/error-dialog';
 import '../../dialogs/manage-sensor-groups-dialog';
 import '../../components/alarmo-select';
+import '../../components/alarmo-collapsible-section';
+
 import { exportPath } from '../../common/navigation';
 import { fireEvent } from '../../fire_event';
 @customElement('sensor-editor-card')
@@ -60,17 +62,17 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
     this.data = Object.keys(sensors).includes(this.item) ? sensors[this.item] : undefined;
     if (this.data && !this.data?.area && Object.keys(areas).length == 1)
       this.data = { ...this.data, area: Object.keys(this.areas)[0] };
-      
+
     let sensorsList = getConfigurableSensors(this.hass, Object.keys(sensors), true);
     this.sensorsList = sensorsList.map(e => Object({ ...e, description: e.id, value: e.id }));
 
-    if(!this.hass.states[this.item]) this.entityIdUnlocked = true;
+    if (!this.hass.states[this.item]) this.entityIdUnlocked = true;
   }
 
   render() {
     if (!this.data) return html``;
     let sensorsList = [...this.sensorsList];
-    if(!sensorsList.find(e => e.value == this.data!.entity_id)) {
+    if (!sensorsList.find(e => e.value == this.data!.entity_id)) {
       sensorsList = [<Option>{
         value: this.data!.entity_id,
         description: this.data!.entity_id,
@@ -89,14 +91,14 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
         </div>
         <div class="card-content">
           ${localize(
-            'panels.sensors.cards.editor.description',
-            this.hass.language,
-            '{entity}',
-            computeName(this.hass.states[this.item])
-          )}
+      'panels.sensors.cards.editor.description',
+      this.hass.language,
+      '{entity}',
+      computeName(this.hass.states[this.item])
+    )}
         </div>
 
-        <settings-row .narrow=${this.narrow} .large=${true}>
+        <alarmo-settings-row .narrow=${this.narrow} .large=${true}>
           <span slot="heading">
             ${localize('panels.sensors.cards.editor.fields.entity.heading', this.hass.language)}
           </span>
@@ -110,7 +112,7 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
               .items=${sensorsList}
               .value=${this.data!.entity_id}
               label="${localize('panels.sensors.cards.editor.fields.entity.heading', this.hass.language)}"
-              @value-changed=${(ev: Event) => {(this.data = { ...this.data!, new_entity_id: (ev.target as HTMLInputElement).value })}}
+              @value-changed=${(ev: Event) => { (this.data = { ...this.data!, new_entity_id: (ev.target as HTMLInputElement).value }) }}
               ?disabled=${!this.entityIdUnlocked}
               ?icons=${true}
               ?invalid=${this.hass.states[this.data.new_entity_id || this.data.entity_id] === undefined}
@@ -118,18 +120,18 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
 
             <ha-icon-button
               .path=${this.entityIdUnlocked ? mdiLock : mdiLockOpen}
-              @click=${() => {this.entityIdUnlocked = !this.entityIdUnlocked}}
+              @click=${() => { this.entityIdUnlocked = !this.entityIdUnlocked }}
               style="--mdc-icon-size: 20px; --mdc-icon-button-size: 48px"
             >
 
             </ha-icon-button>
           </div>
-        </settings-row>
+        </alarmo-settings-row>
 
 
         ${Object.keys(this.areas).length > 1
-          ? html`
-              <settings-row .narrow=${this.narrow}>
+        ? html`
+              <alarmo-settings-row .narrow=${this.narrow}>
                 <span slot="heading">
                   ${localize('panels.sensors.cards.editor.fields.area.heading', this.hass.language)}
                 </span>
@@ -142,14 +144,14 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
                   value=${this.data.area}
                   label=${localize('panels.sensors.cards.editor.fields.area.heading', this.hass.language)}
                   @value-changed=${(ev: Event) =>
-                    (this.data = { ...this.data!, area: (ev.target as HTMLInputElement).value })}
+            (this.data = { ...this.data!, area: (ev.target as HTMLInputElement).value })}
                   ?invalid=${!this.data.area}
                 ></alarmo-select>
-              </settings-row>
+              </alarmo-settings-row>
             `
-          : ''}
+        : ''}
 
-        <settings-row .narrow=${this.narrow} .large=${true}>
+        <alarmo-settings-row .narrow=${this.narrow} .large=${true}>
           <span slot="heading">
             ${localize('panels.sensors.cards.editor.fields.device_type.heading', this.hass.language)}
           </span>
@@ -165,11 +167,11 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
             icons=${true}
             value=${this.data['type']}
             @value-changed=${(ev: Event) =>
-              this.setType(((ev.target as HTMLInputElement).value || ESensorTypes.Other) as ESensorTypes)}
+        this.setType(((ev.target as HTMLInputElement).value || ESensorTypes.Other) as ESensorTypes)}
           ></alarmo-select>
-        </settings-row>
+        </alarmo-settings-row>
 
-        <settings-row .narrow=${this.narrow} .large=${this.modesByArea(this.data.area).length > 3}>
+        <alarmo-settings-row .narrow=${this.narrow} .large=${this.modesByArea(this.data.area).length > 3}>
           <span slot="heading">
             ${localize('panels.sensors.cards.editor.fields.modes.heading', this.hass.language)}
           </span>
@@ -179,23 +181,23 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
 
           <div>
             ${this.modesByArea(this.data.area).map(
-              el => html`
+          el => html`
                 <mwc-button
                   class="${this.data!.modes.includes(el) || this.data!.always_on ? 'active' : ''}"
                   @click=${() => {
-                    this.setMode(el);
-                  }}
+              this.setMode(el);
+            }}
                   ?disabled=${this.data!.always_on}
                 >
                   <ha-icon icon="${EArmModeIcons[Object.entries(EArmModes).find(([, v]) => v == el)![0]]}"></ha-icon>
                   ${localize(`common.modes_short.${el}`, this.hass.language)}
                 </mwc-button>
               `
-            )}
+        )}
           </div>
-        </settings-row>
+        </alarmo-settings-row>
 
-        <settings-row .narrow=${this.narrow}>
+        <alarmo-settings-row .narrow=${this.narrow}>
           <span slot="heading">
             ${localize('panels.sensors.cards.editor.fields.group.heading', this.hass.language)}
           </span>
@@ -205,31 +207,31 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
 
           <div>
             ${Object.keys(this.sensorGroups).length
-              ? html`
+        ? html`
                   <alarmo-select
                     .clearable=${true}
                     .items=${this.getSensorGroups()}
                     value=${this.data.group}
                     label="${localize('panels.sensors.cards.editor.fields.group.heading', this.hass.language)}"
                     @value-changed=${(ev: CustomEvent) => {
-                      this.data = { ...this.data!, group: ev.detail.value };
-                    }}
+            this.data = { ...this.data!, group: ev.detail.value };
+          }}
                   ></alarmo-select>
                 `
-              : ''}
+        : ''}
             <mwc-button @click=${this.manageGroupsClick}>
               ${localize('panels.sensors.cards.editor.actions.setup_groups', this.hass.language)}
             </mwc-button>
           </div>
-        </settings-row>
+        </alarmo-settings-row>
 
-        <collapsible-section
+        <alarmo-collapsible-section
           .narrow=${this.narrow}
           header=${localize('panels.sensors.cards.editor.actions.toggle_advanced', this.hass.language)}
         >
           ${!this.data.type || [ESensorTypes.Environmental, ESensorTypes.Other].includes(this.data.type)
-            ? html`
-                <settings-row .narrow=${this.narrow}>
+        ? html`
+                <alarmo-settings-row .narrow=${this.narrow}>
                   <span slot="heading">
                     ${localize('panels.sensors.cards.editor.fields.always_on.heading', this.hass.language)}
                   </span>
@@ -241,13 +243,13 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
                     ?checked=${this.data.always_on}
                     @change=${(ev: Event) => this._SetData({ always_on: (ev.target as HTMLInputElement).checked })}
                   ></ha-switch>
-                </settings-row>
+                </alarmo-settings-row>
               `
-            : ''}
+        : ''}
           ${!this.data.type ||
-          [ESensorTypes.Window, ESensorTypes.Door, ESensorTypes.Motion, ESensorTypes.Other].includes(this.data.type)
-            ? html`
-                <settings-row .narrow=${this.narrow}>
+        [ESensorTypes.Window, ESensorTypes.Door, ESensorTypes.Motion, ESensorTypes.Other].includes(this.data.type)
+        ? html`
+                <alarmo-settings-row .narrow=${this.narrow}>
                   <span slot="heading">
                     ${localize('panels.sensors.cards.editor.fields.use_exit_delay.heading', this.hass.language)}
                   </span>
@@ -260,11 +262,11 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
                     ?disabled=${this.data.always_on}
                     @change=${(ev: Event) => this._SetData({ use_exit_delay: (ev.target as HTMLInputElement).checked })}
                   ></ha-switch>
-                </settings-row>
+                </alarmo-settings-row>
 
                 ${this.data.type == ESensorTypes.Motion && this.data.use_exit_delay
-                  ? html`
-                      <settings-row .narrow=${this.narrow} nested>
+            ? html`
+                      <alarmo-settings-row .narrow=${this.narrow} nested>
                         <span slot="heading">
                           ${localize('panels.sensors.cards.editor.fields.allow_open.heading', this.hass.language)}
                         </span>
@@ -276,17 +278,17 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
                           ?checked=${this.data.allow_open}
                           ?disabled=${this.data.always_on || this.data.arm_on_close}
                           @change=${(ev: Event) =>
-                            this._SetData({ allow_open: (ev.target as HTMLInputElement).checked })}
+                this._SetData({ allow_open: (ev.target as HTMLInputElement).checked })}
                         ></ha-switch>
-                      </settings-row>
+                      </alarmo-settings-row>
                     `
-                  : ''}
-              `
             : ''}
+              `
+        : ''}
           ${!this.data.type ||
-          [ESensorTypes.Window, ESensorTypes.Door, ESensorTypes.Motion, ESensorTypes.Other].includes(this.data.type)
-            ? html`
-                <settings-row .narrow=${this.narrow}>
+        [ESensorTypes.Window, ESensorTypes.Door, ESensorTypes.Motion, ESensorTypes.Other].includes(this.data.type)
+        ? html`
+                <alarmo-settings-row .narrow=${this.narrow}>
                   <span slot="heading">
                     ${localize('panels.sensors.cards.editor.fields.use_entry_delay.heading', this.hass.language)}
                   </span>
@@ -298,14 +300,14 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
                     ?checked=${this.data.use_entry_delay}
                     ?disabled=${this.data.always_on}
                     @change=${(ev: Event) =>
-                      this._SetData({ use_entry_delay: (ev.target as HTMLInputElement).checked })}
+            this._SetData({ use_entry_delay: (ev.target as HTMLInputElement).checked })}
                   ></ha-switch>
-                </settings-row>
+                </alarmo-settings-row>
               `
-            : ''}
+        : ''}
           ${!this.data.type || [ESensorTypes.Door, ESensorTypes.Other].includes(this.data.type)
-            ? html`
-                <settings-row .narrow=${this.narrow}>
+        ? html`
+                <alarmo-settings-row .narrow=${this.narrow}>
                   <span slot="heading">
                     ${localize('panels.sensors.cards.editor.fields.arm_on_close.heading', this.hass.language)}
                   </span>
@@ -318,12 +320,12 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
                     ?disabled=${this.data.always_on}
                     @change=${(ev: Event) => this._SetData({ arm_on_close: (ev.target as HTMLInputElement).checked })}
                   ></ha-switch>
-                </settings-row>
+                </alarmo-settings-row>
               `
-            : ''}
+        : ''}
           ${!this.data.type || [ESensorTypes.Window, ESensorTypes.Door, ESensorTypes.Other].includes(this.data.type)
-            ? html`
-                <settings-row .narrow=${this.narrow}>
+        ? html`
+                <alarmo-settings-row .narrow=${this.narrow}>
                   <span slot="heading">
                     ${localize('panels.sensors.cards.editor.fields.auto_bypass.heading', this.hass.language)}
                   </span>
@@ -336,25 +338,25 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
                     ?disabled=${this.data.always_on}
                     @change=${(ev: Event) => this._SetData({ auto_bypass: (ev.target as HTMLInputElement).checked })}
                   ></ha-switch>
-                </settings-row>
+                </alarmo-settings-row>
 
                 ${this.data.auto_bypass
-                  ? html`
-                      <settings-row .narrow=${this.narrow} .large=${this.modesByArea(this.data.area).length > 2} nested>
+            ? html`
+                      <alarmo-settings-row .narrow=${this.narrow} .large=${this.modesByArea(this.data.area).length > 2} nested>
                         <span slot="heading">
                           ${localize('panels.sensors.cards.editor.fields.auto_bypass.modes', this.hass.language)}
                         </span>
                         <div>
                           ${this.modesByArea(this.data.area).map(
-                            el => html`
+              el => html`
                               <mwc-button
                                 class="${this.data!.auto_bypass_modes.includes(el) && this.data!.modes.includes(el)
-                                  ? 'active'
-                                  : ''}"
+                  ? 'active'
+                  : ''}"
                                 ?disabled=${!this.data!.modes.includes(el)}
                                 @click=${() => {
-                                  this.setBypassMode(el);
-                                }}
+                  this.setBypassMode(el);
+                }}
                               >
                                 <ha-icon
                                   icon="${EArmModeIcons[Object.entries(EArmModes).find(([, v]) => v == el)![0]]}"
@@ -362,17 +364,17 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
                                 ${localize(`common.modes_short.${el}`, this.hass.language)}
                               </mwc-button>
                             `
-                          )}
+            )}
                         </div>
-                      </settings-row>
+                      </alarmo-settings-row>
                     `
-                  : ''}
-              `
             : ''}
+              `
+        : ''}
 
         ${(!this.data.type || [ESensorTypes.Window, ESensorTypes.Door, ESensorTypes.Other].includes(this.data.type))
-          ? html`
-              <settings-row .narrow=${this.narrow}>
+        ? html`
+              <alarmo-settings-row .narrow=${this.narrow}>
                 <span slot="heading">
                   ${localize('panels.sensors.cards.editor.fields.allow_open.heading', this.hass.language)}
                 </span>
@@ -384,13 +386,13 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
                   ?checked=${this.data.allow_open}
                   ?disabled=${this.data.always_on || this.data.arm_on_close}
                   @change=${(ev: Event) =>
-                    this._SetData({ allow_open: (ev.target as HTMLInputElement).checked })}
+            this._SetData({ allow_open: (ev.target as HTMLInputElement).checked })}
                 ></ha-switch>
-              </settings-row>
+              </alarmo-settings-row>
             `
-          : ''}
+        : ''}
 
-          <settings-row .narrow=${this.narrow}>
+          <alarmo-settings-row .narrow=${this.narrow}>
             <span slot="heading">
               ${localize('panels.sensors.cards.editor.fields.trigger_unavailable.heading', this.hass.language)}
             </span>
@@ -402,8 +404,8 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
               ?checked=${this.data.trigger_unavailable}
               @change=${(ev: Event) => this._SetData({ trigger_unavailable: (ev.target as HTMLInputElement).checked })}
             ></ha-switch>
-          </settings-row>
-        </collapsible-section>
+          </alarmo-settings-row>
+        </alarmo-collapsible-section>
 
         <div class="card-actions">
           <mwc-button @click=${this.saveClick}>
@@ -453,7 +455,7 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
           break;
         case 'use_exit_delay':
           this.data = { ...this.data, use_exit_delay: val == true };
-          if(this.data.type === ESensorTypes.Motion && !val) this.data = {...this.data, allow_open: false};
+          if (this.data.type === ESensorTypes.Motion && !val) this.data = { ...this.data, allow_open: false };
           break;
         case 'arm_on_close':
           this.data = { ...this.data, arm_on_close: val == true };
@@ -515,7 +517,7 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
     if (!this.data) return;
     const errors: string[] = [];
 
-    if(this.data.new_entity_id && this.data.new_entity_id == this.data.entity_id) this.data = omit(this.data, 'new_entity_id');
+    if (this.data.new_entity_id && this.data.new_entity_id == this.data.entity_id) this.data = omit(this.data, 'new_entity_id');
 
     this.data = {
       ...this.data,
@@ -534,11 +536,11 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
           ${localize('panels.sensors.cards.editor.errors.description', this.hass.language)}
           <ul>
             ${errors.map(
-              e =>
-                html`
+          e =>
+            html`
                   <li>${e}</li>
                 `
-            )}
+        )}
           </ul>
         `
       );

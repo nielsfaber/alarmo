@@ -6,7 +6,7 @@ import { mdiPencil } from '@mdi/js';
 import { prettyPrint, sortAlphabetically } from '../../helpers';
 import { AlarmoConfig, Dictionary, AlarmoArea, AlarmoSensor, AlarmoAutomation, HomeAssistant } from '../../types';
 
-import '../../components/settings-row.ts';
+import '../../components/alarmo-settings-row';
 import '../../components/alarmo-table.ts';
 import '../../dialogs/create-area-dialog';
 
@@ -71,8 +71,8 @@ export class AreaConfigCard extends SubscribeMixin(LitElement) {
       const automations =
         Object.values(areas).length == 1
           ? Object.values(this.automations).filter(
-              e => e.triggers?.map(e => e.area).includes(item.area_id) || !e.triggers?.map(e => e.area).length
-            ).length
+            e => e.triggers?.map(e => e.area).includes(item.area_id) || !e.triggers?.map(e => e.area).length
+          ).length
           : Object.values(this.automations).filter(e => e.triggers?.map(e => e.area).includes(item.area_id)).length;
       const summary_sensors = `<a href="${exportPath('sensors', { filter: { area: item.area_id } })}">${localize(
         'panels.general.cards.areas.table.summary_sensors',

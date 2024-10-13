@@ -14,15 +14,15 @@ const round = (val: number, step: number) => {
 }
 
 const calcStepSize = (min: number, max: number) => {
-  const stepSizes = [10/60, 15/60, 20/60, 30/60, 1, 2, 5];
+  const stepSizes = [10 / 60, 15 / 60, 20 / 60, 30 / 60, 1, 2, 5];
   let range = max - min;
   let step = range / 12;
   step = stepSizes.reduce((prev, curr) => Math.abs(curr - step) < Math.abs(prev - step) ? curr : prev);
   return step;
 }
 
-@customElement('time-slider')
-export class TimeSlider extends LitElement {
+@customElement('alarmo-time-slider')
+export class AlarmoTimeSlider extends LitElement {
   hass?: HomeAssistant;
 
   @property({ type: Number })
@@ -53,7 +53,7 @@ export class TimeSlider extends LitElement {
   _step: number = 0;
 
   firstUpdated() {
-    if(this.value > 0 && this.value < 60) this.setUnit(ETimeUnits.Seconds);
+    if (this.value > 0 && this.value < 60) this.setUnit(ETimeUnits.Seconds);
     else this.setUnit(ETimeUnits.Minutes);
   }
 
@@ -61,11 +61,11 @@ export class TimeSlider extends LitElement {
     this.unit = unit;
     this.scaleFactor = this.unit == ETimeUnits.Minutes ? 1 / 60 : 1;
     this._step = calcStepSize(this.min * this.scaleFactor, (ETimeUnits.Minutes ? this.max : 60) * this.scaleFactor);
-    if(this.step && this._step > this.step * this.scaleFactor) this._step = this.step * this.scaleFactor;
+    if (this.step && this._step > this.step * this.scaleFactor) this._step = this.step * this.scaleFactor;
     let min = this.min * this.scaleFactor;
-    if(min < this._step) min = this._step;
+    if (min < this._step) min = this._step;
     this._min = this.min ? round(min, this._step) : 0;
-    this._max = (unit == ETimeUnits.Minutes ? round(this.max, this._step) : 60)  * this.scaleFactor;
+    this._max = (unit == ETimeUnits.Minutes ? round(this.max, this._step) : 60) * this.scaleFactor;
   }
 
   render() {

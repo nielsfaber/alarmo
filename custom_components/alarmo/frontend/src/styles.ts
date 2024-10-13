@@ -123,8 +123,8 @@ export const commonStyle = css`
     --mdc-tab-text-label-color-default: var(--disabled-text-color);
   }
 
-  ha-card settings-row:first-child,
-  ha-card settings-row:first-of-type {
+  ha-card alarmo-settings-row:first-child,
+  ha-card alarmo-settings-row:first-of-type {
     border-top: 0px;
   }
 

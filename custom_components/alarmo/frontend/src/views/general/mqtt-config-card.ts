@@ -5,8 +5,8 @@ import { loadHaForm } from '../../load-ha-elements';
 import { AlarmoConfig, MqttConfig, AlarmoArea, Dictionary, HomeAssistant } from '../../types';
 import { commonStyle } from '../../styles';
 
-import '../../components/settings-row.ts';
-import '../../components/collapsible-section.ts';
+import '../../components/alarmo-settings-row';
+import '../../components/alarmo-collapsible-section';
 
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
 import { fetchConfig, saveConfig, fetchAreas } from '../../data/websockets';
@@ -55,7 +55,7 @@ export class MqttConfigCard extends SubscribeMixin(LitElement) {
         </div>
         <div class="card-content">${localize('panels.general.cards.mqtt.description', this.hass.language)}</div>
 
-        <settings-row .narrow=${this.narrow}>
+        <alarmo-settings-row .narrow=${this.narrow}>
           <span slot="heading">
             ${localize('panels.general.cards.mqtt.fields.state_topic.heading', this.hass.language)}
           </span>
@@ -66,45 +66,45 @@ export class MqttConfigCard extends SubscribeMixin(LitElement) {
             label="${localize('panels.general.cards.mqtt.fields.state_topic.heading', this.hass.language)}"
             value=${this.selection.state_topic}
             @change=${(ev: Event) => {
-              this.selection = { ...this.selection!, state_topic: (ev.target as HTMLInputElement).value };
-            }}
+        this.selection = { ...this.selection!, state_topic: (ev.target as HTMLInputElement).value };
+      }}
           ></ha-textfield>
-        </settings-row>
+        </alarmo-settings-row>
 
-        <collapsible-section
+        <alarmo-collapsible-section
           .narrow=${this.narrow}
           header=${localize('panels.general.cards.mqtt.fields.state_payload.heading', this.hass.language)}
         >
           ${Object.values(AlarmStates)
-            .filter(state => Object.values(this.areas).some(area => filterState(state, area.modes)))
-            .map(
-              e => html`
-                <settings-row .narrow=${this.narrow}>
+        .filter(state => Object.values(this.areas).some(area => filterState(state, area.modes)))
+        .map(
+          e => html`
+                <alarmo-settings-row .narrow=${this.narrow}>
                   <span slot="heading">${prettyPrint(e)}</span>
                   <span slot="description">
                     ${localize(
-                      'panels.general.cards.mqtt.fields.state_payload.item',
-                      this.hass!.language,
-                      '{state}',
-                      prettyPrint(e)
-                    )}
+            'panels.general.cards.mqtt.fields.state_payload.item',
+            this.hass!.language,
+            '{state}',
+            prettyPrint(e)
+          )}
                   </span>
                   <ha-textfield
                     label=${prettyPrint(e)}
                     placeholder=${e}
                     value=${this.selection!.state_payload[e] || ''}
                     @change=${(ev: Event) => {
-                      this.selection = Assign(this.selection!, {
-                        state_payload: { [e]: (ev.target as HTMLInputElement).value },
-                      });
-                    }}
+              this.selection = Assign(this.selection!, {
+                state_payload: { [e]: (ev.target as HTMLInputElement).value },
+              });
+            }}
                   ></ha-textfield>
-                </settings-row>
+                </alarmo-settings-row>
               `
-            )}
-        </collapsible-section>
+        )}
+        </alarmo-collapsible-section>
 
-        <settings-row .narrow=${this.narrow}>
+        <alarmo-settings-row .narrow=${this.narrow}>
           <span slot="heading">
             ${localize('panels.general.cards.mqtt.fields.event_topic.heading', this.hass.language)}
           </span>
@@ -115,12 +115,12 @@ export class MqttConfigCard extends SubscribeMixin(LitElement) {
             label="${localize('panels.general.cards.mqtt.fields.event_topic.heading', this.hass.language)}"
             value=${this.selection.event_topic}
             @change=${(ev: Event) => {
-              this.selection = { ...this.selection!, event_topic: (ev.target as HTMLInputElement).value };
-            }}
+        this.selection = { ...this.selection!, event_topic: (ev.target as HTMLInputElement).value };
+      }}
           ></ha-textfield>
-        </settings-row>
+        </alarmo-settings-row>
 
-        <settings-row .narrow=${this.narrow}>
+        <alarmo-settings-row .narrow=${this.narrow}>
           <span slot="heading">
             ${localize('panels.general.cards.mqtt.fields.command_topic.heading', this.hass.language)}
           </span>
@@ -131,47 +131,47 @@ export class MqttConfigCard extends SubscribeMixin(LitElement) {
             label="${localize('panels.general.cards.mqtt.fields.command_topic.heading', this.hass.language)}"
             value=${this.selection.command_topic}
             @change=${(ev: Event) => {
-              this.selection = { ...this.selection!, command_topic: (ev.target as HTMLInputElement).value };
-            }}
+        this.selection = { ...this.selection!, command_topic: (ev.target as HTMLInputElement).value };
+      }}
           ></ha-textfield>
-        </settings-row>
+        </alarmo-settings-row>
 
-        <collapsible-section
+        <alarmo-collapsible-section
           .narrow=${this.narrow}
           header=${localize('panels.general.cards.mqtt.fields.command_payload.heading', this.hass.language)}
         >
           ${Object.values(AlarmCommands)
-            .filter(command =>
-              Object.values(this.areas).some(area => filterState(commandToState(command)!, area.modes))
-            )
-            .map(
-              e => html`
-                <settings-row .narrow=${this.narrow}>
+        .filter(command =>
+          Object.values(this.areas).some(area => filterState(commandToState(command)!, area.modes))
+        )
+        .map(
+          e => html`
+                <alarmo-settings-row .narrow=${this.narrow}>
                   <span slot="heading">${prettyPrint(e)}</span>
                   <span slot="description">
                     ${localize(
-                      'panels.general.cards.mqtt.fields.command_payload.item',
-                      this.hass!.language,
-                      '{command}',
-                      prettyPrint(e)
-                    )}
+            'panels.general.cards.mqtt.fields.command_payload.item',
+            this.hass!.language,
+            '{command}',
+            prettyPrint(e)
+          )}
                   </span>
                   <ha-textfield
                     label=${prettyPrint(e)}
                     placeholder=${e}
                     value=${this.selection!.command_payload[e] || ''}
                     @change=${(ev: Event) => {
-                      this.selection = Assign(this.selection!, {
-                        command_payload: { [e]: (ev.target as HTMLInputElement).value },
-                      });
-                    }}
+              this.selection = Assign(this.selection!, {
+                command_payload: { [e]: (ev.target as HTMLInputElement).value },
+              });
+            }}
                   ></ha-textfield>
-                </settings-row>
+                </alarmo-settings-row>
               `
-            )}
-        </collapsible-section>
+        )}
+        </alarmo-collapsible-section>
 
-        <settings-row .narrow=${this.narrow}>
+        <alarmo-settings-row .narrow=${this.narrow}>
           <span slot="heading">
             ${localize('panels.general.cards.mqtt.fields.require_code.heading', this.hass.language)}
           </span>
@@ -182,10 +182,10 @@ export class MqttConfigCard extends SubscribeMixin(LitElement) {
             ?checked=${this.selection.require_code}
             ?disabled=${!this.config!.code_arm_required && !this.config!.code_disarm_required}
             @change=${(ev: Event) => {
-              this.selection = { ...this.selection!, require_code: (ev.target as HTMLInputElement).checked };
-            }}
+        this.selection = { ...this.selection!, require_code: (ev.target as HTMLInputElement).checked };
+      }}
           ></ha-switch>
-        </settings-row>
+        </alarmo-settings-row>
 
         <div class="card-actions">
           <mwc-button @click=${this.saveClick}>

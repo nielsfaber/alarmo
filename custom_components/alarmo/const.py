@@ -21,7 +21,7 @@ from homeassistant.const import (
 from homeassistant.components.alarm_control_panel import AlarmControlPanelEntityFeature
 from homeassistant.helpers import config_validation as cv
 
-VERSION = "1.10.4"
+VERSION = "1.10.5"
 NAME = "Alarmo"
 MANUFACTURER = "@nielsfaber"
 
@@ -185,7 +185,7 @@ MODES_TO_SUPPORTED_FEATURES = {
 SERVICE_ARM = "arm"
 SERVICE_DISARM = "disarm"
 
-SERVICE_ARM_SCHEMA = vol.Schema(
+SERVICE_ARM_SCHEMA = cv.make_entity_service_schema(
     {
         vol.Required(ATTR_ENTITY_ID): cv.entity_id,
         vol.Optional(CONF_CODE, default=""): cv.string,
@@ -207,7 +207,7 @@ SERVICE_ARM_SCHEMA = vol.Schema(
     }
 )
 
-SERVICE_DISARM_SCHEMA = vol.Schema(
+SERVICE_DISARM_SCHEMA = cv.make_entity_service_schema(
     {
         vol.Required(ATTR_ENTITY_ID): cv.entity_id,
         vol.Optional(CONF_CODE, default=""): cv.string,

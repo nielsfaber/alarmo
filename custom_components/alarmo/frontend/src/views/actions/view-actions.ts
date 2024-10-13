@@ -14,7 +14,7 @@ import { localize } from '../../../localize/localize';
 
 import './notification-editor-card.ts';
 import './automation-editor-card.ts';
-import '../../components/settings-row.ts';
+import '../../components/alarmo-settings-row';
 
 import { EAutomationTypes } from '../../const';
 import { getAreaOptions, computeAreaDisplay } from '../../data/actions';
@@ -112,10 +112,10 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
                   <ha-icon icon="mdi:alert" style="color: var(--error-color)"></ha-icon>
                 `
               : item.type == EAutomationTypes.Notification
-              ? html`
+                ? html`
                   <ha-icon icon="hass:message-text-outline"  class="${!item.enabled ? 'disabled' : ''}"></ha-icon>
                 `
-              : html`
+                : html`
                   <ha-icon icon="hass:flash"  class="${!item.enabled ? 'disabled' : ''}"></ha-icon>
                 `,
         },
@@ -137,9 +137,9 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
             <ha-switch
               ?checked=${item.enabled}
               @click=${(ev: Event) => {
-                ev.stopPropagation();
-                this.toggleEnable(ev, item.automation_id!);
-              }}
+              ev.stopPropagation();
+              this.toggleEnable(ev, item.automation_id!);
+            }}
             ></ha-switch>
           `,
         },
@@ -180,7 +180,7 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
             .data=${notificationData}
             .filters=${this.getTableFilterOptions()}
             @row-click=${(ev: CustomEvent) =>
-              navigate(this, exportPath('actions', { params: { edit_notification: ev.detail.id } }), true)}
+          navigate(this, exportPath('actions', { params: { edit_notification: ev.detail.id } }), true)}
           >
             ${localize('panels.actions.cards.notifications.table.no_items', this.hass.language)}
           </alarmo-table>
@@ -202,7 +202,7 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
             .data=${automationData}
             .filters=${this.getTableFilterOptions()}
             @row-click=${(ev: CustomEvent) =>
-              navigate(this, exportPath('actions', { params: { edit_action: ev.detail.id } }), true)}
+          navigate(this, exportPath('actions', { params: { edit_action: ev.detail.id } }), true)}
           >
             ${localize('panels.actions.cards.actions.table.no_items', this.hass.language)}
           </alarmo-table>
