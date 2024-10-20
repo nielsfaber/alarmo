@@ -17,6 +17,7 @@ from homeassistant.const import (
 from homeassistant.components.notify import ATTR_MESSAGE
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.translation import async_get_translations
+from homeassistant.helpers.template import is_template_string, Template
 
 from homeassistant.components.binary_sensor.device_condition import (
     ENTITY_CONDITIONS,
@@ -249,6 +250,10 @@ class AutomationHandler:
             delay = str(alarm_entity.delay) if alarm_entity.delay else ""
             input = input.replace("{{delay}}", delay)
         
+        # process HA templates
+        if is_template_string(input):
+            input = Template(input, self.hass).async_render()
+
         return input
 
     async def async_get_open_sensor_string(self, entity_id: str, state: str, language: str):

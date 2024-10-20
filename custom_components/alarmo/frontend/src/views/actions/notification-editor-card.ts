@@ -817,7 +817,7 @@ export class NotificationEditorCard extends LitElement {
       .then(() => this._cancelClick());
   }
 
-  private _testClick(ev: Event) {
+  private async _testClick(ev: Event) {
     const data = this._parseAutomation();
     const action = data.actions[0];
     const [domain, service] = action.service!.split('.');
@@ -830,12 +830,16 @@ export class NotificationEditorCard extends LitElement {
     message = message.replace('{{changed_by}}', 'Some Example User');
     message = message.replace('{{delay}}', '30');
 
-    this.hass
-      .callService(domain, service, {
-        ...action.data,
-        message: message,
-      })
-      .then()
+    let sequence = {
+      action: action.service,
+      data: action.data,
+      entity_id: action.entity_id
+    };
+
+    this.hass.callWS({
+      type: "execute_script",
+      sequence,
+    }).then()
       .catch(e => {
         showErrorDialog(ev, e.message);
         return;
