@@ -670,7 +670,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
 
             if open_sensors:
                 # there where errors -> abort the arm
-                _LOGGER.info(
+                _LOGGER.warning(
                     "Cannot transition from state {} to state {}, there are open sensors".format(self._state, arm_mode)
                 )
                 self.async_arm_failure(open_sensors, context_id=context_id)
@@ -710,7 +710,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
 
             if open_sensors:
                 # there where errors -> abort the arm
-                _LOGGER.info("Cannot arm right now, there are open sensors")
+                _LOGGER.warning("Cannot arm right now, there are open sensors")
                 self.async_arm_failure(open_sensors, context_id=context_id)
                 return False
             else:
@@ -808,7 +808,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
                 # clear previous timer when transitioning from pending state
                 self.async_clear_timer()
 
-            _LOGGER.info("Alarm is triggered!")
+            _LOGGER.warning("Alarm is triggered!")
             self.async_update_state(STATE_ALARM_TRIGGERED)
 
         else:  # to pending state
