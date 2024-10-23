@@ -264,7 +264,7 @@ class SensorHandler:
                 else:
                     open_sensors[entity] = sensor_state
 
-        return (open_sensors, bypassed_sensors)
+        return (open_sensors, bypassed_sensors, sensors_list)
 
     @callback
     def async_sensor_state_changed(self, event):
@@ -426,7 +426,7 @@ class SensorHandler:
             arm_modes.remove(alarm_entity.arm_mode)
 
         def arm_mode_is_ready(mode):
-            (blocking_sensors, _bypassed_sensors) = self.validate_arming_event(area_id, mode)
+            (blocking_sensors, _bypassed_sensors, _active_sensors) = self.validate_arming_event(area_id, mode)
             result = not(len(blocking_sensors))
             return result
 
