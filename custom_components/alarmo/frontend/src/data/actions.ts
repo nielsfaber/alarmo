@@ -137,22 +137,28 @@ export const computeAreaDisplay = (
   }
 };
 
-export const computeServiceDisplay = (hass: HomeAssistant, ...services: (string | undefined)[]) => {
-  const output = services
-    .map(service => {
-      if (!service) return null;
-      const domain = computeDomain(service);
-      const domainService = computeEntity(service);
+export const computeServiceDisplay = (hass: HomeAssistant, ...actions: { service?: string, entity_id?: string }[]) => {
+  const output = actions
+    .map(action => {
+
+      if (action.entity_id) {
+        let data = computeEntityDisplay([action.entity_id], hass).pop();
+        return data;
+      }
+
+      if (!action || !action.service) return null;
+      const domain = computeDomain(action.service);
+      const domainService = computeEntity(action.service);
 
       let data = {
-        value: service,
+        value: action.service,
         name: domainService
           .replace(/_/g, ' ')
           .split(' ')
           .map(e => e.substring(0, 1).toUpperCase() + e.substring(1))
           .join(' '),
         icon: 'hass:home',
-        description: service,
+        description: action.service,
       };
 
       switch (domain) {
@@ -170,7 +176,6 @@ export const computeServiceDisplay = (hass: HomeAssistant, ...services: (string 
           data = { ...data, icon: 'hass:microphone' };
           break;
       }
-
       return data;
     })
     .filter(isDefined);
@@ -220,18 +225,33 @@ export const computeEntityDisplay = (entity_id: string[], hass: HomeAssistant) =
   return data;
 };
 
-export const getNotifyServices = (hass: HomeAssistant) => {
-  let res: string[] = [];
+export const getNotifyServices = (hass: HomeAssistant): { service: string, entity_id?: string }[] => {
+  let res: { service: string, entity_id?: string }[] = [];
   if ('notify' in hass.services)
-    res = [...res, ...Object.keys(hass.services.notify).map(service => `notify.${service}`)];
+    res = [
+      ...res,
+      ...Object.keys(hass.services.notify)
+        .filter(e => e != 'send_message')
+        .map(service => Object({ service: `notify.${service}` }))
+    ];
 
   if ('tts' in hass.services)
     res = [
       ...res,
       ...Object.keys(hass.services.tts)
         .filter(e => e != 'clear_cache')
-        .map(service => `tts.${service}`),
+        .map(service => Object({ service: `tts.${service}` }))
     ];
+
+  Object.keys(hass.states).filter(e => computeDomain(e) == 'notify')
+    .map(entityId => {
+      res = [...res,
+      {
+        service: 'notify.send_message',
+        entity_id: entityId
+      }
+      ]
+    });
   return res;
 };
 

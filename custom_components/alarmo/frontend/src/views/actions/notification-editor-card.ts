@@ -83,7 +83,7 @@ export class NotificationEditorCard extends LitElement {
     this.alarmoConfig = await fetchConfig(this.hass);
 
     if (this.item) {
-      let actions = this.item.actions.map(e => omit(e, 'entity_id'));
+      let actions = [...this.item.actions];
       this.config = { ...this.item, actions: [actions[0], ...actions.slice(1)] };
       if (this.config.triggers.length > 1) this.config = { ...this.config, triggers: [this.config.triggers[0]] };
 
@@ -200,7 +200,7 @@ export class NotificationEditorCard extends LitElement {
                     ?disabled=${!getNotifyServices(this.hass).length}
                     label=${localize('panels.actions.cards.new_notification.fields.target.heading', this.hass.language)}
                     icons=${true}
-                    .value=${this.config.actions[0].service}
+                    .value=${getNotifyServices(this.hass).find(e => e.entity_id == this.config.actions[0].entity_id && e.service == this.config.actions[0].service)?.entity_id || getNotifyServices(this.hass).find(e => e.service == this.config.actions[0].service)?.service || undefined}
                     @value-changed=${this._setService}
                     ?invalid=${this.errors.service}
                     allow-custom-value
@@ -499,14 +499,11 @@ export class NotificationEditorCard extends LitElement {
   private _setService(ev: CustomEvent) {
     ev.stopPropagation();
     const value = String(ev.detail.value);
+    let config = getNotifyServices(this.hass).find(e => e.entity_id == value || e.service == value);
     let actionConfig = this.config.actions;
-    Object.assign(actionConfig, { [0]: { ...actionConfig[0], service: value, ...omit(actionConfig[0], 'service') } });
-    if ((actionConfig[0].data || {}).entity_id && computeDomain(value) == 'notify')
-      Object.assign(actionConfig, {
-        [0]: { ...actionConfig[0], data: omit(actionConfig[0].data || {}, 'entity_id') },
-      });
+    Object.assign(actionConfig, { [0]: { ...config, ...omit(actionConfig[0], 'service', 'entity_id') } });
     this.config = { ...this.config, actions: actionConfig };
-    if (Object.keys(this.errors).includes('service')) this._validateConfig();
+    if (Object.keys(this.errors).includes('service') || Object.keys(this.errors).includes('entity')) this._validateConfig();
   }
 
   private _setTitle(ev: Event) {
@@ -603,9 +600,10 @@ export class NotificationEditorCard extends LitElement {
       this.errors = { ...this.errors, modes: true };
 
     const actionConfig = data.actions[0];
+
     if (
       !actionConfig.service ||
-      (!getNotifyServices(this.hass).includes(actionConfig.service) && computeDomain(actionConfig.service) != 'script')
+      (!getNotifyServices(this.hass).find(e => e.service == actionConfig.service && e.entity_id == actionConfig.entity_id) && computeDomain(actionConfig.service) != 'script')
     )
       this.errors = { ...this.errors, service: true };
     else if (
@@ -640,7 +638,7 @@ export class NotificationEditorCard extends LitElement {
     return (
       actionConfig.service &&
       (computeDomain(actionConfig.service) == 'script' ||
-        getNotifyServices(this.hass).includes(actionConfig.service)) &&
+        getNotifyServices(this.hass).find(e => e.service == actionConfig.service && e.entity_id == actionConfig.entity_id)) &&
       isValidString(actionConfig.data?.message)
     );
   }
@@ -670,7 +668,7 @@ export class NotificationEditorCard extends LitElement {
 
       if (!serviceData.message) serviceData = { ...serviceData, message: '' };
 
-      if (getNotifyServices(this.hass).includes(actionConfig.service!)) {
+      if (getNotifyServices(this.hass).find(e => e.service == actionConfig.service && e.entity_id == actionConfig.entity_id)) {
         if (computeDomain(actionConfig.service!) == 'notify' && !serviceData.title)
           serviceData = { ...serviceData, title: '' };
         if (computeDomain(actionConfig.service!) == 'tts' && !serviceData.entity_id)
@@ -696,7 +694,7 @@ export class NotificationEditorCard extends LitElement {
     const domain = this.config.actions[0].service ? computeDomain(this.config.actions[0].service) : null;
     if (!event) return '';
     if (domain == 'notify') {
-      const target = computeServiceDisplay(this.hass, this.config.actions[0].service);
+      const target = computeServiceDisplay(this.hass, this.config.actions[0]);
       if (!target.length) return '';
 
       return localize(
@@ -819,8 +817,7 @@ export class NotificationEditorCard extends LitElement {
 
   private async _testClick(ev: Event) {
     const data = this._parseAutomation();
-    const action = data.actions[0];
-    const [domain, service] = action.service!.split('.');
+    let action = { ...data.actions[0] };
 
     let message = action.data!.message;
     message = message.replace('{{open_sensors|format=short}}', 'Some Example Sensor');
@@ -830,11 +827,9 @@ export class NotificationEditorCard extends LitElement {
     message = message.replace('{{changed_by}}', 'Some Example User');
     message = message.replace('{{delay}}', '30');
 
-    let sequence = {
-      action: action.service,
-      data: action.data,
-      entity_id: action.entity_id
-    };
+    action = { ...action, data: { ...action.data, message: message } };
+
+    let sequence = { ...omit(action, 'service'), action: action.service };
 
     this.hass.callWS({
       type: "execute_script",
