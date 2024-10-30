@@ -85,6 +85,7 @@ export class NotificationEditorCard extends LitElement {
     if (this.item) {
       let actions = [...this.item.actions];
       this.config = { ...this.item, actions: [actions[0], ...actions.slice(1)] };
+      if (this.config.actions[0].entity_id === null) Object.assign(this.config.actions, { [0]: omit(this.config.actions[0], 'entity_id') });
       if (this.config.triggers.length > 1) this.config = { ...this.config, triggers: [this.config.triggers[0]] };
 
       let area = this.config.triggers[0].area;
