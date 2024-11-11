@@ -3,22 +3,16 @@ import datetime
 import voluptuous as vol
 
 from homeassistant.const import (
-    STATE_ALARM_ARMED_AWAY,
-    STATE_ALARM_ARMED_HOME,
-    STATE_ALARM_ARMED_NIGHT,
-    STATE_ALARM_ARMED_CUSTOM_BYPASS,
-    STATE_ALARM_ARMED_VACATION,
-    STATE_ALARM_DISARMED,
-    STATE_ALARM_TRIGGERED,
-    STATE_ALARM_PENDING,
-    STATE_ALARM_ARMING,
     ATTR_ENTITY_ID,
     CONF_MODE,
     CONF_CODE,
     ATTR_NAME,
 )
 
-from homeassistant.components.alarm_control_panel import AlarmControlPanelEntityFeature
+from homeassistant.components.alarm_control_panel import (
+  AlarmControlPanelEntityFeature,
+  AlarmControlPanelState
+)
 from homeassistant.helpers import config_validation as cv
 
 VERSION = "1.10.6"
@@ -41,39 +35,39 @@ INITIALIZATION_TIME = datetime.timedelta(seconds=60)
 SENSOR_ARM_TIME = datetime.timedelta(seconds=5)
 
 STATES = [
-    STATE_ALARM_ARMED_AWAY,
-    STATE_ALARM_ARMED_HOME,
-    STATE_ALARM_ARMED_NIGHT,
-    STATE_ALARM_ARMED_CUSTOM_BYPASS,
-    STATE_ALARM_ARMED_VACATION,
-    STATE_ALARM_DISARMED,
-    STATE_ALARM_TRIGGERED,
-    STATE_ALARM_PENDING,
-    STATE_ALARM_ARMING,
+    AlarmControlPanelState.ARMED_AWAY,
+    AlarmControlPanelState.ARMED_HOME,
+    AlarmControlPanelState.ARMED_NIGHT,
+    AlarmControlPanelState.ARMED_CUSTOM_BYPASS,
+    AlarmControlPanelState.ARMED_VACATION,
+    AlarmControlPanelState.DISARMED,
+    AlarmControlPanelState.TRIGGERED,
+    AlarmControlPanelState.PENDING,
+    AlarmControlPanelState.ARMING,
 ]
 
 ARM_MODES = [
-    STATE_ALARM_ARMED_AWAY,
-    STATE_ALARM_ARMED_HOME,
-    STATE_ALARM_ARMED_NIGHT,
-    STATE_ALARM_ARMED_CUSTOM_BYPASS,
-    STATE_ALARM_ARMED_VACATION
+    AlarmControlPanelState.ARMED_AWAY,
+    AlarmControlPanelState.ARMED_HOME,
+    AlarmControlPanelState.ARMED_NIGHT,
+    AlarmControlPanelState.ARMED_CUSTOM_BYPASS,
+    AlarmControlPanelState.ARMED_VACATION
 ]
 
 ARM_MODE_TO_STATE = {
-    "away": STATE_ALARM_ARMED_AWAY,
-    "home": STATE_ALARM_ARMED_HOME,
-    "night": STATE_ALARM_ARMED_NIGHT,
-    "custom": STATE_ALARM_ARMED_CUSTOM_BYPASS,
-    "vacation": STATE_ALARM_ARMED_VACATION
+    "away": AlarmControlPanelState.ARMED_AWAY,
+    "home": AlarmControlPanelState.ARMED_HOME,
+    "night": AlarmControlPanelState.ARMED_NIGHT,
+    "custom": AlarmControlPanelState.ARMED_CUSTOM_BYPASS,
+    "vacation": AlarmControlPanelState.ARMED_VACATION
 }
 
 STATE_TO_ARM_MODE = {
-    STATE_ALARM_ARMED_AWAY: "away",
-    STATE_ALARM_ARMED_HOME: "home",
-    STATE_ALARM_ARMED_NIGHT: "night",
-    STATE_ALARM_ARMED_CUSTOM_BYPASS: "custom",
-    STATE_ALARM_ARMED_VACATION: "vacation"
+    AlarmControlPanelState.ARMED_AWAY: "away",
+    AlarmControlPanelState.ARMED_HOME: "home",
+    AlarmControlPanelState.ARMED_NIGHT: "night",
+    AlarmControlPanelState.ARMED_CUSTOM_BYPASS: "custom",
+    AlarmControlPanelState.ARMED_VACATION: "vacation"
 }
 
 COMMAND_ARM_NIGHT = "arm_night"
@@ -171,31 +165,41 @@ EVENT_ACTIONS = [
 ]
 
 MODES_TO_SUPPORTED_FEATURES = {
-    STATE_ALARM_ARMED_AWAY: AlarmControlPanelEntityFeature.ARM_AWAY,
-    STATE_ALARM_ARMED_HOME: AlarmControlPanelEntityFeature.ARM_HOME,
-    STATE_ALARM_ARMED_NIGHT: AlarmControlPanelEntityFeature.ARM_NIGHT,
-    STATE_ALARM_ARMED_CUSTOM_BYPASS: AlarmControlPanelEntityFeature.ARM_CUSTOM_BYPASS,
-    STATE_ALARM_ARMED_VACATION: AlarmControlPanelEntityFeature.ARM_VACATION
+    AlarmControlPanelState.ARMED_AWAY: AlarmControlPanelEntityFeature.ARM_AWAY,
+    AlarmControlPanelState.ARMED_HOME: AlarmControlPanelEntityFeature.ARM_HOME,
+    AlarmControlPanelState.ARMED_NIGHT: AlarmControlPanelEntityFeature.ARM_NIGHT,
+    AlarmControlPanelState.ARMED_CUSTOM_BYPASS: AlarmControlPanelEntityFeature.ARM_CUSTOM_BYPASS,
+    AlarmControlPanelState.ARMED_VACATION: AlarmControlPanelEntityFeature.ARM_VACATION
 }
 
 SERVICE_ARM = "arm"
 SERVICE_DISARM = "disarm"
 
+CONF_ALARM_ARMED_AWAY = "armed_away"
+CONF_ALARM_ARMED_CUSTOM_BYPASS = "armed_custom_bypass"
+CONF_ALARM_ARMED_HOME = "armed_home"
+CONF_ALARM_ARMED_NIGHT = "armed_night"
+CONF_ALARM_ARMED_VACATION = "armed_vacation"
+CONF_ALARM_ARMING = "arming"
+CONF_ALARM_DISARMED = "disarmed"
+CONF_ALARM_PENDING = "pending"
+CONF_ALARM_TRIGGERED = "triggered"
+
 SERVICE_ARM_SCHEMA = cv.make_entity_service_schema(
     {
         vol.Required(ATTR_ENTITY_ID): cv.entity_id,
         vol.Optional(CONF_CODE, default=""): cv.string,
-        vol.Optional(CONF_MODE, default=STATE_ALARM_ARMED_AWAY): vol.In([
+        vol.Optional(CONF_MODE, default=AlarmControlPanelState.ARMED_AWAY): vol.In([
             "away",
             "home",
             "night",
             "custom",
             "vacation",
-            STATE_ALARM_ARMED_AWAY,
-            STATE_ALARM_ARMED_HOME,
-            STATE_ALARM_ARMED_NIGHT,
-            STATE_ALARM_ARMED_CUSTOM_BYPASS,
-            STATE_ALARM_ARMED_VACATION,
+            CONF_ALARM_ARMED_AWAY,
+            CONF_ALARM_ARMED_HOME,
+            CONF_ALARM_ARMED_NIGHT,
+            CONF_ALARM_ARMED_CUSTOM_BYPASS,
+            CONF_ALARM_ARMED_VACATION,
         ]),
         vol.Optional(ATTR_SKIP_DELAY, default=False): cv.boolean,
         vol.Optional(ATTR_FORCE, default=False): cv.boolean,

@@ -25,14 +25,12 @@ from homeassistant.const import (
     STATE_CLOSED,
     STATE_ON,
     STATE_OFF,
-    STATE_ALARM_PENDING,
-    STATE_ALARM_ARMING,
-    STATE_ALARM_TRIGGERED,
     ATTR_STATE,
     ATTR_LAST_TRIP_TIME,
     ATTR_NAME,
 )
 
+from homeassistant.components.alarm_control_panel import AlarmControlPanelState
 
 from homeassistant.components.lock import LockState
 
@@ -95,7 +93,7 @@ def sensor_state_allowed(state, sensor_config, alarm_state):
         # sensor has the safe state
         return True
 
-    elif alarm_state == STATE_ALARM_TRIGGERED:
+    elif alarm_state == AlarmControlPanelState.TRIGGERED:
         # alarm is already triggered
         return True
 
@@ -103,7 +101,7 @@ def sensor_state_allowed(state, sensor_config, alarm_state):
         # alarm should always be triggered by always-on sensor
         return False
 
-    elif alarm_state == STATE_ALARM_ARMING and not sensor_config[ATTR_USE_EXIT_DELAY]:
+    elif alarm_state == AlarmControlPanelState.ARMING and not sensor_config[ATTR_USE_EXIT_DELAY]:
         # arming should be aborted if sensor without exit delay is active
         return False
 
@@ -111,7 +109,7 @@ def sensor_state_allowed(state, sensor_config, alarm_state):
         # normal triggering case
         return False
 
-    elif alarm_state == STATE_ALARM_PENDING and not sensor_config[ATTR_USE_ENTRY_DELAY]:
+    elif alarm_state == AlarmControlPanelState.PENDING and not sensor_config[ATTR_USE_ENTRY_DELAY]:
         # triggering of immediate sensor while alarm is pending
         return False
 
@@ -236,9 +234,9 @@ class SensorHandler:
 
         alarm_state = target_state
         if use_delay and alarm_state in const.ARM_MODES:
-            alarm_state = STATE_ALARM_ARMING
-        elif use_delay and alarm_state == STATE_ALARM_TRIGGERED:
-            alarm_state = STATE_ALARM_PENDING
+            alarm_state = AlarmControlPanelState.ARMING
+        elif use_delay and alarm_state == AlarmControlPanelState.TRIGGERED:
+            alarm_state = AlarmControlPanelState.PENDING
 
         for entity in sensors_list:
             sensor_config = self._config[entity]
@@ -299,7 +297,7 @@ class SensorHandler:
 
         res = sensor_state_allowed(new_state, sensor_config, alarm_state)
 
-        if sensor_config[ATTR_ARM_ON_CLOSE] and alarm_state == STATE_ALARM_ARMING:
+        if sensor_config[ATTR_ARM_ON_CLOSE] and alarm_state == AlarmControlPanelState.ARMING:
             # we are arming and sensor is configured to arm on closing
             if new_state == STATE_CLOSED:
                 self.start_arm_timer(entity)
@@ -325,7 +323,7 @@ class SensorHandler:
                 open_sensors=open_sensors
             )
 
-        elif alarm_state == STATE_ALARM_ARMING:
+        elif alarm_state == AlarmControlPanelState.ARMING:
             # sensor triggered while arming, abort arming
             _LOGGER.debug("Arming was aborted due to a sensor being active: {}".format(entity))
             alarm_entity.async_arm_failure(open_sensors)
@@ -338,7 +336,7 @@ class SensorHandler:
                 open_sensors=open_sensors
             )
 
-        elif alarm_state == STATE_ALARM_PENDING:
+        elif alarm_state == AlarmControlPanelState.PENDING:
             # immediate trigger while in pending state
             _LOGGER.info("Alarm is triggered due to sensor: {}".format(entity))
             alarm_entity.async_trigger(
@@ -356,7 +354,7 @@ class SensorHandler:
             _LOGGER.debug("timer finished")
             sensor_config = self._config[entity]
             alarm_entity = self.hass.data[const.DOMAIN]["areas"][sensor_config["area"]]
-            if alarm_entity.state == STATE_ALARM_ARMING:
+            if alarm_entity.state == AlarmControlPanelState.ARMING:
                 alarm_entity.async_arm(alarm_entity.arm_mode, skip_delay=True)
         now = dt_util.utcnow()
 
@@ -422,7 +420,7 @@ class SensorHandler:
             if config[const.ATTR_ENABLED]
         ]
 
-        if alarm_entity.state in const.ARM_MODES or alarm_entity.state == STATE_ALARM_ARMING and alarm_entity.arm_mode:
+        if alarm_entity.state in const.ARM_MODES or alarm_entity.state == AlarmControlPanelState.ARMING and alarm_entity.arm_mode:
             arm_modes.remove(alarm_entity.arm_mode)
 
         def arm_mode_is_ready(mode):
