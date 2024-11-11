@@ -1,0 +1,75 @@
+{
+  "services": {
+    "arm": {
+      "name": "Armement",
+      "description": "Armer une entité Alarmo avec des paramètres personnalisés.",
+      "fields": {
+        "entity_id": {
+          "name": "Entité",
+          "description": "Entité d'alarme qui doit être armée"
+        },
+        "code": {
+          "name": "Code",
+          "description": "Code pour armer l'alarme."
+        },
+        "mode": {
+          "name": "Mode",
+          "description": "Mode d'armement."
+        },
+        "skip_delay": {
+          "name": "Suppression du temps de sortie",
+          "description": "Évite le délai de sortie."
+        },
+        "force": {
+          "name": "Forcage",
+          "description": "Contourner automatiquement tous les capteurs qui empêchent l'opération d'armement."
+        }
+      }
+    },
+    "disarm": {
+      "name": "Désarmement",
+      "description": "Désarmer une entité Alarmo.",
+      "fields": {
+        "entity_id": {
+          "name": "Entité",
+          "description": "Entité d'alarme qui doit être désarmée."
+        },
+        "code": {
+          "name": "Code",
+          "description": "Code pour désarmer l'alarme."
+        }
+      }
+    },
+    "enable_user": {
+      "name": "Utilisateur autorisé",
+      "description": "Autoriser un utilisateur à armer/désarmer l'alarme.",
+      "fields": {
+        "name": {
+          "name": "Nom",
+          "description": "Nom de l'utilisateur autorisé."
+        }
+      }
+    },
+    "disable_user": {
+      "name": "Utilisateur non autorisé",
+      "description": "Bloquer un utilisateur à armer/désarmer l'alarme.",
+      "fields": {
+        "name": {
+          "name": "Nom",
+          "description": "Nom de l'utilisateur non autorisé."
+        }
+      }
+    }
+  },
+  "selector": {
+    "arm_mode": {
+      "options": {
+        "away": "Absence",
+        "night": "Nuit",
+        "home": "Présence",
+        "vacation": "Vacances",
+        "custom": "Personnalisé"
+      }
+    }
+  }
+}
