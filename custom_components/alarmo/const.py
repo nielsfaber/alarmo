@@ -15,7 +15,7 @@ from homeassistant.components.alarm_control_panel import (
 )
 from homeassistant.helpers import config_validation as cv
 
-VERSION = "1.10.6"
+VERSION = "1.10.7"
 NAME = "Alarmo"
 MANUFACTURER = "@nielsfaber"
 

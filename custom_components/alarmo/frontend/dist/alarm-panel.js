@@ -2446,7 +2446,7 @@ class ms extends Xn{constructor(e){if(super(e),this.et=V,e.type!==Qn)throw Error
         align-items: center;
         margin-right: -6px !important;
       }
-    `}};var cr;n([Qe()],lr.prototype,"hass",void 0),n([Qe()],lr.prototype,"items",void 0),n([Qe({type:Array})],lr.prototype,"value",void 0),n([Qe()],lr.prototype,"label",void 0),n([Qe({type:Boolean})],lr.prototype,"invalid",void 0),lr=n([Ke("alarmo-selector")],lr),function(e){e[e.Yaml=0]="Yaml",e[e.UI=1]="UI"}(cr||(cr={}));let hr=class extends Ge{constructor(){super(...arguments),this.config={type:bn.Notification,triggers:[{}],actions:[{}]},this.viewMode=cr.UI,this.errors={}}async firstUpdated(){if(await et(),this.areas=await ht(this.hass),this.alarmoConfig=await tt(this.hass),this.item){let e=[...this.item.actions];this.config=Object.assign(Object.assign({},this.item),{actions:[e[0],...e.slice(1)]}),this.config.triggers.length>1&&(this.config=Object.assign(Object.assign({},this.config),{triggers:[this.config.triggers[0]]}));let t=this.config.triggers[0].area;Sn(t)&&!Qs(this.areas,this.alarmoConfig).includes(t)?t=void 0:null===t&&(t=0),this._setArea(new CustomEvent("value-changed",{detail:{value:t}}))}if(!Sn(this.config.triggers[0].area)){const e=Qs(this.areas,this.alarmoConfig);1==e.length?this._setArea(new CustomEvent("value-changed",{detail:{value:e[0]}})):e.includes(0)&&this._setArea(new CustomEvent("value-changed",{detail:{value:0}}))}}render(){var e,t,a,i,n,s,r;return this.hass&&this.areas&&this.alarmoConfig?Te`
+    `}};var cr;n([Qe()],lr.prototype,"hass",void 0),n([Qe()],lr.prototype,"items",void 0),n([Qe({type:Array})],lr.prototype,"value",void 0),n([Qe()],lr.prototype,"label",void 0),n([Qe({type:Boolean})],lr.prototype,"invalid",void 0),lr=n([Ke("alarmo-selector")],lr),function(e){e[e.Yaml=0]="Yaml",e[e.UI=1]="UI"}(cr||(cr={}));let hr=class extends Ge{constructor(){super(...arguments),this.config={type:bn.Notification,triggers:[{}],actions:[{}]},this.viewMode=cr.UI,this.errors={}}async firstUpdated(){if(await et(),this.areas=await ht(this.hass),this.alarmoConfig=await tt(this.hass),this.item){let e=[...this.item.actions];this.config=Object.assign(Object.assign({},this.item),{actions:[e[0],...e.slice(1)]}),null===this.config.actions[0].entity_id&&Object.assign(this.config.actions,{0:xn(this.config.actions[0],"entity_id")}),this.config.triggers.length>1&&(this.config=Object.assign(Object.assign({},this.config),{triggers:[this.config.triggers[0]]}));let t=this.config.triggers[0].area;Sn(t)&&!Qs(this.areas,this.alarmoConfig).includes(t)?t=void 0:null===t&&(t=0),this._setArea(new CustomEvent("value-changed",{detail:{value:t}}))}if(!Sn(this.config.triggers[0].area)){const e=Qs(this.areas,this.alarmoConfig);1==e.length?this._setArea(new CustomEvent("value-changed",{detail:{value:e[0]}})):e.includes(0)&&this._setArea(new CustomEvent("value-changed",{detail:{value:0}}))}}render(){var e,t,a,i,n,s,r;return this.hass&&this.areas&&this.alarmoConfig?Te`
       <div class="heading">
         <ha-icon-button .path=${Zn} @click=${this._cancelClick} class="icon"></ha-icon-button>
         <div class="header">${mn("panels.actions.cards.new_notification.title",this.hass.language)}</div>
@@ -3167,7 +3167,7 @@ class ms extends Xn{constructor(e){if(super(e),this.et=V,e.type!==Qn)throw Error
             ${mn("title",this.hass.language)}
           </div>
           <div class="version">
-            v${"1.10.6"}
+            v${"1.10.7"}
           </div>
         </div>
 
