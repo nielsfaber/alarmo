@@ -11,9 +11,9 @@ jobs:
     - uses: actions/stale@v3
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
-        stale-issue-message: 'This issue is stale because it has been open 30 days with no activity. Remove stale label or comment or this will be closed in 7 days'
-        stale-pr-message: 'This pull request is stale because it has been open 30 days with no activity. Remove stale label or comment or this will be closed in 7 days'
-        days-before-stale: 30
-        days-before-close: 7
+        stale-issue-message: 'This issue is stale because it has been open 60 days with no activity. Remove stale label or comment or this will be closed in 14 days'
+        stale-pr-message: 'This pull request is stale because it has been open 60 days with no activity. Remove stale label or comment or this will be closed in 14 days'
+        days-before-stale: 60
+        days-before-close: 14
         operations-per-run: 500
         exempt-issue-labels: 'will pick this up at some point'
