@@ -1,0 +1,75 @@
+{
+  "services": {
+    "arm": {
+      "name": "Armar",
+      "description": "Armar una entidad Alarmo amb configuracions personalitzades.",
+      "fields": {
+        "entity_id": {
+          "name": "ID d'entitat",
+          "description": "Entitat d'alarma que ha de ser armada."
+        },
+        "code": {
+          "name": "Codi",
+          "description": "Codi a utilitzar per a l'armat."
+        },
+        "mode": {
+          "name": "Mode",
+          "description": "Mode per armar l'alarma."
+        },
+        "skip_delay": {
+          "name": "Saltar Retard",
+          "description": "Saltar el retard de sortida."
+        },
+        "force": {
+          "name": "Forçar",
+          "description": "Ignorar automàticament tots els sensors que impedeixen l'operació d'armat."
+        }
+      }
+    },
+    "disarm": {
+      "name": "Desarmar",
+      "description": "Desarmar una entitat Alarmo.",
+      "fields": {
+        "entity_id": {
+          "name": "ID d'entitat",
+          "description": "Entidad d'alarma que ha de ser desarmada."
+        },
+        "code": {
+          "name": "Codi",
+          "description": "Codi a utilitzar per al desarmat."
+        }
+      }
+    },
+    "enable_user": {
+      "name": "Habilitar Usuari",
+      "description": "Permetre a un usuari armar/desarmar Alarmo.",
+      "fields": {
+        "name": {
+          "name": "Nom",
+          "description": "Nom de l'usuari a habilitar."
+        }
+      }
+    },
+    "disable_user": {
+      "name": "Inhabilitar Usuari",
+      "description": "Bloquejar un usuari perquè no pugui armar/desarmar Alarmo.",
+      "fields": {
+        "name": {
+          "name": "Nom",
+          "description": "Nom de l'usuari a deshabilitar."
+        }
+      }
+    }
+  },
+  "selector": {
+    "arm_mode": {
+      "options": {
+        "away": "Armat Fora",
+        "night": "Armat Nit",
+        "home": "Armat Llar",
+        "vacation": "Armat Vacances",
+        "custom": "Armat Bypass Personalitzat"
+      }
+    }
+  }
+}
