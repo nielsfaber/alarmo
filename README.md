@@ -628,7 +628,7 @@ There are two cards available:
 This section is intended to give a starting point for users who want to operate Alarmo outside of HA.
 
 ### Android MQTT Alarm Panel
-Alarmo is designed to be fully compatible with the [Android MQTT Alarm Panel](http://thanksmister.com/android-mqtt-alarm-panel/) project.
+Alarmo is designed to be fully compatible with the [Android MQTT Alarm Panel](https://github.com/thanksmister/android-mqtt-alarm-panel) project.
 
 This project provides a GUI for you to operate your alarm via a tablet which you could (for example) mount on the wall at your main entrance.
 
