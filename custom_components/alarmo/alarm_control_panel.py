@@ -109,6 +109,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
         self._arm_mode = None
         self._changed_by = None
         self._open_sensors = {}
+        self._bypass_open_sensors = False
         self._bypassed_sensors = []
         self._delay = None
         self.expiration = None
@@ -645,7 +646,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
     def async_arm(self, arm_mode, **kwargs):
         """Arm the alarm or switch between arm modes."""
         skip_delay = kwargs.get("skip_delay", False)
-        bypass_open_sensors = kwargs.get("bypass_open_sensors", False)
+        self._bypass_open_sensors = bypass_open_sensors = kwargs.get("bypass_open_sensors", self._bypass_open_sensors)
         context_id = kwargs.get("context_id", None)
 
         self._arm_mode = arm_mode
@@ -657,7 +658,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
             (open_sensors, bypassed_sensors) = self.hass.data[const.DOMAIN]["sensor_handler"].validate_arming_event(
                 area_id=self.area_id,
                 target_state=arm_mode,
-                bypass_open_sensors=bypass_open_sensors
+                bypass_open_sensors=self._bypass_open_sensors
             )
 
             if open_sensors:
@@ -697,7 +698,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
                 area_id=self.area_id,
                 target_state=arm_mode,
                 use_delay=True,
-                bypass_open_sensors=bypass_open_sensors,
+                bypass_open_sensors=self._bypass_open_sensors
             )
 
             if open_sensors:
@@ -716,7 +717,6 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
                     self.async_clear_timer()
                     self.async_arm(
                         self.arm_mode,
-                        bypass_open_sensors=bypass_open_sensors,
                         skip_delay=True
                     )
                 self.async_set_timer(exit_delay, async_leave_timer_finished)
