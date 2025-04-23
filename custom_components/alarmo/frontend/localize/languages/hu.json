@@ -495,7 +495,7 @@
             },
             "target": {
               "heading": "Cél",
-              "description": "Az eszköz, amelyre az értesítés küldésre kerül"
+              "description": "Az eszköz, amelyre az értesítés érkezik"
             },
             "media_player_entity": {
               "heading": "Médialejátszó entitás",
