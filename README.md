@@ -643,8 +643,10 @@ Alarmo entities are of type `alarm_control_panel`, so make sure to configure the
 The alarm should now automatically become visible in Homekit, with the current state visible together with the possibility to arm and disarm.
 
 In case you have Alarmo configured to require a code for arming/disarming, you need to setup homekit in yaml mode (instead of via the integrations page).
+If you want to configure the rest of homekit using the Home Assistant UI, but configure the pin in configuration.yaml, you will have to configure two 
+Homekit bridges. In this case, do not select 'alarm_control_panel' when configuring via the UI, as this instance will not have the pin. Then add the 
+following lines minimally to the 'configuration.yaml`:
 
-Example of minimal setup in `configuration.yaml`:
 ```yaml
 homekit:
   - filter:
@@ -655,6 +657,8 @@ homekit:
         code: 1234 # should be identical to a user in Alarmo as well
 ```
 
+Then you will need to scan the QR codes for both the UI based configuration and the 'configuration.yaml' based configuration to have access to Alarmo
+and your other UI based devices in Apple Home.
 
 The Homekit gateway has the following limitations:
 * The [arm modes](#arm-modes) `custom` and `vacation` are not visible in Homekit.
