@@ -26,7 +26,7 @@
       "filter": {
         "label": "Elemek szűrése",
         "item": "Szűrés: {name}",
-        "hidden_items": "{number} {number, plural,\n  one {item is}\n  egyéb {items are}\n} rejtve"
+        "hidden_items": "{number} {number, plural,\n  one {item is}\n  other {items are}\n} rejtve"
       }
     }
   },
