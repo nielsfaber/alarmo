@@ -1,0 +1,569 @@
+{
+  "common": {
+    "modes_short": {
+      "armed_away": "Teljes élesítés",
+      "armed_home": "Otthoni élesítés",
+      "armed_night": "Éjszakai élesítés",
+      "armed_custom_bypass": "Egyedi élesítés",
+      "armed_vacation": "Nyaralás mód"
+    },
+    "enabled": "Engedélyezve",
+    "disabled": "Letiltva"
+  },
+  "components": {
+    "time_slider": {
+      "seconds": "mp",
+      "minutes": "perc",
+      "infinite": "végtelen",
+      "none": "nincs"
+    },
+    "editor": {
+      "ui_mode": "UI mód",
+      "yaml_mode": "YAML mód",
+      "edit_in_yaml": "Szerkesztés YAML-ben"
+    },
+    "table": {
+      "filter": {
+        "label": "Elemek szűrése",
+        "item": "Szűrés: {name}",
+        "hidden_items": "{number} {number, plural,\n  one {item is}\n  egyéb {items are}\n} rejtve"
+      }
+    }
+  },
+  "title": "Riasztópanel",
+  "panels": {
+    "general": {
+      "title": "Általános",
+      "cards": {
+        "general": {
+          "description": "Ez a panel a riasztó néhány globális beállítását tartalmazza.",
+          "fields": {
+            "disarm_after_trigger": {
+              "heading": "Hatástalanítás riasztás után",
+              "description": "A riasztási idő lejárta után a rendszer hatástalanítódik ahelyett, hogy visszatérne élesített állapotba."
+            },
+            "enable_mqtt": {
+              "heading": "MQTT engedélyezése",
+              "description": "Engedélyezi a riasztópanel MQTT-n keresztüli vezérlését."
+            },
+            "enable_master": {
+              "heading": "Főriasztó engedélyezése",
+              "description": "Létrehoz egy entitást az összes zóna egyidejű vezérléséhez."
+            }
+          },
+          "actions": {
+            "setup_mqtt": "MQTT Beállítások",
+            "setup_master": "Főriasztó beállítások"
+          }
+        },
+        "modes": {
+          "title": "Módok",
+          "description": "Ez a panel használható a riasztó élesítési módjainak beállítására.",
+          "modes": {
+            "armed_away": "A 'Teljes élesítés' akkor használatos, amikor mindenki elhagyta az otthont. Minden ajtó és ablak, valamint a belső mozgásérzékelők is aktívak lesznek.",
+            "armed_home": "Az 'Otthoni élesítés' (más néven 'maradás mód') akkor használatos, amikor valaki otthon tartózkodik. Az ajtók és ablakok védettek, de a belső mozgásérzékelők nem aktívak.",
+            "armed_night": "Az 'Éjszakai élesítés' alvás előtt ajánlott. Védi a külső nyílászárókat, valamint kiválasztott (pl. földszinti) mozgásérzékelőket.",
+            "armed_vacation": "A 'Nyaralás mód' a teljes élesítés kiterjesztése hosszabb távollét esetére. A késleltetési idők és a riasztási válaszok ehhez igazíthatók.",
+            "armed_custom_bypass": "Egy extra mód, amelyben saját védelmi zónák határozhatók meg (például kivételek, kizárt érzékelők)."
+          },
+          "number_sensors_active": "{number} {number, plural,\n  one {sensor}\n  other {sensors}\n} active",
+          "fields": {
+            "status": {
+              "heading": "Állapot",
+              "description": "Szabályozza, hogy a riasztó élesíthető-e ebben a módban."
+            },
+            "exit_delay": {
+              "heading": "Kilépési késleltetés",
+              "description": "A riasztó élesítése után ennyi ideig nem vált ki riasztást az érzékelő, lehetőséget adva az elhagyásra."
+            },
+            "entry_delay": {
+              "heading": "Belépési késleltetés",
+              "description": "Az az idő, ami alatt a rendszer még nem riaszt, miután egy érzékelő aktiválódik (pl. bejárat használatakor)."
+            },
+            "trigger_time": {
+              "heading": "Riasztási idő",
+              "description": "Az az időtartam, ameddig a riasztás aktív marad, miután kiváltódott."
+            }
+          }
+        },
+        "mqtt": {
+          "title": "MQTT beállítások",
+          "description": "Ez a panel az MQTT interfész konfigurálására szolgál.",
+          "fields": {
+            "state_topic": {
+              "heading": "Állapot topic",
+              "description": "Az a témakör, amelyre az állapotfrissítések kerülnek publikálásra."
+            },
+            "event_topic": {
+              "heading": "Esemény topic",
+              "description": "Az a témakör, amelyre a riasztási események kerülnek publikálásra."
+            },
+            "command_topic": {
+              "heading": "Parancs topic",
+              "description": "Az a témakör, amelyen keresztül az Alarmo az élesítési/hatástalanítási parancsokat fogadja."
+            },
+            "require_code": {
+              "heading": "Kód megkövetelése",
+              "description": "A parancs elküldésekor kötelező a kód megadása."
+            },
+            "state_payload": {
+              "heading": "Állapotonkénti payload beállítása",
+              "item": "Payload definiálása a(z) ''{state}'' állapothoz"
+            },
+            "command_payload": {
+              "heading": "Parancsonkénti payload beállítása",
+              "item": "Payload definiálása a(z) ''{command}'' parancshoz"
+            }
+          }
+        },
+        "areas": {
+          "title": "Zónák",
+          "description": "A zónák segítségével a riasztórendszer több, külön vezérelhető részre bontható.",
+          "no_items": "Még nincs definiálva egyetlen zóna sem.",
+          "table": {
+            "remarks": "Megjegyzések",
+            "summary": "Ez a zóna {summary_sensors} és {summary_automations} elemet tartalmaz.",
+            "summary_sensors": "{number} {number, plural,\n  one {sensor}\n  other {sensors}\n}",
+            "summary_automations": "{number} {number, plural,\n  one {automation}\n  other {automations}\n}"
+          },
+          "actions": {
+            "add": "Hozzáadás"
+          }
+        }
+      },
+      "dialogs": {
+        "create_area": {
+          "title": "Új zóna",
+          "fields": {
+            "copy_from": "Beállítások másolása innen"
+          }
+        },
+        "edit_area": {
+          "title": "Zóna szerkesztése: ''{area}''",
+          "name_warning": "Figyelem: a név megváltoztatása az entitás azonosítót is megváltoztatja."
+        },
+        "remove_area": {
+          "title": "Zóna törlése?",
+          "description": "Biztosan törölni szeretnéd ezt a zónát? Ez a zóna {sensors} érzékelőt és {automations} automatizálást tartalmaz, amelyek szintén törölve lesznek."
+        },
+        "edit_master": {
+          "title": "Főriasztó konfiguráció"
+        },
+        "disable_master": {
+          "title": "Főriasztó letiltása?",
+          "description": "Biztosan le szeretnéd tiltani a főriasztót? Ez a zóna {automations} automatizálást tartalmaz, amelyek szintén törlésre kerülnek ezzel a művelettel."
+        }
+      }
+    },
+    "sensors": {
+      "title": "Érzékelők",
+      "cards": {
+        "sensors": {
+          "description": "Jelenleg konfigurált érzékelők. Kattints egy elemre a szerkesztéshez.",
+          "table": {
+            "no_items": "Nincsenek megjeleníthető érzékelők.",
+            "no_area_warning": "Az érzékelő nincs hozzárendelve egyetlen zónához sem.",
+            "arm_modes": "Élesítési módok",
+            "always_on": "(Mindig aktív)"
+          }
+        },
+        "add_sensors": {
+          "title": "Érzékelők hozzáadása",
+          "description": "További érzékelők hozzáadása. Ügyelj arra, hogy az érzékelők neve jól azonosítható legyen.",
+          "no_items": "Nincs elérhető Home Assistant entitás, amely konfigurálható lenne a riasztóhoz. Győződj meg róla, hogy `binary_sensor` típusú entitások szerepelnek a rendszerben.",
+          "table": {
+            "type": "Észlelt típus"
+          },
+          "actions": {
+            "add_to_alarm": "hozzáadás a riasztóhoz",
+            "filter_supported": "Ismeretlen típusú elemek elrejtése"
+          }
+        },
+        "editor": {
+          "title": "Érzékelő szerkesztése",
+          "description": "A(z) ''{entity}'' érzékelő beállításainak konfigurálása.",
+          "fields": {
+            "entity": {
+              "heading": "Entitás",
+              "description": "Az érzékelőhöz tartozó entitás."
+            },
+            "area": {
+              "heading": "Zóna",
+              "description": "Válaszd ki, melyik zónához tartozzon az érzékelő."
+            },
+            "group": {
+              "heading": "Csoport",
+              "description": "Csoportosítsd más érzékelőkkel közös riasztási logikához."
+            },
+            "device_type": {
+              "heading": "Eszköztípus",
+              "description": "Válassz eszköztípust az automatikus beállításokhoz.",
+              "choose": {
+                "door": {
+                  "name": "Ajtó",
+                  "description": "Bejárati ajtó, kapu vagy más nyílászáró, amelyen keresztül ki vagy be lehet jutni."
+                },
+                "window": {
+                  "name": "Ablak",
+                  "description": "Ablak vagy olyan ajtó, amely nem szolgál fő bejáratként (pl. erkélyajtó)."
+                },
+                "motion": {
+                  "name": "Mozgásérzékelő",
+                  "description": "Mozgás- vagy jelenlétérzékelő, amely aktiválás között késleltetéssel működik."
+                },
+                "tamper": {
+                  "name": "Szabotázsérzékelő",
+                  "description": "Fedéllevétel-, üvegtörés- vagy más szabotázst jelző szenzor."
+                },
+                "environmental": {
+                  "name": "Környezeti érzékelő",
+                  "description": "Füst-, gáz-, vízszivárgás-érzékelő (nem betörésvédelmi célra)."
+                },
+                "other": {
+                  "name": "Egyéb"
+                }
+              }
+            },
+            "always_on": {
+              "heading": "Mindig aktív",
+              "description": "Az érzékelő minden esetben riasztást vált ki, függetlenül az élesítési módtól."
+            },
+            "modes": {
+              "heading": "Aktív módok",
+              "description": "Azok az élesítési módok, amelyekben ez az érzékelő működésben van."
+            },
+            "arm_on_close": {
+              "heading": "Élesítés zárás után",
+              "description": "Az érzékelő inaktiválódása (pl. ajtó becsukása) után a hátralévő kilépési késleltetés automatikusan átugrásra kerül."
+            },
+            "use_exit_delay": {
+              "heading": "Kilépési késleltetés használata",
+              "description": "Az érzékelő akkor is aktív lehet, amikor a kilépési késleltetés elindul."
+            },
+            "use_entry_delay": {
+              "heading": "Belépési késleltetés használata",
+              "description": "Az érzékelő aktiválása nem azonnali riasztást indít, hanem csak a belépési késleltetés lejárta után."
+            },
+            "allow_open": {
+              "heading": "Nyitott állapot engedélyezése induláskor",
+              "description": "Az érzékelő nyitott állapota élesítéskor figyelmen kívül marad – a későbbi aktiválása viszont riasztást vált ki."
+            },
+            "auto_bypass": {
+              "heading": "Automatikus kizárás",
+              "description": "Ha az érzékelő nyitva van élesítéskor, automatikusan kizárásra kerül a riasztásból.",
+              "modes": "Módok, amelyekben az érzékelő kizárható"
+            },
+            "trigger_unavailable": {
+              "heading": "Riasztás elérhetetlenség esetén",
+              "description": "Ha az érzékelő állapota 'nem elérhetővé' válik, az riasztást vált ki."
+            }
+          },
+          "actions": {
+            "toggle_advanced": "Speciális beállítások",
+            "remove": "Eltávolítás",
+            "setup_groups": "Csoportok beállítása"
+          },
+          "errors": {
+            "description": "Kérlek javítsd az alábbi hibákat:",
+            "no_area": "Nincs kiválasztva zóna",
+            "no_modes": "Nincs beállítva élesítési mód, amelyben az érzékelő aktív lenne",
+            "no_auto_bypass_modes": "Nincs megadva, hogy mely módokban lehet az érzékelő automatikusan kizárva"
+          }
+        }
+      },
+      "dialogs": {
+        "manage_groups": {
+          "title": "Érzékelőcsoportok kezelése",
+          "description": "Egy érzékelőcsoportban több érzékelő aktiválódásának kell bekövetkeznie egy meghatározott időn belül a riasztás kiváltásához.",
+          "no_items": "Még nincs létrehozott csoport.",
+          "actions": {
+            "new_group": "Új csoport létrehozása"
+          }
+        },
+        "create_group": {
+          "title": "Új érzékelőcsoport",
+          "fields": {
+            "name": {
+              "heading": "Név",
+              "description": "Az érzékelőcsoport megnevezése."
+            },
+            "timeout": {
+              "heading": "Időkorlát",
+              "description": "Az az időintervallum (másodpercben), amelyen belül több érzékelőnek kell aktiválódnia a riasztás kiváltásához."
+            },
+            "event_count": {
+              "heading": "Aktiválások száma",
+              "description": "Hány különböző érzékelő aktiválódása szükséges a riasztás elindításához."
+            },
+            "sensors": {
+              "heading": "Érzékelők",
+              "description": "Válaszd ki azokat az érzékelőket, amelyek ehhez a csoporthoz tartoznak."
+            }
+          },
+          "errors": {
+            "invalid_name": "Érvénytelen csoportnév.",
+            "insufficient_sensors": "Legalább 2 érzékelőt ki kell választani a csoport létrehozásához."
+          }
+        },
+        "edit_group": {
+          "title": "Érzékelőcsoport szerkesztése: ''{name}''"
+        }
+      }
+    },
+    "codes": {
+      "title": "Kódok",
+      "cards": {
+        "codes": {
+          "description": "A kódhasználat beállításai.",
+          "fields": {
+            "code_arm_required": {
+              "heading": "Kód megadása kötelező élesítéshez",
+              "description": "A riasztó élesítéséhez érvényes kód megadása szükséges."
+            },
+            "code_disarm_required": {
+              "heading": "Kód megadása kötelező hatástalanításhoz",
+              "description": "A riasztó hatástalanításához érvényes kód megadása szükséges."
+            },
+            "code_mode_change_required": {
+              "heading": "Kód szükséges módváltáshoz",
+              "description": "Az aktív élesítési mód módosításához érvényes kód megadása szükséges."
+            },
+            "code_format": {
+              "heading": "Kód formátuma",
+              "description": "A Lovelace riasztókártyán használt bevitel típusa.",
+              "code_format_number": "pin-kód",
+              "code_format_text": "jelszó"
+            }
+          }
+        },
+        "user_management": {
+          "title": "Felhasználók kezelése",
+          "description": "Minden felhasználó saját kóddal rendelkezik a riasztó élesítéséhez és hatástalanításához.",
+          "no_items": "Még nincs létrehozott felhasználó",
+          "actions": {
+            "new_user": "új felhasználó"
+          }
+        },
+        "new_user": {
+          "title": "Új felhasználó létrehozása",
+          "description": "Hozz létre felhasználókat a riasztórendszer eléréséhez és vezérléséhez.",
+          "fields": {
+            "name": {
+              "heading": "Név",
+              "description": "A felhasználó neve."
+            },
+            "code": {
+              "heading": "Kód",
+              "description": "A felhasználóhoz tartozó kód."
+            },
+            "confirm_code": {
+              "heading": "Kód megerősítése",
+              "description": "A kód ismételt megadása a megerősítéshez."
+            },
+            "can_arm": {
+              "heading": "Élesítés engedélyezése ezzel a kóddal",
+              "description": "Entering this code activates the alarm"
+            },
+            "can_disarm": {
+              "heading": "Hatástalanítás engedélyezése ezzel a kóddal",
+              "description": "A kód beírásával a riasztó hatástalanítható"
+            },
+            "is_override_code": {
+              "heading": "Kényszerített élesítési kód",
+              "description": "Ezzel a kóddal akkor is élesíthető a rendszer, ha nyitott érzékelők vannak (kényszerített élesítés)"
+            },
+            "area_limit": {
+              "heading": "Zónakorlátozás",
+              "description": "A felhasználó csak a kiválasztott zónákhoz férhet hozzá."
+            }
+          },
+          "errors": {
+            "no_name": "Nincs megadva név.",
+            "no_code": "A kódnak legalább 4 karakter hosszúnak kell lennie.",
+            "code_mismatch": "A megadott kódok nem egyeznek."
+          }
+        },
+        "edit_user": {
+          "title": "Felhasználó szerkesztése",
+          "description": "A(z) ''{name}'' felhasználó beállításainak módosítása.",
+          "fields": {
+            "old_code": {
+              "heading": "Jelenlegi kód",
+              "description": "A jelenleg érvényes kód. Hagyd üresen, ha nem szeretnéd módosítani."
+            }
+          }
+        }
+      }
+    },
+    "actions": {
+      "title": "Műveletek",
+      "cards": {
+        "notifications": {
+          "title": "Értesítések",
+          "description": "Ebben a panelben beállíthatod, hogy milyen riasztási eseményeknél küldjön a rendszer értesítést.",
+          "table": {
+            "no_items": "Még nincs létrehozva értesítés.",
+            "no_area_warning": "Ez a művelet nincs zónához rendelve."
+          },
+          "actions": {
+            "new_notification": "új értesítés"
+          }
+        },
+        "actions": {
+          "description": "Ez a panel lehetőséget ad eszközök (pl. lámpák, szirénák) vezérlésére a riasztórendszer állapotának változásakor.",
+          "table": {
+            "no_items": "Még nincs létrehozott művelet."
+          },
+          "actions": {
+            "new_action": "új művelet"
+          }
+        },
+        "new_notification": {
+          "title": "Értesítés beállítása",
+          "description": "Értesítés küldése a riasztó élesítése, hatástalanítása, riasztás aktiválása stb. esetén.",
+          "trigger": "Feltétel",
+          "action": "Művelet",
+          "options": "Lehetőségek",
+          "fields": {
+            "event": {
+              "heading": "Esemény",
+              "description": "Mely eseménykor küldjön a rendszer értesítést",
+              "choose": {
+                "armed": {
+                  "name": "Riasztó élesítve",
+                  "description": "A riasztó élesítve lett"
+                },
+                "disarmed": {
+                  "name": "Riasztó hatástalanítva",
+                  "description": "A riasztó hatástalanítva lett"
+                },
+                "triggered": {
+                  "name": "A riasztó megszólalt",
+                  "description": "A rendszer behatolást jelez"
+                },
+                "untriggered": {
+                  "name": "Riasztás megszűnt",
+                  "description": "A riasztási állapot véget ért"
+                },
+                "arm_failure": {
+                  "name": "Élesítés sikertelen",
+                  "description": "A riasztó nem tudott élesedni, mert egy vagy több érzékelő nyitva maradt"
+                },
+                "arming": {
+                  "name": "Kilépési késleltetés elindult",
+                  "description": "A kilépési időzítő elindult, ideje elhagyni az otthont."
+                },
+                "pending": {
+                  "name": "Belépési késleltetés elindult",
+                  "description": "A belépési időzítő elindult, hamarosan bekapcsol a riasztás."
+                }
+              }
+            },
+            "mode": {
+              "heading": "Mód",
+              "description": "Korlátozza a műveletet meghatározott élesítési módokra (opcionális)"
+            },
+            "title": {
+              "heading": "Cím",
+              "description": "Az értesítési üzenet címe"
+            },
+            "message": {
+              "heading": "Üzenet",
+              "description": "Az értesítési üzenet szövege",
+              "insert_wildcard": "Változó beillesztése",
+              "placeholders": {
+                "armed": "A riasztó beállítva: {{arm_mode}} módba.",
+                "disarmed": "A riasztó kikapcsolt.",
+                "triggered": "Riasztáa! Ok: {{open_sensors}}.",
+                "untriggered": "A riasztási állapot megszűnt.",
+                "arm_failure": "A riasztó nem tudott élesedni. Ok: {{open_sensors}}.",
+                "arming": "A riasztó hamarosan élesítésre kerül, kérjük hagyd el az épületet.",
+                "pending": "A riasztás hamarosan aktiválódik, hatástalanítsd gyorsan!"
+              }
+            },
+            "open_sensors_format": {
+              "heading": "Az open_sensors változó formátuma",
+              "description": "Válaszd ki, milyen érzékelő-információ jelenjen meg az üzenetben",
+              "options": {
+                "default": "Nevek és állapotok",
+                "short": "Csak nevek"
+              }
+            },
+            "arm_mode_format": {
+              "heading": "arm_mode változó nyelve",
+              "description": "Válaszd ki, milyen nyelven jelenjen meg az élesítési mód az üzenetben"
+            },
+            "target": {
+              "heading": "Cél",
+              "description": "Az eszköz, amelyre az értesítés érkezik"
+            },
+            "media_player_entity": {
+              "heading": "Médialejátszó entitás",
+              "description": "Az a médialejátszó, amelyen az üzenet lejátszásra kerül"
+            },
+            "name": {
+              "heading": "Név",
+              "description": "Leírás ehhez az értesítéshez",
+              "placeholders": {
+                "armed": "{target} értesítése élesítéskor",
+                "disarmed": "{target} értesítése hatástalanításkor",
+                "triggered": "{target} értesítése riasztás esetén",
+                "untriggered": "{target} értesítése amikor megszűnik a riasztás",
+                "arm_failure": "{target} értesítése élesítési hiba esetén",
+                "arming": "{target} értesítése kilépéskor",
+                "pending": "{target} értesítése érkezéskor"
+              }
+            },
+            "delete": {
+              "heading": "Automatizálás törlése",
+              "description": "Ez az automatizálás véglegesen törlésre kerül"
+            }
+          },
+          "actions": {
+            "test": "Próba"
+          }
+        },
+        "new_action": {
+          "title": "Művelet konfigurálása",
+          "description": "Világítás vagy eszköz (pl. sziréna) vezérlése a riasztó élesítése, hatástalanítása, vagy riasztás során.",
+          "fields": {
+            "event": {
+              "heading": "Esemény",
+              "description": "Melyik eseménykor hajtódjon végre a művelet"
+            },
+            "area": {
+              "heading": "Zóna",
+              "description": "Az a zóna, amelyre az esemény és a művelet vonatkozik."
+            },
+            "mode": {
+              "heading": "Mód",
+              "description": "Korlátozza a műveletet meghatározott élesítési módokra (opcionális)"
+            },
+            "entity": {
+              "heading": "Entitás",
+              "description": "Az a Home Assistant entitás, amelyen a művelet végrehajtásra kerül"
+            },
+            "action": {
+              "heading": "Név",
+              "description": "Leírás ehhez a művelethez",
+              "no_common_actions": "A kiválasztott entitásokhoz csak YAML módban rendelhetők műveletek."
+            },
+            "name": {
+              "heading": "Név",
+              "description": "Leírás ehhez a művelethez",
+              "placeholders": {
+                "armed": "{entity} beállítása {state} állapotra élesítéskor",
+                "disarmed": "{entity} beállítása {state} állapotra hatástalanításkor",
+                "triggered": "{entity} beállítása {state} állapotra riasztás esetén",
+                "untriggered": "{entity} beállítása {state} állapotra riasztás megszűnésekor",
+                "arm_failure": "{entity} beállítása {state} állapotra élesítési hiba esetén",
+                "arming": "{entity} beállítása {state} állapotra távozáskor",
+                "pending": "{entity} beállítása {state} állapotra érkezéskor"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
