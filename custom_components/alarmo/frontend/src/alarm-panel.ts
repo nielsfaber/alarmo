@@ -15,6 +15,13 @@ import { localize } from '../localize/localize';
 import { exportPath, getPath, Path } from './common/navigation';
 import { navigate } from './helpers';
 
+enum EMenuItems {
+  General = 'general',
+  Sensors = 'sensors',
+  Codes = 'codes',
+  Actions = 'actions'
+}
+
 @customElement('alarm-panel')
 export class MyAlarmPanel extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
@@ -40,8 +47,6 @@ export class MyAlarmPanel extends LitElement {
         loading...
       `;
 
-      console.log(customElements.get('ha-tabs'));
-
     const path = getPath();
 
     return html`
@@ -57,23 +62,13 @@ export class MyAlarmPanel extends LitElement {
         </div>
 
         <sl-tab-group
-          scrollable
-          attr-for-selected="page-name"
-          .selected=${path.page}
           @sl-tab-show=${this.handlePageSelected}
         >
-          <sl-tab slot="nav" panel="general" .active=${path.page === "general"}>
-            ${localize('panels.general.title', this.hass.language)}
-          </sl-tab>
-          <sl-tab slot="nav" panel="sensors" .active=${path.page === "sensors"}>
-            ${localize('panels.sensors.title', this.hass.language)}
-          </sl-tab>
-          <sl-tab slot="nav" panel="codes" .active=${path.page === "codes"}>
-            ${localize('panels.codes.title', this.hass.language)}
-          </sl-tab>
-          <sl-tab slot="nav" panel="actions" .active=${path.page === "actions"}>
-            ${localize('panels.actions.title', this.hass.language)}
-          </sl-tab>
+          ${Object.values(EMenuItems).map(e => html`
+            <sl-tab slot="nav" panel="${e}" .active=${path.page === e}>
+              ${localize(`panels.${e}.title`, this.hass.language)}
+            </sl-tab>
+          `)}
         </sl-tab-group>
       </div>
       <div class="view">
