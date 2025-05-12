@@ -6,6 +6,7 @@ import re
 
 from homeassistant.core import (
     callback,
+    ServiceCall,
 )
 from homeassistant.components.alarm_control_panel import DOMAIN as PLATFORM
 from homeassistant.config_entries import ConfigEntry
@@ -24,6 +25,8 @@ from homeassistant.helpers.dispatcher import (
 from homeassistant.helpers.service import (
     async_register_admin_service,
 )
+from homeassistant.helpers import config_validation as cv
+import voluptuous as vol
 from . import const
 from .store import async_get_registry
 from .panel import (
@@ -41,6 +44,11 @@ from .sensors import (
 from .automations import AutomationHandler
 from .mqtt import MqttHandler
 from .event import EventHandler
+from .sensor_service import (
+    async_service_set_sensor_configuration,
+    async_service_get_sensor_configuration,
+    SERVICE_SET_SENSOR_CONFIGURATION_SCHEMA,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -449,3 +457,34 @@ def register_services(hass):
     async_register_admin_service(
         hass, const.DOMAIN, const.SERVICE_DISABLE_USER, async_srv_toggle_user, schema=const.SERVICE_TOGGLE_USER_SCHEMA
     )
+
+    async def srv_set_sensor_config_wrapper(call: ServiceCall):
+        """Wrapper for the new service to pass coordinator"""
+        await async_service_set_sensor_configuration(hass, call, coordinator)
+
+    async_register_admin_service(
+        hass,
+        const.DOMAIN,
+        const.SERVICE_SET_SENSOR_CONFIGURATION,
+        srv_set_sensor_config_wrapper,
+        schema=SERVICE_SET_SENSOR_CONFIGURATION_SCHEMA
+    )
+
+    async def srv_get_sensor_config_wrapper(call: ServiceCall):
+        """Wrapper for the get_sensor_configuration service"""
+        _LOGGER.debug("srv_get_sensor_config_wrapper called with data: %s", call.data)
+        await async_service_get_sensor_configuration(hass, call, coordinator)
+
+    get_sensor_config_schema = vol.Schema(
+        {
+            vol.Required(const.ATTR_ENTITY_ID): cv.entity_id,
+        }
+    )
+    async_register_admin_service(
+        hass,
+        const.DOMAIN,
+        const.SERVICE_GET_SENSOR_CONFIGURATION,
+        srv_get_sensor_config_wrapper,
+        schema=get_sensor_config_schema
+    )
+

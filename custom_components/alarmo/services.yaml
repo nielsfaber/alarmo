@@ -1,4 +1,3 @@
-
 arm:
   fields:
     entity_id:
@@ -66,3 +65,117 @@ disable_user:
       required: true
       selector:
         text:
+
+set_sensor_configuration:
+  description: "Sets various configuration properties for one or more Alarmo sensors. You can target a single sensor or a list of sensors. The same configuration will be applied to all specified sensors."
+  fields:
+    entity_id:
+      description: "The Alarmo sensor entity or list of entities to configure. You can specify a single entity_id as a string or multiple as a list."
+      example: '["binary_sensor.door_contact", "binary_sensor.window_contact"]'
+      required: true
+      selector:
+        entity:
+          # We don't have a direct way to filter for Alarmo-managed sensors here,
+          # but the service handler will validate it.
+          # Consider adding a filter if HA allows it in the future for custom integrations.
+    type:
+      description: "The type of the sensor (e.g., door, window, motion)."
+      required: false
+      example: "door"
+      selector:
+        select:
+          options:
+            - "door"
+            - "window"
+            - "motion"
+            - "tamper"
+            - "environmental"
+            - "other"
+    modes:
+      description: "List of arm modes in which this sensor is active. Use user-friendly names: home, away, night, custom, vacation."
+      required: false
+      example: '["away", "home"]'
+      selector:
+        select:
+          multiple: true
+          options:
+            - "away"
+            - "night"
+            - "home"
+            - "custom"
+            - "vacation"
+          # ensure custom_value: false if we only want predefined modes
+    is_alarmo_sensor_enabled:
+      description: "Enable or disable this sensor within Alarmo's internal configuration (distinct from the HA entity's enabled state). When disabled, Alarmo will ignore this sensor."
+      required: false
+      example: true
+      selector:
+        boolean:
+    use_exit_delay:
+      description: "Whether the sensor respects the exit delay."
+      required: false
+      selector:
+        boolean:
+    use_entry_delay:
+      description: "Whether the sensor respects the entry delay."
+      required: false
+      selector:
+        boolean:
+    always_on:
+      description: "Whether the sensor is always active, regardless of arm mode."
+      required: false
+      selector:
+        boolean:
+    arm_on_close:
+      description: "Whether the alarm attempts to arm when this sensor closes (if it was an immediate sensor preventing arming)."
+      required: false
+      selector:
+        boolean:
+    allow_open:
+      description: "Whether this sensor is allowed to be open when arming (relevant for immediate sensors)."
+      required: false
+      selector:
+        boolean:
+    trigger_unavailable:
+      description: "Whether the sensor going to an 'unavailable' state should trigger the alarm."
+      required: false
+      selector:
+        boolean:
+    auto_bypass:
+      description: "Automatically bypass this sensor if it's open when arming."
+      required: false
+      selector:
+        boolean:
+      example: true
+    auto_bypass_modes:
+      description: "List of arm modes in which auto-bypass is applicable. Use user-friendly names: home, away, night, custom, vacation. If you provide this field, you must also provide auto_bypass."
+      required: false
+      example: '["away", "home"]'
+      selector:
+        select:
+          multiple: true
+          options:
+            - "away"
+            - "night"
+            - "home"
+            - "custom"
+            - "vacation"
+  example: |
+    entity_id: binary_sensor.door_contact
+    auto_bypass: true
+    modes:
+      - away
+      - home
+    auto_bypass_modes:
+      - away
+      - home
+
+get_sensor_configuration:
+  description: "Retrieves the Alarmo-specific configuration for a given sensor and fires an event with the data. The event type will be 'alarmo_sensor_get_config_event'."
+  fields:
+    entity_id:
+      description: "The Alarmo sensor entity (e.g., binary_sensor.door_contact) to get configuration for."
+      required: true
+      example: "binary_sensor.door_contact"
+      selector:
+        entity: {} # Simple entity selector
