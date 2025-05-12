@@ -222,3 +222,21 @@ SERVICE_TOGGLE_USER_SCHEMA = vol.Schema(
         vol.Required(ATTR_NAME, default=""): cv.string,
     }
 )
+
+SERVICE_SET_SENSOR_CONFIGURATION = "set_sensor_configuration"
+SERVICE_GET_SENSOR_CONFIGURATION = "get_sensor_configuration"
+EVENT_ALARMO_SENSOR_GET_CONFIG_EVENT = "alarmo_sensor_get_config_event"
+
+FRIENDLY_TO_INTERNAL_MODE = {
+    "away": "armed_away",
+    "home": "armed_home",
+    "night": "armed_night",
+    "custom": "armed_custom_bypass",
+    "vacation": "armed_vacation",
+    # Allow internal names as well
+    "armed_away": "armed_away",
+    "armed_home": "armed_home",
+    "armed_night": "armed_night",
+    "armed_custom_bypass": "armed_custom_bypass",
+    "armed_vacation": "armed_vacation",
+}

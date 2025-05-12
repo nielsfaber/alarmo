@@ -592,6 +592,64 @@ Structure of the event data:
 }
 ```
 
+---
+
+Alarmo supports two admin services for advanced sensor configuration:
+
+**Disable an Alarmo sensor**
+
+Example YAML:
+```yaml
+service: alarmo.set_sensor_configuration
+data:
+  entity_id: binary_sensor.virtual_window_sensor_window
+  enabled: false
+```
+
+**`alarmo.set_sensor_configuration`**  
+Update Alarmo-specific configuration for one or more sensors. Supports updating type, enabled state, modes, and advanced flags (e.g., auto_bypass).
+
+Example YAML:
+```yaml
+service: alarmo.set_sensor_configuration
+data:
+  entity_id:
+    - binary_sensor.virtual_motion_sensor_motion
+    - binary_sensor.virtual_window_sensor_window
+  type: door
+  modes:
+    - armed_away
+    - armed_home
+  use_exit_delay: false
+  always_on: false
+  auto_bypass: true
+  auto_bypass_modes:
+    - armed_away
+```
+
+**`alarmo.get_sensor_configuration`**  
+Retrieve the Alarmo configuration for a specific sensor.
+
+Example YAML:
+```yaml
+service: alarmo.get_sensor_configuration
+data:
+  entity_id: binary_sensor.virtual_window_sensor_window
+```
+
+To read the sensor configuration after calling the get_sensor_configuration action listen for the event `alarmo_sensor_get_config_event` in Home Assistant. You can do this in Developer Tools > Events, or in an automation:
+
+```yaml
+trigger:
+  - platform: event
+    event_type: alarmo_sensor_get_config_event
+action:
+  - service: logbook.log
+    data:
+      name: "Alarmo sensor config"
+      message: "{{ trigger.event.data }}"
+```
+
 #### Automatic arming
 If you want to control the state of Alarmo through an external device (e.g. a keyfob, button panel, or phone with geofencing), you can do so by means of a HA automation.
 

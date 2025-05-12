@@ -6,6 +6,7 @@ import re
 
 from homeassistant.core import (
     callback,
+    ServiceCall,
 )
 from homeassistant.components.alarm_control_panel import DOMAIN as PLATFORM
 from homeassistant.config_entries import ConfigEntry
@@ -24,7 +25,10 @@ from homeassistant.helpers.dispatcher import (
 from homeassistant.helpers.service import (
     async_register_admin_service,
 )
+from homeassistant.helpers import config_validation as cv
+import voluptuous as vol
 from . import const
+from . import sensors as sensor_const
 from .store import async_get_registry
 from .panel import (
     async_register_panel,
@@ -41,6 +45,10 @@ from .sensors import (
 from .automations import AutomationHandler
 from .mqtt import MqttHandler
 from .event import EventHandler
+from .sensor_service import (
+    async_service_set_sensor_configuration,
+    async_service_get_sensor_configuration,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -449,3 +457,51 @@ def register_services(hass):
     async_register_admin_service(
         hass, const.DOMAIN, const.SERVICE_DISABLE_USER, async_srv_toggle_user, schema=const.SERVICE_TOGGLE_USER_SCHEMA
     )
+
+    async def srv_set_sensor_config_wrapper(call: ServiceCall):
+        """Wrapper for the new service to pass coordinator"""
+        await async_service_set_sensor_configuration(hass, call, coordinator)
+
+    async_register_admin_service(
+        hass,
+        const.DOMAIN,
+        const.SERVICE_SET_SENSOR_CONFIGURATION,
+        srv_set_sensor_config_wrapper,
+        schema=SERVICE_SET_SENSOR_CONFIGURATION_SCHEMA
+    )
+
+    async def srv_get_sensor_config_wrapper(call: ServiceCall):
+        """Wrapper for the get_sensor_configuration service"""
+        _LOGGER.debug("srv_get_sensor_config_wrapper called with data: %s", call.data)
+        await async_service_get_sensor_configuration(hass, call, coordinator)
+
+    get_sensor_config_schema = vol.Schema(
+        {
+            vol.Required(const.ATTR_ENTITY_ID): cv.entity_id,
+        }
+    )
+    async_register_admin_service(
+        hass,
+        const.DOMAIN,
+        const.SERVICE_GET_SENSOR_CONFIGURATION,
+        srv_get_sensor_config_wrapper,
+        schema=get_sensor_config_schema
+    )
+
+SERVICE_SET_SENSOR_CONFIGURATION_SCHEMA: vol.Schema = vol.Schema(
+    {
+        vol.Required(const.ATTR_ENTITY_ID): cv.entity_ids,
+        vol.Optional(const.ATTR_TYPE): cv.string,
+        vol.Optional(const.ATTR_MODES): vol.All(cv.ensure_list, [cv.string]),
+        vol.Optional(const.ATTR_ENABLED): cv.boolean,
+        vol.Optional(sensor_const.ATTR_USE_EXIT_DELAY): cv.boolean,
+        vol.Optional(sensor_const.ATTR_USE_ENTRY_DELAY): cv.boolean,
+        vol.Optional(sensor_const.ATTR_ALWAYS_ON): cv.boolean,
+        vol.Optional(sensor_const.ATTR_ARM_ON_CLOSE): cv.boolean,
+        vol.Optional(sensor_const.ATTR_ALLOW_OPEN): cv.boolean,
+        vol.Optional(sensor_const.ATTR_TRIGGER_UNAVAILABLE): cv.boolean,
+        vol.Optional(sensor_const.ATTR_AUTO_BYPASS): cv.boolean,
+        vol.Optional(sensor_const.ATTR_AUTO_BYPASS_MODES): vol.All(cv.ensure_list, [cv.string]),
+    },
+    extra=vol.PREVENT_EXTRA,
+)
