@@ -116,6 +116,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
         self.area_id = None
         self._revert_state = None
         self._ready_to_arm_modes = []
+        self._last_triggered = None
 
     @property
     def device_info(self) -> dict:
@@ -240,6 +241,11 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
         else:
             self._delay = None
             self.expiration = None
+    
+    @property
+    def last_triggered(self):
+        """Get last time occurrence of alarm trigger."""
+        return self._last_triggered
 
     @property
     def extra_state_attributes(self):
@@ -251,6 +257,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             "open_sensors": self.open_sensors,
             "bypassed_sensors": self.bypassed_sensors,
             "delay": self.delay,
+            "last_triggered": self.last_triggered,
         }
 
     def _validate_code(self, code, to_state):
@@ -497,6 +504,8 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
                 self.open_sensors = state.attributes["open_sensors"]
             if "bypassed_sensors" in state.attributes:
                 self._bypassed_sensors = state.attributes["bypassed_sensors"]
+            if "last_triggered" in state.attributes:
+                self._last_triggered = state.attributes["last_triggered"]
 
     async def async_will_remove_from_hass(self):
         await super().async_will_remove_from_hass()
@@ -802,6 +811,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
 
             _LOGGER.warning("Alarm is triggered!")
             self.async_update_state(AlarmControlPanelState.TRIGGERED)
+            self._last_triggered = dt_util.now().strftime("%Y-%m-%d %H:%M:%S")
 
         else:  # to pending state
 
@@ -1034,6 +1044,9 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
             self._state = state
             _LOGGER.debug("entity {} was updated from {} to {}".format(self.entity_id, old_state, state))
             dispatcher_send(self.hass, "alarmo_state_updated", None, old_state, state)
+
+            if state == AlarmControlPanelState.TRIGGERED:
+                 self._last_triggered = dt_util.now().strftime("%Y-%m-%d %H:%M:%S")
 
         # take bypassed sensors by combining all areas
         bypassed_sensors = []
