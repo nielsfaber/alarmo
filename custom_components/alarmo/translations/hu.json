@@ -40,6 +40,16 @@
         }
       }
     },
+    "skip_delay": {
+      "name": "Skip Delay",
+      "description": "Skip the remainder of the exit/entry delay and proceed directly to the next state. Only has effect whilst the alarm is in arming or pending state.",
+      "fields": {
+        "entity_id": {
+          "name": "Entity ID",
+          "description": "Alarm entity for which the delay should be skipped."
+        }
+      }
+    },
     "enable_user": {
       "name": "Felhasználó engedélyezése",
       "description": "Felhasználó engedélyezése az Alarmo élesítésére/hatástalanítására.",

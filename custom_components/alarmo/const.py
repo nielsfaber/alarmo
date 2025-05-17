@@ -174,6 +174,7 @@ MODES_TO_SUPPORTED_FEATURES = {
 
 SERVICE_ARM = "arm"
 SERVICE_DISARM = "disarm"
+SERVICE_SKIP_DELAY = "skip_delay"
 
 CONF_ALARM_ARMED_AWAY = "armed_away"
 CONF_ALARM_ARMED_CUSTOM_BYPASS = "armed_custom_bypass"
@@ -212,6 +213,12 @@ SERVICE_DISARM_SCHEMA = cv.make_entity_service_schema(
         vol.Required(ATTR_ENTITY_ID): cv.entity_id,
         vol.Optional(CONF_CODE, default=""): cv.string,
         vol.Optional(ATTR_CONTEXT_ID): int
+    }
+)
+
+SERVICE_SKIP_DELAY_SCHEMA = cv.make_entity_service_schema(
+    {
+        vol.Required(ATTR_ENTITY_ID): cv.entity_id,
     }
 )
 

@@ -34,6 +34,7 @@ from homeassistant.const import (
     ATTR_CODE_FORMAT,
     ATTR_NAME,
 )
+from homeassistant.exceptions import HomeAssistantError
 from . import const
 
 _LOGGER = logging.getLogger(__name__)
@@ -95,6 +96,11 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
         const.SERVICE_DISARM,
         const.SERVICE_DISARM_SCHEMA,
         "async_service_disarm_handler",
+    )
+    platform.async_register_entity_service(
+        const.SERVICE_SKIP_DELAY,
+        const.SERVICE_SKIP_DELAY_SCHEMA,
+        "async_service_skip_delay_handler",
     )
 
 
@@ -445,6 +451,22 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             bypass_open_sensors=bypass_open_sensors,
             context_id=context_id
         )
+
+    @callback
+    def async_service_skip_delay_handler(self):
+        """service handler for alarmo.skip_delay."""
+        _LOGGER.debug("Service alarmo.skip_delay was called")
+
+        if self._state not in [AlarmControlPanelState.ARMING, AlarmControlPanelState.PENDING]:
+            raise HomeAssistantError(f"Entity has state '{self._state}', but must be in state '{AlarmControlPanelState.ARMING}' or '{AlarmControlPanelState.PENDING}'.")
+
+        elif self._state == AlarmControlPanelState.ARMING:
+            self.async_arm(
+                self.arm_mode,
+                skip_delay=True
+            )
+        elif self._state == AlarmControlPanelState.PENDING:
+            self.async_trigger(skip_delay=True)
 
     @abstractmethod
     @callback
@@ -1085,7 +1107,11 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
 
         open_sensors = {}
         for item in self.hass.data[const.DOMAIN]["areas"].values():
-            if (item.state in const.ARM_MODES and item.arm_mode != arm_mode) or item.state == AlarmControlPanelState.DISARMED:
+            if (
+                (item.state in const.ARM_MODES and item.arm_mode != arm_mode) or
+                item.state == AlarmControlPanelState.DISARMED or
+                (item.state == AlarmControlPanelState.ARMING and skip_delay)
+            ):
                 item._revert_state = item._state if item._state in const.ARM_MODES else AlarmControlPanelState.DISARMED
                 res = item.async_arm(
                     arm_mode,
