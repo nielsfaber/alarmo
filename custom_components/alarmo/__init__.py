@@ -116,6 +116,11 @@ async def async_remove_entry(hass, entry):
     del hass.data[const.DOMAIN]
 
 
+async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Handle migration of config entry."""
+    return True
+
+
 class AlarmoCoordinator(DataUpdateCoordinator):
     """Define an object to hold Alarmo device."""
 
