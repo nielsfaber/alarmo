@@ -42,6 +42,10 @@
               "heading": "Larma av efter utlös",
               "description": "Efter utlös tiden har gått ut, larma av larmet istället för att återgå till larmat läge."
             },
+            "ignore_blocking_sensors_after_trigger": {
+              "heading": "Ignorera blockeringssensorer vid återaktivering",
+              "description": "Återgå till tillkopplat läge utan att kontrollera om det finns sensorer som fortfarande kan vara aktiva."
+            },
             "enable_mqtt": {
               "heading": "Aktivera MQTT",
               "description": "Tillåt alarm panelen att kontrolleras via MQTT."

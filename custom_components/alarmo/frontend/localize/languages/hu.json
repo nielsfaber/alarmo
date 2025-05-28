@@ -42,6 +42,10 @@
               "heading": "Hatástalanítás riasztás után",
               "description": "A riasztási idő lejárta után a rendszer hatástalanítódik ahelyett, hogy visszatérne élesített állapotba."
             },
+            "ignore_blocking_sensors_after_trigger": {
+              "heading": "Újraélesítéskor figyelmen kívül hagyja a blokkoló érzékelőket",
+              "description": "Térjen vissza élesített állapotba anélkül, hogy ellenőrizné az esetleg még aktív érzékelőket."
+            },
             "enable_mqtt": {
               "heading": "MQTT engedélyezése",
               "description": "Engedélyezi a riasztópanel MQTT-n keresztüli vezérlését."

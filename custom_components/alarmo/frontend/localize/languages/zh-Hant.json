@@ -42,6 +42,10 @@
               "heading": "觸發後解除警戒",
               "description": "觸發超時後解除警報，而不是返回到警戒狀態。"
             },
+            "ignore_blocking_sensors_after_trigger": {
+              "heading": "重新布防期間忽略阻擋感應器",
+              "description": "返回武裝狀態，而不檢查可能仍處於活動狀態的感測器。"
+            },
             "enable_mqtt": {
               "heading": "啟用MQTT",
               "description": "允許通過MQTT控制警戒面板。"

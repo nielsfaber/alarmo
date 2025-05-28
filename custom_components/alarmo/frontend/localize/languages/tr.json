@@ -26,7 +26,7 @@
       "filter": {
         "label": "Öğeleri filtrele",
         "item": "{name}'e göre filtrele",
-        "hidden_items": "{number} {number, plural,\n  bir {item is}\n  diğer {items are}\n} gizli"
+        "hidden_items": "{number} {number, plural,\n  one {bir madde}\n  other {iki madde}\n} gizli"
       }
     }
   },
@@ -41,6 +41,10 @@
             "disarm_after_trigger": {
               "heading": "Tetiklemeden sonra devre dışı bırakma",
               "description": "Tetikleme süresi zaman aşımına uğradıktan sonra, etkin duruma dönmek yerine alarmı devre dışı bırakın."
+            },
+            "ignore_blocking_sensors_after_trigger": {
+              "heading": "Yeniden silahlandırırken bloke eden sensörleri yok sayın",
+              "description": "Hala aktif olabilecek sensörleri kontrol etmeden silahlı duruma geri dönün."
             },
             "enable_mqtt": {
               "heading": "MQTT'yi Etkinleştir",
@@ -66,7 +70,7 @@
             "armed_vacation": "Aktif tatil, daha uzun süreli uzakta kalma durumunda aktif uzakta modunun bir eki olarak kullanılabilir. Gecikme süreleri ve tetikleme tepkileri (istenildiği gibi) evden uzakta olmaya göre uyarlanabilir.",
             "armed_custom_bypass": "Kendi güvenlik çevrenizi tanımlamak için ekstra bir mod."
           },
-          "number_sensors_active": "{number} {number, plural,\n  bir {sensor}\n  diğer {sensors}\n} aktif",
+          "number_sensors_active": "{number} {number, plural,\n  one {sensör}\n  other {sensörler}\n} aktif",
           "fields": {
             "status": {
               "heading": "Durum",
@@ -123,8 +127,8 @@
           "table": {
             "remarks": "Özet",
             "summary": "Bu alan {summary_sensors} ve {summary_automations} öğelerini içerir.",
-            "summary_sensors": "{number} {number, plural,\n  bir {sensor}\n  diğer {sensors}\n}",
-            "summary_automations": "{number} {number, plural,\n  bir {automation}\n  diğer {automations}\n}"
+            "summary_sensors": "{number} {number, plural,\n  one {sensör}\n  other {sensörler}\n}",
+            "summary_automations": "{number} {number, plural,\n  one {otomasyon}\n  other {otomasyonlar}\n}"
           },
           "actions": {
             "add": "Ekle"

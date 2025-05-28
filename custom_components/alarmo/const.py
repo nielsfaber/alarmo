@@ -115,6 +115,7 @@ ATTR_USER_ID = "user_id"
 ATTR_CAN_ARM = "can_arm"
 ATTR_CAN_DISARM = "can_disarm"
 ATTR_DISARM_AFTER_TRIGGER = "disarm_after_trigger"
+ATTR_IGNORE_BLOCKING_SENSORS_AFTER_TRIGGER = "ignore_blocking_sensors_after_trigger"
 
 ATTR_REMOVE = "remove"
 ATTR_IS_OVERRIDE_CODE = "is_override_code"

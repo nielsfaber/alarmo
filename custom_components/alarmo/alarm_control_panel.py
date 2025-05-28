@@ -677,7 +677,8 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
     def async_arm(self, arm_mode, **kwargs):
         """Arm the alarm or switch between arm modes."""
         skip_delay = kwargs.get("skip_delay", False)
-        self._bypass_open_sensors = bypass_open_sensors = kwargs.get("bypass_open_sensors", self._bypass_open_sensors)
+        skip_validation = kwargs.get("skip_validation", False)
+        self._bypass_open_sensors = kwargs.get("bypass_open_sensors", self._bypass_open_sensors)
         context_id = kwargs.get("context_id", None)
 
         self._arm_mode = arm_mode
@@ -692,7 +693,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
                 bypass_open_sensors=self._bypass_open_sensors
             )
 
-            if open_sensors:
+            if open_sensors and not skip_validation:
                 # there where errors -> abort the arm
                 _LOGGER.warning(
                     "Cannot transition from state {} to state {}, there are open sensors".format(self._state, arm_mode)
@@ -703,7 +704,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
                 # proceed the arm
                 if bypassed_sensors:
                     self.bypassed_sensors = bypassed_sensors
-                self.open_sensors = None
+                self.open_sensors = open_sensors if open_sensors else None
                 if self.changed_by:
                     _LOGGER.info("Alarm '{}' is armed ({}) by {}.".format(self.name, arm_mode, self.changed_by))
                 else:
@@ -732,7 +733,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
                 bypass_open_sensors=self._bypass_open_sensors
             )
 
-            if open_sensors:
+            if open_sensors and not skip_validation:
                 # there where errors -> abort the arm
                 _LOGGER.warning("Cannot arm right now, there are open sensors")
                 self.async_arm_failure(open_sensors, context_id=context_id)
@@ -752,7 +753,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
                     )
                 self.async_set_timer(exit_delay, async_leave_timer_finished)
                 self.delay = exit_delay
-                self.open_sensors = None
+                self.open_sensors = open_sensors if open_sensors else None
 
                 dispatcher_send(
                     self.hass,
@@ -814,6 +815,9 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
                     if self._config[const.ATTR_DISARM_AFTER_TRIGGER] or not self.arm_mode:
                         self.bypassed_sensors = None
                         self.async_update_state(AlarmControlPanelState.DISARMED)
+                    elif self._config[const.ATTR_IGNORE_BLOCKING_SENSORS_AFTER_TRIGGER]:
+                        self.open_sensors = None
+                        self.async_arm(self.arm_mode, skip_validation=True, skip_delay=True)
                     else:
                         self.open_sensors = None
                         self._revert_state = AlarmControlPanelState.DISARMED

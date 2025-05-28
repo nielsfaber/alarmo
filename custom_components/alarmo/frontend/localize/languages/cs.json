@@ -42,6 +42,10 @@
               "heading": "Deaktivovat alarm po spuštění",
               "description": "Po vypršení času spuštěného alarmu, deatkivovat alarm místo návratu do zajištěného stavu."
             },
+            "ignore_blocking_sensors_after_trigger": {
+              "heading": "Ignorovat blokující senzory při opětovném zapnutí",
+              "description": "Návrat do zapnutého stavu bez kontroly senzorů, které by mohly být stále aktivní."
+            },
             "enable_mqtt": {
               "heading": "Povolit MQTT",
               "description": "Povolení kontroly alarmu přes MQTT."

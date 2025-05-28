@@ -42,6 +42,10 @@
               "heading": "Häire summutamine",
               "description": "Peale häire lõppu võta valvest maha miite ära valvesta uuesti."
             },
+            "ignore_blocking_sensors_after_trigger": {
+              "heading": "Ignoreeri blokeerivaid andureid uuesti valve alla panemisel",
+              "description": "Naaske valvestatud olekusse ilma kontrollimata andureid, mis võivad endiselt aktiivsed olla."
+            },
             "enable_mqtt": {
               "heading": "Luba MQTT juhtimine",
               "description": "Luba nupustiku juhtimist MQTT abil."

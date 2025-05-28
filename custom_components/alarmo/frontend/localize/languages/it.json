@@ -42,6 +42,10 @@
               "heading": "Disattiva allarme dopo l'attivazione",
               "description": "Dopo che il tempo di attivazione è scaduto, disattivare l'allarme invece di tornare allo stato inserito."
             },
+            "ignore_blocking_sensors_after_trigger": {
+              "heading": "Ignora i sensori di blocco durante il riarmo",
+              "description": "Ritornare allo stato armato senza controllare i sensori che potrebbero essere ancora attivi."
+            },
             "enable_mqtt": {
               "heading": "Abilita MQTT",
               "description": "Permetti al pannello allarme di essere controllato attraverso MQTT."
