@@ -38,6 +38,7 @@ class AreaFactory:
         "code_disarm_required": True,
         "code_mode_change_required": True,
         "disarm_after_trigger": False,
+        "ignore_blocking_sensors_after_trigger": False,
     }
 
     @staticmethod
@@ -78,6 +79,7 @@ class AreaFactory:
             "code_disarm_required",
             "code_mode_change_required",
             "disarm_after_trigger",
+            "ignore_blocking_sensors_after_trigger",
         ]:
             if k in kwargs:
                 area[k] = kwargs[k]
