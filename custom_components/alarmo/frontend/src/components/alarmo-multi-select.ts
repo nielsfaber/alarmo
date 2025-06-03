@@ -76,8 +76,6 @@ export class AlarmoMultiSelect extends LitElement {
   protected render(): TemplateResult {
     const hasValue = isDefined(this._value) && this.items.find(e => e.value == this._value);
 
-    console.log('renderr');
-
     return html`
       <vaadin-combo-box-light
         item-value-path="value"
@@ -204,20 +202,14 @@ export class AlarmoMultiSelect extends LitElement {
 
   private _valueChanged(ev: CustomEvent) {
     const newValue: string | [] = ev.detail.value;
-    if(newValue === '' || typeof newValue === 'object') return;
-    if(this.value.includes(newValue)) this._setValue(this.value.filter(e => e !== newValue));
+    if (newValue === '' || typeof newValue === 'object') return;
+    if (this.value.includes(newValue)) this._setValue(this.value.filter(e => e !== newValue));
     else this._setValue([...this.value, newValue]);
     ev.stopPropagation();
-    // if (newValue !== this._value) {
-    //   this._setValue(newValue);
-    // }
   }
 
   private _setValue(value: string[]) {
     this.value = value;
-
-    console.log('_setValue');
-    console.log(value);
 
     setTimeout(() => {
       fireEvent(this, 'value-changed', { value: this.value });
