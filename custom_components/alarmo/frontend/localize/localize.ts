@@ -6,14 +6,17 @@ import * as en from './languages/en.json';
 import * as es from './languages/es.json';
 import * as et from './languages/et.json';
 import * as fr from './languages/fr.json';
+import * as hu from './languages/hu.json';
 import * as it from './languages/it.json';
 import * as nl from './languages/nl.json';
+import * as pl from './languages/pl.json';
 import * as sk from './languages/sk.json';
 import * as sv from './languages/sv.json';
 import * as vi from './languages/vi.json';
 import * as zh_Hans from './languages/zh-Hans.json';
 import * as zh_Hant from './languages/zh-Hant.json';
 import * as ru from './languages/ru.json';
+import * as tr from './languages/tr.json';
 
 import IntlMessageFormat from 'intl-messageformat';
 
@@ -26,10 +29,13 @@ var languages: any = {
   et: et,
   es: es,
   fr: fr,
+  hu: hu,
   it: it,
   nl: nl,
+  pl: pl,
   sk: sk,
   sv: sv,
+  tr: tr,
   vi: vi,
   'zh-Hans': zh_Hans,
   'zh-Hant': zh_Hant,

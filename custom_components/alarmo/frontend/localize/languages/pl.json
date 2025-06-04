@@ -1,0 +1,569 @@
+{
+  "common": {
+    "modes_short": {
+      "armed_away": "Poza domem",
+      "armed_home": "W domu",
+      "armed_night": "Noc",
+      "armed_custom_bypass": "Custom",
+      "armed_vacation": "Wakacje"
+    },
+    "enabled": "Włączone",
+    "disabled": "Wyłączone"
+  },
+  "components": {
+    "time_slider": {
+      "seconds": "sek",
+      "minutes": "min",
+      "infinite": "nieskończenie",
+      "none": "brak"
+    },
+    "editor": {
+      "ui_mode": "Tryb UI",
+      "yaml_mode": "Tryb YAML",
+      "edit_in_yaml": "Edytuj w YAML"
+    },
+    "table": {
+      "filter": {
+        "label": "Filtruj elementy",
+        "item": "Filtruj po {name}",
+        "hidden_items": "{number} {number, plural,\n  jednego {item is}\n  innego {items are}\n} ukryty"
+      }
+    }
+  },
+  "title": "Panel alarmu",
+  "panels": {
+    "general": {
+      "title": "Główne",
+      "cards": {
+        "general": {
+          "description": "Ten panel definiuje globalne ustawienia alarmu.",
+          "fields": {
+            "disarm_after_trigger": {
+              "heading": "Rozbrojenie po wywołaniu alarmu",
+              "description": "Po upływie zdefiniowanego czasu od wywołania alarmu zostanie on rozbrojony."
+            },
+            "enable_mqtt": {
+              "heading": "Włącz MQTT",
+              "description": "Pozwala na sterowanie panelem alarmu za pomocą protokołu MQTT."
+            },
+            "enable_master": {
+              "heading": "Włącz master alarm",
+              "description": "Tworzy encję do sterowania wszystkimi obszarami jednocześnie."
+            }
+          },
+          "actions": {
+            "setup_mqtt": "Konfiguracja MQTT",
+            "setup_master": "Konfiguracja master"
+          }
+        },
+        "modes": {
+          "title": "Tryby",
+          "description": "Ten panel służy do konfiguracji trybów uzbrojenia alarmu.",
+          "modes": {
+            "armed_away": "Tryb  'Poza domem' może być użyty, gdy wszyscy opuszczają dom. Wszystkie czujniki drzwi i okien oraz detektory ruchu wewnątrz domu będą aktywne.",
+            "armed_home": "Tryb 'W domu' może być użyty, gdy mieszkańcy są w domu. Wszystkie czujniki drzwi i okien będą aktywne, poza detektorami ruchu wewnątrz domu.",
+            "armed_night": "Tryb 'Noc' może być użyty, gdy domownicy idą spać. Wszystkie czujniki drzwi i okien będą aktywne, a wybrane detektory ruchu (np. na dole) będą aktywne.",
+            "armed_vacation": "Tryb 'Wakacje' może być użyty w przypadku dłuższej nieobecności w domu. Czasy opóźnienia i reakcje na wyzwolenie czujnikow i detektorów mogą być dowolnie definiowane, aby nie wszczynać fałszywego alarmu",
+            "armed_custom_bypass": "Dodatkowa opcja do definiowania własnego trybu działania alarmu."
+          },
+          "number_sensors_active": "{number} {number, plural,\n  jeden {csensor}\n  inne {sensors}\n} aktywne",
+          "fields": {
+            "status": {
+              "heading": "Stan",
+              "description": "Sprawdza, czy alarm może być uzbrojony w tym trybie."
+            },
+            "exit_delay": {
+              "heading": "Opóźnienie uzbrojenia alarmu",
+              "description": "Alarm zostanie uzbrojony po ustawionym czasie, aby wszyscy mogli opuścić dom nie wywołując alarmu."
+            },
+            "entry_delay": {
+              "heading": "Opóźnienie wywołania alarmu",
+              "description": "Zdefiniowany czas, aby domownicy mogli wejść do domu i rozbroić alarm."
+            },
+            "trigger_time": {
+              "heading": "Czas działania alarmu",
+              "description": "Długość czasu aktywności alarmu po jego wyzwoleniu."
+            }
+          }
+        },
+        "mqtt": {
+          "title": "Konfiguracja MQTT",
+          "description": "Ten panel służy do konfiguracji interfejsu MQTT.",
+          "fields": {
+            "state_topic": {
+              "heading": "Temat aktualizacji",
+              "description": "Temat, na którym publikowane są aktualizacje stanu alarmu"
+            },
+            "event_topic": {
+              "heading": "Temat zdarzeń",
+              "description": "Temat, na którym publikowane są zdarzenia alarmowe"
+            },
+            "command_topic": {
+              "heading": "Temat poleceń",
+              "description": "Temat, na którym są nasłuchiwane polecenia uzbrojenia/rozbrojenia alarmu."
+            },
+            "require_code": {
+              "heading": "Wymagaj kodu",
+              "description": "Wymagaj przesłania kodu wraz z poleceniem."
+            },
+            "state_payload": {
+              "heading": "Konfiguruj pakiet danych dla każdego stanu",
+              "item": "Zdefiniuj pakiet danych dla stanu ''{state}''"
+            },
+            "command_payload": {
+              "heading": "Konfiguruj pakiet danych dla każdego polecenia",
+              "item": "Zdefiniuj pakiet danych dla polecenia ''{command}''"
+            }
+          }
+        },
+        "areas": {
+          "title": "Strefy",
+          "description": "Strefy służą do podziału domu na kilka części, każda z nich działa niezależnie od siebie.",
+          "no_items": "Nie zdefiniowano jeszcze żadnych stref.",
+          "table": {
+            "remarks": "Uwagi",
+            "summary": "Ten obszar zawiera {summary_sensors} oraz {summary_automations}.",
+            "summary_sensors": "{number} {number, plural,\n  one {sensor}\n  other {sensors}\n}",
+            "summary_automations": "{number} {number, plural,\n  one {automations}\n  other {automations}\n}"
+          },
+          "actions": {
+            "add": "Dodaj"
+          }
+        }
+      },
+      "dialogs": {
+        "create_area": {
+          "title": "Nowa strefa",
+          "fields": {
+            "copy_from": "Skopiuj ustawienia z"
+          }
+        },
+        "edit_area": {
+          "title": "Edytowanie strefy ''{area}''",
+          "name_warning": "Uwaga: zmiana nazwy strefy spowoduje zmianę nazwy encji"
+        },
+        "remove_area": {
+          "title": "Usunąć strefę?",
+          "description": "Czy na pewno chcesz usunąć tą strefę? Ta strefa zawiera {sensors} czujników i {automations} automatyzacji, które również zostaną usunięte."
+        },
+        "edit_master": {
+          "title": "Konfiguracja nadrzędna"
+        },
+        "disable_master": {
+          "title": "Wyłączyć konfigurację nadrzędną?",
+          "description": "Czy na pewno chcesz usunąć alarm nadrzędny? Ten obszar zawiera {automations} automatyzacje, które zostaną usunięte wraz z tą akcją."
+        }
+      }
+    },
+    "sensors": {
+      "title": "Czujniki",
+      "cards": {
+        "sensors": {
+          "description": "Obecnie skonfigurowane czujniki. Kliknij, aby wprowadzić zmiany.",
+          "table": {
+            "no_items": "Brak czujników do wyświetlenia.",
+            "no_area_warning": "Czujnik nie jest przypisany do żadnej strefy.",
+            "arm_modes": "Tryby uzbrojenia",
+            "always_on": "(Zawsze)"
+          }
+        },
+        "add_sensors": {
+          "title": "Dodaj czujniki",
+          "description": "Dodaj więcej czujników. Upewnij się, że Twoje czujniki mają odpowiednią nazwę, aby można je było rozpoznać.",
+          "no_items": "Nie ma dostępnych encji HA, które można skonfigurować dla alarmu. Upewnij się, że uwzględniasz encje typu binary_sensor.",
+          "table": {
+            "type": "Wykryty rodzaj"
+          },
+          "actions": {
+            "add_to_alarm": "dodaj do alarmu",
+            "filter_supported": "Ukryj nieznane elementy"
+          }
+        },
+        "editor": {
+          "title": "Edytuj czujnik",
+          "description": "Konfigurowanie ustawień czujnika ''{entity}''.",
+          "fields": {
+            "entity": {
+              "heading": "Encja",
+              "description": "Encja powiązana z tym czujnikiem"
+            },
+            "area": {
+              "heading": "Obszar",
+              "description": "Wybierz obszar, który zawiera ten czujnik."
+            },
+            "group": {
+              "heading": "Grupa",
+              "description": "Grupuj z innymi czujnikami, aby używać ich łącznie."
+            },
+            "device_type": {
+              "heading": "Typ urządzenia",
+              "description": "Wybierz typ urządzenia, odpowiednie ustawienia będą dobrane automatycznie.",
+              "choose": {
+                "door": {
+                  "name": "Drzwi",
+                  "description": "Drzwi, brama itp., którędy wchodzi się do domu."
+                },
+                "window": {
+                  "name": "Okno",
+                  "description": "Okno lub drzwi nieużywane do wchodzenia do domu, takie jak balkon."
+                },
+                "motion": {
+                  "name": "Ruch",
+                  "description": "Czujnik obecności lub podobne urządzenie mające opóźnienie między aktywacjami."
+                },
+                "tamper": {
+                  "name": "Sabotaż",
+                  "description": "Detektor usunięcia pokrywy czujnika, czujnik stłuczenia szkła itp."
+                },
+                "environmental": {
+                  "name": "Środowisko",
+                  "description": "Czujnik dymu/gazu, zalania itp. (nie związany z ochroną przed włamaniem)."
+                },
+                "other": {
+                  "name": "Ogólny"
+                }
+              }
+            },
+            "always_on": {
+              "heading": "Zawsze włączony",
+              "description": "Czujnik powinien zawsze wywołać alarm."
+            },
+            "modes": {
+              "heading": "Włączone tryby",
+              "description": "Tryby alarmu, w których ten czujnik jest aktywny."
+            },
+            "arm_on_close": {
+              "heading": "Uzbrojenie po zamknięciu",
+              "description": "Po wykryciu zamknięcia, alarm się uzbroi."
+            },
+            "use_exit_delay": {
+              "heading": "Użyj opóźnienia wyjścia",
+              "description": "Czujnik może być aktywny, w trakcie uzbrajania alarmu."
+            },
+            "use_entry_delay": {
+              "heading": "Użyj opóźnienia wejścia",
+              "description": "Aktywacja czujnika wywoła alarm dopiero po uzbrojeniu się alarmu."
+            },
+            "allow_open": {
+              "heading": "Pozwól na otwarcie",
+              "description": "Stan otwarty czujnika podczas uzbrajania jest ignorowany (kolejna aktywacja czujnika wyzwoli alarm)."
+            },
+            "auto_bypass": {
+              "heading": "Automatyczne pomijanie",
+              "description": "Wyklucz ten czujnik z alarmu, jeśli jest otwarty podczas uzbrajania.",
+              "modes": "Tryby, w których czujnik może być pominięty"
+            },
+            "trigger_unavailable": {
+              "heading": "Wyzwalaj, gdy niedostępny",
+              "description": "Gdy stan czujnika staje się 'niedostępny', czujnik jest wyzwalany."
+            }
+          },
+          "actions": {
+            "toggle_advanced": "Zaawansowane",
+            "remove": "Usuń",
+            "setup_groups": "Konfiguruj grupy"
+          },
+          "errors": {
+            "description": "Proszę poprawić następujące błędy:",
+            "no_area": "Nie wybrano obszaru",
+            "no_modes": "Nie wybrano trybów, w których czujnik powinien być aktywny",
+            "no_auto_bypass_modes": "Nie wybrano trybów, w których czujnik może być automatycznie pominięty"
+          }
+        }
+      },
+      "dialogs": {
+        "manage_groups": {
+          "title": "Zarządzaj grupami czujników",
+          "description": "W grupie czujników kilka czujników musi zostać aktywowanych w określonym czasie, aby alarm został uruchomiony.",
+          "no_items": "Brak grup",
+          "actions": {
+            "new_group": "Nowa grupa"
+          }
+        },
+        "create_group": {
+          "title": "Nowa grupa czujników",
+          "fields": {
+            "name": {
+              "heading": "Nazwa",
+              "description": "Nazwa grupy czujników"
+            },
+            "timeout": {
+              "heading": "Limit czasu",
+              "description": "Okres czasu, w którym kolejne aktywacje czujników uruchamiają alarm."
+            },
+            "event_count": {
+              "heading": "Liczba",
+              "description": "Liczba różnych czujników, które muszą zostać aktywowane, aby uruchomić alarm."
+            },
+            "sensors": {
+              "heading": "Czujniki",
+              "description": "Wybierz czujniki, które są zawarte w tej grupie."
+            }
+          },
+          "errors": {
+            "invalid_name": "Podano nieprawidłową nazwę.",
+            "insufficient_sensors": "Należy wybrać przynajmniej 2 czujniki."
+          }
+        },
+        "edit_group": {
+          "title": "Edytuj grupę czujników ''{name}''"
+        }
+      }
+    },
+    "codes": {
+      "title": "Kody",
+      "cards": {
+        "codes": {
+          "description": "Zmień ustawienia kodu.",
+          "fields": {
+            "code_arm_required": {
+              "heading": "Wymagaj kodu do uzbrojenia",
+              "description": "Aby uzbroić alarm, należy podać prawidłowy kod."
+            },
+            "code_disarm_required": {
+              "heading": "Wymagaj kodu do rozbrojenia",
+              "description": "Aby rozbroić alarm, należy podać prawidłowy kod."
+            },
+            "code_mode_change_required": {
+              "heading": "Wymagaj kodu do zmiany trybu",
+              "description": "Aby zmienić aktywny tryb uzbrojenia, należy podać prawidłowy kod."
+            },
+            "code_format": {
+              "heading": "Format kodu",
+              "description": "Ustawia sposób wprowadzania kodu/hasła dla karty alarmu Lovelace.",
+              "code_format_number": "kod PIN",
+              "code_format_text": "hasło"
+            }
+          }
+        },
+        "user_management": {
+          "title": "Zarządzanie użytkownikami",
+          "description": "Każdy użytkownik ma własny kod do uzbrojenia/rozbrojenia alarmu.",
+          "no_items": "Nie ma jeszcze użytkowników",
+          "actions": {
+            "new_user": "nowy użytkownik"
+          }
+        },
+        "new_user": {
+          "title": "Utwórz nowego użytkownika",
+          "description": "Użytkownicy, którzy mają dostęp do obsługi alarmu.",
+          "fields": {
+            "name": {
+              "heading": "Nazwa",
+              "description": "Nazwa użytkownika."
+            },
+            "code": {
+              "heading": "Kod",
+              "description": "Kod użytkownika."
+            },
+            "confirm_code": {
+              "heading": "Potwierdź kod",
+              "description": "Powtórz kod."
+            },
+            "can_arm": {
+              "heading": "Zezwól na kod do uzbrojenia",
+              "description": "Wprowadzenie tego kodu uzbroi alarm"
+            },
+            "can_disarm": {
+              "heading": "Zezwól na kod do rozbrojenia",
+              "description": "Wprowadzenie tego kodu rozbroi alarm"
+            },
+            "is_override_code": {
+              "heading": "Jest kodem nadrzędnym",
+              "description": "Wprowadzenie tego kodu uzbroi alarm siłowo"
+            },
+            "area_limit": {
+              "heading": "Ograniczone obszary",
+              "description": "Ogranicz użytkownika do kontrolowania tylko wybranych obszarów"
+            }
+          },
+          "errors": {
+            "no_name": "Nie podano nazwy.",
+            "no_code": "Kod powinien mieć co najmniej 4 znaki/liczby.",
+            "code_mismatch": "Kody nie pasują do siebie."
+          }
+        },
+        "edit_user": {
+          "title": "Edytuj użytkownika",
+          "description": "Zmień konfigurację dla użytkownika ''{name}''.",
+          "fields": {
+            "old_code": {
+              "heading": "Obecny kod",
+              "description": "Obecny kod, pozostaw pusty, aby go nie zmieniać."
+            }
+          }
+        }
+      }
+    },
+    "actions": {
+      "title": "Akcje",
+      "cards": {
+        "notifications": {
+          "title": "Powiadomienia",
+          "description": "Za pomocą tego panelu możesz zarządzać wysyłanymi powiadomieniami.",
+          "table": {
+            "no_items": "Nie utworzono jeszcze żadnych powiadomień.",
+            "no_area_warning": "Akcja nie jest przypisana do żadnego obszaru."
+          },
+          "actions": {
+            "new_notification": "nowe powiadomienie"
+          }
+        },
+        "actions": {
+          "description": "Ten panel może być użyty do przełączania urządzenia, gdy zmienia się stan alarmu.",
+          "table": {
+            "no_items": "Nie utworzono jeszcze żadnych akcji."
+          },
+          "actions": {
+            "new_action": "nowa akcja"
+          }
+        },
+        "new_notification": {
+          "title": "Konfiguruj powiadomienie",
+          "description": "Otrzymuj powiadomienie podczas uzbrajania/rozbrajania alarmu, aktywacji itp.",
+          "trigger": "Warunek",
+          "action": "Zadanie",
+          "options": "Opcje",
+          "fields": {
+            "event": {
+              "heading": "Zdarzenie",
+              "description": "Zdecyduj, kiedy powiadomienie powinno być wysłane",
+              "choose": {
+                "armed": {
+                  "name": "Alarm jest uzbrojony",
+                  "description": "Alarm został uzbrojony"
+                },
+                "disarmed": {
+                  "name": "Alarm jest rozbrojony",
+                  "description": "Alarm został rozbrojony"
+                },
+                "triggered": {
+                  "name": "Wywołano alarm",
+                  "description": "Alarm został wywołany"
+                },
+                "untriggered": {
+                  "name": "Zakończono alarm",
+                  "description": "Alarm został zakończony"
+                },
+                "arm_failure": {
+                  "name": "Nie udało się uzbroić alarmu",
+                  "description": "Uzbrojenie alarmu nie powiodło się z powodu co najmniej jednego otwartego czujnika"
+                },
+                "arming": {
+                  "name": "Rozpoczęto opóźnienie wyjścia",
+                  "description": "Rozpoczęto opóźnienie wyjścia, wyjdż z domu."
+                },
+                "pending": {
+                  "name": "Rozpoczęto opóźnienie wejścia",
+                  "description": "Rozpoczęto opóźnienie wejścia, alarm wkrótce będzie wywołany."
+                }
+              }
+            },
+            "mode": {
+              "heading": "Tryb",
+              "description": "Ogranicz akcję do określonych trybów uzbrojenia (opcjonalnie)"
+            },
+            "title": {
+              "heading": "Tytuł",
+              "description": "Tytuł powiadomienia"
+            },
+            "message": {
+              "heading": "Wiadomość",
+              "description": "Treść powiadomienia",
+              "insert_wildcard": "Wstaw wildcard",
+              "placeholders": {
+                "armed": "Alarm jest ustawiony w trybie {{arm_mode}}",
+                "disarmed": "Alarm jest teraz WYŁĄCZONY",
+                "triggered": "Alarm został wyzwolony! Przyczyna: {{open_sensors}}.",
+                "untriggered": "Alarm nie jest już wyzwolony.",
+                "arm_failure": "Alarm nie mógł zostać uzbrojony w tej chwili z powodu: {{open_sensors}}.",
+                "arming": "Alarm wkrótce zostanie uzbrojony, wyjdż z domu.",
+                "pending": "Alarm wkrótce zostanie wywołany, rozbrój go!"
+              }
+            },
+            "open_sensors_format": {
+              "heading": "Format wildcard dla open_sensors",
+              "description": "Wybierz, które informacje o czujnikach są dodawane do wiadomości",
+              "options": {
+                "default": "Nazwy i stany",
+                "short": "Tylko nazwy"
+              }
+            },
+            "arm_mode_format": {
+              "heading": "Język dla wildcard arm_mode",
+              "description": "Wybierz, w jakim języku tryb uzbrojenia jest wstawiany do wiadomości"
+            },
+            "target": {
+              "heading": "Urządzenie",
+              "description": "Urządzenie, do którego wysyłane będzie powiadomienie"
+            },
+            "media_player_entity": {
+              "heading": "Encja odtwarzacza multimedialnego",
+              "description": "Wybierz głosnik, na którym będą odtwarzane wiadomości"
+            },
+            "name": {
+              "heading": "Nazwa",
+              "description": "Opis dla tego powiadomienia",
+              "placeholders": {
+                "armed": "Powiadom {target} o uzbrojeniu",
+                "disarmed": "Powiadom {target} o rozbrojeniu",
+                "triggered": "Powiadom {target} o wywołaniu alarmu",
+                "untriggered": "Powiadom {target} o zakończeniu alarmu",
+                "arm_failure": "Powiadom {target} o niepowodzeniu",
+                "arming": "Powiadom {target} o opuszczeniu domu",
+                "pending": "Powiadom {target} o przybyciu do domu"
+              }
+            },
+            "delete": {
+              "heading": "Usuń automatyzację",
+              "description": "Trwale usuń tę automatyzację"
+            }
+          },
+          "actions": {
+            "test": "Wypróbuj"
+          }
+        },
+        "new_action": {
+          "title": "Konfiguruj akcję",
+          "description": "Przełącz światła lub urządzenia (takie jak syreny) podczas uzbrajania/rozbrajania alarmu, aktywacji itp.",
+          "fields": {
+            "event": {
+              "heading": "Zdarzenie",
+              "description": "Kiedy akcja powinna być wykonana"
+            },
+            "area": {
+              "heading": "Strefa",
+              "description": "Strefa alarmu, dla którego zdarzenie ma zastosowanie."
+            },
+            "mode": {
+              "heading": "Tryb",
+              "description": "Ogranicz akcję do określonych trybów uzbrojenia (opcjonalnie)"
+            },
+            "entity": {
+              "heading": "Encja",
+              "description": "Encja, na której ma być wykonana akcja"
+            },
+            "action": {
+              "heading": "Akcja",
+              "description": "Akcja do wykonania na encji",
+              "no_common_actions": "Akcje mogą być przypisane tylko w trybie YAML dla wybranych encji."
+            },
+            "name": {
+              "heading": "Nazwa",
+              "description": "Opis dla tej akcji",
+              "placeholders": {
+                "armed": "Ustaw {entity} na {state} podczas uzbrajania alarmu",
+                "disarmed": "Ustaw {entity} na {state} podczas rozbrajania alarmu",
+                "triggered": "Ustaw {entity} na {state} gdy wywołano alarm",
+                "untriggered": "Ustaw {entity} na {state} gdy rozbroisz alarm",
+                "arm_failure": "Ustaw {entity} na {state} nie uda się rozbroić alarmu",
+                "arming": "Ustaw {entity} na {state} gdy opuszczasz dom",
+                "pending": "Ustaw {entity} na {state} gdy wchodzisz do domu"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
