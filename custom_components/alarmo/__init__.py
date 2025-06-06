@@ -1,7 +1,12 @@
 """The Alarmo Integration."""
+
+# Max number of threads to start when checking user codes.
+MAX_WORKERS = 4
+
 import logging
 import bcrypt
 import base64
+import concurrent.futures
 import re
 
 from homeassistant.core import (
@@ -119,6 +124,18 @@ async def async_remove_entry(hass, entry):
 async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Handle migration of config entry."""
     return True
+
+
+def check_user_code(user, code):
+    """Returns the supplied user object if the code matches, None otherwise."""
+    if not user[const.ATTR_ENABLED]:
+        return
+    elif not user[ATTR_CODE] and not code:
+        return user
+    elif user[ATTR_CODE]:
+        hash = base64.b64decode(user[ATTR_CODE])
+        if bcrypt.checkpw(code.encode("utf-8"), hash):
+            return user
 
 
 class AlarmoCoordinator(DataUpdateCoordinator):
@@ -282,16 +299,10 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                 user_id: self.store.async_get_user(user_id)
             }
 
-        for (user_id, user) in users.items():
-            if not user[const.ATTR_ENABLED]:
-                continue
-            elif not user[ATTR_CODE] and not code:
-                return user
-            elif user[ATTR_CODE]:
-                hash = base64.b64decode(user[ATTR_CODE])
-                if bcrypt.checkpw(code.encode("utf-8"), hash):
-                    return user
-
+        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+            futures = [executor.submit(check_user_code, user[1], code) for user in users.items()]
+            for future in concurrent.futures.as_completed(futures):
+                if future.result(): return future.result()
         return
 
     def async_update_automation_config(self, automation_id: str = None, data: dict = {}):
