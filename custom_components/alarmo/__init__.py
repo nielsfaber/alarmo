@@ -2,6 +2,8 @@
 
 # Max number of threads to start when checking user codes.
 MAX_WORKERS = 4
+# Number of rounds of hashing when computing user hashes.
+BCRYPT_NUM_ROUNDS = 10
 
 import logging
 import bcrypt
@@ -272,7 +274,7 @@ class AlarmoCoordinator(DataUpdateCoordinator):
             data[const.ATTR_CODE_FORMAT] = "number" if data[ATTR_CODE].isdigit() else "text"
             data[const.ATTR_CODE_LENGTH] = len(data[ATTR_CODE])
             hashed = bcrypt.hashpw(
-                data[ATTR_CODE].encode("utf-8"), bcrypt.gensalt(rounds=12)
+                data[ATTR_CODE].encode("utf-8"), bcrypt.gensalt(rounds=BCRYPT_NUM_ROUNDS)
             )
             hashed = base64.b64encode(hashed)
             data[ATTR_CODE] = hashed.decode()
