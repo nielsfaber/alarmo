@@ -300,7 +300,7 @@ class AlarmoCoordinator(DataUpdateCoordinator):
             }
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-            futures = [executor.submit(check_user_code, user[1], code) for user in users.items()]
+            futures = [executor.submit(check_user_code, user, code) for user in users.values()]
             for future in concurrent.futures.as_completed(futures):
                 if future.result(): return future.result()
         return
