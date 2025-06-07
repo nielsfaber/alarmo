@@ -9,6 +9,7 @@ import * as fr from './languages/fr.json';
 import * as hu from './languages/hu.json';
 import * as it from './languages/it.json';
 import * as nl from './languages/nl.json';
+import * as pl from './languages/pl.json';
 import * as sk from './languages/sk.json';
 import * as sv from './languages/sv.json';
 import * as vi from './languages/vi.json';
@@ -31,6 +32,7 @@ var languages: any = {
   hu: hu,
   it: it,
   nl: nl,
+  pl: pl,
   sk: sk,
   sv: sv,
   tr: tr,
