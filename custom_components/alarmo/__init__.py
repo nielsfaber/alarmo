@@ -293,7 +293,7 @@ class AlarmoCoordinator(DataUpdateCoordinator):
         if not user_id:
             self.store.async_create_user(data)
         else:
-            if ATTR_CODE in data
+            if ATTR_CODE in data:
                 del data[const.ATTR_OLD_CODE]
             self.store.async_update_user(user_id, data)
 
