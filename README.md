@@ -28,6 +28,11 @@ This is an alarm system integration for Home Assistant. It provides a user inter
     - [Codes and users](#codes-and-users)
       - [Codes](#codes)
     - [Services](#services)
+    - [alarmo.arm](#alarmoarm)
+    - [alarmo.disarm](#alarmodisarm)
+    - [alarmo.skip\_delay](#alarmoskip_delay)
+    - [alarmo.enable\_user](#alarmoenable_user)
+    - [alarmo.disable\_user](#alarmodisable_user)
     - [Events](#events)
       - [alarmo\_failed\_to\_arm](#alarmo_failed_to_arm)
       - [alarmo\_command\_success](#alarmo_command_success)
@@ -354,6 +359,56 @@ So it is impossible to recover your pin code.
 This also means that if you lose your pincode, you cannot unlock the alarm (there is no backup code!)
 
 ### Services
+Alarmo exposes `alarm_control_panel` entities. These can be interacted with from automations by using services.
+HA defines a set of generic services which can be used to control the alarm entities, see [here](https://www.home-assistant.io/integrations/alarm_control_panel/#actions). 
+
+The following sections define the Alarmo-specific services that are supported.
+
+### alarmo.arm
+Arm the alarm. 
+Can also be used to transition between arm modes.
+
+The following table provides the settings that can be provided with the `alarmo.arm` service:
+
+| Setting      | Optional/required | Description                                                                                        | Example value                |
+| ------------ | ----------------- | -------------------------------------------------------------------------------------------------- | ---------------------------- |
+| `entity_id`  | Required          | Entity-ID of the alarm.                                                                            | `alarm_control_panel.alarmo` |
+| `code`       | Optional          | Code used for arming the alarm. Only needed if a code is required for arming.                      | `1234`                       |
+| `mode`       | Required          | Mode in which to arm the alarm to. Valid values are `away`, `home`, `night`, `vacation`, `custom`. | `away`                       |
+| `skip_delay` | Optional          | Set to `true` to arm without any exit delay.                                                       | `true`                       |
+| `force`      | Optional          | Set to `true` for enforced arming, causing any open sensors to be bypassed.                        | `true`                       |
+
+### alarmo.disarm
+Disarm the alarm.
+Equivalent to the service `alarm_control_panel.alarm_disarm`.
+
+The following table provides the settings that can be provided with the `alarmo.disarm` service:
+
+| Setting     | Optional/required | Description                                                                         | Example value                |
+| ----------- | ----------------- | ----------------------------------------------------------------------------------- | ---------------------------- |
+| `entity_id` | Required          | Entity-ID of the alarm.                                                             | `alarm_control_panel.alarmo` |
+| `code`      | Optional          | Code used for disarming the alarm. Only needed if a code is required for disarming. | `1234`                       |
+
+### alarmo.skip_delay
+Skip the remaining delay time and proceed to the next state.
+This service only has effect when the alarm entity is in the `arming` or `pending` state.
+| Setting     | Optional/required | Description             | Example value                |
+| ----------- | ----------------- | ----------------------- | ---------------------------- |
+| `entity_id` | Required          | Entity-ID of the alarm. | `alarm_control_panel.alarmo` |
+
+### alarmo.enable_user
+Enable a user for operating the alarm using his/her configured code.
+
+| Setting | Optional/required | Description                     | Example value |
+| ------- | ----------------- | ------------------------------- | ------------- |
+| `name`  | Required          | Name of the user to be enabled. | `Frank`       |
+
+### alarmo.disable_user
+Disable a user for operating the alarm using his/her configured code.
+
+| Setting | Optional/required | Description                      | Example value |
+| ------- | ----------------- | -------------------------------- | ------------- |
+| `name`  | Required          | Name of the user to be disabled. | `Frank`       |
 
 ### Events
 Alarmo exposes several [events](https://www.home-assistant.io/docs/configuration/events/) in HA, which can be used within automations or template entities for user-specific needs.
