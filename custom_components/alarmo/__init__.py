@@ -293,7 +293,7 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                 hash = base64.b64decode(user[ATTR_CODE])
                 if bcrypt.checkpw(code.encode("utf-8"), hash):
                     return user
-            
+
         if not user_id:
             users = self.store.async_get_users()
         else:
