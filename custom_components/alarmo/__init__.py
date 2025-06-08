@@ -1,7 +1,14 @@
 """The Alarmo Integration."""
+
+# Max number of threads to start when checking user codes.
+MAX_WORKERS = 4
+# Number of rounds of hashing when computing user hashes.
+BCRYPT_NUM_ROUNDS = 10
+
 import logging
 import bcrypt
 import base64
+import concurrent.futures
 import re
 
 from homeassistant.core import (
@@ -255,7 +262,7 @@ class AlarmoCoordinator(DataUpdateCoordinator):
             data[const.ATTR_CODE_FORMAT] = "number" if data[ATTR_CODE].isdigit() else "text"
             data[const.ATTR_CODE_LENGTH] = len(data[ATTR_CODE])
             hashed = bcrypt.hashpw(
-                data[ATTR_CODE].encode("utf-8"), bcrypt.gensalt(rounds=12)
+                data[ATTR_CODE].encode("utf-8"), bcrypt.gensalt(rounds=BCRYPT_NUM_ROUNDS)
             )
             hashed = base64.b64encode(hashed)
             data[ATTR_CODE] = hashed.decode()
@@ -275,16 +282,11 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                 self.store.async_update_user(user_id, data)
 
     def async_authenticate_user(self, code: str, user_id: str = None):
-        if not user_id:
-            users = self.store.async_get_users()
-        else:
-            users = {
-                user_id: self.store.async_get_user(user_id)
-            }
 
-        for (user_id, user) in users.items():
+        def check_user_code(user, code):
+            """Returns the supplied user object if the code matches, None otherwise."""
             if not user[const.ATTR_ENABLED]:
-                continue
+                return
             elif not user[ATTR_CODE] and not code:
                 return user
             elif user[ATTR_CODE]:
@@ -292,7 +294,16 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                 if bcrypt.checkpw(code.encode("utf-8"), hash):
                     return user
 
-        return
+        if user_id:
+            return check_user_code(self.store.async_get_user(user_id), code)
+
+        users = self.store.async_get_users()
+        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+            futures = [executor.submit(check_user_code, user, code) for user in users.values()]
+            for future in concurrent.futures.as_completed(futures):
+                if future.result():
+                    executor.shutdown(wait=False, cancel_futures=True)
+                    return future.result()
 
     def async_update_automation_config(self, automation_id: str = None, data: dict = {}):
         if const.ATTR_REMOVE in data:
