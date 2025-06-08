@@ -128,18 +128,6 @@ async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     return True
 
 
-def check_user_code(user, code):
-    """Returns the supplied user object if the code matches, None otherwise."""
-    if not user[const.ATTR_ENABLED]:
-        return
-    elif not user[ATTR_CODE] and not code:
-        return user
-    elif user[ATTR_CODE]:
-        hash = base64.b64decode(user[ATTR_CODE])
-        if bcrypt.checkpw(code.encode("utf-8"), hash):
-            return user
-
-
 class AlarmoCoordinator(DataUpdateCoordinator):
     """Define an object to hold Alarmo device."""
 
@@ -294,6 +282,18 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                 self.store.async_update_user(user_id, data)
 
     def async_authenticate_user(self, code: str, user_id: str = None):
+
+        def check_user_code(user, code):
+            """Returns the supplied user object if the code matches, None otherwise."""
+            if not user[const.ATTR_ENABLED]:
+                return
+            elif not user[ATTR_CODE] and not code:
+                return user
+            elif user[ATTR_CODE]:
+                hash = base64.b64decode(user[ATTR_CODE])
+                if bcrypt.checkpw(code.encode("utf-8"), hash):
+                    return user
+            
         if not user_id:
             users = self.store.async_get_users()
         else:
