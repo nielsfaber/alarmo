@@ -294,20 +294,16 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                 if bcrypt.checkpw(code.encode("utf-8"), hash):
                     return user
 
-        if not user_id:
-            users = self.store.async_get_users()
-        else:
-            users = {
-                user_id: self.store.async_get_user(user_id)
-            }
+        if user_id:
+            return check_user_code(self.store.async_get_user(user_id), code)
 
+        users = self.store.async_get_users()
         with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
             futures = [executor.submit(check_user_code, user, code) for user in users.values()]
             for future in concurrent.futures.as_completed(futures):
                 if future.result():
                     executor.shutdown(wait=False, cancel_futures=True)
                     return future.result()
-        return
 
     def async_update_automation_config(self, automation_id: str = None, data: dict = {}):
         if const.ATTR_REMOVE in data:
