@@ -270,15 +270,17 @@ class AlarmoCoordinator(DataUpdateCoordinator):
             self.store.async_delete_user(user_id)
             return
 
-        if user_id:
-            if ATTR_CODE in data:
+        if ATTR_CODE in data:
+            # Do not allow creation of multiple users with same code, as we idenitify users by this code
+            user_with_code = self.async_authenticate_user(data[ATTR_CODE])
+            if user_id:
                 if const.ATTR_OLD_CODE not in data:
                     return False
                 if not self.async_authenticate_user(data[const.ATTR_OLD_CODE], user_id):
                     return False
-        else:
-            if ATTR_CODE in data and self.async_authenticate_user(data[ATTR_CODE]):
-                # Do not allow creation of multiple users with same code, as we idenitify users by this code
+                if user_with_code and user_with_code[const.ATTR_USER_ID] != user_id:
+                    return False
+            elif user_with_code:
                 return False
 
         if ATTR_CODE in data and data[ATTR_CODE]:
