@@ -617,7 +617,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
         self.async_write_ha_state()
 
     @callback
-    def async_update_state(self, state: str = None):
+    def async_update_state(self, state: str = None) -> None:
         """update the state or refresh state attributes"""
 
         if state == self._state:
@@ -626,22 +626,44 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
         old_state = self._state
         self._state = state
 
-        _LOGGER.debug("entity {} was updated from {} to {}".format(self.entity_id, old_state, state))
+        _LOGGER.debug(
+            "entity %s was updated from %s to %s",
+            self.entity_id,
+            old_state,
+            state,
+        )
 
-        if state in const.ARM_MODES + [AlarmControlPanelState.DISARMED]:
+        if state in (
+            *const.ARM_MODES,
+            AlarmControlPanelState.DISARMED,
+        ):
             # cancel a running timer that possibly running when transitioning from states arming, pending, triggered
             self.async_clear_timer()
 
-        if self.state not in [AlarmControlPanelState.ARMING, AlarmControlPanelState.PENDING]:
+        if self.state not in [
+            AlarmControlPanelState.ARMING,
+            AlarmControlPanelState.PENDING,
+        ]:
             self.delay = None
 
         if state in const.ARM_MODES:
             self._arm_mode = state
             self._revert_state = None
-        elif old_state == AlarmControlPanelState.DISARMED and state == AlarmControlPanelState.TRIGGERED:
+        elif (
+            old_state == AlarmControlPanelState.DISARMED
+            and state == AlarmControlPanelState.TRIGGERED
+        ):
             self._arm_mode = None
 
-        dispatcher_send(self.hass, "alarmo_state_updated", self.area_id, old_state, state)
+        dispatcher_send(
+            hass=self.hass,
+            signal="alarmo_state_updated",
+            *(
+                self.area_id,
+                old_state,
+                state,
+            ),
+        )
 
         self.schedule_update_ha_state()
 
@@ -991,70 +1013,97 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
         self.async_write_ha_state()
 
     @callback
-    def async_update_state(self, state: str = None):
-        """update the state or refresh state attributes"""
+    def async_update_state(self, state: str = None) -> None:
+        """update the state or refresh state attributes.
 
+
+        Note:
+            The 'state' parameter is retained for backward compatibility only.
+            It is ignored if provided, and state updates must be determined internally.
+        """
+
+        # Do not allow updating the state directly
         if state:
-            # do not allow updating the state directly
             return
 
-        states = [
-            item.state
-            for item in self.hass.data[const.DOMAIN]["areas"].values()
-        ]
-        state = None
-        if AlarmControlPanelState.TRIGGERED in states:
-            state = AlarmControlPanelState.TRIGGERED
-        elif AlarmControlPanelState.PENDING in states:
-            state = AlarmControlPanelState.PENDING
-        elif AlarmControlPanelState.ARMING in states and all(el in const.ARM_MODES or el == AlarmControlPanelState.ARMING for el in states):
-            state = AlarmControlPanelState.ARMING
-        elif all(el == AlarmControlPanelState.ARMED_AWAY for el in states):
-            state = AlarmControlPanelState.ARMED_AWAY
-        elif all(el == AlarmControlPanelState.ARMED_HOME for el in states):
-            state = AlarmControlPanelState.ARMED_HOME
-        elif all(el == AlarmControlPanelState.ARMED_NIGHT for el in states):
-            state = AlarmControlPanelState.ARMED_NIGHT
-        elif all(el == AlarmControlPanelState.ARMED_CUSTOM_BYPASS for el in states):
-            state = AlarmControlPanelState.ARMED_CUSTOM_BYPASS
-        elif all(el == AlarmControlPanelState.ARMED_VACATION for el in states):
-            state = AlarmControlPanelState.ARMED_VACATION
-        elif all(el == AlarmControlPanelState.DISARMED for el in states):
-            state = AlarmControlPanelState.DISARMED
+        def _get_domain_areas():
+            """Get areas from the domain data."""
+            return self.hass.data[const.DOMAIN]["areas"]
 
-        arm_modes = [
-            item._arm_mode
-            for item in self.hass.data[const.DOMAIN]["areas"].values()
+        # set up a copy of const.STATES, excluding states we don't want to check all sensors against
+        control_panel_states = [
+            state
+            for state in const.STATES
+            if state
+            not in (
+                AlarmControlPanelState.ARMING,
+                AlarmControlPanelState.PENDING,
+                AlarmControlPanelState.TRIGGERED,
+            )
         ]
-        arm_mode = arm_modes[0] if len(set(arm_modes)) == 1 else None
+
+        active_sensor_states = [item.state for item in _get_domain_areas().values()]
+
+        if AlarmControlPanelState.TRIGGERED in active_sensor_states:
+            state = AlarmControlPanelState.TRIGGERED
+            self._last_triggered = dt_util.now().strftime("%Y-%m-%d %H:%M:%S")
+        elif AlarmControlPanelState.PENDING in active_sensor_states:
+            state = AlarmControlPanelState.PENDING
+        elif AlarmControlPanelState.ARMING in active_sensor_states and all(
+            sensor_state in const.ARM_MODES
+            or sensor_state == AlarmControlPanelState.ARMING
+            for sensor_state in active_sensor_states
+        ):
+            state = AlarmControlPanelState.ARMING
+        else:
+            # Match all sensors to one consistent state, if able
+            for control_panel_state in control_panel_states:
+                if all(
+                    sensor_state == control_panel_state
+                    for sensor_state in active_sensor_states
+                ):
+                    state = control_panel_state
+                    break
+
+        arm_modes = {item._arm_mode for item in _get_domain_areas().values()}
+        arm_mode = arm_modes[0] if len(arm_modes) == 1 else None
 
         if state == self._target_state:
             # we are transitioning to an armed state and target state is reached
             self._target_state = None
 
-        if state in [AlarmControlPanelState.ARMING, AlarmControlPanelState.PENDING]:
-            # one or more areas went to arming/pending state, recalculate the delay time
+        def _get_matching_areas():
+            """Get areas that match the current state."""
+            return [
+                area for area in _get_domain_areas().values() if area.state == state
+            ]
 
-            area_filter = dict(filter(lambda el: el[1].state == state, self.hass.data[const.DOMAIN]["areas"].items()))
-            delays = [el.delay for el in area_filter.values()]
+        delay = None
+        if state in [
+            AlarmControlPanelState.ARMING,
+            AlarmControlPanelState.PENDING,
+        ]:
+            # one or more areas went to arming/pending state, recalculate the delay time
+            delays = [area.delay for area in _get_matching_areas()]
 
             # use maximum of all areas when arming, minimum of all areas when pending
-            delay = max(delays) if state == AlarmControlPanelState.ARMING else min(delays) if len(delays) else None
-        else:
-            delay = None
+            if delays:
+                if state == AlarmControlPanelState.ARMING:
+                    delay = max(delays)
+                else:
+                    delay = min(delays)
 
         # take open sensors by combining areas having same state
         open_sensors = {}
-        area_filter = dict(filter(lambda el: el[1].state == state, self.hass.data[const.DOMAIN]["areas"].items()))
-        for item in area_filter.values():
-            if item.open_sensors:
-                open_sensors.update(item.open_sensors)
+        for area in _get_matching_areas():
+            if area.open_sensors:
+                open_sensors.update(area.open_sensors)
 
         if (
-            arm_mode == self._arm_mode and
-            (state == self._state or not state) and
-            delay == self.delay and
-            open_sensors == self.open_sensors
+            arm_mode == self._arm_mode
+            and (state == self._state or not state)
+            and delay == self.delay
+            and open_sensors == self.open_sensors
         ):
             # do not update if state and properties remain unchanged
             return
@@ -1066,20 +1115,28 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
         if state != self._state and state:
             # state changes
             old_state = self._state
-
             self._state = state
-            _LOGGER.debug("entity {} was updated from {} to {}".format(self.entity_id, old_state, state))
-            dispatcher_send(self.hass, "alarmo_state_updated", None, old_state, state)
 
-            if state == AlarmControlPanelState.TRIGGERED:
-                 self._last_triggered = dt_util.now().strftime("%Y-%m-%d %H:%M:%S")
+            _LOGGER.debug(
+                "entity %s was updated from %s to %s",
+                self.entity_id,
+                old_state,
+                state,
+            )
+            dispatcher_send(
+                hass=self.hass,
+                signal="alarmo_state_updated",
+                *(
+                    None,
+                    old_state,
+                    state,
+                ),
+            )
 
-        # take bypassed sensors by combining all areas
-        bypassed_sensors = []
-        for item in self.hass.data[const.DOMAIN]["areas"].values():
-            if item.bypassed_sensors:
-                bypassed_sensors.extend(item.bypassed_sensors)
-        self.bypassed_sensors = bypassed_sensors
+        # get bypassed sensors by combining all areas
+        self.bypassed_sensors = [
+            area.bypassed_sensors for area in _get_domain_areas().values()
+        ]
 
         self.update_ready_to_arm_modes()
 
