@@ -2,15 +2,14 @@ To Run the Tests:
 
 From the project root...
 
-```python -m venv venv```
-```source venv/bin/activate```
-```pip install -r requirements_test.txt```
+```uv venv```
+```uv sync```
 To run all the tests:
-```pytest tests```
+```uv run pytest tests```
 OR to run a battery of tests in a file:
-```pytest tests/test_user_permissions.py```
+```uv run pytest tests/test_user_permissions.py```
 OR to run a single test in a file:
-```pytest tests/test_user_permissions.py -k test_arm_with_authorized_user```
+```uv run pytest tests/test_user_permissions.py -k test_arm_with_authorized_user```
 
 ---
 
