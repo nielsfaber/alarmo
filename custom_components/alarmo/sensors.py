@@ -191,7 +191,11 @@ class SensorHandler:
                 state = self.hass.states.get(entity)
                 sensor_state = parse_sensor_state(state)
                 if state and state.state and sensor_state != STATE_UNKNOWN:
-                    _LOGGER.debug("Initial state for {} is {}".format(entity, parse_sensor_state(state)))
+                    _LOGGER.debug(
+                        "Initial state for %s is %s",
+                        entity,
+                        parse_sensor_state(state),
+                    )
 
         if area_id:
             self.update_ready_to_arm_status(area_id)
@@ -274,14 +278,23 @@ class SensorHandler:
         sensor_config = self._config[entity]
         if old_state == STATE_UNKNOWN:
             # sensor is unknown at startup, state which comes after is considered as initial state
-            _LOGGER.debug("Initial state for {} is {}".format(entity, new_state))
+            _LOGGER.debug(
+                "Initial state for %s is %s",
+                entity,
+                new_state,
+            )
             self.update_ready_to_arm_status(sensor_config["area"])
             return
         if old_state == new_state:
             # not a state change - ignore
             return
 
-        _LOGGER.debug("entity {} changed: old_state={}, new_state={}".format(entity, old_state, new_state))
+        _LOGGER.debug(
+            "entity %s changed: old_state=%s, new_state=%s",
+            entity,
+            old_state,
+            new_state,
+        )
 
         alarm_entity = self.hass.data[const.DOMAIN]["areas"][sensor_config["area"]]
         alarm_state = alarm_entity.state
@@ -317,7 +330,10 @@ class SensorHandler:
 
         if sensor_config[ATTR_ALWAYS_ON]:
             # immediate trigger due to always on sensor
-            _LOGGER.info("Alarm is triggered due to an always-on sensor: {}".format(entity))
+            _LOGGER.info(
+                "Alarm is triggered due to an always-on sensor: %s",
+                entity,
+            )
             alarm_entity.async_trigger(
                 skip_delay=True,
                 open_sensors=open_sensors
@@ -325,12 +341,18 @@ class SensorHandler:
 
         elif alarm_state == AlarmControlPanelState.ARMING:
             # sensor triggered while arming, abort arming
-            _LOGGER.debug("Arming was aborted due to a sensor being active: {}".format(entity))
+            _LOGGER.debug(
+                "Arming was aborted due to a sensor being active: %s",
+                entity,
+            )
             alarm_entity.async_arm_failure(open_sensors)
 
         elif alarm_state in const.ARM_MODES:
             # standard alarm trigger
-            _LOGGER.info("Alarm is triggered due to sensor: {}".format(entity))
+            _LOGGER.info(
+                "Alarm is triggered due to sensor: %s",
+                entity,
+            )
             alarm_entity.async_trigger(
                 skip_delay=(not sensor_config[ATTR_USE_ENTRY_DELAY]),
                 open_sensors=open_sensors
@@ -338,7 +360,10 @@ class SensorHandler:
 
         elif alarm_state == AlarmControlPanelState.PENDING:
             # immediate trigger while in pending state
-            _LOGGER.info("Alarm is triggered due to sensor: {}".format(entity))
+            _LOGGER.info(
+                "Alarm is triggered due to sensor: %s",
+                entity,
+            )
             alarm_entity.async_trigger(
                 skip_delay=True,
                 open_sensors=open_sensors
@@ -402,12 +427,20 @@ class SensorHandler:
         }
         recent_events = dict(filter(lambda el: el[1] <= group[ATTR_TIMEOUT], recent_events.items()))
         if len(recent_events.keys()) < group[ATTR_EVENT_COUNT]:
-            _LOGGER.debug("tripped sensor {} was ignored since it belongs to group {}".format(entity, group[ATTR_NAME]))
+            _LOGGER.debug(
+                "tripped sensor %s was ignored since it belongs to group %s",
+                entity,
+                group[ATTR_NAME],
+            )
             return {}
         else:
             for entity in recent_events.keys():
                 open_sensors[entity] = group_events[entity][ATTR_STATE]
-            _LOGGER.debug("tripped sensor {} caused the triggering of group {}".format(entity, group[ATTR_NAME]))
+            _LOGGER.debug(
+                "tripped sensor %s caused the triggering of group %s",
+                entity, 
+                group[ATTR_NAME],
+            )
             return open_sensors
 
     def update_ready_to_arm_status(self, area_id):

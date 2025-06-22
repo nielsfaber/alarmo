@@ -104,7 +104,12 @@ class AutomationHandler:
             if not alarm_entity:
                 return
 
-            _LOGGER.debug("state of {} is updated from {} to {}".format(alarm_entity.entity_id, old_state, new_state))
+            _LOGGER.debug(
+                "state of %s is updated from %s to %s",
+                alarm_entity.entity_id,
+                old_state,
+                new_state,
+            )
 
             if new_state in const.ARM_MODES:
                 # we don't distinguish between armed modes for automations, they are handled separately
@@ -134,7 +139,10 @@ class AutomationHandler:
             else:
                 alarm_entity = self.hass.data[const.DOMAIN]["master"]
 
-            _LOGGER.debug("{} has failed to arm".format(alarm_entity.entity_id))
+            _LOGGER.debug(
+                "%s has failed to arm",
+                alarm_entity.entity_id,
+            )
 
             for automation_id, config in self._config.items():
                 if not config[const.ATTR_ENABLED]:
@@ -158,7 +166,10 @@ class AutomationHandler:
 
     async def async_execute_automation(self, automation_id: str, alarm_entity: AlarmoBaseEntity):
         # automation is a dict of AutomationEntry
-        _LOGGER.debug("Executing automation {}".format(automation_id))
+        _LOGGER.debug(
+            "Executing automation %s",
+            automation_id,
+        )
 
         actions = self._config[automation_id][const.ATTR_ACTIONS]
         for action in actions:
@@ -191,7 +202,11 @@ class AutomationHandler:
                     )
                 )
             except HomeAssistantError as e:
-                _LOGGER.error("Execution of action {} failed, reason: {}".format(automation_id, e))
+                _LOGGER.error(
+                    "Execution of action %s failed, reason: %s",
+                    automation_id,
+                    e,
+                )
 
     def get_automations_by_area(self, area_id: str):
         result = []
@@ -280,17 +295,21 @@ class AutomationHandler:
         device_type = entity.attributes["device_class"] if entity and "device_class" in entity.attributes else None
 
         if state == STATE_OPEN:
-            translation_key = "component.binary_sensor.device_automation.condition_type.{}".format(
-                ENTITY_CONDITIONS[device_type][0]["type"]
-            ) if device_type in ENTITY_CONDITIONS else None
+            translation_key = (
+                f"component.binary_sensor.device_automation.condition_type.{ENTITY_CONDITIONS[device_type][0]["type"]}" 
+                if device_type in ENTITY_CONDITIONS 
+                else None
+            )
             if translation_key and translation_key in translations:
                 string = translations[translation_key]
             else:
                 string = "{entity_name} is open"
         elif state == STATE_CLOSED:
-            translation_key = "component.binary_sensor.device_automation.condition_type.{}".format(
-                ENTITY_CONDITIONS[device_type][1]["type"]
-            ) if device_type in ENTITY_CONDITIONS else None
+            translation_key = (
+                f"component.binary_sensor.device_automation.condition_type.{ENTITY_CONDITIONS[device_type][1]["type"]}"
+                if device_type in ENTITY_CONDITIONS 
+                else None
+            )
             if translation_key and translation_key in translations:
                 string = translations[translation_key]
             else:
@@ -326,8 +345,10 @@ class AutomationHandler:
             self._alarmTranslationLang = language
 
         translation_key = (
-            "component.alarm_control_panel.entity_component._.state.{}".format(arm_mode)
-        ) if arm_mode else None
+            f"component.alarm_control_panel.entity_component._.state.{arm_mode}"
+            if arm_mode 
+            else None
+        ) 
 
         if translation_key and translation_key in translations:
             return translations[translation_key]

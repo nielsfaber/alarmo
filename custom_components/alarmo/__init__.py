@@ -341,7 +341,10 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                 _LOGGER.info("Received request for disarming")
                 alarm_entity.alarm_disarm(None, skip_code=True)
             else:
-                _LOGGER.info("Received request for arming with mode {}".format(arm_mode))
+                _LOGGER.info(
+                    "Received request for arming with mode %s", 
+                    arm_mode,
+                )
                 alarm_entity.async_handle_arm_request(arm_mode, skip_code=True)
 
         self._subscriptions.append(
@@ -386,7 +389,11 @@ class AlarmoCoordinator(DataUpdateCoordinator):
             # add sensor to group
             group = self.store.async_get_sensor_group(group_id)
             if not group:
-                _LOGGER.error("Failed to assign entity {} to group {}".format(entity_id, group_id))
+                _LOGGER.error(
+                    "Failed to assign entity %s to group %s",
+                    entity_id,
+                    group_id,
+                )
             elif entity_id not in group[ATTR_ENTITIES]:
                 self.store.async_update_sensor_group(group_id, {
                     ATTR_ENTITIES: group[ATTR_ENTITIES] + [entity_id]
@@ -442,11 +449,19 @@ def register_services(hass):
         users = coordinator.store.async_get_users()
         user = next((item for item in list(users.values()) if item[ATTR_NAME] == name), None)
         if user is None:
-            _LOGGER.warning("Failed to {} user, no match for name '{}'".format("enable" if enable else "disable", name))
+            _LOGGER.warning(
+                "Failed to %s user, no match for name '%s'",
+                "enable" if enable else "disable",
+                name,
+            )
             return
 
         coordinator.store.async_update_user(user[const.ATTR_USER_ID], {const.ATTR_ENABLED: enable})
-        _LOGGER.debug("User user '{}' was {}".format(name, "enabled" if enable else "disabled"))
+        _LOGGER.debug(
+            "User user '%s' was %s",
+            name,
+            "enabled" if enable else "disabled"
+        )
 
     async_register_admin_service(
         hass, const.DOMAIN, const.SERVICE_ENABLE_USER, async_srv_toggle_user, schema=const.SERVICE_TOGGLE_USER_SCHEMA
