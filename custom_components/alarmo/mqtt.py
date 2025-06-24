@@ -81,7 +81,11 @@ class MqttHandler:
                 message = new_state
 
             hass.async_create_task(mqtt.async_publish(self.hass, topic, message, retain=True))
-            _LOGGER.debug("Published state '{}' on topic '{}'".format(message, topic))
+            _LOGGER.debug(
+                "Published state '%s' on topic '%s'",
+                message,
+                topic,
+            )
 
         self._subscriptions.append(
             async_dispatcher_connect(self.hass, "alarmo_state_updated", async_alarm_state_changed)
@@ -107,10 +111,7 @@ class MqttHandler:
 
             if event == const.EVENT_ARM:
                 payload = {
-                    "event": "{}_{}".format(
-                        event.upper(),
-                        args["arm_mode"].split("_", 1).pop(1).upper()
-                    ),
+                    "event": f"{event.upper()}_{args["arm_mode"].split("_", 1).pop(1).upper()}",
                     "delay": args["delay"],
                 }
             elif event == const.EVENT_TRIGGER:
@@ -181,7 +182,10 @@ class MqttHandler:
                     self.async_message_received,
                 )
         )
-        _LOGGER.debug("Subscribed to topic {}".format(self._config[ATTR_MQTT][CONF_COMMAND_TOPIC]))
+        _LOGGER.debug(
+            "Subscribed to topic %s",
+            self._config[ATTR_MQTT][CONF_COMMAND_TOPIC],
+        )
 
     @callback
     async def async_message_received(self, msg):
@@ -251,7 +255,10 @@ class MqttHandler:
         if area:
             res = list(filter(lambda el: slugify(el.name) == area, self.hass.data[const.DOMAIN]["areas"].values()))
             if not res:
-                _LOGGER.warning("Area {} does not exist".format(area))
+                _LOGGER.warning(
+                    "Area %s does not exist",
+                    area,
+                )
                 return
             entity = res[0]
         else:
@@ -263,7 +270,10 @@ class MqttHandler:
                 _LOGGER.warning("No area specified")
                 return
 
-        _LOGGER.debug("Received command {}".format(command))
+        _LOGGER.debug(
+            "Received command %s",
+            command,
+        )
 
         if command == command_payloads[const.COMMAND_DISARM]:
             entity.alarm_disarm(code, skip_code=skip_code)
