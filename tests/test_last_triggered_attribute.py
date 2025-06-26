@@ -1,4 +1,4 @@
-"""Test last_triggered attribute feature (issue #1103)."""
+"""Test last_triggered attribute feature (#1103)."""
 
 from datetime import datetime
 from typing import Any

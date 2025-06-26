@@ -45,6 +45,7 @@ OR to run a single test in a file:
 | Motion sensors not monitored while disarmed | `test_ready_to_arm_events.py` |
 | Cross-area independence for ready-to-arm status | `test_ready_to_arm_events.py` |
 | last_triggered attribute (set, persist, update) | `test_last_triggered_attribute.py` |
+| Trigger timeout behavior (re-arm/disarm after trigger timeout, with and without ignore_blocking_sensors_after_trigger) | `test_trigger_timeout_behavior.py` |
 
 ### **Not Covered:**
 
