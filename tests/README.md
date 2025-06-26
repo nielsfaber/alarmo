@@ -44,6 +44,7 @@ OR to run a single test in a file:
 | Ready-to-arm events (backend dispatcher and HA event bus) | `test_ready_to_arm_events.py` |
 | Motion sensors not monitored while disarmed | `test_ready_to_arm_events.py` |
 | Cross-area independence for ready-to-arm status | `test_ready_to_arm_events.py` |
+| last_triggered attribute (set, persist, update) | `test_last_triggered_attribute.py` |
 
 ### **Not Covered:**
 
