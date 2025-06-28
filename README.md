@@ -56,6 +56,7 @@ This is an alarm system integration for Home Assistant. It provides a user inter
     - [Android MQTT Alarm Panel](#android-mqtt-alarm-panel)
     - [Apple Homekit](#apple-homekit)
     - [Google Home](#google-home)
+  - [Making Contributions](#making-contributions)
   - [Say thank you](#say-thank-you)
 
 
@@ -831,6 +832,10 @@ It is also possible to arm/disarm the alarm as a step in a routine (e.g. the *'G
 * Since anyone can wake up your device and speak to Google Assistant, it's highly recommended to set up a pincode for disarming.
 * In case you have a pin set up, the Google Assistant will ask you to speak the pin. In some devices, like the Nest Hub, it is also possible to enter the pin via the keypad on the screen.
 * The Google Translate [text-to-speech service](https://www.home-assistant.io/integrations/google_translate/) can be very useful to provide additional feedback (e.g. when arming fails) for the members of your home. You can set up a notification action via Alarmo.
+
+## Making Contributions
+Want to contribute? See the [Development](./DEVELOPMENT.md) documentation for setup instructions.
+
 
 ## Say thank you
 If you want to make donation as appreciation of my work, you can do so via PayPal or buy me a coffee. Thank you!
