@@ -14,7 +14,7 @@
     "time_slider": {
       "seconds": "sek",
       "minutes": "min",
-      "infinite": "nieskończenie",
+      "infinite": "w nieskończoność",
       "none": "brak"
     },
     "editor": {
@@ -26,7 +26,7 @@
       "filter": {
         "label": "Filtruj elementy",
         "item": "Filtruj po {name}",
-        "hidden_items": "{number} {number, plural,\n  jednego {item is}\n  innego {items are}\n} ukryty"
+        "hidden_items": "{number} {number, plural,\n  one { element jest}\n  other { elementy są}\n} ukryte"
       }
     }
   },
@@ -66,7 +66,7 @@
             "armed_vacation": "Tryb 'Wakacje' może być użyty w przypadku dłuższej nieobecności w domu. Czasy opóźnienia i reakcje na wyzwolenie czujnikow i detektorów mogą być dowolnie definiowane, aby nie wszczynać fałszywego alarmu",
             "armed_custom_bypass": "Dodatkowa opcja do definiowania własnego trybu działania alarmu."
           },
-          "number_sensors_active": "{number} {number, plural,\n  jeden {csensor}\n  inne {sensors}\n} aktywne",
+          "number_sensors_active": "{number} {number, plural,\n  one {czujnik}\n  other {czujniki}\n} aktywne",
           "fields": {
             "status": {
               "heading": "Stan",
@@ -123,8 +123,8 @@
           "table": {
             "remarks": "Uwagi",
             "summary": "Ten obszar zawiera {summary_sensors} oraz {summary_automations}.",
-            "summary_sensors": "{number} {number, plural,\n  one {sensor}\n  other {sensors}\n}",
-            "summary_automations": "{number} {number, plural,\n  one {automations}\n  other {automations}\n}"
+            "summary_sensors": "{number} {number, plural,\n  one {czujnik}\n  other {czujniki}\n}",
+            "summary_automations": "{number} {number, plural,\n  one {automatyzacja}\n  other {automatyzacje}\n}"
           },
           "actions": {
             "add": "Dodaj"
@@ -451,7 +451,7 @@
                 },
                 "arming": {
                   "name": "Rozpoczęto opóźnienie wyjścia",
-                  "description": "Rozpoczęto opóźnienie wyjścia, wyjdż z domu."
+                  "description": "Rozpoczęto opóźnienie wyjścia, wyjdź z domu."
                 },
                 "pending": {
                   "name": "Rozpoczęto opóźnienie wejścia",
@@ -473,7 +473,7 @@
               "insert_wildcard": "Wstaw wildcard",
               "placeholders": {
                 "armed": "Alarm jest ustawiony w trybie {{arm_mode}}",
-                "disarmed": "Alarm jest teraz WYŁĄCZONY",
+                "disarmed": "Alarm jest teraz wyłączony.",
                 "triggered": "Alarm został wyzwolony! Przyczyna: {{open_sensors}}.",
                 "untriggered": "Alarm nie jest już wyzwolony.",
                 "arm_failure": "Alarm nie mógł zostać uzbrojony w tej chwili z powodu: {{open_sensors}}.",
