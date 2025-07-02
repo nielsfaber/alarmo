@@ -42,6 +42,10 @@
               "heading": "Frakobling efter alarm",
               "description": "Efter udløsningstid er udløbet, deaktiver alarmen i stedet for at vende tilbage til aktiveret tilstand."
             },
+            "ignore_blocking_sensors_after_trigger": {
+              "heading": "Ignorer blokeringssensorer ved genaktivering",
+              "description": "Gå tilbage til aktiveret tilstand uden at kontrollere for sensorer, der stadig kan være aktive."
+            },
             "enable_mqtt": {
               "heading": "Aktiver MQTT",
               "description": "Tillad at alarmpanelet blive styret igennem MQTT."

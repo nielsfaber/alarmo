@@ -1,0 +1,85 @@
+{
+  "services": {
+    "arm": {
+      "name": "Élesítés",
+      "description": "Egy Alarmo riasztózóna élesítése egyedi beállításokkal.",
+      "fields": {
+        "entity_id": {
+          "name": "Entitás azonosító",
+          "description": "A riasztózóna, amelyet élesíteni kell."
+        },
+        "code": {
+          "name": "Kód",
+          "description": "Az élesítéshez használt kód."
+        },
+        "mode": {
+          "name": "Mód",
+          "description": "A riasztó élesítési módja."
+        },
+        "skip_delay": {
+          "name": "Késleltetés kihagyása",
+          "description": "Kijárási késleltetés kihagyása élesítéskor."
+        },
+        "force": {
+          "name": "Kényszerített élesítés",
+          "description": "Automatikusan kizár minden olyan zónát, amely akadályozza az élesítést (pl. nyitott érzékelők)."
+        }
+      }
+    },
+    "disarm": {
+      "name": "Hatástalanítás",
+      "description": "Egy Alarmo riasztózóna hatástalanítása.",
+      "fields": {
+        "entity_id": {
+          "name": "Entitás azonosító",
+          "description": "A riasztózóna, amelyet hatástalanítani kell."
+        },
+        "code": {
+          "name": "Kód",
+          "description": "A hatástalanításhoz használt kód."
+        }
+      }
+    },
+    "skip_delay": {
+      "name": "Skip Delay",
+      "description": "Skip the remainder of the exit/entry delay and proceed directly to the next state. Only has effect whilst the alarm is in arming or pending state.",
+      "fields": {
+        "entity_id": {
+          "name": "Entity ID",
+          "description": "Alarm entity for which the delay should be skipped."
+        }
+      }
+    },
+    "enable_user": {
+      "name": "Felhasználó engedélyezése",
+      "description": "Felhasználó engedélyezése az Alarmo élesítésére/hatástalanítására.",
+      "fields": {
+        "name": {
+          "name": "Név",
+          "description": "A felhasználó neve, akit engedélyezni szeretnél."
+        }
+      }
+    },
+    "disable_user": {
+      "name": "Felhasználó letiltása",
+      "description": "Felhasználó tiltása az Alarmo élesítéséből/hatástalanításából.",
+      "fields": {
+        "name": {
+          "name": "Név",
+          "description": "A felhasználó neve, akit le szeretnél tiltani."
+        }
+      }
+    }
+  },
+  "selector": {
+    "arm_mode": {
+      "options": {
+        "away": "Teljes élesítés (távollét)",
+        "night": "Élesítés éjszakára",
+        "home": "Részleges élesítés (otthon)",
+        "vacation": "Élesítés nyaralás mód",
+        "custom": "Egyedi élesítés (zónák kizárásával)"
+      }
+    }
+  }
+}

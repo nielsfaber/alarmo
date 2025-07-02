@@ -308,6 +308,7 @@ export class NotificationEditorCard extends LitElement {
             )}:
                           </span>
                           <alarmo-chip-set
+                            selectable
                             .items=${getWildcardOptions(this.config.triggers[0].event, this.alarmoConfig)}
                             @value-changed=${(ev: CustomEvent) => this._insertWildCard(ev.detail)}
                           ></alarmo-chip-set>

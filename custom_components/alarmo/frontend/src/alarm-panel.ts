@@ -15,12 +15,20 @@ import { localize } from '../localize/localize';
 import { exportPath, getPath, Path } from './common/navigation';
 import { navigate } from './helpers';
 
+enum EMenuItems {
+  General = 'general',
+  Sensors = 'sensors',
+  Codes = 'codes',
+  Actions = 'actions'
+}
+
 @customElement('alarm-panel')
 export class MyAlarmPanel extends LitElement {
-  @property() public hass!: HomeAssistant;
+  @property({ attribute: false }) public hass!: HomeAssistant;
+
   @property({ type: Boolean, reflect: true }) public narrow!: boolean;
 
-  @property() userConfig?: Dictionary<AlarmoUser>;
+  @property({ attribute: false }) userConfig?: Dictionary<AlarmoUser>;
 
   async firstUpdated() {
     window.addEventListener('location-changed', () => {
@@ -53,25 +61,15 @@ export class MyAlarmPanel extends LitElement {
           </div>
         </div>
 
-        <ha-tabs
-          scrollable
-          attr-for-selected="page-name"
-          .selected=${path.page}
-          @iron-activate=${this.handlePageSelected}
+        <sl-tab-group
+          @sl-tab-show=${this.handlePageSelected}
         >
-          <paper-tab page-name="general">
-            ${localize('panels.general.title', this.hass.language)}
-          </paper-tab>
-          <paper-tab page-name="sensors">
-            ${localize('panels.sensors.title', this.hass.language)}
-          </paper-tab>
-          <paper-tab page-name="codes">
-            ${localize('panels.codes.title', this.hass.language)}
-          </paper-tab>
-          <paper-tab page-name="actions">
-            ${localize('panels.actions.title', this.hass.language)}
-          </paper-tab>
-        </ha-tabs>
+          ${Object.values(EMenuItems).map(e => html`
+            <sl-tab slot="nav" panel="${e}" .active=${path.page === e}>
+              ${localize(`panels.${e}.title`, this.hass.language)}
+            </sl-tab>
+          `)}
+        </sl-tab-group>
       </div>
       <div class="view">
         ${this.getView(path)}
@@ -110,8 +108,8 @@ export class MyAlarmPanel extends LitElement {
     }
   }
 
-  handlePageSelected(ev) {
-    const newPage = ev.detail.item.getAttribute('page-name');
+  handlePageSelected(ev: CustomEvent) {
+    const newPage = ev.detail.name;
     if (newPage !== getPath()) {
       navigate(this, exportPath(newPage));
       this.requestUpdate();
@@ -145,28 +143,25 @@ export class MyAlarmPanel extends LitElement {
         line-height: 20px;
         flex-grow: 1;
       }
-      ha-tabs {
+      sl-tab-group {
         margin-left: max(env(safe-area-inset-left), 24px);
         margin-right: max(env(safe-area-inset-right), 24px);
-        --paper-tabs-selection-bar-color: var(--app-header-selection-bar-color, var(--app-header-text-color, #fff));
-        text-transform: uppercase;
+        --ha-tab-active-text-color: var(--app-header-text-color, white);
+        --ha-tab-indicator-color: var(--app-header-text-color, white);
+        --ha-tab-track-color: transparent;
       }
-
       .view {
         height: calc(100vh - 112px);
         display: flex;
         justify-content: center;
       }
-
       .view > * {
         width: 600px;
         max-width: 600px;
       }
-
       .view > *:last-child {
         margin-bottom: 20px;
       }
-
       .version {
         font-size: 14px;
         font-weight: 500;

@@ -52,6 +52,15 @@ disarm:
       required: false
       selector:
         text:
+skip_delay:
+  fields:
+    entity_id:
+      example: "alarm_control_panel.alarm"
+      required: true
+      selector:
+        entity:
+          integration: alarmo
+          domain: alarm_control_panel
 enable_user:
   fields:
     name:

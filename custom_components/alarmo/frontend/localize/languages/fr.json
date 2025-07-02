@@ -42,6 +42,10 @@
               "heading": "Désactivation après déclenchement",
               "description": "Lorsque le temps de fonctionnement de la sirène est écoulé, désactive l'alarme au lieu de la réactiver."
             },
+            "ignore_blocking_sensors_after_trigger": {
+              "heading": "Ignorer les capteurs de blocage lors du réarmement",
+              "description": "Revenez à l'état armé sans vérifier les capteurs qui peuvent encore être actifs."
+            },
             "enable_mqtt": {
               "heading": "Utilisation avec MQTT",
               "description": "Permet au panneau d'alarme d'être contrôlé via MQTT."

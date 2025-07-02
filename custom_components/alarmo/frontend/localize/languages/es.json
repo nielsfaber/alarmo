@@ -42,6 +42,10 @@
               "heading": "Desarmar después de disparar",
               "description": "Una vez transcurrido el tiempo de activación, desactivar la alarma en lugar de volver al estado de armada."
             },
+            "ignore_blocking_sensors_after_trigger": {
+              "heading": "Ignorar los sensores de bloqueo al rearmar",
+              "description": "Regresar al estado armado sin verificar si hay sensores que aún puedan estar activos."
+            },
             "enable_mqtt": {
               "heading": "Habilitar MQTT",
               "description": "Permitir que el panel de alarma se controle a través de MQTT."

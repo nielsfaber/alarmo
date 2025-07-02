@@ -97,6 +97,7 @@ class AlarmoConfigView(HomeAssistantView):
             {
                 vol.Optional(ATTR_CODE_ARM_REQUIRED): cv.boolean,
                 vol.Optional(const.ATTR_CODE_DISARM_REQUIRED): cv.boolean,
+                vol.Optional(const.ATTR_IGNORE_BLOCKING_SENSORS_AFTER_TRIGGER): cv.boolean,
                 vol.Optional(const.ATTR_CODE_MODE_CHANGE_REQUIRED): cv.boolean,
                 vol.Optional(ATTR_CODE_FORMAT): vol.In(
                     [CodeFormat.NUMBER, CodeFormat.TEXT]

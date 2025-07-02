@@ -42,6 +42,10 @@
               "heading": "Tắt bảo vệ sau khi báo động",
               "description": "Sau khi đã hết thời gian kích hoạt báo động, tắt bảo vệ thay vì trở lại trạng thái bảo vệ trước đó."
             },
+            "ignore_blocking_sensors_after_trigger": {
+              "heading": "Bỏ qua các cảm biến chặn khi kích hoạt lại",
+              "description": "Trở lại trạng thái bật chế độ cảnh báo mà không cần kiểm tra các cảm biến có thể vẫn đang hoạt động."
+            },
             "enable_mqtt": {
               "heading": "Bật MQTT",
               "description": "Cho phép quản lý bảng điều khiển báo động qua MQTT."

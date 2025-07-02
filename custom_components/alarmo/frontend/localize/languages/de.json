@@ -42,6 +42,10 @@
               "heading": "Entschärfen nach Auslösung",
               "description": "Nach Ablauf der Auslösezeit wird der Alarm entschärft, anstatt in den scharfen Zustand zurückzukehren."
             },
+            "ignore_blocking_sensors_after_trigger": {
+              "heading": "Blockierende Sensoren beim erneuten Scharfschalten ignorieren",
+              "description": "Kehren Sie in den scharfgeschalteten Zustand zurück, ohne zu prüfen, ob die Sensoren noch aktiv sind."
+            },
             "enable_mqtt": {
               "heading": "MQTT aktivieren",
               "description": "Erlaubt die Steuerung der Alarmzentrale über MQTT."

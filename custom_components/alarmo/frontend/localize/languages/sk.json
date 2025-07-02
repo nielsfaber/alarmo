@@ -42,6 +42,10 @@
               "heading": "Deaktivujte po spustení",
               "description": "Po uplynutí času spustenia alarm namiesto návratu do stráženého stavu deaktivujte."
             },
+            "ignore_blocking_sensors_after_trigger": {
+              "heading": "Ignorovať blokujúce senzory počas opätovného zapínania stráženia",
+              "description": "Návrat do zapnutého stavu bez kontroly senzorov, ktoré môžu byť stále aktívne."
+            },
             "enable_mqtt": {
               "heading": "Povoliť MQTT",
               "description": "Umožnite, aby bol panel alarmu ovládaný cez MQTT."

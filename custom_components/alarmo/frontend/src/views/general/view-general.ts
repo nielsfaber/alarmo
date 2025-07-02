@@ -43,7 +43,7 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
     this.config = await fetchConfig(this.hass);
     this.areas = await fetchAreas(this.hass);
     this.automations = await fetchAutomations(this.hass);
-    this.data = pick(this.config, ['trigger_time', 'disarm_after_trigger', 'mqtt', 'master']);
+    this.data = pick(this.config, ['trigger_time', 'disarm_after_trigger', 'ignore_blocking_sensors_after_trigger', 'mqtt', 'master']);
   }
 
   firstUpdated() {
@@ -87,6 +87,24 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
         }}
             ></ha-switch>
           </alarmo-settings-row>
+
+          ${this.data?.disarm_after_trigger === false
+          ? html`
+          <alarmo-settings-row .narrow=${this.narrow} nested>
+            <span slot="heading">
+              ${localize('panels.general.cards.general.fields.ignore_blocking_sensors_after_trigger.heading', this.hass.language)}
+            </span>
+            <span slot="description">
+              ${localize('panels.general.cards.general.fields.ignore_blocking_sensors_after_trigger.description', this.hass.language)}
+            </span>
+            <ha-switch
+              ?checked=${this.data!.ignore_blocking_sensors_after_trigger}
+              @change=${(ev: Event) => {
+              this.saveData({ ignore_blocking_sensors_after_trigger: (ev.target as HTMLInputElement).checked });
+            }}
+            ></ha-switch>
+          </alarmo-settings-row>
+          ` : ''}
 
           <alarmo-settings-row .narrow=${this.narrow}>
             <span slot="heading">

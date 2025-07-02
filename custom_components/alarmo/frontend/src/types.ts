@@ -92,6 +92,7 @@ export type AlarmoConfig = {
   code_mode_change_required: boolean;
   code_format: 'number' | 'text';
   disarm_after_trigger: boolean;
+  ignore_blocking_sensors_after_trigger: boolean;
   mqtt: MqttConfig;
   master: MasterConfig;
 };

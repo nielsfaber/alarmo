@@ -4,6 +4,8 @@ import { fireEvent } from '../fire_event';
 import { isDefined, IsEqual } from '../helpers';
 import { HomeAssistant } from '../types';
 
+import './alarmo-chip-set';
+
 export type Option = {
   value: string;
   name: string;
@@ -44,28 +46,13 @@ export class AlarmoSelector extends LitElement {
 
   protected render(): TemplateResult {
     return html`
-      <div class="chip-set">
-        ${this.value.length
-          ? this.value
-              .map(val => this.items.find(e => e.value == val))
-              .filter(isDefined)
-              .map(
-                e =>
-                  html`
-          <div class="chip">
-            <ha-icon class="icon" icon=${e.icon}>
-            </ha-icon>
-            <span class="label">
-              ${e.name}
-            </span>            
-            <ha-icon class="button" icon="hass:close" @click=${() => this._removeClick(e.value)}>
-            </ha-icon>
-            </mwc-icon-button>
-          </div>
-        `
-              )
-          : ''}
-      </div>
+      <alarmo-chip-set
+        .hass=${this.hass}
+        .items=${this.value.map(val => this.items.find(e => e.value == val)).filter(isDefined)}
+        removable
+        @value-changed=${this._removeClick}
+      >
+      </alarmo-chip-set>
       <alarmo-select
         .hass=${this.hass}
         .items=${this.items.filter(e => !this.value.includes(e.value))}
@@ -78,7 +65,8 @@ export class AlarmoSelector extends LitElement {
     `;
   }
 
-  private _removeClick(value: string) {
+  private _removeClick(ev: CustomEvent) {
+    const value = ev.detail;
     this.value = this.value.filter(e => e !== value);
     fireEvent(this, 'value-changed', { value: this.value });
   }
@@ -90,55 +78,5 @@ export class AlarmoSelector extends LitElement {
     if (!this.value.includes(value)) this.value = [...this.value, value];
     target.value = '';
     fireEvent(this, 'value-changed', { value: [...this.value] });
-  }
-
-  static get styles(): CSSResultGroup {
-    return css`
-      div.chip-set {
-        margin: 0px -4px;
-      }
-      div.chip {
-        height: 32px;
-        border-radius: 16px;
-        border: 2px solid rgb(168, 232, 251);
-        line-height: 1.25rem;
-        font-size: 0.875rem;
-        font-weight: 400;
-        padding: 0px 12px;
-        display: inline-flex;
-        align-items: center;
-        box-sizing: border-box;
-        margin: 4px;
-      }
-      .icon {
-        vertical-align: middle;
-        outline: none;
-        display: flex;
-        align-items: center;
-        border-radius: 50%;
-        padding: 6px;
-        color: rgba(0, 0, 0, 0.54);
-        background: rgb(168, 232, 251);
-        --mdc-icon-size: 20px;
-        margin-left: -14px !important;
-      }
-      .label {
-        margin: 0px 4px;
-      }
-      .button {
-        cursor: pointer;
-        background: var(--secondary-text-color);
-        border-radius: 50%;
-        --mdc-icon-size: 14px;
-        color: var(--card-background-color);
-        width: 16px;
-        height: 16px;
-        padding: 1px;
-        box-sizing: border-box;
-        display: inline-flex;
-        align-items: center;
-        margin-right: -6px !important;
-      }
-    `;
   }
 }

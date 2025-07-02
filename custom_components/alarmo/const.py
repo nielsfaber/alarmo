@@ -15,7 +15,7 @@ from homeassistant.components.alarm_control_panel import (
 )
 from homeassistant.helpers import config_validation as cv
 
-VERSION = "1.10.7"
+VERSION = "1.10.9"
 NAME = "Alarmo"
 MANUFACTURER = "@nielsfaber"
 
@@ -115,6 +115,7 @@ ATTR_USER_ID = "user_id"
 ATTR_CAN_ARM = "can_arm"
 ATTR_CAN_DISARM = "can_disarm"
 ATTR_DISARM_AFTER_TRIGGER = "disarm_after_trigger"
+ATTR_IGNORE_BLOCKING_SENSORS_AFTER_TRIGGER = "ignore_blocking_sensors_after_trigger"
 
 ATTR_REMOVE = "remove"
 ATTR_IS_OVERRIDE_CODE = "is_override_code"
@@ -174,6 +175,7 @@ MODES_TO_SUPPORTED_FEATURES = {
 
 SERVICE_ARM = "arm"
 SERVICE_DISARM = "disarm"
+SERVICE_SKIP_DELAY = "skip_delay"
 
 CONF_ALARM_ARMED_AWAY = "armed_away"
 CONF_ALARM_ARMED_CUSTOM_BYPASS = "armed_custom_bypass"
@@ -212,6 +214,12 @@ SERVICE_DISARM_SCHEMA = cv.make_entity_service_schema(
         vol.Required(ATTR_ENTITY_ID): cv.entity_id,
         vol.Optional(CONF_CODE, default=""): cv.string,
         vol.Optional(ATTR_CONTEXT_ID): int
+    }
+)
+
+SERVICE_SKIP_DELAY_SCHEMA = cv.make_entity_service_schema(
+    {
+        vol.Required(ATTR_ENTITY_ID): cv.entity_id,
     }
 )
 

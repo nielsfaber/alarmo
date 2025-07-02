@@ -39,8 +39,12 @@
           "description": "This panel defines some global settings for the alarm.",
           "fields": {
             "disarm_after_trigger": {
-              "heading": "Disarm after trigger",
-              "description": "After trigger time has expired, disarm the alarm instead of returning to armed state."
+              "heading": "Disarm after triggering",
+              "description": "Automatically disarm the alarm rather than returning to the armed state."
+            },
+            "ignore_blocking_sensors_after_trigger": {
+              "heading": "Ignore blocking sensors when re-arming",
+              "description": "Return to armed state without checking for sensors that may still be active."
             },
             "enable_mqtt": {
               "heading": "Enable MQTT",

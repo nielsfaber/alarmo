@@ -176,12 +176,13 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
     sensors.sort(sortAlphabetically);
 
     if (!sensors.length) return localize('panels.sensors.cards.sensors.no_items', this.hass.language);
-
+    
     return html`
       <alarmo-chip-set
+        .hass=${this.hass}
         .items=${sensors}
         .value=${this.data.entities}
-        ?selectable=${true}
+        toggleable
         @value-changed=${(ev: CustomEvent) => (this.data = { ...this.data, entities: ev.detail })}
       ></alarmo-chip-set>
     `;

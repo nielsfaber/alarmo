@@ -1,7 +1,14 @@
 """The Alarmo Integration."""
+
+# Max number of threads to start when checking user codes.
+MAX_WORKERS = 4
+# Number of rounds of hashing when computing user hashes.
+BCRYPT_NUM_ROUNDS = 10
+
 import logging
 import bcrypt
 import base64
+import concurrent.futures
 import re
 
 from homeassistant.core import (
@@ -114,6 +121,11 @@ async def async_remove_entry(hass, entry):
     coordinator = hass.data[const.DOMAIN]["coordinator"]
     await coordinator.async_delete_config()
     del hass.data[const.DOMAIN]
+
+
+async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Handle migration of config entry."""
+    return True
 
 
 class AlarmoCoordinator(DataUpdateCoordinator):
@@ -250,7 +262,7 @@ class AlarmoCoordinator(DataUpdateCoordinator):
             data[const.ATTR_CODE_FORMAT] = "number" if data[ATTR_CODE].isdigit() else "text"
             data[const.ATTR_CODE_LENGTH] = len(data[ATTR_CODE])
             hashed = bcrypt.hashpw(
-                data[ATTR_CODE].encode("utf-8"), bcrypt.gensalt(rounds=12)
+                data[ATTR_CODE].encode("utf-8"), bcrypt.gensalt(rounds=BCRYPT_NUM_ROUNDS)
             )
             hashed = base64.b64encode(hashed)
             data[ATTR_CODE] = hashed.decode()
@@ -270,16 +282,11 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                 self.store.async_update_user(user_id, data)
 
     def async_authenticate_user(self, code: str, user_id: str = None):
-        if not user_id:
-            users = self.store.async_get_users()
-        else:
-            users = {
-                user_id: self.store.async_get_user(user_id)
-            }
 
-        for (user_id, user) in users.items():
+        def check_user_code(user, code):
+            """Returns the supplied user object if the code matches, None otherwise."""
             if not user[const.ATTR_ENABLED]:
-                continue
+                return
             elif not user[ATTR_CODE] and not code:
                 return user
             elif user[ATTR_CODE]:
@@ -287,7 +294,16 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                 if bcrypt.checkpw(code.encode("utf-8"), hash):
                     return user
 
-        return
+        if user_id:
+            return check_user_code(self.store.async_get_user(user_id), code)
+
+        users = self.store.async_get_users()
+        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+            futures = [executor.submit(check_user_code, user, code) for user in users.values()]
+            for future in concurrent.futures.as_completed(futures):
+                if future.result():
+                    executor.shutdown(wait=False, cancel_futures=True)
+                    return future.result()
 
     def async_update_automation_config(self, automation_id: str = None, data: dict = {}):
         if const.ATTR_REMOVE in data:
@@ -336,7 +352,10 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                 _LOGGER.info("Received request for disarming")
                 alarm_entity.alarm_disarm(None, skip_code=True)
             else:
-                _LOGGER.info("Received request for arming with mode {}".format(arm_mode))
+                _LOGGER.info(
+                    "Received request for arming with mode %s", 
+                    arm_mode,
+                )
                 alarm_entity.async_handle_arm_request(arm_mode, skip_code=True)
 
         self._subscriptions.append(
@@ -381,7 +400,11 @@ class AlarmoCoordinator(DataUpdateCoordinator):
             # add sensor to group
             group = self.store.async_get_sensor_group(group_id)
             if not group:
-                _LOGGER.error("Failed to assign entity {} to group {}".format(entity_id, group_id))
+                _LOGGER.error(
+                    "Failed to assign entity %s to group %s",
+                    entity_id,
+                    group_id,
+                )
             elif entity_id not in group[ATTR_ENTITIES]:
                 self.store.async_update_sensor_group(group_id, {
                     ATTR_ENTITIES: group[ATTR_ENTITIES] + [entity_id]
@@ -437,11 +460,19 @@ def register_services(hass):
         users = coordinator.store.async_get_users()
         user = next((item for item in list(users.values()) if item[ATTR_NAME] == name), None)
         if user is None:
-            _LOGGER.warning("Failed to {} user, no match for name '{}'".format("enable" if enable else "disable", name))
+            _LOGGER.warning(
+                "Failed to %s user, no match for name '%s'",
+                "enable" if enable else "disable",
+                name,
+            )
             return
 
         coordinator.store.async_update_user(user[const.ATTR_USER_ID], {const.ATTR_ENABLED: enable})
-        _LOGGER.debug("User user '{}' was {}".format(name, "enabled" if enable else "disabled"))
+        _LOGGER.debug(
+            "User user '%s' was %s",
+            name,
+            "enabled" if enable else "disabled"
+        )
 
     async_register_admin_service(
         hass, const.DOMAIN, const.SERVICE_ENABLE_USER, async_srv_toggle_user, schema=const.SERVICE_TOGGLE_USER_SCHEMA

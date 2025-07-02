@@ -27,6 +27,17 @@ This is an alarm system integration for Home Assistant. It provides a user inter
       - [Sensor groups](#sensor-groups)
     - [Codes and users](#codes-and-users)
       - [Codes](#codes)
+    - [Services](#services)
+    - [alarmo.arm](#alarmoarm)
+    - [alarmo.disarm](#alarmodisarm)
+    - [alarmo.skip\_delay](#alarmoskip_delay)
+    - [alarmo.enable\_user](#alarmoenable_user)
+    - [alarmo.disable\_user](#alarmodisable_user)
+    - [Events](#events)
+      - [alarmo\_failed\_to\_arm](#alarmo_failed_to_arm)
+      - [alarmo\_command\_success](#alarmo_command_success)
+      - [alarmo\_ready\_to\_arm\_modes\_updated](#alarmo_ready_to_arm_modes_updated)
+        - [Creating readiness indicator entities](#creating-readiness-indicator-entities)
     - [MQTT](#mqtt)
       - [State topic](#state-topic)
       - [Event topic](#event-topic)
@@ -207,6 +218,7 @@ The Alarmo entity defines the following attributes:
 | `open_sensors`     | `null`                  | `{binary_sensor.backdoor: on}` | Dictionary of sensors with their entity-ID + state, that caused the alarm to change state.<br>Set when arming attempt failed (due to one or more sensors).<br>Set when alarm is triggered (only first sensor that caused the triggering is stored).                                                                                                                                                                              |
 | `bypassed_sensors` | `null`                  | `[binary_sensor.backdoor]`     | List of sensors that are temporarily excluded from the alarm, due to arming in force.                                                                                                                                                                                                                                                                                                                                            |
 | `delay`            | `null`                  | 30                             | Duration of the exit or entry delay. Only set in the `arming` and `pending` states, `null` otherwise.                                                                                                                                                                                                                                                                                                                            |
+| `last_triggered`   | `null`                  | 2025-05-14 20:33:00            | Date and time of the last occurrence of the entity reaching the `triggered` state.                                                                                                                                                                                                                                                                                                                                               |
 
 #### Commands
 The Alarmo entities support the following commands:
@@ -345,6 +357,126 @@ This setting is detected by the alarm panel card, and will automatically show ei
 Your code is stored completely secure. It is encrypted in the same way as your login credentials, and stored in the HA storage registry. When you enter a code, this will be encrypted too, and the encrypted values will be compared for a match.
 So it is impossible to recover your pin code.
 This also means that if you lose your pincode, you cannot unlock the alarm (there is no backup code!)
+
+### Services
+Alarmo exposes `alarm_control_panel` entities. These can be interacted with from automations by using services.
+HA defines a set of generic services which can be used to control the alarm entities, see [here](https://www.home-assistant.io/integrations/alarm_control_panel/#actions). 
+
+The following sections define the Alarmo-specific services that are supported.
+
+### alarmo.arm
+Arm the alarm. 
+Can also be used to transition between arm modes.
+
+The following table provides the settings that can be provided with the `alarmo.arm` service:
+
+| Setting      | Optional/required | Description                                                                                        | Example value                |
+| ------------ | ----------------- | -------------------------------------------------------------------------------------------------- | ---------------------------- |
+| `entity_id`  | Required          | Entity-ID of the alarm.                                                                            | `alarm_control_panel.alarmo` |
+| `code`       | Optional          | Code used for arming the alarm. Only needed if a code is required for arming.                      | `1234`                       |
+| `mode`       | Required          | Mode in which to arm the alarm to. Valid values are `away`, `home`, `night`, `vacation`, `custom`. | `away`                       |
+| `skip_delay` | Optional          | Set to `true` to arm without any exit delay.                                                       | `true`                       |
+| `force`      | Optional          | Set to `true` for enforced arming, causing any open sensors to be bypassed.                        | `true`                       |
+
+### alarmo.disarm
+Disarm the alarm.
+Equivalent to the service `alarm_control_panel.alarm_disarm`.
+
+The following table provides the settings that can be provided with the `alarmo.disarm` service:
+
+| Setting     | Optional/required | Description                                                                         | Example value                |
+| ----------- | ----------------- | ----------------------------------------------------------------------------------- | ---------------------------- |
+| `entity_id` | Required          | Entity-ID of the alarm.                                                             | `alarm_control_panel.alarmo` |
+| `code`      | Optional          | Code used for disarming the alarm. Only needed if a code is required for disarming. | `1234`                       |
+
+### alarmo.skip_delay
+Skip the remaining delay time and proceed to the next state.
+This service only has effect when the alarm entity is in the `arming` or `pending` state.
+| Setting     | Optional/required | Description             | Example value                |
+| ----------- | ----------------- | ----------------------- | ---------------------------- |
+| `entity_id` | Required          | Entity-ID of the alarm. | `alarm_control_panel.alarmo` |
+
+### alarmo.enable_user
+Enable a user for operating the alarm using his/her configured code.
+
+| Setting | Optional/required | Description                     | Example value |
+| ------- | ----------------- | ------------------------------- | ------------- |
+| `name`  | Required          | Name of the user to be enabled. | `Frank`       |
+
+### alarmo.disable_user
+Disable a user for operating the alarm using his/her configured code.
+
+| Setting | Optional/required | Description                      | Example value |
+| ------- | ----------------- | -------------------------------- | ------------- |
+| `name`  | Required          | Name of the user to be disabled. | `Frank`       |
+
+### Events
+Alarmo exposes several [events](https://www.home-assistant.io/docs/configuration/events/) in HA, which can be used within automations or template entities for user-specific needs.
+
+#### alarmo_failed_to_arm
+The Failed To Arm event is sent by Alarmo in case an arming or disarming attempt was made, but could not be completed. 
+The event will provide feedback regarding the cause of the failure.
+
+The following table provides the data that is provided with the `alarmo_failed_to_arm` event:
+| Property       | Description                                                                                                                                                                                           | Example value                |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| `entity_id`    | Entity-ID of the alarm. Particularly useful in case multiple areas are configured.                                                                                                                    | `alarm_control_panel.alarmo` |
+| `area_id`      | Internal ID assigned by Alarmo to the area. Particularly useful in case multiple areas are configured. Unaffected by renaming of the area (in contrast to `entity_id`).                               | `12345678`                   |
+| `reason`       | Reason/context of why the arming failed. Possible values: `open_sensors`, `not_allowed`, `invalid_code`.                                                                                              | `open_sensors`               |
+| `open_sensors` | list of entity-IDs of the sensors causing the failure. Only set if `reason` equals `open_sensors`.                                                                                                    | [`binary_sensor.front_door`] |
+| `command`      | Arming mode used for the operation (which has failed).                                                                                                                                                | `arm_away`                   |
+| `context_id`   | If `alarmo.arm` or `alarmo.disarm` service was used prior to the failure and `context_id` was provided with this service, the same value will be returned. Otherwise this parameter will not be sent. | `23`                         |
+
+
+#### alarmo_command_success
+The Command Success event will be sent when an arming/disarming command was successfully executed.
+
+The following table provides the data that is provided with the `alarmo_command_success` event:
+| Property     | Description                                                                                                                                                             | Example value                |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| `entity_id`  | Entity-ID of the alarm. Particularly useful in case multiple areas are configured.                                                                                      | `alarm_control_panel.alarmo` |
+| `area_id`    | Internal ID assigned by Alarmo to the area. Particularly useful in case multiple areas are configured. Unaffected by renaming of the area (in contrast to `entity_id`). | `12345678`                   |
+| `action`     | Action that was performed. Possible values: `arm`, `disarm`.                                                                                                            | `arm`                        |
+| `arm_mode`   | Arm mode in which the alarm was armed. Only set if `action` equals `arm`.                                                                                               | `away`                       |
+| `delay`      | Delay time used (in seconds) until the alarm will be set to the `arm_mode`. Only set if `action` equals `arm`.                                                          | `30`                         |
+| `context_id` | If `alarmo.arm` or `alarmo.disarm` service was used prior to the failure and `context_id` was provided with this service, the same value will be returned.              | `23`                         |
+
+#### alarmo_ready_to_arm_modes_updated
+This event indicates whether the alarm is ready to arm.
+Alarmo internally monitors the states of all configured sensors to check whether the conditions for arming into a each arm mode are met.
+The event provides a prediction whether all conditions are satisfied (e.g. all windows and doors are closed), prior to arming.
+
+**Note:** 
+While the alarm entity is *disarmed*, sensors which have type *motion* are **not** watched. This is done to prevent excessive recalculation while people are inside the house.
+It is advised to configure the alarm such that motion sensors should never cause arming to fail (e.g. by setting an exit delay which is sufficiently large).
+
+The following table provides the data that is provided with the `alarmo_ready_to_arm_modes_updated` event:
+| Property              | Description                                                                                                                                                                                                     | Example value                |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| `entity_id`           | Entity-ID of the alarm. Particularly useful in case multiple areas are configured.                                                                                                                              | `alarm_control_panel.alarmo` |
+| `area_id`             | Internal ID assigned by Alarmo to the area. Particularly useful in case multiple areas are configured. Unaffected by renaming of the area (in contrast to `entity_id`).                                         | `12345678`                   |
+| `armed_away`          | Indicates whether or not all conditions for arming in mode `armed_away` are met. Possible values: `true`, `false`. Only provided in case the arm mode `armed_away` is enabled for the entity.                   | `true`                       |
+| `armed_home`          | Indicates whether or not all conditions for arming in mode  `armed_home` are met. Possible values: `true`, `false`. Only provided in case the arm mode `armed_home` is enabled for the entity.                  | `true`                       |
+| `armed_night`         | Indicates whether or not all conditions for arming in mode  `armed_night` are met. Possible values: `true`, `false`. Only provided in case the arm mode `armed_night` is enabled for the entity.                | `true`                       |
+| `armed_custom_bypass` | Indicates whether or not all conditions for arming in mode  `armed_custom_bypass` are met. Possible values: `true`, `false`. Only provided in case the arm mode `armed_custom_bypass` is enabled for the entity | `true`                       |
+| `armed_vacation`      | Indicates whether or not all conditions for arming in mode `armed_vacation` are met. Possible values: `true`, `false`. Only provided in case the arm mode `armed_vacation` is enabled for the entity.           | `true`                       |
+
+##### Creating readiness indicator entities
+The `alarmo_ready_to_arm_modes_updated` event can be converted into an entity such that readiness information can be shown on a dashboard (similar to the green/red indicators on the arming buttons of alarmo-card). 
+
+Below is a code example for creating a binary sensor indicating whether the alarm can be set to mode armed away:
+```yaml
+template:
+  - triggers:
+      - trigger: event
+        event_type: alarmo_ready_to_arm_modes_updated
+        event_data: 
+          entity_id: alarm_control_panel.alarmo
+    binary_sensor:
+      - name: "Alarmo Ready To Arm Away"
+        state: '{{ trigger.event.data.armed_away }}'
+```
+
 
 ### MQTT
 Alarmo supports MQTT for external control of the alarm. This function is intended for third-party alarm panels (such as a touch screen in the hallway).
@@ -643,8 +775,10 @@ Alarmo entities are of type `alarm_control_panel`, so make sure to configure the
 The alarm should now automatically become visible in Homekit, with the current state visible together with the possibility to arm and disarm.
 
 In case you have Alarmo configured to require a code for arming/disarming, you need to setup homekit in yaml mode (instead of via the integrations page).
+If you want to configure the rest of homekit using the Home Assistant UI, but configure the pin in configuration.yaml, you will have to configure two 
+Homekit bridges. In this case, do not select 'alarm_control_panel' when configuring via the UI, as this instance will not have the pin. Then add the 
+following lines minimally to the 'configuration.yaml`:
 
-Example of minimal setup in `configuration.yaml`:
 ```yaml
 homekit:
   - filter:
@@ -655,6 +789,8 @@ homekit:
         code: 1234 # should be identical to a user in Alarmo as well
 ```
 
+Then you will need to scan the QR codes for both the UI based configuration and the 'configuration.yaml' based configuration to have access to Alarmo
+and your other UI based devices in Apple Home.
 
 The Homekit gateway has the following limitations:
 * The [arm modes](#arm-modes) `custom` and `vacation` are not visible in Homekit.

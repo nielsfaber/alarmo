@@ -168,7 +168,13 @@ export class AlarmoTable extends LitElement {
 
         ${this._getFilteredItems()
           ? html`
-              <alarmo-chip cancellable table @button-clicked=${this._clearFilters}>
+              <alarmo-chip
+                .hass=${this.hass}
+                removable
+                active
+                @icon-clicked=${this._clearFilters}
+                style="--chip-color: var(--primary-color); --background-opacity: 0.12; --chip-border-radius: 8px; --chip-height: 40px; --chip-font-size: 1em; --icon-color: var(--dark-primary-color)"
+              >
                 ${localize(
                   'components.table.filter.hidden_items',
                   this.hass.language,
@@ -240,7 +246,7 @@ export class AlarmoTable extends LitElement {
               ${this.filterConfig![key].name}
             </span>
             <alarmo-chip-set
-              selectable
+              toggleable
               .items=${items}
               @value-changed=${(ev: CustomEvent) => this._updateFilterSelection(key, ev.detail)}
               .value=${value}

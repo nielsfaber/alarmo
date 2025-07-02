@@ -42,6 +42,10 @@
               "heading": "Desactivar després del disparador",
               "description": "Quan hagi transcorregut el temps d’activació, desactiveu l’alarma en lloc de tornar a l’estat armat."
             },
+            "ignore_blocking_sensors_after_trigger": {
+              "heading": "Ignora els sensors de bloqueig en rearmar",
+              "description": "Torna a l'estat armat sense comprovar si hi ha sensors que encara puguin estar actius."
+            },
             "enable_mqtt": {
               "heading": "Activa MQTT",
               "description": "Permet controlar el tauler d'alarma mitjançant MQTT."

@@ -1,5 +1,5 @@
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
-import { html, LitElement, PropertyValues } from 'lit';
+import { html, LitElement, PropertyValues, TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators';
 
 import { localize } from '../../../localize/localize';
@@ -89,10 +89,11 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
   }
 
   private tableColumns(): Dictionary<TableColumn> {
-    const warningTooltip = () => html`
-      <simple-tooltip animation-delay="0">
-        ${localize('panels.sensors.cards.sensors.table.no_area_warning', this.hass.language)}
-      </simple-tooltip>
+    const renderTooltip = (content: TemplateResult | string, tooltipText?: string | null) => html`
+      ${tooltipText ? 
+        html`<ha-tooltip content="${tooltipText}">${content}</ha-tooltip>`
+        : content
+      }
     `;
 
     return {
@@ -103,21 +104,16 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
           const type = Object.keys(ESensorTypes).find(e => ESensorTypes[e] == data.type) as ESensorTypes;
           const icon = stateObj ? stateObj.state === "on" ? ESensorIconsActive[type] : ESensorIcons[type] : 'hass:help-circle-outline';
           return data.area == noArea
-            ? html`
-                ${warningTooltip()}
-                <ha-icon icon="mdi:alert" style="color: var(--error-color)"></ha-icon>
-              `
-            : html`
-                <simple-tooltip animation-delay="0">
-                  ${stateObj
-                ? localize(
-                  `panels.sensors.cards.editor.fields.device_type.choose.${data.type}.name`,
-                  this.hass!.language
-                )
-                : this.hass.localize('state_badge.default.entity_not_found')}
-                </simple-tooltip>
-                <ha-icon icon="${icon}" class="${!data.enabled ? 'disabled' : ''}"></ha-icon>
-              `;
+            ? renderTooltip(
+                html`<ha-icon icon="mdi:alert" style="color: var(--error-color)"></ha-icon>`,
+                localize('panels.sensors.cards.sensors.table.no_area_warning', this.hass.language)
+              )
+            : renderTooltip(
+                html`<ha-icon icon="${icon}" class="${!data.enabled ? 'disabled' : ''}"></ha-icon>`,
+                stateObj
+                  ? localize(`panels.sensors.cards.editor.fields.device_type.choose.${data.type}.name`, this.hass!.language)
+                  : this.hass.localize('state_badge.default.entity_not_found')
+              )
         },
       },
       name: {
@@ -126,9 +122,22 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
         grow: true,
         text: true,
         renderer: (data: AlarmoSensor & { name: string }) => html`
-          ${data.area == noArea ? warningTooltip() : ''}
-          <span class="${!data.enabled ? 'disabled' : ''}">${data.name}</span>
-          <span class="secondary ${!data.enabled ? 'disabled' : ''}">${data.entity_id}</span>
+          <span class="${!data.enabled ? 'disabled' : ''}">
+            ${renderTooltip(
+              data.name,
+              data.area == noArea
+                ? localize('panels.sensors.cards.sensors.table.no_area_warning', this.hass.language)
+                : null
+            )}
+          </span>
+          <span class="secondary ${!data.enabled ? 'disabled' : ''}">
+            ${renderTooltip(
+              data.entity_id,
+              data.area == noArea
+                ? localize('panels.sensors.cards.sensors.table.no_area_warning', this.hass.language)
+                : null
+            )}
+        </span>
         `,
       },
       modes: {
@@ -137,13 +146,17 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
         hide: this.narrow,
         text: true,
         renderer: (data: AlarmoSensor) => html`
-          ${data.area == noArea ? warningTooltip() : ''}
           <span class="${!data.enabled ? 'disabled' : ''}">
-            ${data.always_on
-            ? localize('panels.sensors.cards.sensors.table.always_on', this.hass!.language)
-            : data.modes.length
-              ? data.modes.map(e => localize(`common.modes_short.${e}`, this.hass!.language)).join(', ')
-              : this.hass.localize('state_attributes.climate.preset_mode.none')}
+            ${renderTooltip(
+              data.always_on
+                ? localize('panels.sensors.cards.sensors.table.always_on', this.hass!.language)
+                : data.modes.length
+                  ? data.modes.map(e => localize(`common.modes_short.${e}`, this.hass!.language)).join(', ')
+                  : this.hass.localize('state_attributes.climate.preset_mode.none'),
+                data.area == noArea
+                  ? localize('panels.sensors.cards.sensors.table.no_area_warning', this.hass.language)
+                  : null
+              )}
           </span>
         `,
       },

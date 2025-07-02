@@ -42,6 +42,10 @@
               "heading": "Uitschakelen na activatie",
               "description": "Nadat de triggertijd is verstreken, schakelt u het alarm uit in plaats van terug te keren naar de ingeschakelde toestand."
             },
+            "ignore_blocking_sensors_after_trigger": {
+              "heading": "Negeer blokkerende sensoren bij het opnieuw inschakelen",
+              "description": "Alarm wordt teruggezet naar ingeschakelde status zonder te controleren of er nog sensoren actief zijn."
+            },
             "enable_mqtt": {
               "heading": "MQTT inschakelen",
               "description": "Toestaan het alarmpaneel via MQTT aan te sturen."
