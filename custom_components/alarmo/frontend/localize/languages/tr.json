@@ -1,0 +1,573 @@
+{
+  "common": {
+    "modes_short": {
+      "armed_away": "Uzakta",
+      "armed_home": "Ev",
+      "armed_night": "Gece",
+      "armed_custom_bypass": "Özel",
+      "armed_vacation": "Tatil"
+    },
+    "enabled": "Aktif",
+    "disabled": "Deaktif"
+  },
+  "components": {
+    "time_slider": {
+      "seconds": "sn",
+      "minutes": "min",
+      "infinite": "sonsuz",
+      "none": "hiçbiri"
+    },
+    "editor": {
+      "ui_mode": "Kullanıcı Arayüzüne",
+      "yaml_mode": "YAML'e",
+      "edit_in_yaml": "YAML olarak düzenleme"
+    },
+    "table": {
+      "filter": {
+        "label": "Öğeleri filtrele",
+        "item": "{name}'e göre filtrele",
+        "hidden_items": "{number} {number, plural,\n  one {bir madde}\n  other {iki madde}\n} gizli"
+      }
+    }
+  },
+  "title": "Alarm paneli",
+  "panels": {
+    "general": {
+      "title": "Genel",
+      "cards": {
+        "general": {
+          "description": "Bu panel alarm için bazı genel ayarları tanımlar.",
+          "fields": {
+            "disarm_after_trigger": {
+              "heading": "Tetiklemeden sonra devre dışı bırakma",
+              "description": "Tetikleme süresi zaman aşımına uğradıktan sonra, etkin duruma dönmek yerine alarmı devre dışı bırakın."
+            },
+            "ignore_blocking_sensors_after_trigger": {
+              "heading": "Yeniden silahlandırırken bloke eden sensörleri yok sayın",
+              "description": "Hala aktif olabilecek sensörleri kontrol etmeden silahlı duruma geri dönün."
+            },
+            "enable_mqtt": {
+              "heading": "MQTT'yi Etkinleştir",
+              "description": "Alarm panelinin MQTT aracılığıyla kontrol edilmesine izin verin."
+            },
+            "enable_master": {
+              "heading": "Alarm yöneticisini etkinleştir",
+              "description": "Tüm alanları aynı anda kontrol etmek için bir varlık oluşturur."
+            }
+          },
+          "actions": {
+            "setup_mqtt": "MQTT Yapılandırması",
+            "setup_master": "Ana Yapılandırma"
+          }
+        },
+        "modes": {
+          "title": "Modlar",
+          "description": "Bu panel alarmın modlarını ayarlamak için kullanılabilir.",
+          "modes": {
+            "armed_away": "Tüm insanlar evi terk ettiğinde uzakta modu kullanılacaktır. Eve erişim sağlayan tüm kapı ve pencerelerin yanı sıra evin içindeki hareket sensörleri de korunacaktır.",
+            "armed_home": "Evdeyken aktif(evde iken alarm devrede olarak da bilinir), insanlar evdeyken ve alarm aktifken kullanılacaktır. Eve erişim sağlayan tüm kapı ve pencereler korunacak, ancak evin içindeki hareket sensörleri korunmayacaktır.",
+            "armed_night": "Uyumadan önce alarm kurulurken gece aktif modu kullanılacaktır. Eve erişim sağlayan tüm kapı ve pencereler ve evdeki seçilmiş hareket sensörleri (mesela alt kat) korunacak.",
+            "armed_vacation": "Aktif tatil, daha uzun süreli uzakta kalma durumunda aktif uzakta modunun bir eki olarak kullanılabilir. Gecikme süreleri ve tetikleme tepkileri (istenildiği gibi) evden uzakta olmaya göre uyarlanabilir.",
+            "armed_custom_bypass": "Kendi güvenlik çevrenizi tanımlamak için ekstra bir mod."
+          },
+          "number_sensors_active": "{number} {number, plural,\n  one {sensör}\n  other {sensörler}\n} aktif",
+          "fields": {
+            "status": {
+              "heading": "Durum",
+              "description": "Alarmın bu modda devreye alınıp alınamayacağını kontrol eder."
+            },
+            "exit_delay": {
+              "heading": "Çıkış gecikmesi",
+              "description": "Alarmı kurarken geçen bu süre içinde sensörler henüz alarmı tetiklemeyecektir."
+            },
+            "entry_delay": {
+              "heading": "Giriş gecikmesi",
+              "description": "Sensörlerden biri etkinleştirildikten sonra alarmın tetiklenmesine kadar geçen gecikme süresi."
+            },
+            "trigger_time": {
+              "heading": "Tetikleme süresi",
+              "description": "Etkinleştirmeden sonra alarmın tetiklenmiş durumda kalacağı süre."
+            }
+          }
+        },
+        "mqtt": {
+          "title": "MQTT yapılandırması",
+          "description": "Bu panel MQTT arayüzünün yapılandırılması için kullanılabilir.",
+          "fields": {
+            "state_topic": {
+              "heading": "Durum konusu",
+              "description": "Durum güncellemelerinin yayınlandığı konu"
+            },
+            "event_topic": {
+              "heading": "Etkinlik konusu",
+              "description": "Alarm olaylarının yayınlandığı konu başlığı"
+            },
+            "command_topic": {
+              "heading": "Komut konusu",
+              "description": "Alarmo'nun devreye alma/devreden çıkarma komutları için dinlediği konu."
+            },
+            "require_code": {
+              "heading": "Kod gerektir",
+              "description": "Komutla birlikte gönderilecek kodu gerektirir."
+            },
+            "state_payload": {
+              "heading": "Durum başına veri yükü yapılandırma",
+              "item": "''{state}'' durumu için bir veri yükü tanımlayın"
+            },
+            "command_payload": {
+              "heading": "Komut başına veri yükü yapılandırma",
+              "item": "''{command}'' komutu için bir veri yükü tanımlayın"
+            }
+          }
+        },
+        "areas": {
+          "title": "Alanlar",
+          "description": "Alanlar, alarm sisteminizi birden fazla bölüme ayırmak için kullanılabilir.",
+          "no_items": "Henüz tanımlanmış bir alan bulunmamaktadır.",
+          "table": {
+            "remarks": "Özet",
+            "summary": "Bu alan {summary_sensors} ve {summary_automations} öğelerini içerir.",
+            "summary_sensors": "{number} {number, plural,\n  one {sensör}\n  other {sensörler}\n}",
+            "summary_automations": "{number} {number, plural,\n  one {otomasyon}\n  other {otomasyonlar}\n}"
+          },
+          "actions": {
+            "add": "Ekle"
+          }
+        }
+      },
+      "dialogs": {
+        "create_area": {
+          "title": "Yeni alan",
+          "fields": {
+            "copy_from": "Ayarları şuradan kopyala"
+          }
+        },
+        "edit_area": {
+          "title": "Alanı düzenle ''{area}''",
+          "name_warning": "Not: adın değiştirilmesi varlık kimliğini(entity ID) de değiştirecektir"
+        },
+        "remove_area": {
+          "title": "Alan kaldırılsın mı?",
+          "description": "Bu alanı kaldırmak istediğinizden emin misiniz? Bu alan {sensors} sensörlerini ve {automations} otomasyonlarını içerir, bunlar da kaldırılacaktır."
+        },
+        "edit_master": {
+          "title": "Ana yapılandırma"
+        },
+        "disable_master": {
+          "title": "Ana yapılandırma'yı devre dışı bırakalım mı?",
+          "description": "Alarm yöneticisini kaldırmak istediğinizden emin misiniz? Bu alan, bu eylemle kaldırılacak olan {otomasyonlar} otomasyonlarını içerir."
+        }
+      }
+    },
+    "sensors": {
+      "title": "Sensörler",
+      "cards": {
+        "sensors": {
+          "description": "Şu anda yapılandırılmış sensörler. Değişiklik yapmak için bir öğeye tıklayın.",
+          "table": {
+            "no_items": "Görüntülenecek herhangi bir sensör yok.",
+            "no_area_warning": "Sensör herhangi bir alana atanmamıştır.",
+            "arm_modes": "Alarm Modları",
+            "always_on": "(Her zaman)"
+          }
+        },
+        "add_sensors": {
+          "title": "Sensör Ekleme",
+          "description": "Daha fazla sensör ekleyin. Sensörlerinizin uygun bir ada sahip olduğundan emin olun, böylece onları tanımlayabilirsiniz.",
+          "no_items": "Alarm için yapılandırılabilecek mevcut herhangi HA varlığı yok. binary_sensor türündeki varlıkları eklediğinizden emin olun.",
+          "table": {
+            "type": "Tespit edilen tip"
+          },
+          "actions": {
+            "add_to_alarm": "alarma ekle",
+            "filter_supported": "Türü bilinmeyen öğeleri gizle"
+          }
+        },
+        "editor": {
+          "title": "Sensörü Düzenle",
+          "description": "''{entity}'' sensör ayarlarının yapılandırılması.",
+          "fields": {
+            "entity": {
+              "heading": "Varlık",
+              "description": "Bu sensörle ilişkili varlık"
+            },
+            "area": {
+              "heading": "Alan",
+              "description": "Bu sensörü içeren bir alan seçin."
+            },
+            "group": {
+              "heading": "Grup",
+              "description": "Kombine tetikleme için diğer sensörlerle gruplayın."
+            },
+            "device_type": {
+              "heading": "Cihaz Tipi",
+              "description": "Uygun ayarları otomatik olarak uygulamak için bir cihaz türü seçin.",
+              "choose": {
+                "door": {
+                  "name": "Kapı",
+                  "description": "Eve giriş/çıkış için kullanılan bir kapı, geçit veya başka bir giriş."
+                },
+                "window": {
+                  "name": "Pencere",
+                  "description": "Bir pencere veya balkon gibi eve girmek için kullanılmayan bir kapı."
+                },
+                "motion": {
+                  "name": "Hareket",
+                  "description": "Aktivasyonlar arasında geri sayımı olan varlık sensörü veya benzer bir cihaz."
+                },
+                "tamper": {
+                  "name": "Titreşim",
+                  "description": "Sensör kapağının çıkarılma müşiri, cam kırılma sensörü vb."
+                },
+                "environmental": {
+                  "name": "Çevresel",
+                  "description": "Duman/gaz sensörü, sızıntı detektörü, vb. (hırsıza karşı korumayla ilgili değildir)."
+                },
+                "other": {
+                  "name": "Genel"
+                }
+              }
+            },
+            "always_on": {
+              "heading": "Her zaman açık",
+              "description": "Sensör her zaman alarmı tetiklemelidir."
+            },
+            "modes": {
+              "heading": "Etkin modlar",
+              "description": "Bu sensörün aktif olduğu alarm modları."
+            },
+            "arm_on_close": {
+              "heading": "Kapattıktan sonra aktif et",
+              "description": "Bu sensörün devre dışı bırakılmasından sonra, kalan evden ayrılma geri sayımı otomatik olarak atlanacaktır."
+            },
+            "use_exit_delay": {
+              "heading": "Evden çıkış ertelemesini kullanın",
+              "description": "Evden ayrılma geri sayımı başladığında sensörün aktif olmasına izin verilir."
+            },
+            "use_entry_delay": {
+              "heading": "Eve giriş ertelemesini kullanın",
+              "description": "Sensör aktivasyonu alarmı doğrudan değil giriş geri sayımından sonra tetikler."
+            },
+            "allow_open": {
+              "heading": "Başlangıçta açık olmasına izin verin",
+              "description": "Devreye alma sırasında açık durum göz ardı edilir (sonraki sensör aktivasyonu alarmı tetikleyecektir)."
+            },
+            "auto_bypass": {
+              "heading": "Otomatik olarak bypass",
+              "description": "Devreye alma sırasında açıksa bu sensörü alarmın etkileşiminden hariç tutun.",
+              "modes": "Sensörün bypass edilebileceği modlar"
+            },
+            "trigger_unavailable": {
+              "heading": "Kullanılamadığında tetikle",
+              "description": "Sensör durumu 'kullanılamaz' olduğunda, bu sensörü etkinleştirecektir."
+            }
+          },
+          "actions": {
+            "toggle_advanced": "Gelişmiş ayarlar",
+            "remove": "Kaldır",
+            "setup_groups": "Grupları ayarlayın"
+          },
+          "errors": {
+            "description": "Lütfen aşağıdaki hataları düzeltin:",
+            "no_area": "Hiçbir alan seçilmedi",
+            "no_modes": "Sensörün aktif olması gereken hiçbir mod seçilmedi",
+            "no_auto_bypass_modes": "Sensör için hiçbir mod seçilmezse, otomatik olarak bypass edilebilir"
+          }
+        }
+      },
+      "dialogs": {
+        "manage_groups": {
+          "title": "Sensör gruplarını yönet",
+          "description": "Bir sensör grubunda, alarm tetiklenmeden önce birden fazla sensörün belirli bir süre içinde etkinleştirilmesi gerekir.",
+          "no_items": "Henüz grup yok",
+          "actions": {
+            "new_group": "Yeni grup"
+          }
+        },
+        "create_group": {
+          "title": "Yeni sensör grubu",
+          "fields": {
+            "name": {
+              "heading": "İsim",
+              "description": "Sensör grubu için ad"
+            },
+            "timeout": {
+              "heading": "Zaman aşımı",
+              "description": "Ardışık sensör aktivasyonlarının alarmı tetiklediği süre."
+            },
+            "event_count": {
+              "heading": "Sayı",
+              "description": "Alarmı tetiklemek için etkinleştirilmesi gereken farklı sensörlerin miktarı."
+            },
+            "sensors": {
+              "heading": "Sensörler",
+              "description": "Bu grubun içerdiği sensörleri seçin."
+            }
+          },
+          "errors": {
+            "invalid_name": "Geçersiz ad sağlandı.",
+            "insufficient_sensors": "En az 2 sensörün seçilmesi gerekir."
+          }
+        },
+        "edit_group": {
+          "title": "Sensör ''{name}'' grubunu düzenleyin"
+        }
+      }
+    },
+    "codes": {
+      "title": "Kodlar",
+      "cards": {
+        "codes": {
+          "description": "Kod için ayarları değiştirin.",
+          "fields": {
+            "code_arm_required": {
+              "heading": "Etkinleştirmek için kod gerektir",
+              "description": "Alarmı aktifleştirmek için geçerli bir kod sunulmalıdır."
+            },
+            "code_disarm_required": {
+              "heading": "Devre dışı bırakmak için kod gereksin",
+              "description": "Alarmı devre dışı bırakmak için geçerli bir kod sağlanmalıdır."
+            },
+            "code_mode_change_required": {
+              "heading": "Anahtarlama modu için kod gerektir",
+              "description": "Aktif modu değiştirmek için geçerli bir kod sağlanmalıdır."
+            },
+            "code_format": {
+              "heading": "Kod formatı",
+              "description": "Lovelace alarm kartı için giriş türünü ayarlar.",
+              "code_format_number": "pin kodu",
+              "code_format_text": "şifre"
+            }
+          }
+        },
+        "user_management": {
+          "title": "Kullanıcı yönetimi",
+          "description": "Her kullanıcının alarmı kurmak/devre dışı bırakmak için kendi kodu vardır.",
+          "no_items": "Henüz kullanıcı yok",
+          "actions": {
+            "new_user": "yeni kullanıcı"
+          }
+        },
+        "new_user": {
+          "title": "Yeni kullanıcı oluştur",
+          "description": "Alarmın çalıştırılmasına erişim sağlamak için kullanıcılar oluşturulabilir.",
+          "fields": {
+            "name": {
+              "heading": "İsim",
+              "description": "Kullanıcının adı."
+            },
+            "code": {
+              "heading": "Kod",
+              "description": "Bu kullanıcı için kod."
+            },
+            "confirm_code": {
+              "heading": "Kodu onayla",
+              "description": "Kodu tekrarlayın."
+            },
+            "can_arm": {
+              "heading": "Etkinleştirmek için koda izin ver",
+              "description": "Bu kodun girilmesi alarmı etkinleştirir"
+            },
+            "can_disarm": {
+              "heading": "Etkisizleştirmek için koda izin ver",
+              "description": "Bu kod girilince alarm devre dışı kalır"
+            },
+            "is_override_code": {
+              "heading": "Geçersiz kılma kodu",
+              "description": "Bu kodun girilmesi alarmı zor kullanarak aktif tutacaktır."
+            },
+            "area_limit": {
+              "heading": "Kısıtlı alanlar",
+              "description": "Kullanıcıyı yalnızca seçilen alanları kontrol etmekle sınırlandırın"
+            }
+          },
+          "errors": {
+            "no_name": "İsim verilmemiş.",
+            "no_code": "Kod en az 4 karakter/rakam içermelidir.",
+            "code_mismatch": "Kodlar uyuşmuyor."
+          }
+        },
+        "edit_user": {
+          "title": "Kullanıcıyı Düzenle",
+          "description": "''{name}'' kullanıcısı için yapılandırmayı değiştirin.",
+          "fields": {
+            "old_code": {
+              "heading": "Şu anki kod",
+              "description": "Geçerli kodu değiştirmek istemiyorsanız boş bırakın."
+            }
+          }
+        }
+      }
+    },
+    "actions": {
+      "title": "Eylemler",
+      "cards": {
+        "notifications": {
+          "title": "Bildirimler",
+          "description": "Bu paneli kullanarak, belirli bir alarm olayı gerçekleştiğinde gönderilecek bildirimleri yönetebilirsiniz.",
+          "table": {
+            "no_items": "Henüz oluşturulmuş bir bildirim yok.",
+            "no_area_warning": "Eylem herhangi bir alana atanmamıştır."
+          },
+          "actions": {
+            "new_notification": "yeni bildirim"
+          }
+        },
+        "actions": {
+          "description": "Bu panel, alarm durumu değiştiğinde bir cihazı değiştirmek için kullanılabilir.",
+          "table": {
+            "no_items": "Henüz oluşturulmuş bir eylem yok."
+          },
+          "actions": {
+            "new_action": "yeni eylem"
+          }
+        },
+        "new_notification": {
+          "title": "Bildirimi yapılandırın",
+          "description": "Alarmı kurarken/devre dışı bırakırken, aktivasyonda bırakırken vb. durumlarda bir bildirim alın.",
+          "trigger": "Durum",
+          "action": "Görev",
+          "options": "Seçenekler",
+          "fields": {
+            "event": {
+              "heading": "Etkinlik",
+              "description": "Bildirim ne zaman gönderilmeli?",
+              "choose": {
+                "armed": {
+                  "name": "Alarm devrede",
+                  "description": "Alarm başarıyla devreye alındı"
+                },
+                "disarmed": {
+                  "name": "Alarm devre dışı bırakıldı",
+                  "description": "Alarm devre dışı bırakıldı"
+                },
+                "triggered": {
+                  "name": "Alarm tetiklendi",
+                  "description": "Alarm tetiklenir"
+                },
+                "untriggered": {
+                  "name": "Alarm artık tetiklenmiyor",
+                  "description": "Alarmın tetiklenme durumu sona erdi"
+                },
+                "arm_failure": {
+                  "name": "Etkinleştirilemedi",
+                  "description": "Bir veya daha fazla açık sensör nedeniyle alarmın devreye alınması başarısızlıkla sonuçlandı"
+                },
+                "arming": {
+                  "name": "Çıkış gecikmesi başladı",
+                  "description": "Çıkış geri sayımı başladı, evden çıkmaya hazır."
+                },
+                "pending": {
+                  "name": "Giriş gecikmesi başladı",
+                  "description": "Giriş geri sayımı başladı, alarm yakında tetiklenecek."
+                }
+              }
+            },
+            "mode": {
+              "heading": "Mod",
+              "description": "Eylemi belirli modlarla sınırlayın (isteğe bağlı)"
+            },
+            "title": {
+              "heading": "Başlık",
+              "description": "Bildirim mesajı için başlık"
+            },
+            "message": {
+              "heading": "Mesaj",
+              "description": "Bildirim mesajının içeriği",
+              "insert_wildcard": "Joker karakter ekle",
+              "placeholders": {
+                "armed": "Alarm {{arm_mode}} olarak ayarlanmıştır",
+                "disarmed": "Alarm şimdi KAPALI",
+                "triggered": "Alarm tetiklendi! Nedeni: {{open_sensors}}.",
+                "untriggered": "Alarm artık tetiklenmez.",
+                "arm_failure": "Alarm şu anda etkinleştirilemedi, çünkü: {{open_sensors}}.",
+                "arming": "Alarm birazdan devreye girecek, lütfen evi terk edin.",
+                "pending": "Alarm tetiklenmek üzere, hızlıca etkisiz hale getirin!"
+              }
+            },
+            "open_sensors_format": {
+              "heading": "open_sensors joker karakteri için biçim",
+              "description": "Mesaja hangi sensör bilgilerinin ekleneceğini seçin",
+              "options": {
+                "default": "İsimler ve durumlar",
+                "short": "Sadece isimler"
+              }
+            },
+            "arm_mode_format": {
+              "heading": "arm_mode joker karakteri için çeviri",
+              "description": "Alarm modunun mesaja hangi dilde ekleneceğini seçin"
+            },
+            "target": {
+              "heading": "Hedef",
+              "description": "Bildirimin gönderileceği cihaz"
+            },
+            "media_player_entity": {
+              "heading": "Medya oynatıcı varlığı",
+              "description": "Mesajı oynatmak için medya oynatıcı"
+            },
+            "name": {
+              "heading": "İsim",
+              "description": "Bu bildirim için açıklama",
+              "placeholders": {
+                "armed": "Etkinleştirildiğinde {target} bilgilendir",
+                "disarmed": "Etkisizleştirildiğinde {target} bildir",
+                "triggered": "Tetiklendiğinde {target}'e bildir",
+                "untriggered": "Tetikleme durduğunda {hedef}'e bildir",
+                "arm_failure": "Başarısızlık durumunda {target}'e bildir",
+                "arming": "Ayrılırken {target}'e bildir",
+                "pending": "Geldiğinde {target}'e bildir"
+              }
+            },
+            "delete": {
+              "heading": "Otomasyonu sil",
+              "description": "Bu otomasyonu kalıcı olarak kaldırın"
+            }
+          },
+          "actions": {
+            "test": "Dene"
+          }
+        },
+        "new_action": {
+          "title": "Eylemi yapılandırın",
+          "description": "Alarmı devreye sokarken/devreden çıkarırken, etkinleştirme sırasında vb. ışıkları veya cihazları (sirenler gibi) yönetin.",
+          "fields": {
+            "event": {
+              "heading": "Etkinlik",
+              "description": "Eylem ne zaman gerçekleştirilmelidir"
+            },
+            "area": {
+              "heading": "Alan",
+              "description": "Olayın geçerli olduğu alarm alanı."
+            },
+            "mode": {
+              "heading": "Mod",
+              "description": "Eylemi belirli modlarla sınırlayın (isteğe bağlı)"
+            },
+            "entity": {
+              "heading": "Varlık",
+              "description": "Üzerinde eylem gerçekleştirilecek varlık"
+            },
+            "action": {
+              "heading": "Eylem",
+              "description": "Varlık üzerinde gerçekleştirilecek eylem",
+              "no_common_actions": "Eylemler seçilen varlıklar için yalnızca YAML modunda atanabilir."
+            },
+            "name": {
+              "heading": "İsim",
+              "description": "Bu eylem için açıklama",
+              "placeholders": {
+                "armed": "Etkinleştirildiğinde {entity} öğesini {state} olarak ayarla",
+                "disarmed": "Etkisizleştirmenin ardından {entity} öğesini {state} olarak ayarlayın",
+                "triggered": "Tetiklendiğinde {entity} öğesini {state} olarak ayarla",
+                "untriggered": "Tetikleme durduğunda, {entity} öğesini {state} olarak ayarlayın",
+                "arm_failure": "Başarısızlık durumunda {entity} öğesini {state} olarak ayarla",
+                "arming": "Ayrılırken {entity} öğesini {state} olarak ayarlayın",
+                "pending": "Vardığımda {entity} öğesini {state} olarak ayarla"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
