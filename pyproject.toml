@@ -1,0 +1,13 @@
+[project]
+name = "alarmo"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13.2"
+dependencies = [
+    "homeassistant>=2025.5.0",
+    "pytest>=8.3.5",
+    "pytest-asyncio>=0.26.0",
+    "pytest-homeassistant-custom-component>=0.13.243",
+    "setuptools>=80.9.0",
+]

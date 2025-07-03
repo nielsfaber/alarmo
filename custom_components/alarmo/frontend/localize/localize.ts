@@ -16,6 +16,7 @@ import * as zh_Hans from './languages/zh-Hans.json';
 import * as zh_Hant from './languages/zh-Hant.json';
 import * as ru from './languages/ru.json';
 import * as tr from './languages/tr.json';
+import * as pl from './languages/pl.json';
 
 import IntlMessageFormat from 'intl-messageformat';
 
@@ -38,6 +39,7 @@ var languages: any = {
   'zh-Hans': zh_Hans,
   'zh-Hant': zh_Hant,
   ru: ru,
+  pl: pl,
 };
 
 export function localize(string: string, language: string, ...args: any[]): string {

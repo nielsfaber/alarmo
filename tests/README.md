@@ -1,17 +1,24 @@
-To Run the Tests:
+# Alarmo Testing Guide
+## To Run the Tests:
+> Ensure you've set up the development environment: See [Development](../DEVELOPMENT.md) documentation
 
-From the project root...
+### From the project root...
 
-```python -m venv venv```
-```source venv/bin/activate```
-```pip install -r requirements_test.txt```
+Ensure your UV environment exists
+> **Note:** These commands will 
+> - update the uv.lock file with the newest verions of available dependancies
+> - install all updated packages into the .venv
+
+```uv sync --upgrade```
+
 To run all the tests:
-```pytest tests```
+```uv run pytest tests```
 OR to run a battery of tests in a file:
-```pytest tests/test_user_permissions.py```
+```uv run pytest tests/test_user_permissions.py```
 OR to run a single test in a file:
-```pytest tests/test_user_permissions.py -k test_arm_with_authorized_user```
+```uv run pytest tests/test_user_permissions.py -k test_arm_with_authorized_user```
 
+### **Note:** ensure you commit any changes to the uv.lock file to ensure the main branch is updated to use the newest version of all packages
 ---
 
 ## **Test Coverage:**
@@ -49,10 +56,10 @@ OR to run a single test in a file:
 
 ### **Not Covered:**
 
-| Feature/Test | Notes |
-|--------------|-------|
-| MQTT integration | No test for MQTT state/event/command topic integration |
-| Sensor group with more than two sensors | Only two-sensor group tested |
+| Feature/Test                            | Notes                                                  |
+| --------------------------------------- | ------------------------------------------------------ |
+| MQTT integration                        | No test for MQTT state/event/command topic integration |
+| Sensor group with more than two sensors | Only two-sensor group tested                           |
 
 ---
 
