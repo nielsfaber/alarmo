@@ -1,24 +1,36 @@
 # Alarmo Testing Guide
-## To Run the Tests:
+
+## To Run the Tests
+
 > Ensure you've set up the development environment: See [Development](../DEVELOPMENT.md) documentation
 
-### From the project root...
+### From the project root
 
 Ensure your UV environment exists
-> **Note:** These commands will 
-> - update the uv.lock file with the newest verions of available dependancies
+
+```uv venv```
+
+> **Note:** These commands will
+
+> - update the uv.lock file with the corrrect verions of available dependancies from the toml
 > - install all updated packages into the .venv
 
-```uv sync --upgrade```
+```uv sync```
 
 To run all the tests:
+
 ```uv run pytest tests```
+
 OR to run a battery of tests in a file:
+
 ```uv run pytest tests/test_user_permissions.py```
+
 OR to run a single test in a file:
+
 ```uv run pytest tests/test_user_permissions.py -k test_arm_with_authorized_user```
 
 ### **Note:** ensure you commit any changes to the uv.lock file to ensure the main branch is updated to use the newest version of all packages
+
 ---
 
 ## **Test Coverage:**
