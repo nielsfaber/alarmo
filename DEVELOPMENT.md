@@ -8,7 +8,7 @@ Welcome! This guide explains how to set up a local development environment for c
 
 Before you start, ensure you have installed:
 
-- Any supported version of Python3 
+- Any supported version of Python3
 - The newest version of Git
 - A code editor (e.g., VSCode)
 
@@ -24,19 +24,23 @@ If you don't have `uv` installed yet see the uv [installation guide](https://doc
 
 ---
 
-### 📦 Create and Sync Your Environment
+### 📦 Setup Python Environment
 
 > **Note:** These steps will:
 > - Create the `.venv` virtual environment directory (even if it already exists)
-> - Leverage the `uv.lock` file to install the tagged version of each dependency
-> - Install all dependencies into the `.venv`
-> 
-From the root of the project:
+> - Install all dependencies from uv.lock into the `.venv`
+> - Update .git/hooks/pre-commit to use pre-commit installed in your .venv
+>
+From the root of the project, run:
 
-```
-uv venv
-uv sync
-```   
+- `uv sync`
+- `uv run pre-commit install`
+
+### Update vscode to use your .venv
+
+- `ctrl + shift + p (Command Pallet)` 
+- `Python: Select Interpreter`
+- Select the environment to use. should be: `./.venv/bin/python`
 
 ---
 
@@ -46,8 +50,8 @@ With uv, we don't need to activate the .venv to interact with it.
 
 > - new dependancies can be added using `uv add package_name`
 
-> - The .venv will be used automatically when running python scripts or packages using: 
->   - `uv run ./script.py` or `uv run pytest tests` for example 
+> - The .venv will be used automatically when running python scripts or packages using:
+>   - `uv run ./script.py` or `uv run pytest tests` for example
 
 
 ### Make sure to test the code!

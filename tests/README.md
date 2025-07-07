@@ -4,21 +4,21 @@
 
 ### From the project root...
 
-Ensure your UV environment exists
-> **Note:** These commands will 
-> - update the uv.lock file with the newest verions of available dependancies
-> - install all updated packages into the .venv
+Ensure your Python environment is up to date
+> **Note:** This command will:
+> - Create the `.venv` virtual environment directory if it doesn't already exist
+> - Install all dependencies from uv.lock into the `.venv`
+> **Node:** this is always smart to run when developing a new feature branch in case you have an out-of-date .venv.
 
-```uv sync --upgrade```
+`uv sync`
 
 To run all the tests:
-```uv run pytest tests```
+`uv run pytest tests`
 OR to run a battery of tests in a file:
-```uv run pytest tests/test_user_permissions.py```
+`uv run pytest tests/test_user_permissions.py`
 OR to run a single test in a file:
-```uv run pytest tests/test_user_permissions.py -k test_arm_with_authorized_user```
+`uv run pytest tests/test_user_permissions.py -k test_arm_with_authorized_user`
 
-### **Note:** ensure you commit any changes to the uv.lock file to ensure the main branch is updated to use the newest version of all packages
 ---
 
 ## **Test Coverage:**

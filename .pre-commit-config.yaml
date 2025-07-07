@@ -1,0 +1,29 @@
+repos:
+  # Pre-commit hooks for essential file checks only
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-yaml
+        exclude: '\..*_cache/.*|dist/.*|venv/.*'
+      - id: check-toml
+        exclude: '\..*_cache/.*|dist/.*|venv/.*'
+      - id: check-json
+        exclude: '\..*_cache/.*|dist/.*|venv/.*'
+
+  # Check for common security issues
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.8.6
+    hooks:
+      - id: bandit
+        args: ["-c", "pyproject.toml"]
+        additional_dependencies: ["bandit[toml]"]
+        exclude: '^tests/.*|^scripts/.*|\..*_cache/.*|dist/.*|venv/.*'
+
+  - repo: local
+    hooks:
+      - id: run-pytest
+        name: Run pytest tests
+        entry: uv
+        language: python
+        args: ["run", "pytest", "--quiet", "--tb=short", "tests/"]
+        pass_filenames: false
