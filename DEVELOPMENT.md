@@ -1,67 +1,133 @@
 # Alarmo Development Guide
 
-Welcome! This guide explains how to set up a local development environment for contributing to the Alarmo Project.
+Welcome to the Alarmo development guide! This document will help you set up your local development environment and get started with contributing to the project. Whether you're fixing bugs, adding features, or improving documentation, we're excited to have you on board!
 
----
+- [Alarmo Development Guide](#alarmo-development-guide)
+  - [📦 Requirements](#-requirements)
+  - [🧪 Setting Up the Development Environment with uv](#-setting-up-the-development-environment-with-uv)
+    - [🔧 Installation](#-installation-one-time-setup)
+    - [📦 Setup Python Environment](#-setup-python-environment)
+    - [Update VSCode Settings](#update-vscode-settings)
+    - [Running Scripts](#running-scripts)
+    - [Testing Your Changes](#testing-your-changes)
+    - [Managing Python Versions](#managing-python-versions)
+  - [❓ FAQ](#-faq)
+    - [Bypassing pre-commit hooks](#bypassing-pre-commit-hooks)
 
 ## 📦 Requirements
 
-Before you start, ensure you have installed:
+Before you begin, please ensure you have the following tools installed on your system:
 
-- Any supported version of Python3
-- The newest version of Git
-- A code editor (e.g., VSCode)
+- Python 3.x (Latest stable version recommended)
+- Git (Latest version)
+- Visual Studio Code (Recommended editor)
+- Terminal/Command Prompt access
 
 ---
 
 ## 🧪 Setting Up the Development Environment with `uv`
 
-This project uses [`uv`](https://github.com/astral-sh/uv), a fast Python package manager, to manage dependencies.
+We use [`uv`](https://github.com/astral-sh/uv), a modern Python package manager that's significantly faster than pip and provides better dependency resolution.
 
 ### 🔧 Installation (one-time setup)
 
-If you don't have `uv` installed yet see the uv [installation guide](https://docs.astral.sh/uv/getting-started/installation/)
+1. First, install `uv` by following the [official installation guide](https://docs.astral.sh/uv/getting-started/installation/)
 
----
+2. Fork the repository:
+   - Visit https://github.com/nielsfaber/alarmo
+   - Click the "Fork" button in the top right
+   - Wait for GitHub to create your fork
+
+3. Clone your fork:
+   ```bash
+   git clone https://github.com/[your-username]/alarmo.git
+   cd alarmo
+   ```
 
 ### 📦 Setup Python Environment
 
-**Note:** These steps will:
+Running the following commands will:
+- Create a new virtual environment in `.venv`
+- Install all project dependencies from `uv.lock`
+- Set up pre-commit hooks for code quality checks
 
-- Create the `.venv` virtual environment directory (even if it already exists)
-- Install all dependencies from uv.lock into the `.venv`
-- Update .git/hooks/pre-commit to use pre-commit installed in your .venv
+```bash
+# Install dependencies and create virtual environment
+uv sync
 
-From the root of the project, run:
+# Install pre-commit hooks
+uv run pre-commit install
+```
 
-- `uv sync`
-- `uv run pre-commit install`
+### Update VSCode Settings
 
-### Update vscode to use your .venv
+To ensure VSCode uses the correct Python environment:
 
-- `ctrl + shift + p (Command Pallet)`
-- `Python: Select Interpreter`
-- Select the environment to use. should be: `./.venv/bin/python`
+1. Open the Command Palette (Ctrl/Cmd + Shift + P)
+2. Type and select `Python: Select Interpreter`
+3. Choose the interpreter at `./.venv/bin/python`
 
----
+This will configure debugging, linting, and other Python features to use your project's environment.
 
 ### Running Scripts
 
-With uv, we don't need to activate the .venv to interact with it.
+One of the benefits of `uv` is that you don't need to manually activate the virtual environment. Here are some common commands:
 
-- new dependancies can be added using `uv add package_name`
-- The .venv will be used automatically when running python scripts or packages using:
-- `uv run ./script.py` or `uv run pytest tests` for example
+```bash
+# Run a Python script
+uv run python ./script.py
 
-### Make sure to test the code
+# Run tests
+uv run pytest tests
 
-See [Test Documentation](./tests/README.md)
+# Add a new dependency
+uv add package_name
 
-### Updating python versions
+# Update dependencies
+uv sync --upgrade
+```
 
-.python-version is used by uv to install the correct version of python in the .venv
-the requires-python field in pyproject.toml is used by uv to determine functioning versions of dependancies.
+### Testing Your Changes
 
-if the python version needs to be updated, the exact version to use should be updated in .python-version, and the pyproject.toml should be reviewed to ensure its criteria works with the .python-version
+Testing is crucial for maintaining code quality. Before submitting changes:
 
-for example: if the pyproject.toml has requires-python <= "3.13.3" and .python-version = 3.13.4, there will be issues.
+1. Pre-commit hooks will automatically run tests when you commit
+2. Review the [Test Documentation](./tests/README.md) for writing new tests
+
+### Managing Python Versions
+
+Alarmo uses a file to manage Python versions:
+
+- `pyproject.toml`: Defines the compatible Python versions for the project
+
+When updating Python versions:
+1. Update `pyproject.toml` with your target version
+2. Test thoroughly with the new version
+
+---
+
+## ❓ FAQ
+
+### Bypassing pre-commit hooks
+
+While we recommend fixing issues identified by pre-commit, there may be situations where you need to bypass the hooks temporarily:
+- During emergency hotfixes
+- When committing work-in-progress changes
+- When making documentation-only changes
+
+You can bypass pre-commit hooks for a single commit using either:
+```bash
+# Long form
+git commit -m "your message" --no-verify
+
+# Short form
+git commit -m "your message" -n
+```
+
+**Important:** After bypassing hooks:
+1. This should be used sparingly
+2. Run checks manually before pushing:
+   ```bash
+   uv run pre-commit run --all-files
+   ```
+3. Document the reason for bypassing in your commit message
