@@ -9,3 +9,5 @@ package-lock.json
 custom_components/alarmo/__pycache__/*
 *__pycache__**
 *.pyc
+.coverage
+htmlcov/

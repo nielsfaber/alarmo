@@ -5,13 +5,26 @@ on:
   pull_request:
   schedule:
     - cron: "0 0 * * *"
+  workflow_dispatch:
 
 jobs:
   validate:
     runs-on: "ubuntu-latest"
     steps:
-      - uses: "actions/checkout@v2"
+      - uses: "actions/checkout@v4"
+
       - name: HACS validation
         uses: "hacs/action@main"
         with:
           category: "integration"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: latest
+
+      - name: Setup Python Environment
+        run: uv sync
+
+      - name: Run Tests
+        run: uv run pytest tests

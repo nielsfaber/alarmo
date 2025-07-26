@@ -1,73 +1,163 @@
 # Alarmo Testing Guide
-## To Run the Tests:
+
+## To Run the Tests
+
 > Ensure you've set up the development environment: See [Development](../DEVELOPMENT.md) documentation
 
-### From the project root...
+### From the project root
 
-Ensure your UV environment exists
-> **Note:** These commands will 
-> - update the uv.lock file with the newest verions of available dependancies
-> - install all updated packages into the .venv
+Create and Update your Python environment
+`uv sync` will do the following:
 
-```uv sync --upgrade```
+- Create the `.venv` virtual environment directory if it doesn't already exist
+- Install all dependencies from uv.lock into the `.venv`
+this is always smart to run when developing a new feature branch in case you have an out-of-date .venv.
 
 To run all the tests:
-```uv run pytest tests```
-OR to run a battery of tests in a file:
-```uv run pytest tests/test_user_permissions.py```
-OR to run a single test in a file:
-```uv run pytest tests/test_user_permissions.py -k test_arm_with_authorized_user```
+`uv run pytest tests`
 
-### **Note:** ensure you commit any changes to the uv.lock file to ensure the main branch is updated to use the newest version of all packages
+OR to run a battery of tests in a file:
+`uv run pytest tests/test_user_permissions.py`
+
+OR to run a single test in a file:
+`uv run pytest tests/test_user_permissions.py -k test_arm_with_authorized_user`
+
 ---
 
 ## **Test Coverage:**
 
-| Feature/Test | Test File(s) |
-|--------------|-------------|
-| Use exit delay (`use_exit_delay`) | `test_basic_features.py` |
-| Use entry delay (`use_entry_delay`) | `test_basic_features.py` |
-| Bypass automatically (`auto_bypass`) | `test_bypass_mode.py` |
-| Arm after closing (`arm_on_close`) | `test_arm_on_close.py` |
-| Allow open after arming (`allow_open`) | `test_basic_features.py` |
-| Multiple areas and master entity | `test_alarm_master.py` |
-| Sensor groups | `test_sensor_groups.py` |
-| Arm/disarm with code, invalid code | `test_basic_features.py`, `test_user_permissions.py` |
-| All arm modes (away, home, etc.) | `test_basic_features.py` |
-| Delays (exit, entry, trigger) | `test_basic_features.py` |
-| Force arm (bypass) | `test_bypass_mode.py` |
-| Sensor types: door, motion, window | `test_basic_features.py` |
-| Sensor blocking arming | `test_basic_features.py` |
-| Sensor triggers alarm | `test_basic_features.py` |
-| Sensor attributes on state change | `test_basic_features.py` |
-| Always on behavior (triggers alarm when disarmed) | `test_environmental_sensors.py` |
-| Environmental sensor type | `test_environmental_sensors.py` |
-| Tamper sensor type | `test_environmental_sensors.py` |
-| Trigger when unavailable | `test_basic_features.py` |
-| Bypass per mode (`auto_bypass_modes`) | `test_bypass_mode.py` |
-| Code format (number vs text) | `test_user_permissions.py` |
-| User permissions (arm/disarm authorization, area limits) | `test_user_permissions.py` |
-| General events (arm, disarm, trigger, failed_to_arm) | `test_events.py` |
-| Ready-to-arm events (backend dispatcher and HA event bus) | `test_ready_to_arm_events.py` |
-| Motion sensors not monitored while disarmed | `test_ready_to_arm_events.py` |
-| Cross-area independence for ready-to-arm status | `test_ready_to_arm_events.py` |
-| last_triggered attribute (set, persist, update) | `test_last_triggered_attribute.py` |
-| Trigger timeout behavior (re-arm/disarm after trigger timeout, with and without ignore_blocking_sensors_after_trigger) | `test_trigger_timeout_behavior.py` |
+### **Basic Features** (`test_basic_features.py`)
+
+| Test Function | Feature Tested |
+|---------------|----------------|
+| `test_arm_immediate_arms_right_away_with_allow_open` | Immediate arming with exit_time=0 and allow_open sensors |
+| `test_arm_away_from_disarmed` | Basic arm away functionality |
+| `test_disarm_from_armed_away` | Basic disarm functionality |
+| `test_arm_home_from_disarmed` | Basic arm home functionality |
+| `test_arm_with_invalid_code` | Invalid code handling |
+| `test_armed_away_entry_delay_and_trigger` | Entry delay and trigger behavior |
+| `test_arm_with_exit_delay_and_allow_open` | Exit delay with allow_open sensors |
+| `test_sensor_always_on_triggers_when_disarmed` | Always-on sensors trigger when disarmed |
+| `test_arm_away_with_exit_delay` | Exit delay functionality |
+| `test_arm_blocked_with_triggered_sensor_and_no_allow_open` | Sensor blocking arming behavior |
+| `test_sensor_trigger_unavailable` | Trigger when sensor unavailable |
+
+### **Bypass Mode** (`test_bypass_mode.py`)
+
+| Test Function | Feature Tested |
+|---------------|----------------|
+| `test_auto_bypass_true_integration` | Auto bypass enabled functionality |
+| `test_auto_bypass_false_single_sensor` | Auto bypass disabled behavior |
+| `test_auto_bypass_false_multiple_areas_exit_delay` | Auto bypass with multiple areas and exit delay |
+| `test_auto_bypass_modes_not_matched` | Auto bypass modes not matching current mode |
+| `test_auto_bypass_multiple_modes` | Auto bypass with multiple modes |
+| `test_auto_bypass_empty_modes` | Auto bypass with empty modes list |
+
+### **Environmental Sensors** (`test_environmental_sensors.py`)
+
+| Test Function | Feature Tested |
+|---------------|----------------|
+| `test_environmental_sensor_disarmed_state` | Environmental sensors triggering when disarmed |
+| `test_environmental_sensor_armed_state` | Environmental sensors triggering when armed |
+| `test_all_environmental_sensors` | All environmental sensor types (smoke, CO, water, heat) |
+| `test_environmental_sensor_multiple_arm_modes` | Environmental sensors across multiple arm modes |
+
+### **Events** (`test_events.py`)
+
+| Test Function | Feature Tested |
+|---------------|----------------|
+| `test_failed_to_arm_event_fired_when_sensor_blocks_arming` | Failed to arm event with blocking sensor |
+| `test_failed_to_arm_event_with_multiple_blocking_sensors` | Failed to arm event with multiple blocking sensors |
+| `test_no_failed_to_arm_event_when_arming_succeeds` | No failed to arm event when arming succeeds |
+| `test_backend_arm_event_dispatched_on_arming` | Backend arm event dispatching |
+| `test_backend_disarm_event_dispatched_on_disarming` | Backend disarm event dispatching |
+| `test_backend_trigger_event_dispatched_on_triggering` | Backend trigger event dispatching |
+
+### **Alarm Master** (`test_alarm_master.py`)
+
+| Test Function | Feature Tested |
+|---------------|----------------|
+| `test_alarm_master_state_mirroring` | Master entity state mirroring multiple areas |
+| `test_alarm_master_propagates_commands` | Master entity command propagation |
+| `test_alarm_master_priority_states` | Master entity priority state handling |
+
+### **Ready-to-Arm Events** (`test_ready_to_arm_events.py`)
+
+| Test Function | Feature Tested |
+|---------------|----------------|
+| `test_ready_to_arm_modes_changed_event_on_sensor_state_change` | Ready-to-arm event on sensor state change |
+| `test_ready_to_arm_modes_changed_event_with_door_sensor_multiple_modes` | Ready-to-arm with door sensor and multiple modes |
+| `test_motion_sensor_not_monitored_when_disarmed` | Motion sensors not monitored while disarmed |
+| `test_ready_to_arm_with_multiple_sensors_same_mode` | Ready-to-arm with multiple sensors in same mode |
+| `test_ready_to_arm_with_bypass_sensors` | Ready-to-arm with bypass sensors |
+| `test_ready_to_arm_with_allow_open_sensors` | Ready-to-arm with allow_open sensors |
+| `test_ready_to_arm_with_always_on_sensors` | Ready-to-arm with always-on sensors |
+| `test_ready_to_arm_cross_area_independence` | Cross-area independence for ready-to-arm status |
+| `test_ready_to_arm_multiple_modes_different_sensors` | Ready-to-arm with multiple modes and different sensors |
+| `test_home_assistant_event_bus_ready_to_arm_event` | Home Assistant event bus ready-to-arm event |
+
+### **Sensor Groups** (`test_sensor_groups.py`)
+
+| Test Function | Feature Tested |
+|---------------|----------------|
+| `test_single_sensor_in_group_does_not_trigger` | Single sensor in group doesn't trigger alarm |
+| `test_two_sensors_in_group_trigger_within_timeout_triggers_alarm` | Two sensors in group trigger within timeout |
+| `test_two_sensors_in_group_trigger_outside_timeout_does_not_trigger` | Two sensors in group trigger outside timeout |
+
+### **Arm on Close** (`test_arm_on_close.py`)
+
+| Test Function | Feature Tested |
+|---------------|----------------|
+| `test_arm_on_close_behavior` | Arm on close functionality |
+| `test_arm_on_close_timeout` | Arm on close timeout behavior |
+
+### **Last Triggered Attribute** (`test_last_triggered_attribute.py`)
+
+| Test Function | Feature Tested |
+|---------------|----------------|
+| `test_last_triggered_attribute_set_on_alarm_trigger` | Last triggered attribute set on alarm trigger |
+| `test_last_triggered_attribute_persists_across_states` | Last triggered attribute persists across states |
+| `test_last_triggered_attribute_updated_on_multiple_triggers` | Last triggered attribute updated on multiple triggers |
+
+### **User Permissions** (`test_user_permissions.py`)
+
+| Test Function | Feature Tested |
+|---------------|----------------|
+| `test_arm_with_authorized_user` | Arm with authorized user |
+| `test_disarm_with_unauthorized_user` | Disarm with unauthorized user |
+| `test_area_limited_user` | Area-limited user permissions |
+| `test_disabled_user` | Disabled user handling |
+| `test_text_code_format` | Text code format support |
+
+### **Trigger Timeout Behavior** (`test_trigger_timeout_behavior.py`)
+
+| Test Function | Feature Tested |
+|---------------|----------------|
+| `test_ignore_blocking_sensors_after_trigger_enabled_re_arms_with_open_sensors` | Re-arm with open sensors when ignore_blocking_sensors_after_trigger enabled |
+| `test_ignore_blocking_sensors_after_trigger_multiple_sensors` | Ignore blocking sensors after trigger with multiple sensors |
+| `test_default_behavior_disabled_goes_to_disarmed_with_open_sensors` | Default behavior goes to disarmed with open sensors |
+| `test_default_behavior_disabled_re_arms_with_closed_sensors` | Default behavior re-arms with closed sensors |
 
 ### **Not Covered:**
 
-| Feature/Test                            | Notes                                                  |
-| --------------------------------------- | ------------------------------------------------------ |
-| MQTT integration                        | No test for MQTT state/event/command topic integration |
-| Sensor group with more than two sensors | Only two-sensor group tested                           |
+| Feature/Test | Notes |
+|--------------|-------|
+| MQTT integration | No tests for MQTT state/event/command topic integration |
+| Sensor groups with more than two sensors | Only two-sensor groups tested |
+| Tamper sensor type | Referenced in original list but no specific tamper tests found |
+| Multiple alarm panel instances | Tests focus on single alarm panel scenarios |
+| Complex automation scenarios | Tests focus on individual features rather than complex workflows |
+| Performance testing | No load/stress testing of the alarm system |
+| Configuration migration | No tests for config format changes/upgrades |
 
 ---
 
 ## **Test Implementation Notes**
 
 Factory classes for setting up default entities or adjusting with overrides:
-   - `AreaFactory`: Creates area configurations
-   - `ConfigFactory`: Creates configuration objects
-   - `UserFactory`: Creates user objects with bcrypt-hashed codes
-   - `SensorFactory`: Creates various sensor configurations (door, window, motion)
-   - `UserMockFactory`: Creates user configurations with different permission levels
+
+- `AreaFactory`: Creates area configurations
+- `ConfigFactory`: Creates configuration objects
+- `UserFactory`: Creates user objects with bcrypt-hashed codes
+- `SensorFactory`: Creates various sensor configurations (door, window, motion)
+- `UserMockFactory`: Creates user configurations with different permission levels
