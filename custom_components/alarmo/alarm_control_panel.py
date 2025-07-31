@@ -685,9 +685,10 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
         elif old_state == AlarmControlPanelState.DISARMED and state == AlarmControlPanelState.TRIGGERED:
             self._arm_mode = None
 
-        dispatcher_send(self.hass, "alarmo_state_updated", self.area_id, old_state, state)
-
+        # perform state update of entity prior to executing dispatcher callbacks, such that automations can use the updated state
         self.schedule_update_ha_state()
+
+        dispatcher_send(self.hass, "alarmo_state_updated", self.area_id, old_state, state)
 
     def async_arm_failure(self, open_sensors: dict, context_id=None):
         """handle arm failure."""
@@ -1128,20 +1129,19 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
         self.delay = delay
         self.open_sensors = open_sensors
 
-        if state != self._state and state:
-            # state changes
-            old_state = self._state
+        old_state = self._state
+        new_state = state if state != self._state else None
 
-            self._state = state
+        if new_state:
+            self._state = new_state
             _LOGGER.debug(
                 "entity %s was updated from %s to %s",
                 self.entity_id,
                 old_state,
-                state,
+                new_state,
             )
-            dispatcher_send(self.hass, "alarmo_state_updated", None, old_state, state)
 
-            if state == AlarmControlPanelState.TRIGGERED:
+            if new_state == AlarmControlPanelState.TRIGGERED:
                  self._last_triggered = dt_util.now().strftime("%Y-%m-%d %H:%M:%S")
 
         # take bypassed sensors by combining all areas
@@ -1154,6 +1154,10 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
         self.update_ready_to_arm_modes()
 
         self.schedule_update_ha_state()
+
+        # perform state update of entity prior to executing dispatcher callbacks, such that automations can use the updated state
+        if new_state:
+            dispatcher_send(self.hass, "alarmo_state_updated", None, old_state, new_state)
 
     @callback
     def alarm_disarm(self, code=None, **kwargs):
