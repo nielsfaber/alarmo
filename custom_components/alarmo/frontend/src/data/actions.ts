@@ -175,6 +175,8 @@ export const computeServiceDisplay = (hass: HomeAssistant, ...actions: { service
         case 'tts':
           data = { ...data, icon: 'hass:microphone' };
           break;
+        case 'telegram_bot':
+          data = { ...data, icon: 'mdi:send' };
       }
       return data;
     })
@@ -241,6 +243,12 @@ export const getNotifyServices = (hass: HomeAssistant): { service: string, entit
       ...Object.keys(hass.services.tts)
         .filter(e => e != 'clear_cache')
         .map(service => Object({ service: `tts.${service}` }))
+    ];
+
+  if ('telegram_bot' in hass.services)
+    res = [
+      ...res,
+      { service: 'telegram_bot.send_message' }
     ];
 
   Object.keys(hass.states).filter(e => computeDomain(e) == 'notify')

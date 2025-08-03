@@ -12,7 +12,7 @@ import {
   HomeAssistant,
 } from '../../types';
 
-import { handleError, omit, showErrorDialog, isDefined, computeName, computeDomain, navigate } from '../../helpers';
+import { handleError, omit, showErrorDialog, isDefined, computeName, computeDomain, navigate, prettyPrint } from '../../helpers';
 import { saveAutomation, fetchAreas, fetchConfig, deleteAutomation } from '../../data/websockets';
 import { localize } from '../../../localize/localize';
 import {
@@ -712,6 +712,16 @@ export class NotificationEditorCard extends LitElement {
           : null;
       if (!entity || !this.hass.states[entity]) return '';
       const target = computeName(this.hass.states[entity]);
+
+      return localize(
+        `panels.actions.cards.new_notification.fields.name.placeholders.${event}`,
+        this.hass.language,
+        '{target}',
+        target
+      );
+    }
+    else if (domain == 'telegram_bot') {
+      const target = prettyPrint(domain);
 
       return localize(
         `panels.actions.cards.new_notification.fields.name.placeholders.${event}`,
