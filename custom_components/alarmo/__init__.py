@@ -146,7 +146,12 @@ class AlarmoCoordinator(DataUpdateCoordinator):
         )
         self.register_events()
 
-        super().__init__(hass, _LOGGER, name=const.DOMAIN)
+        super().__init__(
+            hass,
+            _LOGGER,
+            config_entry=entry,
+            name=const.DOMAIN
+        )
 
     @callback
     def setup_alarm_entities(self):
