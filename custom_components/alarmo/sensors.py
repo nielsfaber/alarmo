@@ -127,6 +127,7 @@ class SensorHandler:
         self._groups = {}
         self._group_events = {}
         self._startup_complete = False
+        self._unavailable_state_mem = {}
 
         @callback
         def async_update_sensor_config():
@@ -295,6 +296,20 @@ class SensorHandler:
             old_state,
             new_state,
         )
+
+        if new_state == STATE_UNAVAILABLE and not sensor_config[ATTR_TRIGGER_UNAVAILABLE]:
+            # temporarily store the prior state until the sensor becomes available again
+            self._unavailable_state_mem[entity] = old_state
+        elif entity in self._unavailable_state_mem:
+            # if sensor was unavailable, check the state before that, do not act if the sensor reverted to its prior state.
+            prior_state = self._unavailable_state_mem.pop(entity)
+            if old_state == STATE_UNAVAILABLE and prior_state == new_state:
+                _LOGGER.debug("state transition from %s to % to %s detected, ignoring.",
+                    prior_state,
+                    old_state,
+                    new_state,
+                )
+                return
 
         alarm_entity = self.hass.data[const.DOMAIN]["areas"][sensor_config["area"]]
         alarm_state = alarm_entity.state
