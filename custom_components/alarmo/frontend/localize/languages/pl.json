@@ -175,7 +175,7 @@
             "type": "Wykryty rodzaj"
           },
           "actions": {
-            "add_to_alarm": "dodaj do alarmu",
+            "add_to_alarm": "Dodaj do alarmu",
             "filter_supported": "Ukryj nieznane elementy"
           }
         },
@@ -331,8 +331,8 @@
             "code_format": {
               "heading": "Format kodu",
               "description": "Ustawia sposób wprowadzania kodu/hasła dla karty alarmu Lovelace.",
-              "code_format_number": "kod PIN",
-              "code_format_text": "hasło"
+              "code_format_number": "Kod PIN",
+              "code_format_text": "Hasło"
             }
           }
         },
@@ -341,7 +341,7 @@
           "description": "Każdy użytkownik ma własny kod do uzbrojenia/rozbrojenia alarmu.",
           "no_items": "Nie ma jeszcze użytkowników",
           "actions": {
-            "new_user": "nowy użytkownik"
+            "new_user": "Nowy użytkownik"
           }
         },
         "new_user": {
@@ -406,7 +406,7 @@
             "no_area_warning": "Akcja nie jest przypisana do żadnego obszaru."
           },
           "actions": {
-            "new_notification": "nowe powiadomienie"
+            "new_notification": "Nowe powiadomienie"
           }
         },
         "actions": {
@@ -415,7 +415,7 @@
             "no_items": "Nie utworzono jeszcze żadnych akcji."
           },
           "actions": {
-            "new_action": "nowa akcja"
+            "new_action": "Nowa akcja"
           }
         },
         "new_notification": {

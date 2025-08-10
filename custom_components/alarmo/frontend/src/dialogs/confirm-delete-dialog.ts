@@ -33,12 +33,12 @@ export class ConfirmDeleteDialog extends LitElement {
           ${this._params.description}
         </div>
 
-        <mwc-button slot="primaryAction" @click=${this.cancelClick} dialogAction="close">
+        <ha-button appearance="plain" slot="primaryAction" @click=${this.cancelClick} dialogAction="close">
           ${this.hass.localize('ui.dialogs.generic.cancel')}
-        </mwc-button>
-        <mwc-button slot="secondaryAction" style="float: left" @click=${this.confirmClick} dialogAction="close">
+        </ha-button>
+        <ha-button appearance="plain" slot="secondaryAction" style="float: left" @click=${this.confirmClick} dialogAction="close">
           ${this.hass.localize('ui.dialogs.generic.ok')}
-        </mwc-button>
+        </ha-button>
       </ha-dialog>
     `;
   }

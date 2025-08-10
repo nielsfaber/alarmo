@@ -120,9 +120,9 @@ export class AddSensorsCard extends SubscribeMixin(LitElement) {
         </alarmo-table>
 
         <div class="card-actions">
-          <mwc-button @click=${this.addSelected} ?disabled=${this.addSelection.length == 0}>
+          <ha-button appearance="plain" @click=${this.addSelected} ?disabled=${this.addSelection.length == 0}>
             ${localize('panels.sensors.cards.add_sensors.actions.add_to_alarm', this.hass!.language)}
-          </mwc-button>
+          </ha-button>
         </div>
       </ha-card>
     `;
@@ -134,8 +134,8 @@ export class AddSensorsCard extends SubscribeMixin(LitElement) {
       checked && !this.addSelection.includes(id)
         ? [...this.addSelection, id]
         : !checked
-        ? this.addSelection.filter(e => e != id)
-        : this.addSelection;
+          ? this.addSelection.filter(e => e != id)
+          : this.addSelection;
   }
 
   addSelected(ev: Event) {
@@ -154,8 +154,8 @@ export class AddSensorsCard extends SubscribeMixin(LitElement) {
       .map(e =>
         Object.keys(this.areas).length == 1
           ? Object.assign(e, {
-              area: Object.keys(this.areas)[0],
-            })
+            area: Object.keys(this.areas)[0],
+          })
           : e
       )
       .filter(e => e) as AlarmoSensor[];

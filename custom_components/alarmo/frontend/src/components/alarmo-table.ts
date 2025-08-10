@@ -75,8 +75,8 @@ export class AlarmoTable extends LitElement {
       <div class="table">
         ${this.renderHeaderRow()}
         ${filteredData.length
-          ? filteredData.map(e => this.renderDataRow(e))
-          : html`
+        ? filteredData.map(e => this.renderDataRow(e))
+        : html`
               <div class="table-row">
                 <div class="table-cell text grow">
                   <slot></slot>
@@ -92,9 +92,9 @@ export class AlarmoTable extends LitElement {
     return html`
       <div class="table-row header">
         ${Object.values(this.columns).map(e =>
-          e.hide
-            ? ''
-            : html`
+      e.hide
+        ? ''
+        : html`
                 <div
                   class="table-cell ${e.text ? 'text' : ''} ${e.grow ? 'grow' : ''} ${e.align ? e.align : ''}"
                   style="${e.grow ? '' : `width: ${e.width}`}"
@@ -102,7 +102,7 @@ export class AlarmoTable extends LitElement {
                   <span>${e.title || ''}</span>
                 </div>
               `
-        )}
+    )}
       </div>
     `;
   }
@@ -115,9 +115,9 @@ export class AlarmoTable extends LitElement {
         @click=${() => this.handleClick(String(data.id))}
       >
         ${Object.entries(this.columns).map(([col, e]) =>
-          e.hide
-            ? ''
-            : html`
+      e.hide
+        ? ''
+        : html`
                 <div
                   class="table-cell ${e.text ? 'text' : ''} ${e.grow ? 'grow' : ''} ${e.align ? e.align : ''}"
                   style="${e.grow ? '' : `width: ${e.width}`}"
@@ -125,7 +125,7 @@ export class AlarmoTable extends LitElement {
                   ${e.renderer ? e.renderer(data) : data[col]}
                 </div>
               `
-        )}
+    )}
       </div>
     `;
   }
@@ -167,7 +167,7 @@ export class AlarmoTable extends LitElement {
         </mwc-menu>
 
         ${this._getFilteredItems()
-          ? html`
+        ? html`
               <alarmo-chip
                 .hass=${this.hass}
                 removable
@@ -176,14 +176,14 @@ export class AlarmoTable extends LitElement {
                 style="--chip-color: var(--primary-color); --background-opacity: 0.12; --chip-border-radius: 8px; --chip-height: 40px; --chip-font-size: 1em; --icon-color: var(--dark-primary-color)"
               >
                 ${localize(
-                  'components.table.filter.hidden_items',
-                  this.hass.language,
-                  'number',
-                  this._getFilteredItems()
-                )}
+          'components.table.filter.hidden_items',
+          this.hass.language,
+          'number',
+          this._getFilteredItems()
+        )}
               </alarmo-chip>
             `
-          : ''}
+        : ''}
       </div>
     `;
   }
@@ -211,9 +211,9 @@ export class AlarmoTable extends LitElement {
       <ha-icon-button
         .path=${mdiClose}
         @click=${() => {
-          this._menu!.close();
-          setTimeout(() => this._menu!.anchor.blur(), 50);
-        }}
+        this._menu!.close();
+        setTimeout(() => this._menu!.anchor.blur(), 50);
+      }}
       ></ha-icon-button>
       ${Object.keys(this.filterConfig).map(key => {
         if (this.filterConfig![key].binary) {
@@ -450,9 +450,6 @@ export class AlarmoTable extends LitElement {
     div.dropdown-item.checkbox {
       flex-direction: row;
       align-items: center;
-    }
-    ha-button-menu mwc-button {
-      margin-left: 16px;
     }
   `;
 }

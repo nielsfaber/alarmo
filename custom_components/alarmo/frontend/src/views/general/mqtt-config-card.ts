@@ -188,9 +188,9 @@ export class MqttConfigCard extends SubscribeMixin(LitElement) {
         </alarmo-settings-row>
 
         <div class="card-actions">
-          <mwc-button @click=${this.saveClick}>
+          <ha-button appearance="plain" @click=${this.saveClick}>
             ${this.hass.localize('ui.common.save')}
-          </mwc-button>
+          </ha-button>
         </div>
       </ha-card>
     `;

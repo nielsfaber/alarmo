@@ -335,8 +335,8 @@
             "code_format": {
               "heading": "Kodformat",
               "description": "Ändra inmatningstyp för Lovelace alarm kortet.",
-              "code_format_number": "pinkod",
-              "code_format_text": "lösenord"
+              "code_format_number": "Pinkod",
+              "code_format_text": "Lösenord"
             }
           }
         },
@@ -410,7 +410,7 @@
             "no_area_warning": "Åtgärd är inte tilldelad till något område."
           },
           "actions": {
-            "new_notification": "ny notifikation"
+            "new_notification": "Ny notifikation"
           }
         },
         "actions": {
@@ -419,7 +419,7 @@
             "no_items": "Det finns inga åtgärder skapade ännu."
           },
           "actions": {
-            "new_action": "ny åtgärd"
+            "new_action": "Ny åtgärd"
           }
         },
         "new_notification": {

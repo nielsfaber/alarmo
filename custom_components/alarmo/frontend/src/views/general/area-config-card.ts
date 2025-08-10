@@ -116,9 +116,9 @@ export class AreaConfigCard extends SubscribeMixin(LitElement) {
           ${localize('panels.general.cards.areas.no_items', this.hass.language)}
         </alarmo-table>
         <div class="card-actions">
-          <mwc-button @click=${this.addClick}>
+          <ha-button appearance="plain" @click=${this.addClick}>
             ${localize('panels.general.cards.areas.actions.add', this.hass.language)}
-          </mwc-button>
+          </ha-button>
         </div>
       </ha-card>
     `;

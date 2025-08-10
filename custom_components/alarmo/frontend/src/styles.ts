@@ -39,18 +39,6 @@ export const commonStyle = css`
     right: 0px;
   }
 
-  mwc-button.active:not([disabled]) {
-    background: var(--primary-color);
-    --mdc-theme-primary: var(--text-primary-color);
-    border-radius: 4px;
-  }
-  mwc-button.warning {
-    --mdc-theme-primary: var(--error-color);
-  }
-  mwc-button.success {
-    --mdc-theme-primary: var(--success-color);
-  }
-
   div.entity-row {
     display: flex;
     align-items: center;
@@ -86,29 +74,6 @@ export const commonStyle = css`
   a,
   a:visited {
     color: var(--primary-color);
-  }
-  mwc-button ha-icon {
-    padding-right: 11px;
-  }
-  mwc-button[trailingIcon] ha-icon {
-    padding: 0px 0px 0px 6px;
-  }
-  mwc-button.vertical {
-    height: 60px;
-    --mdc-button-height: 60px;
-    background: var(--primary-color);
-    --mdc-theme-primary: var(--text-primary-color);
-  }
-  mwc-button.vertical div {
-    display: flex;
-    flex-direction: column;
-  }
-  mwc-button.vertical span {
-    display: flex;
-  }
-  mwc-button.vertical ha-icon {
-    display: flex;
-    margin-left: 50%;
   }
   mwc-tab {
     --mdc-tab-color-default: var(--secondary-text-color);

@@ -33,9 +33,9 @@ export class ErrorDialog extends LitElement {
           ${this._params.error || ''}
         </div>
 
-        <mwc-button slot="primaryAction" style="float: left" @click=${this.closeDialog} dialogAction="close">
+        <ha-button appearance="plain" slot="primaryAction" style="float: left" @click=${this.closeDialog} dialogAction="close">
           ${this.hass.localize('ui.dialogs.generic.ok')}
-        </mwc-button>
+        </ha-button>
       </ha-dialog>
     `;
   }

@@ -179,7 +179,7 @@
             "type": "Kiểu được phát hiện"
           },
           "actions": {
-            "add_to_alarm": "thêm vào hệ thống",
+            "add_to_alarm": "Thêm vào hệ thống",
             "filter_supported": "Ẩn mục không rõ kiểu"
           }
         },
@@ -335,8 +335,8 @@
             "code_format": {
               "heading": "Định dạng mã",
               "description": "Thiết lập kiểu nhập liệu cho thẻ bảo vệ Lovelace.",
-              "code_format_number": "mã số",
-              "code_format_text": "mật khẩu"
+              "code_format_number": "Mã số",
+              "code_format_text": "Mật khẩu"
             }
           }
         },
@@ -345,7 +345,7 @@
           "description": "Mỗi người dùng sẽ có một mã riêng để bật/tắt hệ thống báo động.",
           "no_items": "Chưa có người dùng nào",
           "actions": {
-            "new_user": "người dùng mới"
+            "new_user": "Người dùng mới"
           }
         },
         "new_user": {
@@ -410,7 +410,7 @@
             "no_area_warning": "Chưa gán hành động vào khu vực nào cả."
           },
           "actions": {
-            "new_notification": "thông báo mới"
+            "new_notification": "Thông báo mới"
           }
         },
         "actions": {
@@ -419,7 +419,7 @@
             "no_items": "Chưa tạo hành động nào."
           },
           "actions": {
-            "new_action": "hành động mới"
+            "new_action": "Hành động mới"
           }
         },
         "new_notification": {

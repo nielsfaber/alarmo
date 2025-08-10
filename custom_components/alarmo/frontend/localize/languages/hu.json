@@ -179,7 +179,7 @@
             "type": "Észlelt típus"
           },
           "actions": {
-            "add_to_alarm": "hozzáadás a riasztóhoz",
+            "add_to_alarm": "Hozzáadás a riasztóhoz",
             "filter_supported": "Ismeretlen típusú elemek elrejtése"
           }
         },
@@ -335,8 +335,8 @@
             "code_format": {
               "heading": "Kód formátuma",
               "description": "A Lovelace riasztókártyán használt bevitel típusa.",
-              "code_format_number": "pin-kód",
-              "code_format_text": "jelszó"
+              "code_format_number": "Pin-kód",
+              "code_format_text": "Jelszó"
             }
           }
         },
@@ -345,7 +345,7 @@
           "description": "Minden felhasználó saját kóddal rendelkezik a riasztó élesítéséhez és hatástalanításához.",
           "no_items": "Még nincs létrehozott felhasználó",
           "actions": {
-            "new_user": "új felhasználó"
+            "new_user": "Új felhasználó"
           }
         },
         "new_user": {
@@ -410,7 +410,7 @@
             "no_area_warning": "Ez a művelet nincs zónához rendelve."
           },
           "actions": {
-            "new_notification": "új értesítés"
+            "new_notification": "Új értesítés"
           }
         },
         "actions": {
@@ -419,7 +419,7 @@
             "no_items": "Még nincs létrehozott művelet."
           },
           "actions": {
-            "new_action": "új művelet"
+            "new_action": "Új művelet"
           }
         },
         "new_notification": {

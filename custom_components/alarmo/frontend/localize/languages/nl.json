@@ -335,8 +335,8 @@
             "code_format": {
               "heading": "Code opmaak",
               "description": "Stelt het invoertype in voor de Lovelace alarmkaart.",
-              "code_format_number": "pincode",
-              "code_format_text": "wachtwoord"
+              "code_format_number": "Pincode",
+              "code_format_text": "Wachtwoord"
             }
           }
         },
@@ -345,7 +345,7 @@
           "description": "Elke gebruiker heeft zijn eigen code om het alarm in/uit te schakelen.",
           "no_items": "Er zijn nog geen gebruikers",
           "actions": {
-            "new_user": "nieuwe gebruiker"
+            "new_user": "Nieuwe gebruiker"
           }
         },
         "new_user": {
@@ -403,14 +403,14 @@
       "title": "Acties",
       "cards": {
         "notifications": {
-          "title": "Meldingen",
+          "title": "Notificaties",
           "description": "Met dit paneel kunt u meldingen beheren die moeten worden verzonden tijdens een bepaalde alarmgebeurtenis",
           "table": {
             "no_items": "Er zijn nog geen notificaties aangemaakt.",
             "no_area_warning": "Actie is niet toegewezen aan een gebied."
           },
           "actions": {
-            "new_notification": "nieuwe melding"
+            "new_notification": "Nieuwe notificatie"
           }
         },
         "actions": {
@@ -419,7 +419,7 @@
             "no_items": "Er zijn nog geen acties gemaakt."
           },
           "actions": {
-            "new_action": "nieuwe actie"
+            "new_action": "Nieuwe actie"
           }
         },
         "new_notification": {

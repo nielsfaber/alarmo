@@ -224,15 +224,15 @@ export class UserEditorCard extends LitElement {
         </alarmo-settings-row>
 
         <div class="card-actions">
-          <mwc-button @click=${this.saveClick}>
+          <ha-button appearance="plain" @click=${this.saveClick}>
             ${this.hass.localize('ui.common.save')}
-          </mwc-button>
+          </ha-button>
 
           ${this.item
         ? html`
-                <mwc-button class="warning" @click=${this.deleteClick}>
+                <ha-button appearance="plain" variant="danger" @click=${this.deleteClick}>
                   ${this.hass.localize('ui.common.delete')}
-                </mwc-button>
+                </ha-button>
               `
         : ''}
         </div>

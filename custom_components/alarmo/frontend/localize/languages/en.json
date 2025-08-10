@@ -179,7 +179,7 @@
             "type": "Detected type"
           },
           "actions": {
-            "add_to_alarm": "add to alarm",
+            "add_to_alarm": "Add to alarm",
             "filter_supported": "Hide items with unknown type"
           }
         },
@@ -335,8 +335,8 @@
             "code_format": {
               "heading": "Code format",
               "description": "Sets the input type for Lovelace alarm card.",
-              "code_format_number": "pincode",
-              "code_format_text": "password"
+              "code_format_number": "Pincode",
+              "code_format_text": "Password"
             }
           }
         },
@@ -345,7 +345,7 @@
           "description": "Each user has its own code to arm/disarm the alarm.",
           "no_items": "There are no users yet",
           "actions": {
-            "new_user": "new user"
+            "new_user": "New user"
           }
         },
         "new_user": {
@@ -410,7 +410,7 @@
             "no_area_warning": "Action is not assigned to any area."
           },
           "actions": {
-            "new_notification": "new notification"
+            "new_notification": "New notification"
           }
         },
         "actions": {
@@ -419,7 +419,7 @@
             "no_items": "There are no actions created yet."
           },
           "actions": {
-            "new_action": "new action"
+            "new_action": "New action"
           }
         },
         "new_notification": {

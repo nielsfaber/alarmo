@@ -179,7 +179,7 @@
             "type": "Erkannter Typ"
           },
           "actions": {
-            "add_to_alarm": "zum Alarm hinzufügen",
+            "add_to_alarm": "Zum Alarm hinzufügen",
             "filter_supported": "Elemente mit unbekanntem Typ ausblenden"
           }
         },
@@ -345,7 +345,7 @@
           "description": "Jeder Benutzer hat seinen eigenen Code zum Scharf-/Unscharfschalten des Alarms.",
           "no_items": "Es sind noch keine Benutzer vorhanden",
           "actions": {
-            "new_user": "neuer Benutzer"
+            "new_user": "Neuer Benutzer"
           }
         },
         "new_user": {
@@ -410,7 +410,7 @@
             "no_area_warning": "Die Aktion ist keinem Bereich zugeordnet."
           },
           "actions": {
-            "new_notification": "neue Benachrichtigung"
+            "new_notification": "Neue Benachrichtigung"
           }
         },
         "actions": {
@@ -419,7 +419,7 @@
             "no_items": "Es sind noch keine Aktionen erstellt worden."
           },
           "actions": {
-            "new_action": "neue Aktion"
+            "new_action": "Neue Aktion"
           }
         },
         "new_notification": {

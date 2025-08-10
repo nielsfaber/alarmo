@@ -186,9 +186,9 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
           </alarmo-table>
 
           <div class="card-actions">
-            <mwc-button @click=${this.addNotificationClick}>
+            <ha-button appearance="plain" @click=${this.addNotificationClick}>
               ${localize('panels.actions.cards.notifications.actions.new_notification', this.hass.language)}
-            </mwc-button>
+            </ha-button>
           </div>
         </ha-card>
 
@@ -208,9 +208,9 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
           </alarmo-table>
 
           <div class="card-actions">
-            <mwc-button @click=${this.addActionClick}>
+            <ha-button appearance="plain" @click=${this.addActionClick}>
               ${localize('panels.actions.cards.actions.actions.new_action', this.hass.language)}
-            </mwc-button>
+            </ha-button>
           </div>
         </ha-card>
       `;

@@ -61,14 +61,14 @@ export class ManageSensorGroupsDialog extends SubscribeMixin(LitElement) {
           </div>
           <div class="container">
             ${Object.keys(this.sensorGroups).length
-              ? Object.values(this.sensorGroups).map(e => this.renderGroup(e))
-              : localize('panels.sensors.dialogs.manage_groups.no_items', this.hass.language)}
+        ? Object.values(this.sensorGroups).map(e => this.renderGroup(e))
+        : localize('panels.sensors.dialogs.manage_groups.no_items', this.hass.language)}
           </div>
         </div>
-        <mwc-button slot="secondaryAction" @click=${this.createGroupClick}>
+        <ha-button appearance="plain" slot="secondaryAction" @click=${this.createGroupClick}>
           <ha-icon icon="hass:plus"></ha-icon>
           ${localize('panels.sensors.dialogs.manage_groups.actions.new_group', this.hass.language)}
-        </mwc-button>
+        </ha-button>
       </ha-dialog>
     `;
   }
@@ -83,11 +83,11 @@ export class ManageSensorGroupsDialog extends SubscribeMixin(LitElement) {
       <div>
         <span class="name">${item.name}</span>
         <span class="description">${localize(
-          'panels.general.cards.areas.table.summary_sensors',
-          this.hass!.language,
-          '{number}',
-          String(item.entities.length)
-        )}
+      'panels.general.cards.areas.table.summary_sensors',
+      this.hass!.language,
+      '{number}',
+      String(item.entities.length)
+    )}
       </div>
       <ha-icon-button .path=${mdiChevronRight}>
       </ha-icon-button>
@@ -166,7 +166,7 @@ export class ManageSensorGroupsDialog extends SubscribeMixin(LitElement) {
       ha-card span.description {
         color: var(--secondary-text-color);
       }
-      mwc-button ha-icon {
+      ha-button ha-icon {
         padding-right: 11px;
       }
     `;

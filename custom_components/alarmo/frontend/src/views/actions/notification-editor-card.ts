@@ -396,19 +396,19 @@ export class NotificationEditorCard extends LitElement {
         </div>
 
         <div class="toggle-button">
-          <mwc-button @click=${this._toggleYamlMode}>
-            <ha-icon icon="hass:shuffle-variant"></ha-icon>
+          <ha-button appearance="filled" @click=${this._toggleYamlMode}>
+            <ha-icon slot="start" icon="hass:shuffle-variant"></ha-icon>
             ${this.viewMode == ViewMode.Yaml
         ? localize('components.editor.ui_mode', this.hass.language)
         : localize('components.editor.yaml_mode', this.hass.language)}
-          </mwc-button>
+          </ha-button>
         </div>
 
         <div class="card-actions">
-          <mwc-button trailingIcon ?disabled=${!this._validAction()} @click=${this._testClick}>
+          <ha-button appearance="plain" ?disabled=${!this._validAction()} @click=${this._testClick}>
             ${localize('panels.actions.cards.new_notification.actions.test', this.hass.language)}
-            <ha-icon icon="hass:arrow-right"></ha-icon>
-          </mwc-button>
+            <ha-icon slot="end" icon="hass:arrow-right"></ha-icon>
+          </ha-button>
         </div>
       </ha-card>
 
@@ -442,10 +442,10 @@ export class NotificationEditorCard extends LitElement {
                     ${localize('panels.actions.cards.new_notification.fields.delete.description', this.hass.language)}
                   </span>
                   <div>
-                    <mwc-button class="warning" outlined @click=${this._deleteClick}>
-                      <ha-icon icon="hass:trash-can-outline"></ha-icon>
+                    <ha-button appearance="filled" variant="danger" @click=${this._deleteClick}>
+                      <ha-icon slot="start" icon="hass:trash-can-outline"></ha-icon>
                       ${this.hass.localize('ui.common.delete')}
-                    </mwc-button>
+                    </ha-button>
                   </div>
                 </alarmo-settings-row>
               `
@@ -454,10 +454,10 @@ export class NotificationEditorCard extends LitElement {
       </ha-card>
 
       <div class="actions">
-        <mwc-button raised @click=${this._saveClick} style="width: 100%" class="save-button">
-          <ha-icon icon="hass:content-save-outline"></ha-icon>
+        <ha-button appearance="filled" @click=${this._saveClick} style="width: 100%">
+          <ha-icon slot="start" icon="hass:content-save-outline"></ha-icon>
           ${this.hass.localize('ui.common.save')}
-        </mwc-button>
+        </ha-button>
       </div>
     `;
   }
@@ -884,10 +884,6 @@ export class NotificationEditorCard extends LitElement {
       div.actions {
         padding: 20px 0px 30px 0px;
       }
-      mwc-button ha-icon {
-        margin-right: 6px;
-        --mdc-icon-size: 20px;
-      }
       .toggle-button {
         position: absolute;
         right: 20px;
@@ -901,12 +897,6 @@ export class NotificationEditorCard extends LitElement {
       }
       span.error-message {
         color: var(--error-color);
-      }
-      mwc-button.warning {
-        --mdc-theme-primary: var(--error-color);
-      }
-      mwc-button.save-button {
-        --mdc-theme-primary: rgba(var(--rgb-primary-color), 0.8);
       }
       div.heading {
         display: grid;

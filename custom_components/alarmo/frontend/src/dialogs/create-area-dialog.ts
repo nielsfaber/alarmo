@@ -62,13 +62,13 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
           </ha-icon-button>
             <span slot="title">
               ${this.area_id
-                ? localize(
-                    'panels.general.dialogs.edit_area.title',
-                    this.hass.language,
-                    '{area}',
-                    this.areas[this.area_id!].name
-                  )
-                : localize('panels.general.dialogs.create_area.title', this.hass.language)}
+        ? localize(
+          'panels.general.dialogs.edit_area.title',
+          this.hass.language,
+          '{area}',
+          this.areas[this.area_id!].name
+        )
+        : localize('panels.general.dialogs.create_area.title', this.hass.language)}
             </span>
         </ha-dialog-header>
         <div class="wrapper">
@@ -78,14 +78,14 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
             value="${this.name}"
           ></ha-textfield>
           ${this.area_id
-            ? html`
+        ? html`
                 <span class="note">
                   ${localize('panels.general.dialogs.edit_area.name_warning', this.hass.language)}
                 </span>
               `
-            : ''}
+        : ''}
           ${!this.area_id
-            ? html`
+        ? html`
                 <alarmo-select
                   .items=${Object.values(this.areas).map(e => Object({ value: e.area_id, name: e.name }))}
                   value=${this.selectedArea}
@@ -94,23 +94,24 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
                   @value-changed=${(ev: Event) => (this.selectedArea = (ev.target as HTMLInputElement).value)}
                 ></alarmo-select>
               `
-            : ''}
+        : ''}
         </div>
-        <mwc-button slot="primaryAction" @click=${this.saveClick}>
+        <ha-button appearance="plain" slot="primaryAction" @click=${this.saveClick}>
           ${this.hass.localize('ui.common.save')}
-        </mwc-button>
+        </ha-button>
         ${this.area_id
-          ? html`
-              <mwc-button
+        ? html`
+              <ha-button
+                appearance="plain"
                 slot="secondaryAction"
                 @click=${this.deleteClick}
-                class="warning"
+                variant="danger"
                 ?disabled=${Object.keys(this.areas!).length == 1}
               >
                 ${this.hass.localize('ui.common.delete')}
-              </mwc-button>
+              </ha-button>
             `
-          : ''}
+        : ''}
       </ha-dialog>
     `;
   }

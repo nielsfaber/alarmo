@@ -182,16 +182,17 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
           <div>
             ${this.modesByArea(this.data.area).map(
           el => html`
-                <mwc-button
-                  class="${this.data!.modes.includes(el) || this.data!.always_on ? 'active' : ''}"
+                <ha-button
+                  appearance="${this.data!.modes.includes(el) || this.data!.always_on ? 'filled' : 'plain'}"
+                  variant="${this.data!.modes.includes(el) || this.data!.always_on ? 'brand' : 'neutral'}"
                   @click=${() => {
               this.setMode(el);
             }}
                   ?disabled=${this.data!.always_on}
                 >
-                  <ha-icon icon="${EArmModeIcons[Object.entries(EArmModes).find(([, v]) => v == el)![0]]}"></ha-icon>
+                  <ha-icon slot="start" icon="${EArmModeIcons[Object.entries(EArmModes).find(([, v]) => v == el)![0]]}"></ha-icon>
                   ${localize(`common.modes_short.${el}`, this.hass.language)}
-                </mwc-button>
+                </ha-button>
               `
         )}
           </div>
@@ -219,9 +220,10 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
                   ></alarmo-select>
                 `
         : ''}
-            <mwc-button @click=${this.manageGroupsClick}>
+            <ha-button appearance="filled" @click=${this.manageGroupsClick}>
               ${localize('panels.sensors.cards.editor.actions.setup_groups', this.hass.language)}
-            </mwc-button>
+              <ha-icon slot="end" icon="mdi:open-in-new"></ha-icon>
+            </ha-button>
           </div>
         </alarmo-settings-row>
 
@@ -349,20 +351,20 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
                         <div>
                           ${this.modesByArea(this.data.area).map(
               el => html`
-                              <mwc-button
-                                class="${this.data!.auto_bypass_modes.includes(el) && this.data!.modes.includes(el)
-                  ? 'active'
-                  : ''}"
+                              <ha-button
+                                appearance="${this.data!.auto_bypass_modes.includes(el) && this.data!.modes.includes(el) ? 'filled' : 'plain'}"
+                                variant="${this.data!.auto_bypass_modes.includes(el) && this.data!.modes.includes(el) ? 'brand' : 'neutral'}"
                                 ?disabled=${!this.data!.modes.includes(el)}
                                 @click=${() => {
                   this.setBypassMode(el);
                 }}
                               >
                                 <ha-icon
+                                  slot="start"
                                   icon="${EArmModeIcons[Object.entries(EArmModes).find(([, v]) => v == el)![0]]}"
                                 ></ha-icon>
                                 ${localize(`common.modes_short.${el}`, this.hass.language)}
-                              </mwc-button>
+                              </ha-button>
                             `
             )}
                         </div>
@@ -408,13 +410,13 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
         </alarmo-collapsible-section>
 
         <div class="card-actions">
-          <mwc-button @click=${this.saveClick}>
+          <ha-button appearance="plain" @click=${this.saveClick}>
             ${this.hass.localize('ui.common.save')}
-          </mwc-button>
+          </ha-button>
 
-          <mwc-button class="warning" @click=${this.deleteClick}>
+          <ha-button appearance="plain" variant="danger" @click=${this.deleteClick}>
             ${localize('panels.sensors.cards.editor.actions.remove', this.hass.language)}
-          </mwc-button>
+          </ha-button>
         </div>
       </ha-card>
     `;

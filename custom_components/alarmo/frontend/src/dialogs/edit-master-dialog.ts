@@ -40,12 +40,12 @@ export class EditMasterDialog extends LitElement {
           ></ha-textfield>
           <span class="note">${localize('panels.general.dialogs.edit_area.name_warning', this.hass.language)}</span>
         </div>
-        <mwc-button slot="primaryAction" @click=${this.saveClick}>
+        <ha-button appearance="plain" slot="primaryAction" @click=${this.saveClick}>
           ${this.hass.localize('ui.common.save')}
-        </mwc-button>
-        <mwc-button slot="secondaryAction" @click=${this.closeDialog}>
+        </ha-button>
+        <ha-button appearance="plain" slot="secondaryAction" @click=${this.closeDialog}>
           ${this.hass.localize('ui.common.cancel')}
-        </mwc-button>
+        </ha-button>
       </ha-dialog>
     `;
   }

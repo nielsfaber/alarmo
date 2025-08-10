@@ -335,8 +335,8 @@
             "code_format": {
               "heading": "Format du code",
               "description": "Définit le type d'entrée pour la carte d'alarme Lovelace.",
-              "code_format_number": "pincode",
-              "code_format_text": "password"
+              "code_format_number": "Pincode",
+              "code_format_text": "Password"
             }
           }
         },

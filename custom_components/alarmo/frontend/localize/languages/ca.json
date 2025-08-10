@@ -179,7 +179,7 @@
             "type": "Detected type"
           },
           "actions": {
-            "add_to_alarm": "afegeix a l'alarma",
+            "add_to_alarm": "Afegeix a l'alarma",
             "show_all": "Mostra-ho tot"
           }
         },
@@ -335,8 +335,8 @@
             "code_format": {
               "heading": "Format del codi",
               "description": "Estableix el tipus de codi per a la targeta d'alarma Lovelace.",
-              "code_format_number": "codi PIN",
-              "code_format_text": "contrasenya"
+              "code_format_number": "Codi PIN",
+              "code_format_text": "Contrasenya"
             }
           }
         },
@@ -345,7 +345,7 @@
           "description": "Cada usuari té el seu propi codi per activar/desactivar l'alarma.",
           "no_items": "Encara no hi ha usuaris",
           "actions": {
-            "new_user": "usuari nou"
+            "new_user": "Usuari nou"
           }
         },
         "new_user": {
@@ -410,7 +410,7 @@
             "no_area_warning": "Action is not assigned to any area."
           },
           "actions": {
-            "new_notification": "nova notificació"
+            "new_notification": "Nova notificació"
           }
         },
         "actions": {
@@ -419,7 +419,7 @@
             "no_items": "Encara no s'han creat accions."
           },
           "actions": {
-            "new_action": "nova acció"
+            "new_action": "Nova acció"
           }
         },
         "new_notification": {

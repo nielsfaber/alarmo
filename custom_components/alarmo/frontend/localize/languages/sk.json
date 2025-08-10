@@ -179,7 +179,7 @@
             "type": "Zistený typ"
           },
           "actions": {
-            "add_to_alarm": "pridať k alarmu",
+            "add_to_alarm": "Pridať k alarmu",
             "filter_supported": "Skryť položky s neznámym typom"
           }
         },
@@ -336,7 +336,7 @@
               "heading": "Formát kódu",
               "description": "Nastaví typ vstupu pre kartu alarmu Lovelace.",
               "code_format_number": "PIN",
-              "code_format_text": "heslo"
+              "code_format_text": "Heslo"
             }
           }
         },
@@ -345,7 +345,7 @@
           "description": "Každý užívateľ má svoj vlastný kód na zapnutie/vypnutie alarmu.",
           "no_items": "Zatiaľ nie sú žiadni používatelia",
           "actions": {
-            "new_user": "nový užívateľ"
+            "new_user": "Nový užívateľ"
           }
         },
         "new_user": {
@@ -410,7 +410,7 @@
             "no_area_warning": "Akcia nie je priradená žiadnej oblasti."
           },
           "actions": {
-            "new_notification": "nová notifikácia"
+            "new_notification": "Nová notifikácia"
           }
         },
         "actions": {
@@ -419,7 +419,7 @@
             "no_items": "Zatiaľ nie sú vytvorené žiadne akcie."
           },
           "actions": {
-            "new_action": "nová akcia"
+            "new_action": "Nová akcia"
           }
         },
         "new_notification": {

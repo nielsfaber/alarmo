@@ -179,7 +179,7 @@
             "type": "Registreret type"
           },
           "actions": {
-            "add_to_alarm": "tilføj til alarm",
+            "add_to_alarm": "Tilføj til alarm",
             "filter_supported": "Gem enheder af ukendt type"
           }
         },
@@ -335,8 +335,8 @@
             "code_format": {
               "heading": "Kode format",
               "description": "Indstil input typen for lovelace alarm kortet.",
-              "code_format_number": "pinkode",
-              "code_format_text": "kodeord"
+              "code_format_number": "Pinkode",
+              "code_format_text": "Kodeord"
             }
           }
         },
@@ -345,7 +345,7 @@
           "description": "Hver bruger har sin egen kode til at til/fra-koble alarmen.",
           "no_items": "Der er ingen brugere endnu",
           "actions": {
-            "new_user": "ny bruger"
+            "new_user": "Ny bruger"
           }
         },
         "new_user": {
@@ -410,7 +410,7 @@
             "no_area_warning": "Handlingen er ikke tildelt noget område."
           },
           "actions": {
-            "new_notification": "ny meddelelse"
+            "new_notification": "Ny meddelelse"
           }
         },
         "actions": {
@@ -419,7 +419,7 @@
             "no_items": "Der er ingen handlinger oprettet endnu."
           },
           "actions": {
-            "new_action": "ny handling"
+            "new_action": "Ny handling"
           }
         },
         "new_notification": {

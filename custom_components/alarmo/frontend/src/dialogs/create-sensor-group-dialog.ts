@@ -147,14 +147,14 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
         : ''
       }
         </div>
-        <mwc-button slot="secondaryAction" @click=${this.saveClick}>
+        <ha-button appearance="plain" slot="secondaryAction" @click=${this.saveClick}>
           ${this.hass.localize('ui.common.save')}
-        </mwc-button>
+        </ha-button>
         ${this.data.group_id
         ? html`
-              <mwc-button slot="secondaryAction" @click=${this.deleteClick} class="warning">
+              <ha-button appearance="plain" slot="secondaryAction" @click=${this.deleteClick} variant="danger">
                 ${this.hass.localize('ui.common.delete')}
-              </mwc-button>
+              </ha-button>
             `
         : ''}
       </ha-dialog>
@@ -176,7 +176,7 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
     sensors.sort(sortAlphabetically);
 
     if (!sensors.length) return localize('panels.sensors.cards.sensors.no_items', this.hass.language);
-    
+
     return html`
       <alarmo-chip-set
         .hass=${this.hass}
@@ -236,9 +236,6 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
       ${dialogStyle}
       div.wrapper {
         color: var(--primary-text-color);
-      }
-      mwc-button.warning {
-        --mdc-theme-primary: var(--error-color);
       }
     `;
   }

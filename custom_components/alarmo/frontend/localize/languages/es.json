@@ -179,7 +179,7 @@
             "type": "Tipo detectado"
           },
           "actions": {
-            "add_to_alarm": "agregar a la alarma",
+            "add_to_alarm": "Agregar a la alarma",
             "filter_supported": "Ocultar elementos con tipo desconocido"
           }
         },
@@ -335,8 +335,8 @@
             "code_format": {
               "heading": "Formato del código",
               "description": "Establece el tipo de entrada para la tarjeta de la alarma.",
-              "code_format_number": "código PIN",
-              "code_format_text": "contraseña"
+              "code_format_number": "Código PIN",
+              "code_format_text": "Contraseña"
             }
           }
         },
@@ -345,7 +345,7 @@
           "description": "Cada usuario tiene su propio código para armar / desarmar la alarma.",
           "no_items": "Aún no hay usuarios",
           "actions": {
-            "new_user": "nuevo usuario"
+            "new_user": "Nuevo usuario"
           }
         },
         "new_user": {
@@ -410,7 +410,7 @@
             "no_area_warning": "La acción no está asignada a ningún área."
           },
           "actions": {
-            "new_notification": "nueva notificación"
+            "new_notification": "Nueva notificación"
           }
         },
         "actions": {
@@ -419,7 +419,7 @@
             "no_items": "Aún no se han creado acciones."
           },
           "actions": {
-            "new_action": "nueva acción"
+            "new_action": "Nueva acción"
           }
         },
         "new_notification": {

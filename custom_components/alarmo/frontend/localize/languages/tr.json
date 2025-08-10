@@ -179,7 +179,7 @@
             "type": "Tespit edilen tip"
           },
           "actions": {
-            "add_to_alarm": "alarma ekle",
+            "add_to_alarm": "Alarma ekle",
             "filter_supported": "Türü bilinmeyen öğeleri gizle"
           }
         },
@@ -335,8 +335,8 @@
             "code_format": {
               "heading": "Kod formatı",
               "description": "Lovelace alarm kartı için giriş türünü ayarlar.",
-              "code_format_number": "pin kodu",
-              "code_format_text": "şifre"
+              "code_format_number": "Pin kodu",
+              "code_format_text": "Şifre"
             }
           }
         },
@@ -345,7 +345,7 @@
           "description": "Her kullanıcının alarmı kurmak/devre dışı bırakmak için kendi kodu vardır.",
           "no_items": "Henüz kullanıcı yok",
           "actions": {
-            "new_user": "yeni kullanıcı"
+            "new_user": "Yeni kullanıcı"
           }
         },
         "new_user": {
@@ -410,7 +410,7 @@
             "no_area_warning": "Eylem herhangi bir alana atanmamıştır."
           },
           "actions": {
-            "new_notification": "yeni bildirim"
+            "new_notification": "Yeni bildirim"
           }
         },
         "actions": {
@@ -419,7 +419,7 @@
             "no_items": "Henüz oluşturulmuş bir eylem yok."
           },
           "actions": {
-            "new_action": "yeni eylem"
+            "new_action": "Yeni eylem"
           }
         },
         "new_notification": {

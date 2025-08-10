@@ -335,8 +335,8 @@
             "code_format": {
               "heading": "Formato del codice",
               "description": "Imposta il tipo di codice da digitare nella card di Lovelace.",
-              "code_format_number": "codice numerico",
-              "code_format_text": "password"
+              "code_format_number": "Codice numerico",
+              "code_format_text": "Password"
             }
           }
         },

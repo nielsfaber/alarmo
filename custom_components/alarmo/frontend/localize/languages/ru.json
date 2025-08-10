@@ -179,7 +179,7 @@
             "type": "Тип обнаружения"
           },
           "actions": {
-            "add_to_alarm": "добавить в сигнализацию",
+            "add_to_alarm": "Добавить в сигнализацию",
             "filter_supported": "Скрыть элементы с неизвестным типом"
           }
         },
@@ -335,8 +335,8 @@
             "code_format": {
               "heading": "Формат кода",
               "description": "Задает тип ввода для карты сигнализации Lovelace.",
-              "code_format_number": "пинкод",
-              "code_format_text": "пароль"
+              "code_format_number": "Пинкод",
+              "code_format_text": "Пароль"
             }
           }
         },
@@ -345,7 +345,7 @@
           "description": "У каждого пользователя есть свой собственный код для включения / выключения сигнализации.",
           "no_items": "Пользователей пока нет",
           "actions": {
-            "new_user": "новый пользователь"
+            "new_user": "Hовый пользователь"
           }
         },
         "new_user": {
@@ -410,7 +410,7 @@
             "no_area_warning": "Действие не назначено ни для какой зоны."
           },
           "actions": {
-            "new_notification": "новое уведомление"
+            "new_notification": "Hовое уведомление"
           }
         },
         "actions": {
@@ -419,7 +419,7 @@
             "no_items": "Еще не создано никаких действий."
           },
           "actions": {
-            "new_action": "новое действие"
+            "new_action": "Hoвое действие"
           }
         },
         "new_notification": {

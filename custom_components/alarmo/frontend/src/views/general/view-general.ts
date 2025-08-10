@@ -124,12 +124,13 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
           ${this.data?.mqtt?.enabled
           ? html`
                 <div style="padding: 0px 0px 16px 16px">
-                  <mwc-button
-                    outlined
+                  <ha-button
+                    appearance="filled"
                     @click=${() => navigate(this, exportPath('general', 'mqtt_configuration'), true)}
                   >
                     ${localize('panels.general.cards.general.actions.setup_mqtt', this.hass.language)}
-                  </mwc-button>
+                    <ha-icon slot="end" icon="mdi:open-in-new"></ha-icon>
+                  </ha-button>
                 </div>
               `
           : ''}
@@ -153,9 +154,13 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
           ${this.data?.master?.enabled && Object.keys(this.areas).length >= 2
           ? html`
                 <div style="padding: 0px 0px 16px 16px">
-                  <mwc-button outlined @click=${this.setupMasterClick}>
+                  <ha-button
+                    appearance="filled"
+                    @click=${this.setupMasterClick}
+                  >
                     ${localize('panels.general.cards.general.actions.setup_master', this.hass.language)}
-                  </mwc-button>
+                    <ha-icon slot="end" icon="mdi:open-in-new"></ha-icon>
+                  </ha-button>
                 </div>
               `
           : ''}

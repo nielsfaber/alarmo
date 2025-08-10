@@ -144,17 +144,22 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
           ${localize('panels.general.cards.modes.fields.status.description', this.hass.language)}
         </span>
         <div>
-          <mwc-button class="${config?.enabled ? 'active' : ''}" @click=${() => this.saveData(mode, { enabled: true })}>
-            <ha-icon icon="mdi:check"></ha-icon>
+          <ha-button
+            appearance="${config?.enabled ? 'filled' : 'plain'}"
+            variant="${config?.enabled ? 'brand' : 'neutral'}"
+            @click=${() => this.saveData(mode, { enabled: true })}
+          >
+            <ha-icon slot="start" icon="mdi:check"></ha-icon>
             ${localize('common.enabled', this.hass.language)}
-          </mwc-button>
-          <mwc-button
-            class="${config?.enabled ? '' : 'active'}"
+          </ha-button>
+          <ha-button
+            appearance="${config?.enabled ? 'plain' : 'filled'}"
+            variant="${config?.enabled ? 'neutral' : 'brand'}"
             @click=${() => this.saveData(mode, { enabled: false })}
           >
-            <ha-icon icon="mdi:close"></ha-icon>
+            <ha-icon slot="start" icon="mdi:close"></ha-icon>
             ${localize('common.disabled', this.hass.language)}
-          </mwc-button>
+          </ha-button>
         </div>
       </alarmo-settings-row>
       <alarmo-settings-row .narrow=${this.narrow}>

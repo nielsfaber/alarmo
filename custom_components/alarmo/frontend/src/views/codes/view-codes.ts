@@ -123,9 +123,9 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
             <span slot="description">
               ${localize('panels.codes.cards.codes.fields.code_format.description', this.hass.language)}
             </span>
-            <mwc-button
-              class="${this.data.code_format == 'number' ? 'active' : ''} ${!codesInUse
-          ? 'disabled'
+            <ha-button
+              appearance="${this.data.code_format == 'number' ? 'filled' : 'plain'}"
+              variant="${this.data.code_format == 'number' ? 'brand' : 'neutral'}"
           : ''}"
               @click=${() => {
           this.saveData({ code_format: 'number' });
@@ -133,10 +133,10 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
               ?disabled=${!codesInUse}
             >
               ${localize('panels.codes.cards.codes.fields.code_format.code_format_number', this.hass.language)}
-            </mwc-button>
-            <mwc-button
-              class="${this.data.code_format == 'text' ? 'active' : ''} ${!codesInUse
-          ? 'disabled'
+            </ha-button>
+            <ha-button
+              appearance="${this.data.code_format == 'text' ? 'filled' : 'plain'}"
+              variant="${this.data.code_format == 'text' ? 'brand' : 'neutral'}"
           : ''
         }"
               @click=${() => {
@@ -145,7 +145,7 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
               ?disabled=${!codesInUse}
             >
               ${localize('panels.codes.cards.codes.fields.code_format.code_format_text', this.hass.language)}
-            </mwc-button>
+            </ha-button>
           </alarmo-settings-row>
         </ha-card>
 
@@ -229,9 +229,9 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
           ${localize('panels.codes.cards.user_management.no_items', this.hass.language)}
         </alarmo-table>
         <div class="card-actions">
-          <mwc-button @click=${this.addUserClick}>
+          <ha-button appearance="plain" @click=${this.addUserClick}>
             ${localize('panels.codes.cards.user_management.actions.new_user', this.hass.language)}
-          </mwc-button>
+          </ha-button>
         </div>
       </ha-card>
     `;
