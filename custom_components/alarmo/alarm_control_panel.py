@@ -833,11 +833,20 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
     def async_trigger(self, skip_delay: bool = False, open_sensors: dict = None):
         """Trigger request. Will only be called the first time a sensor trips."""
 
-        if self._state == AlarmControlPanelState.PENDING or skip_delay or not self._arm_mode:
+        if self._state == AlarmControlPanelState.PENDING or skip_delay or not self.arm_mode:
             entry_delay = 0
         else:
-            entry_delay = self._config[const.ATTR_MODES][self._arm_mode]["entry_time"]
-        trigger_time = self._config[const.ATTR_MODES][self._arm_mode]["trigger_time"] if self._arm_mode else 0
+            entry_delay = self._config[const.ATTR_MODES][self.arm_mode]["entry_time"]
+
+        if self.arm_mode:
+            trigger_time = self._config[const.ATTR_MODES][self.arm_mode]["trigger_time"]
+        else:
+            # if the alarm is not armed, take the maximum trigger_time of all modes
+            trigger_times = []
+            for mode_config in self._config[const.ATTR_MODES].values():
+                if mode_config[const.ATTR_ENABLED]:
+                    trigger_times.append(mode_config["trigger_time"])
+            trigger_time = 0 if 0 in trigger_times else max(trigger_times)
 
         if self._state and (
             self._state != AlarmControlPanelState.PENDING or
@@ -886,7 +895,8 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
                         self.hass,
                         "alarmo_event",
                         const.EVENT_TRIGGER_TIME_EXPIRED,
-                        self.area_id
+                        self.area_id,
+                        {}
                     )
 
                 self.async_set_timer(trigger_time, async_trigger_timer_finished)
