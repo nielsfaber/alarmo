@@ -32,7 +32,7 @@ export class MyAlarmPanel extends LitElement {
 
   async firstUpdated() {
     window.addEventListener('location-changed', () => {
-      if(!window.location.pathname.includes('alarmo')) return;
+      if (!window.location.pathname.includes('alarmo')) return;
       this.requestUpdate();
     });
 
@@ -110,7 +110,7 @@ export class MyAlarmPanel extends LitElement {
 
   handlePageSelected(ev: CustomEvent) {
     const newPage = ev.detail.name;
-    if (newPage !== getPath()) {
+    if (newPage !== getPath().page) {
       navigate(this, exportPath(newPage));
       this.requestUpdate();
     } else {
