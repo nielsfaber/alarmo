@@ -297,9 +297,17 @@ export class UserEditorCard extends LitElement {
         data = { ...data, area_limit: [] };
 
       saveUser(this.hass, data)
-        .catch(e => handleError(e, ev))
-        .then(() => {
-          this.cancelClick();
+        .catch(e => {
+          handleError(e, ev)
+        })
+        .then((res) => {
+          if (!(res || {}).success) {
+            const errMsg = (res || {}).error || "unknown error";
+            showErrorDialog(ev, errMsg);
+          }
+          else {
+            this.cancelClick();
+          }
         });
     }
   }

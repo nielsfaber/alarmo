@@ -34,7 +34,7 @@ export class ErrorDialog extends LitElement {
         </div>
 
         <ha-button appearance="plain" slot="primaryAction" style="float: left" @click=${this.closeDialog} dialogAction="close">
-          ${this.hass.localize('ui.dialogs.generic.ok')}
+          ${this.hass.localize('ui.common.ok')}
         </ha-button>
       </ha-dialog>
     `;
