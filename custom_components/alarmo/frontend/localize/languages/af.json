@@ -1,0 +1,573 @@
+{
+  "common": {
+    "modes_short": {
+      "armed_away": "Weg",
+      "armed_home": "Tuis",
+      "armed_night": "Nag",
+      "armed_custom_bypass": "Pasgemaak",
+      "armed_vacation": "Vakansie"
+    },
+    "enabled": "Gestel",
+    "disabled": "Afgesit"
+  },
+  "components": {
+    "time_slider": {
+      "seconds": "sek",
+      "minutes": "min",
+      "infinite": "oneindig",
+      "none": "geen"
+    },
+    "editor": {
+      "ui_mode": "Na UI",
+      "yaml_mode": "Na YAML",
+      "edit_in_yaml": "Werk by in YAML"
+    },
+    "table": {
+      "filter": {
+        "label": "Filter items",
+        "item": "Filter volgens {name}",
+        "hidden_items": "{number} {number, plural,\n  een {item is}\n  other {items are}\n} versteek"
+      }
+    }
+  },
+  "title": "Alarm-paneel",
+  "panels": {
+    "general": {
+      "title": "Algemeen",
+      "cards": {
+        "general": {
+          "description": "Hierdie paneel definieer globale verstellings vir die alarm.",
+          "fields": {
+            "disarm_after_trigger": {
+              "heading": "Sit af na voorval",
+              "description": "Sit die alarm outomaties af na 'n voorval, eerder as om terug te gaan na die geaktiveerde status."
+            },
+            "ignore_blocking_sensors_after_trigger": {
+              "heading": "Ignoreer aktiewe sensors voor aktivering",
+              "description": "Aktiveer weer die alarm sonder om seker te maak dat daar nog aktiewe sensors is."
+            },
+            "enable_mqtt": {
+              "heading": "Aktiveer MQTT",
+              "description": "Laat toe dat die alarm-paneel deur MQTT beheer kan word."
+            },
+            "enable_master": {
+              "heading": "Aktiveer meester alarm",
+              "description": "Skep 'n entiteit om alle areas gelyk te beheer."
+            }
+          },
+          "actions": {
+            "setup_mqtt": "MQTT-opstelling",
+            "setup_master": "Meester-opstelling"
+          }
+        },
+        "modes": {
+          "title": "Modusse",
+          "description": "Hierdie paneel kan gebruik word om verskeie modusse te aktiveer.",
+          "modes": {
+            "armed_away": "Gestel | Weg sal gebruik word wanneer niemand tuis is nie. Alle deure en vensters wat toegang tot die huis toelaat sal aktief wees, asook enige bewegingsensors binne die huis.",
+            "armed_home": "Gestel | Tuis sal gebruik word as die alarm geaktiveer word terwyl daar mense in die huis is. Alle deure en vensters wat toegang tot die huis toelaat sal aktief wees, maar geen bewegingsensors binne die huis nie.",
+            "armed_night": "Gestel | Nag sal gebruik word wanneer die alarm geaktiveer word voor slapenstyd. Al die deure en vensters wat toegang tot die huis toelaat sal aktief wees, asook sekere bewegingsensors in die huis.",
+            "armed_vacation": "Gestel | Vakansie sal gebruik word as uitbreiding van Gestel | Weg-modus in die geval dat die huis vir langer tye leeg is. Die wagperiodes en sneller-responses kan daarvolgens aangepas word.",
+            "armed_custom_bypass": "An extra mode for defining your own security perimeter."
+          },
+          "number_sensors_active": "{number} {number, plural,\n  een {sensor}\n  other {sensors}\n} aktief",
+          "fields": {
+            "status": {
+              "heading": "Status",
+              "description": "Bevestig of die alarm geaktiveer kan word in die betrokke modus."
+            },
+            "exit_delay": {
+              "heading": "Aktiveer-wagperiode",
+              "description": "Wanneer die alarm geaktiveer word, sal die sensors binne hierdie periode nie aktief wees nie."
+            },
+            "entry_delay": {
+              "heading": "Afsit-wagpeiode",
+              "description": "Wagperiode voordat die alarm 'n voorval registreer nadat 'n sensor aktief is."
+            },
+            "trigger_time": {
+              "heading": "Voorval-tydperk",
+              "description": "Periode waartydens die alarm in voorval-modues sal bly nadat 'n voorval geregistreer is."
+            }
+          }
+        },
+        "mqtt": {
+          "title": "MQTT-opstelling",
+          "description": "Hierdie paneel kan gebruik word om MQTT op te stel.",
+          "fields": {
+            "state_topic": {
+              "heading": "State topic",
+              "description": "Topic waarop statusse gepubliseer word"
+            },
+            "event_topic": {
+              "heading": "Event topic",
+              "description": "Topic waarop events gepubliseer word"
+            },
+            "command_topic": {
+              "heading": "Command topic",
+              "description": "Topic waarop commands gepubliseer word"
+            },
+            "require_code": {
+              "heading": "Vereis kode",
+              "description": "Vereis die kode om saam met die command gestuur te word"
+            },
+            "state_payload": {
+              "heading": "Stel payload per status op",
+              "item": "Definieer 'n payload vir status ''{state}''"
+            },
+            "command_payload": {
+              "heading": "Stel payload op per command",
+              "item": "Definieer 'n payload vir command ''{command}''"
+            }
+          }
+        },
+        "areas": {
+          "title": "Areas",
+          "description": "Areas kan gebruik word om jou huis is afdelings op te deel.",
+          "no_items": "Daar is nog geen areas gedefinieer nie.",
+          "table": {
+            "remarks": "Opmerkings",
+            "summary": "Hierdie area bevat {summary_sensors} en {summary_automations}.",
+            "summary_sensors": "{number} {number, plural,\n  een {sensor}\n  other {sensors}\n}",
+            "summary_automations": "{number} {number, plural,\n  een {automation}\n  other {automations}\n}"
+          },
+          "actions": {
+            "add": "Voeg by"
+          }
+        }
+      },
+      "dialogs": {
+        "create_area": {
+          "title": "Nuwe area",
+          "fields": {
+            "copy_from": "Dupliseer verstellings vanaf"
+          }
+        },
+        "edit_area": {
+          "title": "Bywerk van area ''{area}''",
+          "name_warning": "Let wel! Deur die naam te verander gaan die enditeit-id ook verander"
+        },
+        "remove_area": {
+          "title": "Verwyder area?",
+          "description": "Is jy seker jy wil die area verwyder? Hierdie area bevat {sensors} sensors en {automations} automations, wat ook verwyder gaan word."
+        },
+        "edit_master": {
+          "title": "Meester-opstelling"
+        },
+        "disable_master": {
+          "title": "Sit meester af?",
+          "description": "Is jy seker jy wil meester verwyder? Hierdie area bevat {automations} automations, wat ook verwyder gaan word."
+        }
+      }
+    },
+    "sensors": {
+      "title": "Sensors",
+      "cards": {
+        "sensors": {
+          "description": "Huidig-opgestelde sensors. Kies 'n item om veranderinge te maak.",
+          "table": {
+            "no_items": "Daar is geen sensors wat hier gewys kan word nie.",
+            "no_area_warning": "Sensor is aan geen area gekoppel nie.",
+            "arm_modes": "Aktiveer-modusse",
+            "always_on": "(Altyd)"
+          }
+        },
+        "add_sensors": {
+          "title": "Boeg sensors by",
+          "description": "Voeg nog sensors by. Maak seker dat jou sensors se name gepas is sodat jy hulle kan identifiseer.",
+          "no_items": "Daar is geen HA-entiteite war vir die alarm opgestel kan word nie. Maak seker om entiteit-tipe, binary_sensor in te sluit.",
+          "table": {
+            "type": "Tipe opgetel"
+          },
+          "actions": {
+            "add_to_alarm": "Voeg by die alarm",
+            "filter_supported": "Versteek items van onbekende tipes."
+          }
+        },
+        "editor": {
+          "title": "Verstel Sensor",
+          "description": "Stel die sensor-verstellings op vir ''{entity}''.",
+          "fields": {
+            "entity": {
+              "heading": "Entiteit",
+              "description": "Entiteit geassosieer met die sensor"
+            },
+            "area": {
+              "heading": "Area",
+              "description": "Kies die area waar die sensor is."
+            },
+            "group": {
+              "heading": "Groep",
+              "description": "Groepeer saam met ander sensors vir gekombineerde voorvalregistrasie."
+            },
+            "device_type": {
+              "heading": "Toestel-tipe",
+              "description": "Kies die tipe toestel om die opstelling van beste gepas aan te wend.",
+              "choose": {
+                "door": {
+                  "name": "Deur",
+                  "description": "'n Deur, hek of ander toegangspunt vir die huis."
+                },
+                "window": {
+                  "name": "Venster",
+                  "description": "'n Venster of deur wat nie vir toegang gebruik word nie, soos balkon skuifdeure"
+                },
+                "motion": {
+                  "name": "Beweging",
+                  "description": "Bewegingsensor of soortgelyk, wat 'n wagperiode het tussen voorvalle."
+                },
+                "tamper": {
+                  "name": "Peuter",
+                  "description": "Sensor om die verwyder van bedekking, breek van glas ens. op te tel."
+                },
+                "environmental": {
+                  "name": "Omgewing",
+                  "description": "Rook/gas-sensor, optel van waterlekke ens."
+                },
+                "other": {
+                  "name": "Generies"
+                }
+              }
+            },
+            "always_on": {
+              "heading": "Altyd aan",
+              "description": "Sensor should always trigger the alarm."
+            },
+            "modes": {
+              "heading": "Aktiewe modusse",
+              "description": "Alarm modes in which this sensor is active."
+            },
+            "arm_on_close": {
+              "heading": "Aktiveer na toemaak",
+              "description": "After deactivation of this sensor, the remaining exit delay will automatically be skipped."
+            },
+            "use_exit_delay": {
+              "heading": "Gebruik aktivering-wagperiode",
+              "description": "Sensor is allowed to be active when the exit delay starts."
+            },
+            "use_entry_delay": {
+              "heading": "Gebruik afsit-wagperiode",
+              "description": "Sensor activation triggers the alarm after the entry delay rather than directly."
+            },
+            "allow_open": {
+              "heading": "Laat toe om aanvanklik oop te wees",
+              "description": "Open state while arming is ignored (subsequent sensor activation will trigger alarm)."
+            },
+            "auto_bypass": {
+              "heading": "Ignoreer outomaties",
+              "description": "Exclude this sensor from the alarm if it is open while arming.",
+              "modes": "Modusse waarin die sensor geïgnoreer moet word."
+            },
+            "trigger_unavailable": {
+              "heading": "Registreer voorvan wanneer nie beskikbaar",
+              "description": "When the sensor state becomes 'unavailable', this will activate the sensor."
+            }
+          },
+          "actions": {
+            "toggle_advanced": "Gevorderde verstellings",
+            "remove": "Verwyder",
+            "setup_groups": "Stel groepe op"
+          },
+          "errors": {
+            "description": "Stel die volgende foute reg:",
+            "no_area": "Geen area is gekies nie",
+            "no_modes": "Geen modusse is gekies waarvoor die sensor aktief moet wees nie.",
+            "no_auto_bypass_modes": "Geen modusse is gekies vir die sensor om outomaties geïgnoreer te word nie."
+          }
+        }
+      },
+      "dialogs": {
+        "manage_groups": {
+          "title": "Vestuur sensor-groepe",
+          "description": "In 'n sensor-groep, moet verskeie sensors geaktiveer word binne 'n gegewe tydperk vir die alarm om 'n voorval te registreer.",
+          "no_items": "Nog geen groepe nie",
+          "actions": {
+            "new_group": "Nuwe groep"
+          }
+        },
+        "create_group": {
+          "title": "Nuwe sensor-groep",
+          "fields": {
+            "name": {
+              "heading": "Name",
+              "description": "Naam van die sensor-groep"
+            },
+            "timeout": {
+              "heading": "Tyd op",
+              "description": "Tydperiode waatydens opeenvolgende sensoraktiverings 'n voorval registreer."
+            },
+            "event_count": {
+              "heading": "Telling",
+              "description": "Hoeveelheid verskillende sensors wat aktief moet wees om 'n voorval te registreer."
+            },
+            "sensors": {
+              "heading": "Sensors",
+              "description": "Kies die sensors vir die groep."
+            }
+          },
+          "errors": {
+            "invalid_name": "Ongeldige naam",
+            "insufficient_sensors": "Ten minste 2 sensors moet gekies word."
+          }
+        },
+        "edit_group": {
+          "title": "Werk sensorgroep by ''{name}''"
+        }
+      }
+    },
+    "codes": {
+      "title": "Kodes",
+      "cards": {
+        "codes": {
+          "description": "Verander die kode-verstellings.",
+          "fields": {
+            "code_arm_required": {
+              "heading": "Vereis 'n kode om te aktiveer",
+              "description": "'n Geldige kode word vereid om die alarm te aktiveer."
+            },
+            "code_disarm_required": {
+              "heading": "Vereis 'n kode om af te sit",
+              "description": "A valid code must be provided to disarm the alarm."
+            },
+            "code_mode_change_required": {
+              "heading": "Require code for switching mode",
+              "description": "A valid code must be provided to change the arm mode which is active."
+            },
+            "code_format": {
+              "heading": "Kode-formaat",
+              "description": "Sets the input type for Lovelace alarm card.",
+              "code_format_number": "Pinkode",
+              "code_format_text": "Wagwoord"
+            }
+          }
+        },
+        "user_management": {
+          "title": "Bestuur gebruikers",
+          "description": "Elke gebruik het hulle eie kode om die alarm aan en af te skakel.",
+          "no_items": "Daar is nog geen gebruikers nie",
+          "actions": {
+            "new_user": "Nuwe gebruiker"
+          }
+        },
+        "new_user": {
+          "title": "Skep nuwe wagwoord",
+          "description": "Users can be created for providing access to operating the alarm.",
+          "fields": {
+            "name": {
+              "heading": "Naam",
+              "description": "Naam van die gebruiker."
+            },
+            "code": {
+              "heading": "Kode",
+              "description": "Kode vir die gebruiker."
+            },
+            "confirm_code": {
+              "heading": "Bevestig kode",
+              "description": "Bevestig die kode."
+            },
+            "can_arm": {
+              "heading": "Allow code for arming",
+              "description": "Entering this code activates the alarm"
+            },
+            "can_disarm": {
+              "heading": "Allow code for disarming",
+              "description": "Entering this code deactivates the alarm"
+            },
+            "is_override_code": {
+              "heading": "Is override code",
+              "description": "Entering this code will arm the alarm in force"
+            },
+            "area_limit": {
+              "heading": "Restricted areas",
+              "description": "Limit user to control only the selected areas"
+            }
+          },
+          "errors": {
+            "no_name": "No name provided.",
+            "no_code": "Code should have 4 characters/numbers minimum.",
+            "code_mismatch": "The codes don't match."
+          }
+        },
+        "edit_user": {
+          "title": "Edit User",
+          "description": "Change configuration for user ''{name}''.",
+          "fields": {
+            "old_code": {
+              "heading": "Current code",
+              "description": "Current code, leave empty to leave unchanged."
+            }
+          }
+        }
+      }
+    },
+    "actions": {
+      "title": "Actions",
+      "cards": {
+        "notifications": {
+          "title": "Notifications",
+          "description": "Using this panel, you can manage notifications to be sent when a certain alarm event occurs.",
+          "table": {
+            "no_items": "There are no notifications created yet.",
+            "no_area_warning": "Action is not assigned to any area."
+          },
+          "actions": {
+            "new_notification": "New notification"
+          }
+        },
+        "actions": {
+          "description": "This panel can be used to switch a device when the alarm state changes.",
+          "table": {
+            "no_items": "There are no actions created yet."
+          },
+          "actions": {
+            "new_action": "New action"
+          }
+        },
+        "new_notification": {
+          "title": "Configure notification",
+          "description": "Receive a notification when arming/disarming the alarm, on activation, etc.",
+          "trigger": "Condition",
+          "action": "Task",
+          "options": "Options",
+          "fields": {
+            "event": {
+              "heading": "Event",
+              "description": "When should the notification be sent",
+              "choose": {
+                "armed": {
+                  "name": "Alarm is armed",
+                  "description": "The alarm is succesfully armed"
+                },
+                "disarmed": {
+                  "name": "Alarm is disarmed",
+                  "description": "The alarm is disarmed"
+                },
+                "triggered": {
+                  "name": "Alarm is triggered",
+                  "description": "The alarm is triggered"
+                },
+                "untriggered": {
+                  "name": "Alarm no longer triggered",
+                  "description": "The triggered state of the alarm has ended"
+                },
+                "arm_failure": {
+                  "name": "Failed to arm",
+                  "description": "The arming of the alarm failed due to one or more open sensors"
+                },
+                "arming": {
+                  "name": "Exit delay started",
+                  "description": "Exit delay started, ready to leave the house."
+                },
+                "pending": {
+                  "name": "Entry delay started",
+                  "description": "Entry delay started, the alarm will trigger soon."
+                }
+              }
+            },
+            "mode": {
+              "heading": "Mode",
+              "description": "Limit the action to specific arm modes (optional)"
+            },
+            "title": {
+              "heading": "Title",
+              "description": "Title for the notification message"
+            },
+            "message": {
+              "heading": "Message",
+              "description": "Content of the notification message",
+              "insert_wildcard": "Insert wildcard",
+              "placeholders": {
+                "armed": "The alarm is set to {{arm_mode}}",
+                "disarmed": "The alarm is now OFF",
+                "triggered": "The alarm is triggered! Cause: {{open_sensors}}.",
+                "untriggered": "The alarm is no longer triggered.",
+                "arm_failure": "The alarm could not be armed right now, due to: {{open_sensors}}.",
+                "arming": "The alarm will be armed soon, please leave the house.",
+                "pending": "The alarm is about to trigger, disarm it quickly!"
+              }
+            },
+            "open_sensors_format": {
+              "heading": "Format for open_sensors wildcard",
+              "description": "Choose which sensor information is inserted in the message",
+              "options": {
+                "default": "Names and states",
+                "short": "Names only"
+              }
+            },
+            "arm_mode_format": {
+              "heading": "Translation for arm_mode wildcard",
+              "description": "Choose in which language the arm mode is inserted in the message"
+            },
+            "target": {
+              "heading": "Target",
+              "description": "Device to send the notification to"
+            },
+            "media_player_entity": {
+              "heading": "Media player entity",
+              "description": "Media player to play the message on"
+            },
+            "name": {
+              "heading": "Name",
+              "description": "Description for this notification",
+              "placeholders": {
+                "armed": "Notify {target} upon arming",
+                "disarmed": "Notify {target} upon disarming",
+                "triggered": "Notify {target} when triggered",
+                "untriggered": "Notify {target} when triggering stops",
+                "arm_failure": "Notify {target} on failure",
+                "arming": "Notify {target} when leaving",
+                "pending": "Notify {target} when arriving"
+              }
+            },
+            "delete": {
+              "heading": "Delete automation",
+              "description": "Permanently remove this automation"
+            }
+          },
+          "actions": {
+            "test": "Try it"
+          }
+        },
+        "new_action": {
+          "title": "Configure action",
+          "description": "Switch lights or devices (such as sirens) when arming/disarming the alarm, on activation, etc.",
+          "fields": {
+            "event": {
+              "heading": "Event",
+              "description": "When should the action be executed"
+            },
+            "area": {
+              "heading": "Area",
+              "description": "Alarm area for which the event applies."
+            },
+            "mode": {
+              "heading": "Mode",
+              "description": "Limit the action to specific arm modes (optional)"
+            },
+            "entity": {
+              "heading": "Entity",
+              "description": "Entity to perform action on"
+            },
+            "action": {
+              "heading": "Action",
+              "description": "Action to perform on the entity",
+              "no_common_actions": "Actions can only be assigned in YAML mode for the selected entities."
+            },
+            "name": {
+              "heading": "Name",
+              "description": "Description for this action",
+              "placeholders": {
+                "armed": "Set {entity} to {state} upon arming",
+                "disarmed": "Set {entity} to {state} upon disarming",
+                "triggered": "Set {entity} to {state} when triggered",
+                "untriggered": "Set {entity} to {state} when triggering stops",
+                "arm_failure": "Set {entity} to {state} on failure",
+                "arming": "Set {entity} to {state} when leaving",
+                "pending": "Set {entity} to {state} when arriving"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
