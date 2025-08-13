@@ -271,9 +271,9 @@ class AlarmoUserView(HomeAssistantView):
         if const.ATTR_USER_ID in data:
             user_id = data[const.ATTR_USER_ID]
             del data[const.ATTR_USER_ID]
-        coordinator.async_update_user_config(user_id, data)
+        err = coordinator.async_update_user_config(user_id, data)
         async_dispatcher_send(hass, "alarmo_update_frontend")
-        return self.json({"success": True})
+        return self.json({"success": not isinstance(err, str), "error": err})
 
 
 class AlarmoAutomationView(HomeAssistantView):

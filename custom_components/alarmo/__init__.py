@@ -261,38 +261,37 @@ class AlarmoCoordinator(DataUpdateCoordinator):
         user_with_code = self.async_authenticate_user(data[ATTR_CODE])
         if user_id:
             if const.ATTR_OLD_CODE not in data:
-                _LOGGER.error("Not updating user: Code missing")
-                return False
+                return "No code provided"
             if not self.async_authenticate_user(data[const.ATTR_OLD_CODE], user_id):
-                _LOGGER.error("Not updating user: Wrong code provided")
-                return False
+                return "Wrong code provided"
             if user_with_code and user_with_code[const.ATTR_USER_ID] != user_id:
-                _LOGGER.error("Not updating user: User with same code already exists")
-                return False
+                return "User with same code already exists"
         elif user_with_code:
-            _LOGGER.error("Not creating user: User with same code already exists")
-            return False
-        return True
+            return "User with same code already exists"
+        return
 
     def _validate_user_name(self, user_id: str, data: dict):
         if not data[ATTR_NAME]:
-            _LOGGER.error("User name must not be empty")
-            return False
+            return "User name must not be empty"
         for user in self.store.async_get_users().values():
             if data[ATTR_NAME] == user[ATTR_NAME] and user_id != user[const.ATTR_USER_ID]:
-                _LOGGER.error("User with same name already exists")
-                return False
-        return True
+                return "User with same name already exists"
+        return
 
     def async_update_user_config(self, user_id: str = None, data: dict = {}):
         if const.ATTR_REMOVE in data:
             self.store.async_delete_user(user_id)
-            return True
+            return
 
-        if not self._validate_user_name(user_id, data):
-            return False
-        if ATTR_CODE in data and not self._validate_user_code(user_id, data):
-            return False
+        err = self._validate_user_name(user_id, data)
+        if err:
+            _LOGGER.error(err)
+            return err
+        if ATTR_CODE in data:
+             err = self._validate_user_code(user_id, data)
+             if err:
+                _LOGGER.error(err)
+                return err
 
         if ATTR_CODE in data and data[ATTR_CODE]:
             data[const.ATTR_CODE_FORMAT] = "number" if data[ATTR_CODE].isdigit() else "text"
@@ -305,10 +304,12 @@ class AlarmoCoordinator(DataUpdateCoordinator):
 
         if not user_id:
             self.store.async_create_user(data)
+            return
         else:
             if ATTR_CODE in data:
                 del data[const.ATTR_OLD_CODE]
             self.store.async_update_user(user_id, data)
+            return
 
     def async_authenticate_user(self, code: str, user_id: str = None):
 
