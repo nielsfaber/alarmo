@@ -322,15 +322,15 @@
           "fields": {
             "code_arm_required": {
               "heading": "Vereis 'n kode om te aktiveer",
-              "description": "'n Geldige kode word vereid om die alarm te aktiveer."
+              "description": "'n Geldige kode word vereis om die alarm te aktiveer."
             },
             "code_disarm_required": {
               "heading": "Vereis 'n kode om af te sit",
-              "description": "A valid code must be provided to disarm the alarm."
+              "description": "'n Geldige kode word vereis om die alarm af te sit."
             },
             "code_mode_change_required": {
               "heading": "Require code for switching mode",
-              "description": "A valid code must be provided to change the arm mode which is active."
+              "description": "'n Geldige kode word vereis om die alarm se aktiewe modus te verander."
             },
             "code_format": {
               "heading": "Kode-formaat",
@@ -365,204 +365,204 @@
               "description": "Bevestig die kode."
             },
             "can_arm": {
-              "heading": "Allow code for arming",
-              "description": "Entering this code activates the alarm"
+              "heading": "Laat kode toe om die alarm aan te sit",
+              "description": "Deur die kode in te tik sal die alarm geaktiveer word"
             },
             "can_disarm": {
-              "heading": "Allow code for disarming",
-              "description": "Entering this code deactivates the alarm"
+              "heading": "Laat die kode toe om die alarm af te sit",
+              "description": "Deur die kode in te voeg sal die alarm afgesit word."
             },
             "is_override_code": {
-              "heading": "Is override code",
-              "description": "Entering this code will arm the alarm in force"
+              "heading": "Oorheers die kode",
+              "description": "Deur die kode in te tik sal die alarm geforseer wees om aan te sit"
             },
             "area_limit": {
-              "heading": "Restricted areas",
-              "description": "Limit user to control only the selected areas"
+              "heading": "Beperkte areas",
+              "description": "Beperk die gebruiker tot sekere areas"
             }
           },
           "errors": {
-            "no_name": "No name provided.",
-            "no_code": "Code should have 4 characters/numbers minimum.",
-            "code_mismatch": "The codes don't match."
+            "no_name": "Die naam is nie voorsien nie.",
+            "no_code": "Die kode moet ten minste 4 karakters bevat.",
+            "code_mismatch": "Die kodes verskil."
           }
         },
         "edit_user": {
-          "title": "Edit User",
-          "description": "Change configuration for user ''{name}''.",
+          "title": "Werk gebruiker by",
+          "description": "Verander verstelling vir gebruiker, ''{name}''.",
           "fields": {
             "old_code": {
-              "heading": "Current code",
-              "description": "Current code, leave empty to leave unchanged."
+              "heading": "Huidige kode",
+              "description": "Huidige kode, los leeg om die kode dieselfde te hou."
             }
           }
         }
       }
     },
     "actions": {
-      "title": "Actions",
+      "title": "Aksies",
       "cards": {
         "notifications": {
-          "title": "Notifications",
-          "description": "Using this panel, you can manage notifications to be sent when a certain alarm event occurs.",
+          "title": "Kennisgewings",
+          "description": "Deur die paneel te gebruik, kan jy die kennisgewings bestuur wat gestuur word na sekere aksies.",
           "table": {
-            "no_items": "There are no notifications created yet.",
-            "no_area_warning": "Action is not assigned to any area."
+            "no_items": "Daar is nog geen kennisgewings nie.",
+            "no_area_warning": "Aksie is nie aan enige area toegeken nie."
           },
           "actions": {
-            "new_notification": "New notification"
+            "new_notification": "Nuwe kennisgewing"
           }
         },
         "actions": {
-          "description": "This panel can be used to switch a device when the alarm state changes.",
+          "description": "Hierdie paneel kan gebruik word om 'n toestel te skakel wanneer die alarm-modus verander.",
           "table": {
-            "no_items": "There are no actions created yet."
+            "no_items": "Daar is nog geen nuwe aksies nie."
           },
           "actions": {
-            "new_action": "New action"
+            "new_action": "Nuwe aksie"
           }
         },
         "new_notification": {
-          "title": "Configure notification",
-          "description": "Receive a notification when arming/disarming the alarm, on activation, etc.",
-          "trigger": "Condition",
-          "action": "Task",
-          "options": "Options",
+          "title": "Stel kennisgewing",
+          "description": "Ontvang 'n kennisgewing wanneer die alarm aan- of afgesit word.",
+          "trigger": "Voorvereiste",
+          "action": "Taak",
+          "options": "Opsies",
           "fields": {
             "event": {
-              "heading": "Event",
-              "description": "When should the notification be sent",
+              "heading": "Voorval",
+              "description": "Wanneer moet die kennisgewing gestuur word.",
               "choose": {
                 "armed": {
-                  "name": "Alarm is armed",
-                  "description": "The alarm is succesfully armed"
+                  "name": "Alarm is gestel",
+                  "description": "Die alarm is uksesvol gestel."
                 },
                 "disarmed": {
-                  "name": "Alarm is disarmed",
-                  "description": "The alarm is disarmed"
+                  "name": "Alarm is af",
+                  "description": "Die alarm is afgesit."
                 },
                 "triggered": {
-                  "name": "Alarm is triggered",
-                  "description": "The alarm is triggered"
+                  "name": "'n Voorval vind plaas'",
+                  "description": "Die alarm het 'n voorval geregistreer."
                 },
                 "untriggered": {
-                  "name": "Alarm no longer triggered",
-                  "description": "The triggered state of the alarm has ended"
+                  "name": "Voorval het gestop",
+                  "description": "Die voorval vind nie meer plaas nie."
                 },
                 "arm_failure": {
-                  "name": "Failed to arm",
-                  "description": "The arming of the alarm failed due to one or more open sensors"
+                  "name": "Die alarm is nie gestel nie",
+                  "description": "Die alarm kan nie gestel word nie, as gevolg van een of meer oop sensors."
                 },
                 "arming": {
-                  "name": "Exit delay started",
-                  "description": "Exit delay started, ready to leave the house."
+                  "name": "Uitgang-wagperiode het begin",
+                  "description": "Die uitgang-wagperiode het begin. Maak reg om uit te gaan."
                 },
                 "pending": {
-                  "name": "Entry delay started",
-                  "description": "Entry delay started, the alarm will trigger soon."
+                  "name": "Die inkom-wagperiode het begin",
+                  "description": "Die inkom-wagperiode het begin en die alarm gaan binnekort afgaan."
                 }
               }
             },
             "mode": {
-              "heading": "Mode",
-              "description": "Limit the action to specific arm modes (optional)"
+              "heading": "Modus",
+              "description": "Beperk die aksie tot sekere modusse (opsioneel)"
             },
             "title": {
-              "heading": "Title",
-              "description": "Title for the notification message"
+              "heading": "Titel",
+              "description": "Titel vir die kennisgewing-boodskap"
             },
             "message": {
-              "heading": "Message",
-              "description": "Content of the notification message",
-              "insert_wildcard": "Insert wildcard",
+              "heading": "Boodskap",
+              "description": "Inhou dvan die kennisgewing-boodskap",
+              "insert_wildcard": "Voeg wildcard in",
               "placeholders": {
-                "armed": "The alarm is set to {{arm_mode}}",
-                "disarmed": "The alarm is now OFF",
-                "triggered": "The alarm is triggered! Cause: {{open_sensors}}.",
-                "untriggered": "The alarm is no longer triggered.",
-                "arm_failure": "The alarm could not be armed right now, due to: {{open_sensors}}.",
-                "arming": "The alarm will be armed soon, please leave the house.",
-                "pending": "The alarm is about to trigger, disarm it quickly!"
+                "armed": "Die alarm is gestel op {{arm_mode}}",
+                "disarmed": "Die alarm is nou af",
+                "triggered": "'n Voorval het plaasgevind, as gevolg van {{open_sensors}}.",
+                "untriggered": "Die voorval is gestop.",
+                "arm_failure": "Die alarm kan nie aangesit word nie, as gevolg van {{open_sensors}}.",
+                "arming": "Die alarm gaan binnekort aangesit word, gaan uit.",
+                "pending": "'n Voorval gaan binnekort registreer, sit vinnig die alarm af!"
               }
             },
             "open_sensors_format": {
-              "heading": "Format for open_sensors wildcard",
-              "description": "Choose which sensor information is inserted in the message",
+              "heading": "Formaat vir die open_sensors wildcard",
+              "description": "Kies watter sensor-inligting in die boodskap gevoeg moet word",
               "options": {
-                "default": "Names and states",
-                "short": "Names only"
+                "default": "Name en statusse",
+                "short": "Slegs name"
               }
             },
             "arm_mode_format": {
-              "heading": "Translation for arm_mode wildcard",
-              "description": "Choose in which language the arm mode is inserted in the message"
+              "heading": "Vertaling van arm_mode wildcard",
+              "description": "Kies die taal waarin die modus in die boodskap gevoeg moet word"
             },
             "target": {
-              "heading": "Target",
-              "description": "Device to send the notification to"
+              "heading": "Teiken",
+              "description": "Toestel om die kennisgewing heen te stuur"
             },
             "media_player_entity": {
-              "heading": "Media player entity",
-              "description": "Media player to play the message on"
+              "heading": "Media-speler entiteit",
+              "description": "Media-speler om die kennisgewing op te speel"
             },
             "name": {
-              "heading": "Name",
-              "description": "Description for this notification",
+              "heading": "Naam",
+              "description": "Beskrywing vir die kennisgewing",
               "placeholders": {
-                "armed": "Notify {target} upon arming",
-                "disarmed": "Notify {target} upon disarming",
-                "triggered": "Notify {target} when triggered",
-                "untriggered": "Notify {target} when triggering stops",
-                "arm_failure": "Notify {target} on failure",
-                "arming": "Notify {target} when leaving",
-                "pending": "Notify {target} when arriving"
+                "armed": "Stel {target} in kennis wanneer die alarm aangesit word",
+                "disarmed": "Stel {target} in kennis wanneer die alarm afgesit word",
+                "triggered": "Stel {target} in kennis wanneer 'n voorval plaasvind",
+                "untriggered": "Stel {target} in kennis wanneer die voorval stop",
+                "arm_failure": "Stel {target} in kennis wanneer die alarm nie geaktiveer kan word nie",
+                "arming": "Stel {target} in kennis wanneer uitgaan",
+                "pending": "Stel {target} in kennis wanneer terugkom"
               }
             },
             "delete": {
-              "heading": "Delete automation",
-              "description": "Permanently remove this automation"
+              "heading": "Skrap automation",
+              "description": "Skrap die automation permanent"
             }
           },
           "actions": {
-            "test": "Try it"
+            "test": "Probeer dit nou"
           }
         },
         "new_action": {
-          "title": "Configure action",
-          "description": "Switch lights or devices (such as sirens) when arming/disarming the alarm, on activation, etc.",
+          "title": "Stel aksie",
+          "description": "Skakel ligte of toestelle, soos sirenes, wanneer die alarm aan- of afgesit word, met aktivering ens.",
           "fields": {
             "event": {
-              "heading": "Event",
-              "description": "When should the action be executed"
+              "heading": "Voorval",
+              "description": "Wanneer moet die aksie plaasvind?"
             },
             "area": {
               "heading": "Area",
-              "description": "Alarm area for which the event applies."
+              "description": "Area waar die voorval plaasvind"
             },
             "mode": {
-              "heading": "Mode",
-              "description": "Limit the action to specific arm modes (optional)"
+              "heading": "Modus",
+              "description": "Beperk die aksie tot spesifieke alarm-modusse (opsioneel)"
             },
             "entity": {
-              "heading": "Entity",
-              "description": "Entity to perform action on"
+              "heading": "Entiteit",
+              "description": "Entiteit waarop die aksie plaasvind"
             },
             "action": {
-              "heading": "Action",
-              "description": "Action to perform on the entity",
-              "no_common_actions": "Actions can only be assigned in YAML mode for the selected entities."
+              "heading": "Aksie",
+              "description": "Aksie om op die entiteit uit te voer",
+              "no_common_actions": "Aksies vir die gesellekteerde entiteite kan slegs deur YAML bygewerk word."
             },
             "name": {
-              "heading": "Name",
-              "description": "Description for this action",
+              "heading": "Naam",
+              "description": "Beskrywing vir die aksie",
               "placeholders": {
-                "armed": "Set {entity} to {state} upon arming",
-                "disarmed": "Set {entity} to {state} upon disarming",
-                "triggered": "Set {entity} to {state} when triggered",
-                "untriggered": "Set {entity} to {state} when triggering stops",
-                "arm_failure": "Set {entity} to {state} on failure",
-                "arming": "Set {entity} to {state} when leaving",
-                "pending": "Set {entity} to {state} when arriving"
+                "armed": "Stel {entity} na {state} wanneer die alarm aangesit word",
+                "disarmed": "Stel {entity} na {state} wanneer die alarm afgesit word",
+                "triggered": "Stel {entity} na {state} wanneer 'n voorval plaasvind",
+                "untriggered": "Stel {entity} na {state} wanneer die voorval stop",
+                "arm_failure": "Stel {entity} na {state} as die alarm nie aangesit kan word nie",
+                "arming": "Stel {entity} na {state} wanneer uitgaan",
+                "pending": "Stel {entity} na {state} wanneer terugkom"
               }
             }
           }
