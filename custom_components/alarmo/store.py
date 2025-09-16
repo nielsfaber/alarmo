@@ -102,6 +102,7 @@ class SensorEntry:
     auto_bypass_modes = attr.ib(type=list, default=[])
     area = attr.ib(type=str, default=None)
     enabled = attr.ib(type=bool, default=True)
+    entry_delay = attr.ib(type=int, default=None)
 
 
 @attr.s(slots=True, frozen=True)

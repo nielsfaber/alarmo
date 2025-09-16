@@ -246,7 +246,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
         else:
             self._delay = None
             self.expiration = None
-    
+
     @property
     def last_triggered(self):
         """Get last time occurrence of alarm trigger."""
@@ -273,14 +273,14 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             return (True, None)
         elif (
             to_state != AlarmControlPanelState.DISARMED and
-            self._state == AlarmControlPanelState.DISARMED and 
+            self._state == AlarmControlPanelState.DISARMED and
             not self._config[ATTR_CODE_ARM_REQUIRED]
         ):
             self._changed_by = None
             return (True, None)
         elif (
             to_state != AlarmControlPanelState.DISARMED and
-            self._state != AlarmControlPanelState.DISARMED and 
+            self._state != AlarmControlPanelState.DISARMED and
             not self._config[const.ATTR_CODE_MODE_CHANGE_REQUIRED]
         ):
             self._changed_by = None
@@ -345,7 +345,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             else:
                 _LOGGER.warning(
                     "Cannot go to state %s from state %s.",
-                    AlarmControlPanelState.DISARMED, 
+                    AlarmControlPanelState.DISARMED,
                     self._state,
                 )
             dispatcher_send(
@@ -495,7 +495,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
                 skip_delay=True
             )
         elif self._state == AlarmControlPanelState.PENDING:
-            self.async_trigger(skip_delay=True)
+            self.async_trigger(entry_delay=0)
 
     @abstractmethod
     @callback
@@ -504,7 +504,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
 
     @abstractmethod
     @callback
-    def async_trigger(self, skip_delay: bool = False, open_sensors: dict = None):
+    def async_trigger(self, entry_delay: int | None = None, open_sensors: dict[str, str] | None = None):
         """Trigger the alarm."""
 
     async def async_alarm_arm_away(self, code=None, skip_code=False, bypass_open_sensors=False, skip_delay=False):
@@ -535,7 +535,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
     async def async_alarm_trigger(self, code=None) -> None:
         """Send alarm trigger command."""
         _LOGGER.debug("async_alarm_trigger")
-        self.async_trigger(skip_delay=True)
+        self.async_trigger(entry_delay=0)
 
     async def async_added_to_hass(self):
         """Connect to dispatcher listening for entity data notifications."""
@@ -647,7 +647,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
             elif initial_state == AlarmControlPanelState.PENDING:
                 self.async_trigger()
             elif initial_state == AlarmControlPanelState.TRIGGERED:
-                self.async_trigger(skip_delay=True)
+                self.async_trigger(entry_delay=0)
             else:
                 self.async_update_state(initial_state)
         else:
@@ -830,13 +830,44 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
                 return True
 
     @callback
-    def async_trigger(self, skip_delay: bool = False, open_sensors: dict = None):
-        """Trigger request. Will only be called the first time a sensor trips."""
+    def async_trigger(self, entry_delay: int | None = None, open_sensors: dict[str, str] | None = None):
+        """Trigger request. Can be called multiple times for timer shortening or immediate triggers."""
 
-        if self._state == AlarmControlPanelState.PENDING or skip_delay or not self.arm_mode:
-            entry_delay = 0
+        if not self.arm_mode:
+            effective_entry_delay = 0
+        elif entry_delay is not None:
+            if entry_delay == 0:
+                # Immediate trigger (was skip_delay=True)
+                effective_entry_delay = 0
+            elif self._state == AlarmControlPanelState.PENDING:
+                # Already pending - check for timer shortening
+                current_remaining = (self.expiration - dt_util.utcnow()).total_seconds() if self.expiration else 0
+                if entry_delay < current_remaining:
+                    # TIMER SHORTENING: Clear current timer and restart with shorter delay
+                    _LOGGER.debug(f"Timer shortened from {current_remaining:.0f}s to {entry_delay}s")
+                    self.async_clear_timer()
+
+                    @callback
+                    def async_entry_timer_shortened(_now: datetime.datetime) -> None:
+                        """Update state at a scheduled point in time."""
+                        self.async_clear_timer()
+                        _LOGGER.debug("async_entry_timer_shortened")
+                        self.async_trigger(entry_delay=0)
+
+                    self.async_set_timer(entry_delay, async_entry_timer_shortened)
+                    self.delay = entry_delay
+                    # Stay in PENDING state with new shorter timer
+                    return
+                else:
+                    # Ignore longer delay while pending - don't interfere with existing timer
+                    _LOGGER.debug(f"Ignoring longer delay {entry_delay}s while pending (current: {current_remaining:.0f}s remaining)")
+                    return
+            else:
+                # First trigger: use provided delay
+                effective_entry_delay = entry_delay
         else:
-            entry_delay = self._config[const.ATTR_MODES][self.arm_mode]["entry_time"]
+            # Fall back to area default (entry_delay is not provided)
+            effective_entry_delay = self._config[const.ATTR_MODES][self.arm_mode]["entry_time"]
 
         if self.arm_mode:
             trigger_time = self._config[const.ATTR_MODES][self.arm_mode]["trigger_time"]
@@ -850,9 +881,9 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
 
         if self._state and (
             self._state != AlarmControlPanelState.PENDING or
-            (self._state == AlarmControlPanelState.PENDING and skip_delay and open_sensors != self.open_sensors)
+            (self._state == AlarmControlPanelState.PENDING and entry_delay == 0 and open_sensors != self.open_sensors)
         ):
-            # send event on first trigger or consecutive trigger in case it has no entry delay
+            # send event on trigger (includes timer shortening scenarios)
             dispatcher_send(
                 self.hass,
                 "alarmo_event",
@@ -860,14 +891,14 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
                 self.area_id,
                 {
                     "open_sensors": open_sensors if open_sensors else self._open_sensors,
-                    "delay": entry_delay,
+                    "delay": effective_entry_delay,
                 }
             )
 
         if open_sensors:
             self.open_sensors = open_sensors
 
-        if not entry_delay:
+        if not effective_entry_delay:
             # countdown finished or immediate trigger event
 
             if trigger_time:
@@ -916,13 +947,13 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
                 self.async_clear_timer()
 
                 _LOGGER.debug("async_entry_timer_finished")
-                self.async_trigger()
+                self.async_trigger(entry_delay=0)
 
-            self.async_set_timer(entry_delay, async_entry_timer_finished)
-            self.delay = entry_delay
+            self.async_set_timer(effective_entry_delay, async_entry_timer_finished)
+            self.delay = effective_entry_delay
             _LOGGER.info(
                 "Alarm will be triggered after %s seconds.",
-                entry_delay,
+                effective_entry_delay,
             )
 
             self.async_update_state(AlarmControlPanelState.PENDING)
@@ -933,7 +964,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
             self._timer()
             self._timer = None
 
-    def async_set_timer(self, delay, cb_func):
+    def async_set_timer(self, delay: int | datetime.timedelta, cb_func: callable):
         self.async_clear_timer()
         now = dt_util.utcnow()
 
@@ -1256,11 +1287,11 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
         self.schedule_update_ha_state()
 
     @callback
-    def async_trigger(self, skip_delay: bool = False, _open_sensors: dict = None):
+    def async_trigger(self, entry_delay: int | None = None, open_sensors: dict[str, str] | None = None):
         """handle triggering via service call"""
         for item in self.hass.data[const.DOMAIN]["areas"].values():
             if item.state != self._revert_state:
-                item.async_trigger(skip_delay=skip_delay)
+                item.async_trigger(entry_delay=entry_delay, open_sensors=open_sensors)
 
     def update_ready_to_arm_modes(self):
         """Set arm modes which are ready for arming (no blocking sensors)."""
