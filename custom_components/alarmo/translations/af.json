@@ -1,0 +1,85 @@
+{
+  "services": {
+    "arm": {
+      "name": "Aktiveer",
+      "description": "Aktiveer 'n Alarmo-entiteit met pasgemaakde verstellings.",
+      "fields": {
+        "entity_id": {
+          "name": "Entiteit ID",
+          "description": "Alarmo-entiteit wat geaktiveer moet word."
+        },
+        "code": {
+          "name": "Kode",
+          "description": "Kode om die alarm te aktiveer."
+        },
+        "mode": {
+          "name": "Modus",
+          "description": "Modus waarin die alarm geaktiveer moet word."
+        },
+        "skip_delay": {
+          "name": "Slaan wagperiode oor",
+          "description": "Slaan uitgaan-wagperiode oor."
+        },
+        "force": {
+          "name": "Dwing",
+          "description": "Slaan outomaties al die sensors wat keer dat die alarm aktiveer oor."
+        }
+      }
+    },
+    "disarm": {
+      "name": "Sit af",
+      "description": "Sit die Alarmo-entiteit af.",
+      "fields": {
+        "entity_id": {
+          "name": "Entiteit ID",
+          "description": "Alarmo-entiteit wat afgesit moet word."
+        },
+        "code": {
+          "name": "Kode",
+          "description": "Kode om die alarm af te sit."
+        }
+      }
+    },
+    "skip_delay": {
+      "name": "Slaan wagperiode oor",
+      "description": "Slaan die res van die wagperiode oor en stel die status dadelik. Het slegs 'n efffek terwyl die alarm aktiveer of afsit.",
+      "fields": {
+        "entity_id": {
+          "name": "Entiteit ID",
+          "description": "Alarmo-entiteit waarvoor die wagperiode oorgeslaan moet word."
+        }
+      }
+    },
+    "enable_user": {
+      "name": "Bemagtig gebruiker",
+      "description": "Bemagtig 'n gebruiker om Alarmo te aktiveer of af te sit.",
+      "fields": {
+        "name": {
+          "name": "Naam",
+          "description": "Naam van die gebruiker om te bemagtig."
+        }
+      }
+    },
+    "disable_user": {
+      "name": "Keer gebruiker",
+      "description": "Keer 'n gebruiker om Alarmo te aktiveer of af te sit.",
+      "fields": {
+        "name": {
+          "name": "Naam",
+          "description": "Naam van die gebruiker om te keer."
+        }
+      }
+    }
+  },
+  "selector": {
+    "arm_mode": {
+      "options": {
+        "away": "Gestel | Weg",
+        "night": "Gestel | Nag",
+        "home": "Gestel | Tuis",
+        "vacation": "Gestel | Vakansie",
+        "custom": "Gestel | Pasmaak"
+      }
+    }
+  }
+}
