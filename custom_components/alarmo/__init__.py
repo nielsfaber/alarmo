@@ -283,10 +283,11 @@ class AlarmoCoordinator(DataUpdateCoordinator):
             self.store.async_delete_user(user_id)
             return
 
-        err = self._validate_user_name(user_id, data)
-        if err:
-            _LOGGER.error(err)
-            return err
+        if ATTR_NAME in data:
+            err = self._validate_user_name(user_id, data)
+            if err:
+                _LOGGER.error(err)
+                return err
         if ATTR_CODE in data:
              err = self._validate_user_code(user_id, data)
              if err:

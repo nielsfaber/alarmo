@@ -257,7 +257,7 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
   toggleEnabled(ev: Event, id: string) {
     const enabled = (ev.target as HTMLInputElement).checked;
     saveUser(this.hass!, { user_id: id, enabled: enabled })
-      .catch(e => handleError(e, ev))
+      .catch(e => handleError(e, this.shadowRoot!.querySelector('ha-card') as HTMLElement))
       .then();
   }
 
