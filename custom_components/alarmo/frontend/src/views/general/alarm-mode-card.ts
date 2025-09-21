@@ -6,16 +6,15 @@ import { commonStyle } from '../../styles';
 import { localize } from '../../../localize/localize';
 import { AlarmoModeConfig, AlarmoConfig, EArmModes, Dictionary, AlarmoArea, AlarmoSensor, HomeAssistant } from '../../types';
 import { fetchAreas, fetchSensors, saveArea } from '../../data/websockets';
-import { handleError } from '../../helpers';
+import { handleError, isDefined } from '../../helpers';
 import { SubscribeMixin } from '../../subscribe-mixin';
 import { EArmModeIcons } from '../../const';
 
-import '../../components/alarmo-time-slider';
+import '../../components/alarmo-duration-picker';
 import '../../components/alarmo-select';
 import '../../components/alarmo-collapsible';
 
 import { exportPath } from '../../common/navigation';
-import { ETimeUnits } from '../../components/alarmo-time-slider';
 
 @customElement('alarm-mode-card')
 export class AlarmModeCard extends SubscribeMixin(LitElement) {
@@ -147,7 +146,7 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
           <ha-button
             appearance="${config?.enabled ? 'filled' : 'plain'}"
             variant="${config?.enabled ? 'brand' : 'neutral'}"
-            @click=${() => this.saveData(mode, { enabled: true })}
+            @click=${(ev: Event) => this.saveData(ev, mode, { enabled: true })}
           >
             <ha-icon slot="start" icon="mdi:check"></ha-icon>
             ${localize('common.enabled', this.hass.language)}
@@ -155,7 +154,7 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
           <ha-button
             appearance="${config?.enabled ? 'plain' : 'filled'}"
             variant="${config?.enabled ? 'neutral' : 'brand'}"
-            @click=${() => this.saveData(mode, { enabled: false })}
+            @click=${(ev: Event) => this.saveData(ev, mode, { enabled: false })}
           >
             <ha-icon slot="start" icon="mdi:close"></ha-icon>
             ${localize('common.disabled', this.hass.language)}
@@ -169,17 +168,18 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
         <span slot="description">
           ${localize('panels.general.cards.modes.fields.exit_delay.description', this.hass.language)}
         </span>
-        <alarmo-time-slider
+        <alarmo-duration-picker
           .hass=${this.hass}
           max="300"
-          zeroValue=${localize('components.time_slider.none', this.hass.language)}
+          placeholder="-"
           value=${config?.exit_time || 0}
-          @value-changed=${(ev: CustomEvent) =>
-        this.saveData(mode, {
-          exit_time: (ev.detail as any).value,
-        })}
-          ?disabled=${!config?.enabled}
-        ></alarmo-time-slider>
+          @value-changed=${(ev: CustomEvent) => {
+        this.saveData(ev, mode, {
+          exit_time: ev.detail.value,
+        })
+      }}
+          ?disabled=${!config?.enabled || !isDefined(config?.exit_time)}
+        ></alarmo-duration-picker>
       </alarmo-settings-row>
       <alarmo-settings-row .narrow=${this.narrow}>
         <span slot="heading">
@@ -188,17 +188,17 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
         <span slot="description">
           ${localize('panels.general.cards.modes.fields.entry_delay.description', this.hass.language)}
         </span>
-        <alarmo-time-slider
+        <alarmo-duration-picker
           .hass=${this.hass}
           max="300"
-          zeroValue=${localize('components.time_slider.none', this.hass.language)}
+          placeholder="-"
           value=${config?.entry_time || 0}
           @value-changed=${(ev: CustomEvent) =>
-        this.saveData(mode, {
-          entry_time: (ev.detail as any).value,
+        this.saveData(ev, mode, {
+          entry_time: ev.detail.value,
         })}
-          ?disabled=${!config?.enabled}
-        ></alarmo-time-slider>
+          ?disabled=${!config?.enabled || !isDefined(config?.entry_time)}
+        ></alarmo-duration-picker>
       </alarmo-settings-row>
       <alarmo-settings-row .narrow=${this.narrow}>
         <span slot="heading">
@@ -207,18 +207,18 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
         <span slot="description">
           ${localize('panels.general.cards.modes.fields.trigger_time.description', this.hass.language)}
         </span>
-        <alarmo-time-slider
+        <alarmo-duration-picker
           .hass=${this.hass}
           max="3600"
           step="60"
-          zeroValue=${localize('components.time_slider.infinite', this.hass.language)}
+          placeholder="&#8734;"
           value=${config?.trigger_time || 0}
           @value-changed=${(ev: CustomEvent) =>
-        this.saveData(mode, {
-          trigger_time: (ev.detail as any).value,
+        this.saveData(ev, mode, {
+          trigger_time: ev.detail.value,
         })}
-          ?disabled=${!config?.enabled}
-        ></alarmo-time-slider>
+          ?disabled=${!config?.enabled || !isDefined(config?.trigger_time)}
+        ></alarmo-duration-picker>
       </alarmo-settings-row>
     `;
   }
@@ -235,7 +235,7 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
       .then();
   }
 
-  private saveData(mode: EArmModes, update: Partial<AlarmoModeConfig>) {
+  private saveData(ev: Event, mode: EArmModes, update: Partial<AlarmoModeConfig>) {
     const DefaultMode: AlarmoModeConfig = {
       enabled: false,
       exit_time: 0,
@@ -251,7 +251,7 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
     };
 
     saveArea(this.hass, { area_id: this.selectedArea, modes: this.data })
-      .catch(e => handleError(e, this.shadowRoot!.querySelector('ha-card') as HTMLElement))
+      .catch(e => handleError(e, ev.target as HTMLElement))
       .then();
   }
 

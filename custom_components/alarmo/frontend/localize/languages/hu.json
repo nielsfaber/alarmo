@@ -11,11 +11,9 @@
     "disabled": "Letiltva"
   },
   "components": {
-    "time_slider": {
-      "seconds": "mp",
-      "minutes": "perc",
-      "infinite": "végtelen",
-      "none": "nincs"
+    "time_picker": {
+      "seconds": "másodperc",
+      "minutes": "perc"
     },
     "editor": {
       "ui_mode": "UI mód",
@@ -247,6 +245,10 @@
             "use_entry_delay": {
               "heading": "Belépési késleltetés használata",
               "description": "Az érzékelő aktiválása nem azonnali riasztást indít, hanem csak a belépési késleltetés lejárta után."
+            },
+            "entry_delay": {
+              "heading": "Belépési késleltetés",
+              "description": "Cserélje le a késleltetést (a biztonsági módhoz beállított érték szerint) egy adott értékre."
             },
             "allow_open": {
               "heading": "Nyitott állapot engedélyezése induláskor",

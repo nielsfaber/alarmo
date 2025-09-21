@@ -11,11 +11,9 @@
     "disabled": "Zakázáno"
   },
   "components": {
-    "time_slider": {
-      "seconds": "sek",
-      "minutes": "min",
-      "infinite": "neomezeno",
-      "none": "žádné"
+    "time_picker": {
+      "seconds": "sekundy",
+      "minutes": "minuty"
     },
     "editor": {
       "ui_mode": "Do UI",
@@ -247,6 +245,10 @@
             "use_entry_delay": {
               "heading": "Použíy čekání na vstup",
               "description": "Aktivace senzoru spustí alarm až uplyne doba čekání na vstup."
+            },
+            "entry_delay": {
+              "heading": "Zpoždění při příjezdu",
+              "description": "Přepsat vstupní zpoždění (nakonfigurované pro režim zapnutí) zpožděním specifickým pro daný senzor."
             },
             "allow_open": {
               "heading": "Povolit aktivní senzor po zajištění",

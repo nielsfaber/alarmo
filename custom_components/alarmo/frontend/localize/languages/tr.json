@@ -11,11 +11,9 @@
     "disabled": "Deaktif"
   },
   "components": {
-    "time_slider": {
-      "seconds": "sn",
-      "minutes": "min",
-      "infinite": "sonsuz",
-      "none": "hiçbiri"
+    "time_picker": {
+      "seconds": "saniye",
+      "minutes": "dakika"
     },
     "editor": {
       "ui_mode": "Kullanıcı Arayüzüne",
@@ -247,6 +245,10 @@
             "use_entry_delay": {
               "heading": "Eve giriş ertelemesini kullanın",
               "description": "Sensör aktivasyonu alarmı doğrudan değil giriş geri sayımından sonra tetikler."
+            },
+            "entry_delay": {
+              "heading": "Giriş gecikmesi",
+              "description": "Giriş gecikmesini (kol modu için yapılandırıldığı gibi) sensöre özgü bir gecikmeyle geçersiz kılın."
             },
             "allow_open": {
               "heading": "Başlangıçta açık olmasına izin verin",

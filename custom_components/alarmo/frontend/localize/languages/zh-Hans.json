@@ -11,7 +11,7 @@
     "disabled": "已禁用"
   },
   "components": {
-    "time_slider": {
+    "time_picker": {
       "seconds": "秒",
       "minutes": "分",
       "infinite": "无限",
@@ -247,6 +247,10 @@
             "use_entry_delay": {
               "heading": "使用进入延迟",
               "description": "传感器的激活会在进入延迟后触发警报，而不是直接触发。"
+            },
+            "entry_delay": {
+              "heading": "进入延迟",
+              "description": "使用特定于传感器的延迟覆盖进入延迟（如为布防模式配置的）。"
             },
             "allow_open": {
               "heading": "允许在警戒后打开",

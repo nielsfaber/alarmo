@@ -11,11 +11,9 @@
     "disabled": "Deaktiviert"
   },
   "components": {
-    "time_slider": {
-      "seconds": "s",
-      "minutes": "m",
-      "infinite": "unendlich",
-      "none": "keine"
+    "time_picker": {
+      "seconds": "Sekunden",
+      "minutes": "Minuten"
     },
     "editor": {
       "ui_mode": "Zu UI",
@@ -247,6 +245,10 @@
             "use_entry_delay": {
               "heading": "Auslöseverzögerung verwenden",
               "description": "Die Sensoraktivierung löst den Alarm nach der Auslöseverzögerung aus und nicht direkt."
+            },
+            "entry_delay": {
+              "heading": "Auslöseverzögerung",
+              "description": "Ersetzt die Verzögerung (wie für den Scharfschaltmodus konfiguriert) durch einen spezifischer Wert."
             },
             "allow_open": {
               "heading": "Offen bei Scharfschaltung zulassen",

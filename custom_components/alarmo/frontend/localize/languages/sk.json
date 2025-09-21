@@ -11,11 +11,9 @@
     "disabled": "Deaktivovaný"
   },
   "components": {
-    "time_slider": {
-      "seconds": "sek",
-      "minutes": "min",
-      "infinite": "nekonečný",
-      "none": "nie je"
+    "time_picker": {
+      "seconds": "sekundy",
+      "minutes": "minúty"
     },
     "editor": {
       "ui_mode": "Do UI",
@@ -247,6 +245,10 @@
             "use_entry_delay": {
               "heading": "Použite oneskorenie vstupu",
               "description": "Aktivácia senzora spustí alarm po vstupnom oneskorení, nie priamo."
+            },
+            "entry_delay": {
+              "heading": "Vstupné oneskorenie",
+              "description": "Nahraďte oneskorenie (nastavené pre bezpečnostný režim) konkrétnou hodnotou."
             },
             "allow_open": {
               "heading": "Po aktivácii povoliť otvorené",

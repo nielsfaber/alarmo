@@ -93,7 +93,7 @@ export function IsEqual(obj1: Record<string, any> | any[], obj2: Record<string, 
 }
 
 export function showErrorDialog(ev: Event | HTMLElement, error: string | TemplateResult) {
-  const elem = ev.hasOwnProperty('tagName') ? (ev as HTMLElement) : ((ev as Event).target as HTMLElement);
+  const elem = ev instanceof HTMLElement ? (ev as HTMLElement) : ((ev as Event).target as HTMLElement);
   fireEvent(elem, 'show-dialog', {
     dialogTag: 'error-dialog',
     dialogImport: () => import('./dialogs/error-dialog'),
@@ -159,7 +159,7 @@ export const filterState = (state: string, config: Record<EArmModes, AlarmoModeC
   }
 };
 
-export function Assign<Type>(obj: Type, changes: Partial<Type>): Type {
+export function Assign<TValue extends Object>(obj: TValue, changes: Partial<TValue>): TValue {
   Object.entries(changes).forEach(([key, val]) => {
     if (key in obj && typeof obj[key] == 'object' && obj[key] !== null) obj = { ...obj, [key]: Assign(obj[key], val) };
     else obj = { ...obj, [key]: val };

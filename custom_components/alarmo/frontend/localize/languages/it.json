@@ -11,11 +11,9 @@
     "disabled": "Disabilitato"
   },
   "components": {
-    "time_slider": {
-      "seconds": "sec",
-      "minutes": "min",
-      "infinite": "infinito",
-      "none": "niente"
+    "time_picker": {
+      "seconds": "secondi",
+      "minutes": "minuti"
     },
     "editor": {
       "ui_mode": "Passa a UI",
@@ -247,6 +245,10 @@
             "use_entry_delay": {
               "heading": "Usa ritardo in ingresso",
               "description": "Sensore che innesca l'allarme dopo il ritardo in ingresso anzichè direttamente."
+            },
+            "entry_delay": {
+              "heading": "Ritardo di ingresso",
+              "description": "Sostituire il ritardo (impostato per la modalità di sicurezza) con un valore specifico."
             },
             "allow_open": {
               "heading": "Permetti apertura",

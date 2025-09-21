@@ -57,6 +57,7 @@ from .sensors import (
     ATTR_EVENT_COUNT,
     ATTR_ENTITIES,
     ATTR_NEW_ENTITY_ID,
+    ATTR_ENTRY_DELAY,
     SENSOR_TYPES,
 )
 
@@ -155,9 +156,9 @@ class AlarmoAreaView(HomeAssistantView):
 
     mode_schema = vol.Schema({
         vol.Required(const.ATTR_ENABLED): cv.boolean,
-        vol.Required(const.ATTR_EXIT_TIME): cv.positive_int,
-        vol.Required(const.ATTR_ENTRY_TIME): cv.positive_int,
-        vol.Optional(const.ATTR_TRIGGER_TIME): cv.positive_int,
+        vol.Required(const.ATTR_EXIT_TIME): vol.Any(cv.positive_int, None),
+        vol.Required(const.ATTR_ENTRY_TIME): vol.Any(cv.positive_int, None),
+        vol.Optional(const.ATTR_TRIGGER_TIME): vol.Any(cv.positive_int, None),
     })
 
     @RequestDataValidator(
@@ -223,6 +224,7 @@ class AlarmoSensorView(HomeAssistantView):
                     cv.string,
                     None
                 ),
+                vol.Optional(ATTR_ENTRY_DELAY): vol.Any(cv.positive_int, None),
                 vol.Optional(ATTR_NEW_ENTITY_ID): cv.string
             }
         )

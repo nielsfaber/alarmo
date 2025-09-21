@@ -11,11 +11,9 @@
     "disabled": "Desactivat"
   },
   "components": {
-    "time_slider": {
-      "seconds": "seg",
-      "minutes": "min",
-      "infinite": "infinit",
-      "none": "cap"
+    "time_picker": {
+      "seconds": "segons",
+      "minutes": "minuts"
     },
     "editor": {
       "ui_mode": "Canvia a UI",
@@ -247,6 +245,10 @@
             "use_entry_delay": {
               "heading": "Use entry delay",
               "description": "Sensor activation triggers the alarm after the entry delay rather than directly."
+            },
+            "entry_delay": {
+              "heading": "Entry delay",
+              "description": "Override the entry delay (as configured for the arm mode) with a delay specific to the sensor."
             },
             "allow_open": {
               "heading": "Permet obrir mentre s'arma l'alarma",

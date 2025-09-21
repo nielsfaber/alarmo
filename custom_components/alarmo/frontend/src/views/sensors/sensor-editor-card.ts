@@ -5,7 +5,7 @@ import { commonStyle } from '../../styles';
 import { AlarmoSensor, EArmModes, Dictionary, AlarmoArea, SensorGroup, HomeAssistant } from '../../types';
 import { fetchSensors, saveSensor, deleteSensor, fetchAreas, fetchSensorGroups } from '../../data/websockets';
 import { localize } from '../../../localize/localize';
-import { Unique, Without, handleError, showErrorDialog, prettyPrint, computeName, navigate, omit } from '../../helpers';
+import { Unique, Without, handleError, showErrorDialog, computeName, navigate, omit, isDefined } from '../../helpers';
 import { HassEntity, UnsubscribeFunc } from 'home-assistant-js-websocket';
 import { sensorConfigByType, getSensorTypeOptions, getConfigurableSensors } from '../../data/sensors';
 import { EArmModeIcons, ESensorTypes } from '../../const';
@@ -16,6 +16,7 @@ import '../../dialogs/error-dialog';
 import '../../dialogs/manage-sensor-groups-dialog';
 import '../../components/alarmo-select';
 import '../../components/alarmo-collapsible-section';
+import '../../components/alarmo-duration-picker';
 
 import { exportPath } from '../../common/navigation';
 import { fireEvent } from '../../fire_event';
@@ -307,6 +308,32 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
                 </alarmo-settings-row>
               `
         : ''}
+
+
+          ${(!this.data.type ||
+        [ESensorTypes.Window, ESensorTypes.Door, ESensorTypes.Motion, ESensorTypes.Other].includes(this.data.type))
+        && this.data.use_entry_delay
+        ? html`
+                <alarmo-settings-row .narrow=${this.narrow}>
+                  <span slot="heading">
+                    ${localize('panels.sensors.cards.editor.fields.entry_delay.heading', this.hass.language)}
+                  </span>
+                  <span slot="description">
+                    ${localize('panels.sensors.cards.editor.fields.entry_delay.description', this.hass.language)}
+                  </span>
+
+                  <alarmo-duration-picker
+                    .hass=${this.hass}
+                    max="900"
+                    placeholder="-"
+                    ?disabled=${!isDefined(this.data.entry_delay)}
+                    value=${this.data.entry_delay}
+                    @value-changed=${(ev: CustomEvent) => this._SetData({ entry_delay: ev.detail.value })}
+                  ></alarmo-duration-picker>
+                </alarmo-settings-row>
+              `
+        : ''}
+
           ${!this.data.type || [ESensorTypes.Door, ESensorTypes.Other].includes(this.data.type)
         ? html`
                 <alarmo-settings-row .narrow=${this.narrow}>
@@ -473,6 +500,9 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
           break;
         case 'trigger_unavailable':
           this.data = { ...this.data, trigger_unavailable: val == true };
+          break;
+        case 'entry_delay':
+          this.data = { ...this.data, entry_delay: val as number | null };
           break;
       }
     }

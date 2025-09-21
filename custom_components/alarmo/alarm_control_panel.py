@@ -727,7 +727,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
         context_id = kwargs.get("context_id", None)
 
         self._arm_mode = arm_mode
-        exit_delay = self._config[const.ATTR_MODES][arm_mode]["exit_time"]
+        exit_delay = int(self._config[const.ATTR_MODES][arm_mode]["exit_time"] or 0)
 
         if skip_delay or not exit_delay:
             # immediate arm event
@@ -867,16 +867,16 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
                 effective_entry_delay = entry_delay
         else:
             # Fall back to area default (entry_delay is not provided)
-            effective_entry_delay = self._config[const.ATTR_MODES][self.arm_mode]["entry_time"]
+            effective_entry_delay = int(self._config[const.ATTR_MODES][self.arm_mode]["entry_time"] or 0)
 
         if self.arm_mode:
-            trigger_time = self._config[const.ATTR_MODES][self.arm_mode]["trigger_time"]
+            trigger_time = int(self._config[const.ATTR_MODES][self.arm_mode]["trigger_time"] or 0)
         else:
             # if the alarm is not armed, take the maximum trigger_time of all modes
             trigger_times = []
             for mode_config in self._config[const.ATTR_MODES].values():
                 if mode_config[const.ATTR_ENABLED]:
-                    trigger_times.append(mode_config["trigger_time"])
+                    trigger_times.append(int(mode_config["trigger_time"] or 0))
             trigger_time = 0 if 0 in trigger_times else max(trigger_times)
 
         if self._state and (
@@ -1248,7 +1248,7 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
             for (area_id, entity) in self.hass.data[const.DOMAIN]["areas"].items():
                 if entity.state == AlarmControlPanelState.ARMING:
                     t = area_config[area_id][const.ATTR_MODES][arm_mode]["exit_time"]
-                    delay = t if t > delay else delay
+                    delay = t if int(t or 0) > delay else delay
 
             dispatcher_send(
                 self.hass,

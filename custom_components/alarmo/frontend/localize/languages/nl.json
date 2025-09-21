@@ -11,11 +11,9 @@
     "disabled": "Inactief"
   },
   "components": {
-    "time_slider": {
-      "seconds": "sec",
-      "minutes": "min",
-      "infinite": "oneindig",
-      "none": "geen"
+    "time_picker": {
+      "seconds": "seconden",
+      "minutes": "minuten"
     },
     "editor": {
       "ui_mode": "Naar UI",
@@ -241,12 +239,16 @@
               "description": "Na deactivering van deze sensor wordt de resterende vertrek vertraging automatisch overgeslagen."
             },
             "use_exit_delay": {
-              "heading": "Vertragingstijd bij vertrek",
+              "heading": "Gebruik vertrek vertraging",
               "description": "De sensor mag actief zijn wanneer de vertrekperiode wordt gestart."
             },
             "use_entry_delay": {
-              "heading": "Vertragingstijd bij binnenkomst",
+              "heading": "Gebruik binnenkomst vertraging",
               "description": "Als de sensor actief wordt, activeert deze het alarm pas na de vertragingstijd voor binnenkomst."
+            },
+            "entry_delay": {
+              "heading": "Binnenkomst vertraging",
+              "description": "Vervang de vertraging (zoals ingesteld voor de beveiligingsmodus) door een specifieke waarde."
             },
             "allow_open": {
               "heading": "Actieve toestand toestaan bij inschakelen",
