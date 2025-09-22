@@ -314,7 +314,7 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
         [ESensorTypes.Window, ESensorTypes.Door, ESensorTypes.Motion, ESensorTypes.Other].includes(this.data.type))
         && this.data.use_entry_delay
         ? html`
-                <alarmo-settings-row .narrow=${this.narrow}>
+                <alarmo-settings-row .narrow=${this.narrow} nested>
                   <span slot="heading">
                     ${localize('panels.sensors.cards.editor.fields.entry_delay.heading', this.hass.language)}
                   </span>

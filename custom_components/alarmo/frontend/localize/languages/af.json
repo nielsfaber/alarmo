@@ -11,11 +11,9 @@
     "disabled": "Afgesit"
   },
   "components": {
-    "time_slider": {
-      "seconds": "sek",
-      "minutes": "min",
-      "infinite": "oneindig",
-      "none": "geen"
+    "time_picker": {
+      "seconds": "sekondes",
+      "minutes": "minute"
     },
     "editor": {
       "ui_mode": "Na UI",
@@ -70,7 +68,7 @@
             "armed_vacation": "Gestel | Vakansie sal gebruik word as uitbreiding van Gestel | Weg-modus in die geval dat die huis vir langer tye leeg is. Die wagperiodes en sneller-responses kan daarvolgens aangepas word.",
             "armed_custom_bypass": "An extra mode for defining your own security perimeter."
           },
-          "number_sensors_active": "{number} {number, plural,\n  een {sensor}\n  other {sensors}\n} aktief",
+          "number_sensors_active": "{number} {number, plural,\n  one {sensor}\n  other {sensors}\n} aktief",
           "fields": {
             "status": {
               "heading": "Status",
@@ -247,6 +245,10 @@
             "use_entry_delay": {
               "heading": "Gebruik afsit-wagperiode",
               "description": "Sensor activation triggers the alarm after the entry delay rather than directly."
+            },
+            "entry_delay": {
+              "heading": "Afsit-wagperiode",
+              "description": "Vervang die vertraging (soos ingestel vir die sekuriteitsmodus) met 'n spesifieke waarde."
             },
             "allow_open": {
               "heading": "Laat toe om aanvanklik oop te wees",
