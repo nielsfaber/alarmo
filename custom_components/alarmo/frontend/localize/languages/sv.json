@@ -11,11 +11,9 @@
     "disabled": "Inaktiverat"
   },
   "components": {
-    "time_slider": {
-      "seconds": "sek",
-      "minutes": "min",
-      "infinite": "oändligt",
-      "none": "inget"
+    "time_picker": {
+      "seconds": "sekunder",
+      "minutes": "minuter"
     },
     "editor": {
       "ui_mode": "Till UI",
@@ -247,6 +245,10 @@
             "use_entry_delay": {
               "heading": "Använd ankomst fördröjning",
               "description": "Sensor aktivering utlöser larmet efter ankomst fördröjningen istället för direkt."
+            },
+            "entry_delay": {
+              "heading": "Ankomst fördröjning",
+              "description": "Ersätt fördröjningen (som inställd för säkerhetsläget) med ett specifikt värde."
             },
             "allow_open": {
               "heading": "Tillåt öppnad efter larmning.",

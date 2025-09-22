@@ -81,9 +81,9 @@ export enum EArmModes {
 
 export type AlarmoModeConfig = {
   enabled: boolean;
-  exit_time: number;
-  entry_time: number;
-  trigger_time: number;
+  exit_time: number | null;
+  entry_time: number | null;
+  trigger_time: number | null;
 };
 
 export type AlarmoConfig = {
@@ -113,6 +113,7 @@ export type AlarmoSensor = {
   enabled: boolean;
   group?: string | null;
   new_entity_id?: string;
+  entry_delay: number | null;
 };
 
 export type AlarmoUser = {

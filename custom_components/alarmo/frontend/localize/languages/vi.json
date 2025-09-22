@@ -11,11 +11,9 @@
     "disabled": "Đang tắt"
   },
   "components": {
-    "time_slider": {
+    "time_picker": {
       "seconds": "giây",
-      "minutes": "phút",
-      "infinite": "vô hạn",
-      "none": "không có"
+      "minutes": "phút"
     },
     "editor": {
       "ui_mode": "Chế độ giao diện",
@@ -247,6 +245,10 @@
             "use_entry_delay": {
               "heading": "Dùng đếm giờ đi vào",
               "description": "Kích hoạt cảm biến sẽ kích hoạt báo động sau khi đã hết thời gian đếm giờ đi vào, chứ không kích hoạt ngay."
+            },
+            "entry_delay": {
+              "heading": "Đếm giờ đi vào",
+              "description": "Ghi đè độ trễ nhập cảnh (được cấu hình cho chế độ kích hoạt) bằng độ trễ cụ thể cho cảm biến."
             },
             "allow_open": {
               "heading": "Cho phép mở lúc đầu",

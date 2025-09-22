@@ -50,6 +50,7 @@ ATTR_TIMEOUT = "timeout"
 ATTR_EVENT_COUNT = "event_count"
 ATTR_ENTITIES = "entities"
 ATTR_NEW_ENTITY_ID = "new_entity_id"
+ATTR_ENTRY_DELAY = "entry_delay"
 
 SENSOR_STATES_OPEN = [STATE_ON, STATE_OPEN, LockState.UNLOCKED]
 SENSOR_STATES_CLOSED = [STATE_OFF, STATE_CLOSED, LockState.LOCKED]
@@ -109,8 +110,9 @@ def sensor_state_allowed(state, sensor_config, alarm_state):
         # normal triggering case
         return False
 
-    elif alarm_state == AlarmControlPanelState.PENDING and not sensor_config[ATTR_USE_ENTRY_DELAY]:
-        # triggering of immediate sensor while alarm is pending
+    elif alarm_state == AlarmControlPanelState.PENDING:
+        # Allow both immediate and delayed sensors during pending for timer shortening/immediate trigger
+        # This enables per-sensor entry delay logic to process subsequent triggers during countdown
         return False
 
     else:
@@ -269,6 +271,35 @@ class SensorHandler:
 
         return (open_sensors, bypassed_sensors)
 
+    def get_entry_delay_for_trigger(self, open_sensors: dict[str, str], area_id: str, arm_mode: str) -> int | None:
+        """Calculate entry delay based on whether it's a group or individual sensor trigger"""
+
+        # Check if this is a group trigger
+        if ATTR_GROUP_ID in open_sensors:
+            # For groups: only check for immediate triggers, otherwise use area default
+            for entity_id in open_sensors:
+                if entity_id != ATTR_GROUP_ID and entity_id in self._config:
+                    sensor_config = self._config[entity_id]
+                    if not sensor_config[ATTR_USE_ENTRY_DELAY]:
+                        return 0
+
+            # Groups always use area default (maintainer's preference)
+            return None
+        else:
+            # Individual sensor trigger
+            entity_id = list(open_sensors.keys())[0]
+            sensor_config = self._config[entity_id]
+
+            if not sensor_config[ATTR_USE_ENTRY_DELAY]:
+                return 0
+
+            # Use sensor's entry delay if set
+            if ATTR_ENTRY_DELAY in sensor_config and sensor_config[ATTR_ENTRY_DELAY] is not None:
+                return sensor_config[ATTR_ENTRY_DELAY]
+
+        # Fall back to area default (None means use area default)
+        return None
+
     @callback
     def async_sensor_state_changed(self, event):
         """Callback fired when a sensor state has changed."""
@@ -333,7 +364,16 @@ class SensorHandler:
                 self.stop_arm_timer(entity)
 
         if res:
-            # nothing to do here, sensor state is OK
+            # sensor state is OK, but we still need to clean up group events for closed sensors
+            # A sensor that has closed should not contribute to future group triggers until it opens again
+            # Clear closed sensors from group events to prevent stale events from triggering groups later
+            if new_state == STATE_CLOSED:
+                for group_id in list(self._group_events.keys()):
+                    if entity in self._group_events[group_id]:
+                        del self._group_events[group_id][entity]
+                        # Clean up empty group entries
+                        if not self._group_events[group_id]:
+                            del self._group_events[group_id]
             self.update_ready_to_arm_status(sensor_config["area"])
             return
 
@@ -350,7 +390,7 @@ class SensorHandler:
                 entity,
             )
             alarm_entity.async_trigger(
-                skip_delay=True,
+                entry_delay=0,
                 open_sensors=open_sensors
             )
 
@@ -363,26 +403,50 @@ class SensorHandler:
             alarm_entity.async_arm_failure(open_sensors)
 
         elif alarm_state in const.ARM_MODES:
-            # standard alarm trigger
+            # standard alarm trigger - calculate entry delay override
             _LOGGER.info(
                 "Alarm is triggered due to sensor: %s",
                 entity,
             )
-            alarm_entity.async_trigger(
-                skip_delay=(not sensor_config[ATTR_USE_ENTRY_DELAY]),
-                open_sensors=open_sensors
+            entry_delay = self.get_entry_delay_for_trigger(
+                open_sensors, sensor_config["area"], alarm_entity.arm_mode
             )
 
+            if entry_delay == 0:
+                # immediate trigger (no entry delay)
+                alarm_entity.async_trigger(
+                    entry_delay=0,
+                    open_sensors=open_sensors
+                )
+            else:
+                # use calculated delay (could be None for area default)
+                alarm_entity.async_trigger(
+                    entry_delay=entry_delay,
+                    open_sensors=open_sensors
+                )
+
         elif alarm_state == AlarmControlPanelState.PENDING:
-            # immediate trigger while in pending state
+            # trigger while in pending state - calculate entry delay for possible timer shortening
             _LOGGER.info(
                 "Alarm is triggered due to sensor: %s",
                 entity,
             )
-            alarm_entity.async_trigger(
-                skip_delay=True,
-                open_sensors=open_sensors
+            entry_delay = self.get_entry_delay_for_trigger(
+                open_sensors, sensor_config["area"], alarm_entity.arm_mode
             )
+
+            if entry_delay == 0:
+                # immediate trigger
+                alarm_entity.async_trigger(
+                    entry_delay=0,
+                    open_sensors=open_sensors
+                )
+            else:
+                # use calculated delay for possible timer shortening
+                alarm_entity.async_trigger(
+                    entry_delay=entry_delay,
+                    open_sensors=open_sensors
+                )
 
         self.update_ready_to_arm_status(sensor_config["area"])
 
@@ -451,9 +515,12 @@ class SensorHandler:
         else:
             for entity in recent_events.keys():
                 open_sensors[entity] = group_events[entity][ATTR_STATE]
+
+            # Add group info for override delay calculation
+            open_sensors[ATTR_GROUP_ID] = group_id
             _LOGGER.debug(
                 "tripped sensor %s caused the triggering of group %s",
-                entity, 
+                entity,
                 group[ATTR_NAME],
             )
             return open_sensors

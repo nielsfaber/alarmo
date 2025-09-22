@@ -192,6 +192,7 @@ class SensorFactory:
         auto_bypass_modes: Optional[List[str]] = None,
         trigger_unavailable: bool = False,
         always_on: bool = False,
+        entry_delay: Optional[int] = None,
     ) -> Dict[str, Any]:
         """Create a sensor with optional defaults."""
         if modes is None:
@@ -213,6 +214,7 @@ class SensorFactory:
             "trigger_unavailable": trigger_unavailable,
             "always_on": always_on,
             "type": "door",
+            "entry_delay": entry_delay,
         }
 
     @staticmethod
@@ -230,6 +232,7 @@ class SensorFactory:
         auto_bypass_modes: Optional[List[str]] = None,
         trigger_unavailable: bool = False,
         always_on: bool = False,
+        entry_delay: Optional[int] = None,
     ) -> Dict[str, Any]:
         """Create a door sensor with optional defaults."""
         if modes is None:
@@ -251,6 +254,7 @@ class SensorFactory:
             "auto_bypass_modes": auto_bypass_modes,
             "trigger_unavailable": trigger_unavailable,
             "always_on": always_on,
+            "entry_delay": entry_delay,
         }
 
     @staticmethod
@@ -365,6 +369,29 @@ class SensorFactory:
                 name="Generic Area 2 Motion",
                 area="area_2",
             ),
+        }
+
+
+class SensorGroupFactory:
+    """Factory for creating sensor group test objects."""
+
+    @staticmethod
+    def create_sensor_group(
+        group_id: str = "group_1",
+        name: str = "Test Group",
+        entities: Optional[List[str]] = None,
+        timeout: int = 300,
+        event_count: int = 2,
+    ) -> Dict[str, Any]:
+        """Create a sensor group with optional defaults."""
+        if entities is None:
+            entities = []
+        return {
+            "group_id": group_id,
+            "name": name,
+            "entities": entities,
+            "timeout": timeout,
+            "event_count": event_count,
         }
 
 

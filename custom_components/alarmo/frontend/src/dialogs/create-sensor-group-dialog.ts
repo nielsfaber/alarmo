@@ -13,7 +13,7 @@ import { Option } from '../components/alarmo-select';
 
 import '../components/alarmo-chip-set';
 import '../components/alarmo-select';
-import '../components/alarmo-time-slider';
+import '../components/alarmo-duration-picker';
 
 @customElement('create-sensor-group-dialog')
 export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
@@ -116,14 +116,15 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
             <span slot="description">
               ${localize('panels.sensors.dialogs.create_group.fields.timeout.description', this.hass.language)}
             </span>
-            <alarmo-time-slider
+            <alarmo-duration-picker
               .hass=${this.hass}
               min="10"
               max="900"
               .value=${this.data.timeout}
+              ?required=${true}
               @value-changed=${(ev: CustomEvent) =>
-        (this.data = { ...this.data, timeout: (ev.detail as any).value })}
-            ></alarmo-time-slider>
+        (this.data = { ...this.data, timeout: ev.detail.value })}
+            ></alarmo-duration-picker
           </alarmo-settings-row>
 
           ${this.data.entities.length > 2

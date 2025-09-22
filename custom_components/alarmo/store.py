@@ -30,9 +30,9 @@ class ModeEntry:
     """Mode storage Entry."""
 
     enabled = attr.ib(type=bool, default=False)
-    exit_time = attr.ib(type=int, default=0)
-    entry_time = attr.ib(type=int, default=0)
-    trigger_time = attr.ib(type=int, default=0)
+    exit_time = attr.ib(type=int, default=None)
+    entry_time = attr.ib(type=int, default=None)
+    trigger_time = attr.ib(type=int, default=None)
 
 
 @attr.s(slots=True, frozen=True)
@@ -102,6 +102,7 @@ class SensorEntry:
     auto_bypass_modes = attr.ib(type=list, default=[])
     area = attr.ib(type=str, default=None)
     enabled = attr.ib(type=bool, default=True)
+    entry_delay = attr.ib(type=int, default=None)
 
 
 @attr.s(slots=True, frozen=True)
@@ -227,9 +228,9 @@ class MigratableStore(Store):
                     "modes": {
                         mode: attr.asdict(ModeEntry(
                             enabled=bool(config["enabled"]),
-                            exit_time=int(config["leave_time"]),
-                            entry_time=int(config["entry_time"]),
-                            trigger_time=int(data["config"]["trigger_time"])
+                            exit_time=int(config["leave_time"] or 0),
+                            entry_time=int(config["entry_time"] or 0),
+                            trigger_time=int(data["config"]["trigger_time"] or 0)
                         ))
                         for (mode, config) in data["config"]["modes"].items()
                     }

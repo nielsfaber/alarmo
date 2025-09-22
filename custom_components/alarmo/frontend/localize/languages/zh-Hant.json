@@ -11,11 +11,9 @@
     "disabled": "已禁用"
   },
   "components": {
-    "time_slider": {
+    "time_picker": {
       "seconds": "秒",
-      "minutes": "分",
-      "infinite": "無限",
-      "none": "無"
+      "minutes": "分"
     },
     "editor": {
       "ui_mode": "UI模式",
@@ -247,6 +245,10 @@
             "use_entry_delay": {
               "heading": "使用進入延遲",
               "description": "傳感器的激活會在進入延遲後觸發警報，而不是直接觸發。"
+            },
+            "entry_delay": {
+              "heading": "進入延遲",
+              "description": "使用特定於感測器的延遲覆蓋進入延遲（如為布防模式配置的）。"
             },
             "allow_open": {
               "heading": "允許在警戒後打開",

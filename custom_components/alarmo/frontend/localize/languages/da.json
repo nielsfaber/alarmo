@@ -11,11 +11,9 @@
     "disabled": "deaktiveret"
   },
   "components": {
-    "time_slider": {
-      "seconds": "sek",
-      "minutes": "min",
-      "infinite": "Uendeligt",
-      "none": "ingen"
+    "time_picker": {
+      "seconds": "sekunder",
+      "minutes": "minutter"
     },
     "editor": {
       "ui_mode": "Til UI",
@@ -247,6 +245,10 @@
             "use_entry_delay": {
               "heading": "Brug indgangstid",
               "description": "Sensor aktivering udløser alarmen efter indgangstiden i stedet for med det samme."
+            },
+            "entry_delay": {
+              "heading": "Indgangstid",
+              "description": "Tilsidesæt forsinkelsen (som konfigureret for aktiveringstilstand) med en specifik værdi."
             },
             "allow_open": {
               "heading": "Tillad åbning efter tilkobling",

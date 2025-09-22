@@ -11,11 +11,9 @@
     "disabled": "Inactif"
   },
   "components": {
-    "time_slider": {
-      "seconds": "sec",
-      "minutes": "min",
-      "infinite": "infini",
-      "none": "Aucune"
+    "time_picker": {
+      "seconds": "secondes",
+      "minutes": "minutes"
     },
     "editor": {
       "ui_mode": "Afficher l'éditeur visuel",
@@ -247,6 +245,10 @@
             "use_entry_delay": {
               "heading": "Utiliser le délai d'entrée",
               "description": "L'activation du capteur déclenche l'alarme après le délai d'entrée plutôt qu'instantanément."
+            },
+            "entry_delay": {
+              "heading": "Délai pour entrer",
+              "description": "Remplacez le délai (tel que défini pour le mode de sécurité) par une valeur spécifique."
             },
             "allow_open": {
               "heading": "Autoriser l'ouverture lors de l'activation",

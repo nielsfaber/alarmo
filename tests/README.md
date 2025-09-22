@@ -96,6 +96,7 @@ OR to run a single test in a file:
 | `test_ready_to_arm_multiple_modes_different_sensors` | Ready-to-arm with multiple modes and different sensors |
 | `test_home_assistant_event_bus_ready_to_arm_event` | Home Assistant event bus ready-to-arm event |
 
+
 ### **Sensor Groups** (`test_sensor_groups.py`)
 
 | Test Function | Feature Tested |
@@ -103,6 +104,23 @@ OR to run a single test in a file:
 | `test_single_sensor_in_group_does_not_trigger` | Single sensor in group doesn't trigger alarm |
 | `test_two_sensors_in_group_trigger_within_timeout_triggers_alarm` | Two sensors in group trigger within timeout |
 | `test_two_sensors_in_group_trigger_outside_timeout_does_not_trigger` | Two sensors in group trigger outside timeout |
+
+### **Per-Sensor Entry Delay** (`test_per_sensor_entry_delay.py`)
+
+| Test Function | Feature Tested |
+|-----------------------------------------------|-----------------------------------------------|
+| `test_sensor_entry_delay_longer_than_area` | Per-sensor entry delay override (longer than area default) |
+| `test_sensor_entry_delay_shorter_than_area` | Per-sensor entry delay override (shorter than area default) |
+| `test_backward_compatibility_no_override` | No override: falls back to area default |
+| `test_sensor_group_with_no_entry_delay_triggers_immediately` | Sensor group triggers immediately if all sensors have `use_entry_delay=False` |
+| `test_sensor_group_mixed_immediate_and_delayed_triggers_immediately` | Mixed group: immediate member causes immediate trigger |
+| `test_sensor_group_two_delayed_members_fall_back_to_area_default` | Group with only delayed sensors uses area default |
+| `test_sensor_group_ignores_group_override_with_immediate_member` | Group-level override ignored when immediate member present |
+| `test_sensor_group_ignores_group_override_falls_back_to_area_default` | Group-level override ignored, uses area default |
+| `test_timer_shortening_longer_to_shorter_delay` | Timer shortening: longer delay sensor triggers first, then shorter delay shortens timer |
+| `test_timer_shortening_immediate_sensor_during_pending` | Immediate sensor during pending causes immediate trigger |
+| `test_timer_no_shortening_longer_delay_during_pending` | Longer delay sensor during pending causes immediate trigger |
+| `test_three_member_group_event_count_2_paths` | 3-member group: immediate+delayed → immediate; delayed+delayed → area default |
 
 ### **Arm on Close** (`test_arm_on_close.py`)
 

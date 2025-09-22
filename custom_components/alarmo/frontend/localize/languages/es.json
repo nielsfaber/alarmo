@@ -11,11 +11,9 @@
     "disabled": "Deshabilitar"
   },
   "components": {
-    "time_slider": {
-      "seconds": "seg",
-      "minutes": "min",
-      "infinite": "infinito",
-      "none": "ninguno"
+    "time_picker": {
+      "seconds": "segundos",
+      "minutes": "minutos"
     },
     "editor": {
       "ui_mode": "Editar en la UI",
@@ -247,6 +245,10 @@
             "use_entry_delay": {
               "heading": "Usar retardo de entrada",
               "description": "La activación del sensor activa la alarma después del retardo de entrada en lugar de directamente."
+            },
+            "entry_delay": {
+              "heading": "Retardo de entrada",
+              "description": "Reemplace el retraso (como se establece para el modo de seguridad) con un valor específico."
             },
             "allow_open": {
               "heading": "Permitir abrir mientras se arma",

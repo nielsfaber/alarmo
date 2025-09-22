@@ -11,11 +11,9 @@
     "disabled": "Wyłączone"
   },
   "components": {
-    "time_slider": {
-      "seconds": "sek",
-      "minutes": "min",
-      "infinite": "w nieskończoność",
-      "none": "brak"
+    "time_picker": {
+      "seconds": "sekundy",
+      "minutes": "minuty"
     },
     "editor": {
       "ui_mode": "Tryb UI",
@@ -243,6 +241,10 @@
             "use_entry_delay": {
               "heading": "Użyj opóźnienia wejścia",
               "description": "Aktywacja czujnika wywoła alarm dopiero po uzbrojeniu się alarmu."
+            },
+            "entry_delay": {
+              "heading": "Opóźnienie wejścia",
+              "description": "Zastąp opóźnienie (ustawione dla trybu bezpieczeństwa) konkretną wartością."
             },
             "allow_open": {
               "heading": "Pozwól na otwarcie",
