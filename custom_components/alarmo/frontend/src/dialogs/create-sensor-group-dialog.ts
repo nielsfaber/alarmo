@@ -124,7 +124,7 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
               ?required=${true}
               @value-changed=${(ev: CustomEvent) =>
         (this.data = { ...this.data, timeout: ev.detail.value })}
-            ></alarmo-duration-picker
+            ></alarmo-duration-picker>
           </alarmo-settings-row>
 
           ${this.data.entities.length > 2
