@@ -950,13 +950,18 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
                 self.async_trigger(entry_delay=0)
 
             self.async_set_timer(effective_entry_delay, async_entry_timer_finished)
+            entry_delay_changed = self.delay and self.delay != effective_entry_delay
             self.delay = effective_entry_delay
             _LOGGER.info(
                 "Alarm will be triggered after %s seconds.",
                 effective_entry_delay,
             )
 
-            self.async_update_state(AlarmControlPanelState.PENDING)
+            if self._state == AlarmControlPanelState.PENDING and entry_delay_changed:
+                # trigger HA entity state+attributes refresh (as async_update_state will not have any effect)
+                self.schedule_update_ha_state()
+            else:
+                self.async_update_state(AlarmControlPanelState.PENDING)
 
     def async_clear_timer(self):
         """clear a running timer."""
