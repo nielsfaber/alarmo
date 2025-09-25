@@ -61,15 +61,15 @@ export class MyAlarmPanel extends LitElement {
           </div>
         </div>
 
-        <sl-tab-group
-          @sl-tab-show=${this.handlePageSelected}
+        <ha-tab-group
+          @wa-tab-show=${this.handlePageSelected}
         >
           ${Object.values(EMenuItems).map(e => html`
-            <sl-tab slot="nav" panel="${e}" .active=${path.page === e}>
+            <ha-tab-group-tab slot="nav" panel="${e}" .active=${path.page === e}>
               ${localize(`panels.${e}.title`, this.hass.language)}
-            </sl-tab>
+            </ha-tab-group-tab>
           `)}
-        </sl-tab-group>
+        </ha-tab-group>
       </div>
       <div class="view">
         ${this.getView(path)}
@@ -143,7 +143,7 @@ export class MyAlarmPanel extends LitElement {
         line-height: 20px;
         flex-grow: 1;
       }
-      sl-tab-group {
+      ha-tab-group {
         margin-left: max(env(safe-area-inset-left), 24px);
         margin-right: max(env(safe-area-inset-right), 24px);
         --ha-tab-active-text-color: var(--app-header-text-color, white);

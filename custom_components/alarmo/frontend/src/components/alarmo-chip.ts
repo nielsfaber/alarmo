@@ -10,7 +10,7 @@ export class AlarmoChip extends LitElement {
 
   @property({ type: String })
   icon?: string;
-  
+
   @property({ type: Boolean })
   selectable?: boolean;
 
@@ -41,8 +41,8 @@ export class AlarmoChip extends LitElement {
   }
 
   private renderIcon() {
-    if(!this.icon && !this.toggleable) return nothing;
-    if(this.toggleable) {
+    if (!this.icon && !this.toggleable) return nothing;
+    if (this.toggleable) {
       return html`
         <div class="icon">
           <ha-icon
@@ -51,7 +51,7 @@ export class AlarmoChip extends LitElement {
         </div>
       `;
     }
-      return html`
+    return html`
         <div class="icon filled">
           <ha-icon
             .icon=${this.icon}
@@ -61,46 +61,51 @@ export class AlarmoChip extends LitElement {
   }
 
   private renderTrailingIcon() {
-    if(!this.removable && !this.badge) return nothing;
-    if(this.badge) {
+    if (!this.removable && !this.badge) return nothing;
+    if (this.badge) {
       return html`
         <div class="badge">
           ${this.badge}
         </div>
       `;
     }
-      return html`
+    const uniqueId = Math.random().toString(36).substring(2, 9)
+    return html`
         <div class="trailing-icon" @click=${this._iconClick}>
-          <ha-tooltip content="${this.hass.localize('ui.common.remove')}">
-            <ha-icon icon="mdi:close"
-            ></ha-icon>
-          </ha-tooltip>
+          <ha-icon icon="mdi:close" id="${uniqueId}"></ha-icon>
+          <ha-tooltip for="${uniqueId}">${this.hass.localize('ui.common.remove')}</ha-tooltip>
         </div>
       `;
   }
 
   private _handleClick(ev: Event) {
-    if(this.toggleable) {
+    if (this.toggleable) {
       this.active = !this.active;
-      const myEvent = new CustomEvent('click', { detail: {
-        active: this.active,
-        value: this.value,
-      }});
+      const myEvent = new CustomEvent('click', {
+        detail: {
+          active: this.active,
+          value: this.value,
+        }
+      });
       this.dispatchEvent(myEvent);
     }
     else {
-      const myEvent = new CustomEvent('click', { detail: {
-        value: this.value,
-      }});
+      const myEvent = new CustomEvent('click', {
+        detail: {
+          value: this.value,
+        }
+      });
       this.dispatchEvent(myEvent);
     }
     ev.stopPropagation();
   }
 
   private _iconClick(ev: Event) {
-    const myEvent = new CustomEvent('icon-clicked', { detail: {
-      value: this.value,
-    }});
+    const myEvent = new CustomEvent('icon-clicked', {
+      detail: {
+        value: this.value,
+      }
+    });
     this.dispatchEvent(myEvent);
     ev.stopPropagation();
   }
