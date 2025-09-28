@@ -135,6 +135,25 @@ class AlarmoConfigView(HomeAssistantView):
                 vol.Optional(const.ATTR_MASTER): vol.Schema({
                     vol.Required(const.ATTR_ENABLED): cv.boolean,
                     vol.Optional(ATTR_NAME): cv.string,
+                }),
+                vol.Optional(const.ATTR_SIA): vol.Schema({
+                    vol.Required(const.CONF_SIA_ENABLED): cv.boolean,
+                    vol.Optional(const.CONF_SIA_HOST): cv.string,
+                    vol.Optional(const.CONF_SIA_PORT): cv.port,
+                    vol.Optional(const.CONF_SIA_PROTOCOL): vol.In(const.SIA_PROTOCOLS),
+                    vol.Optional(const.CONF_SIA_ACCOUNT): cv.string,
+                    vol.Optional(const.CONF_SIA_ENCRYPTION_KEY): cv.string,
+                    vol.Optional(const.CONF_SIA_RECEIVER_ID): cv.string,
+                    vol.Optional(const.CONF_SIA_LINE_ID): cv.string,
+                    vol.Optional(const.CONF_SIA_SECONDARY_HOST): cv.string,
+                    vol.Optional(const.CONF_SIA_SECONDARY_PORT): cv.port,
+                    vol.Optional(const.CONF_SIA_CONNECTION_MODE): vol.In(const.SIA_CONNECTION_MODES),
+                    vol.Optional(const.CONF_SIA_HEARTBEAT_INTERVAL): cv.positive_int,
+                    vol.Optional(const.CONF_SIA_RETRY_COUNT): cv.positive_int,
+                    vol.Optional(const.CONF_SIA_RETRY_DELAY): cv.positive_int,
+                    vol.Optional(const.CONF_SIA_TIMEOUT): cv.positive_int,
+                    vol.Optional(const.CONF_SIA_EVENT_FILTER): vol.All(cv.ensure_list, [cv.string]),
+                    vol.Optional(const.CONF_SIA_AREA_FILTER): vol.All(cv.ensure_list, [cv.string]),
                 })
             }
         )

@@ -49,6 +49,29 @@ class MqttConfig:
 
 
 @attr.s(slots=True, frozen=True)
+class SiaConfig:
+    """SIA storage Entry."""
+
+    enabled = attr.ib(type=bool, default=False)
+    host = attr.ib(type=str, default="")
+    port = attr.ib(type=int, default=50001)
+    protocol = attr.ib(type=str, default="TCP")
+    account = attr.ib(type=str, default="")
+    encryption_key = attr.ib(type=str, default="")
+    receiver_id = attr.ib(type=str, default="R000A")
+    line_id = attr.ib(type=str, default="L001")
+    secondary_host = attr.ib(type=str, default="")
+    secondary_port = attr.ib(type=int, default=50001)
+    connection_mode = attr.ib(type=str, default="on_demand")
+    heartbeat_interval = attr.ib(type=int, default=300)
+    retry_count = attr.ib(type=int, default=3)
+    retry_delay = attr.ib(type=int, default=5)
+    timeout = attr.ib(type=int, default=30)
+    event_filter = attr.ib(type=list, default=[])
+    area_filter = attr.ib(type=list, default=[])
+
+
+@attr.s(slots=True, frozen=True)
 class MasterConfig:
     """Master storage Entry."""
 
@@ -83,6 +106,7 @@ class Config:
     ignore_blocking_sensors_after_trigger = attr.ib(type=bool, default=False)
     master = attr.ib(type=MasterConfig, default=MasterConfig())
     mqtt = attr.ib(type=MqttConfig, default=MqttConfig())
+    sia = attr.ib(type=SiaConfig, default=SiaConfig())
 
 
 @attr.s(slots=True, frozen=True)

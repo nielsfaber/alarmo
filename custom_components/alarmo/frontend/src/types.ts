@@ -94,6 +94,7 @@ export type AlarmoConfig = {
   disarm_after_trigger: boolean;
   ignore_blocking_sensors_after_trigger: boolean;
   mqtt: MqttConfig;
+  sia: SiaConfig;
   master: MasterConfig;
 };
 
@@ -169,6 +170,26 @@ export type MqttConfig = {
   command_payload: Dictionary<string>;
   require_code: boolean;
   event_topic: string;
+};
+
+export type SiaConfig = {
+  enabled: boolean;
+  host: string;
+  port: number;
+  protocol: string;
+  account: string;
+  encryption_key: string;
+  receiver_id: string;
+  line_id: string;
+  secondary_host: string;
+  secondary_port: number;
+  connection_mode: string;
+  heartbeat_interval: number;
+  retry_count: number;
+  retry_delay: number;
+  timeout: number;
+  event_filter: string[];
+  area_filter: string[];
 };
 
 export type MasterConfig = {

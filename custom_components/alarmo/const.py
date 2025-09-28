@@ -145,6 +145,37 @@ ATTR_CONTEXT_ID = "context_id"
 
 PUSH_EVENT = "mobile_app_notification_action"
 
+# Configuration Keys
+ATTR_SIA = "sia"
+
+# SIA Configuration Constants
+CONF_SIA_ENABLED = "sia_enabled"
+CONF_SIA_HOST = "sia_host"
+CONF_SIA_PORT = "sia_port"
+CONF_SIA_ACCOUNT = "sia_account"
+CONF_SIA_ENCRYPTION_KEY = "sia_encryption_key"
+CONF_SIA_PROTOCOL = "sia_protocol"
+CONF_SIA_RECEIVER_ID = "sia_receiver_id"
+CONF_SIA_LINE_ID = "sia_line_id"
+CONF_SIA_SECONDARY_HOST = "sia_secondary_host"
+CONF_SIA_SECONDARY_PORT = "sia_secondary_port"
+CONF_SIA_CONNECTION_MODE = "sia_connection_mode"
+CONF_SIA_HEARTBEAT_INTERVAL = "sia_heartbeat_interval"
+CONF_SIA_RETRY_COUNT = "sia_retry_count"
+CONF_SIA_RETRY_DELAY = "sia_retry_delay"
+CONF_SIA_TIMEOUT = "sia_timeout"
+CONF_SIA_EVENT_FILTER = "sia_event_filter"
+CONF_SIA_AREA_FILTER = "sia_area_filter"
+
+# SIA Protocol Options
+SIA_PROTOCOL_TCP = "TCP"
+SIA_PROTOCOL_UDP = "UDP"
+SIA_PROTOCOLS = [SIA_PROTOCOL_TCP, SIA_PROTOCOL_UDP]
+
+SIA_CONNECTION_ON_DEMAND = "on_demand"
+SIA_CONNECTION_PERSISTENT = "persistent"
+SIA_CONNECTION_MODES = [SIA_CONNECTION_ON_DEMAND, SIA_CONNECTION_PERSISTENT]
+
 EVENT_ACTION_FORCE_ARM = "ALARMO_FORCE_ARM"
 EVENT_ACTION_RETRY_ARM = "ALARMO_RETRY_ARM"
 EVENT_ACTION_DISARM = "ALARMO_DISARM"

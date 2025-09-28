@@ -48,6 +48,7 @@ from .sensors import (
 from .automations import AutomationHandler
 from .mqtt import MqttHandler
 from .event import EventHandler
+from .sia import SIAHandler
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -159,6 +160,11 @@ class AlarmoCoordinator(DataUpdateCoordinator):
         self.hass.data[const.DOMAIN]["automation_handler"] = AutomationHandler(self.hass)
         self.hass.data[const.DOMAIN]["mqtt_handler"] = MqttHandler(self.hass)
         self.hass.data[const.DOMAIN]["event_handler"] = EventHandler(self.hass)
+
+        # Initialize SIA handler
+        sia_handler = SIAHandler(self.hass)
+        self.hass.data[const.DOMAIN]["sia_handler"] = sia_handler
+        self.hass.async_create_task(sia_handler.async_initialize())
 
         areas = self.store.async_get_areas()
         config = self.store.async_get_config()
