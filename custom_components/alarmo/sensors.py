@@ -335,7 +335,7 @@ class SensorHandler:
             # if sensor was unavailable, check the state before that, do not act if the sensor reverted to its prior state.
             prior_state = self._unavailable_state_mem.pop(entity)
             if old_state == STATE_UNAVAILABLE and prior_state == new_state:
-                _LOGGER.debug("state transition from %s to % to %s detected, ignoring.",
+                _LOGGER.debug("state transition from %s to %s to %s detected, ignoring.",
                     prior_state,
                     old_state,
                     new_state,
