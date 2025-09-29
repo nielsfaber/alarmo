@@ -1,6 +1,7 @@
 # Alarmo Development Guide
 
-Welcome to the Alarmo development guide! This document will help you set up your local development environment and get started with contributing to the project. Whether you're fixing bugs, adding features, or improving documentation, we're excited to have you on board!
+This document will help you set up your local development environment and get started with contributing to the project. 
+Contributions are much appreciated, but before starting on implementation of a new feature you are advised to create an issue for discussing your plans.
 
 - [Alarmo Development Guide](#alarmo-development-guide)
   - [📦 Requirements](#-requirements)
