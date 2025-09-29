@@ -53,12 +53,12 @@ export class AlarmoSettingsRow extends LitElement {
       }
       :host([nested]) {
         border: none;
-        padding: 8px 16px 16px 16px;
+        padding: 8px 16px 0px 16px;
         margin-top: -16px;
         min-height: 40px;
       }
       :host([nested]:not([narrow])) {
-        padding: 16px 16px 16px 32px;
+        padding: 16px 16px 0px 32px;
       }
       :host([first]) {
         border-top: none;

@@ -213,6 +213,7 @@ export class AlarmoDurationPicker extends LitElement {
   static styles = css`
     :host {
       display: flex;
+      padding: 8px 0px;
     }
     div.wrapper {
       display: flex;
