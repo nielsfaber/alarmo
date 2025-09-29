@@ -1,0 +1,85 @@
+{
+  "services": {
+    "arm": {
+      "name": "Alarm",
+      "description": "Alarmo varlığını özel ayarlarla devreye almanızı sağlar.",
+      "fields": {
+        "entity_id": {
+          "name": "Varlık Kimliği",
+          "description": "Devreye alınacak alarm varlığı."
+        },
+        "code": {
+          "name": "Kod",
+          "description": "Devreye alma için kullanılacak kod."
+        },
+        "mode": {
+          "name": "Mod",
+          "description": "Alarmın devreye alınacağı mod."
+        },
+        "skip_delay": {
+          "name": "Gecikmeyi Atla",
+          "description": "Çıkış/Giriş geri sayımını atla."
+        },
+        "force": {
+          "name": "Devreye Almayı Zorla",
+          "description": "Devreye almayı engelleyen tüm sensörleri otomatik olarak yoksay."
+        }
+      }
+    },
+    "disarm": {
+      "name": "Devre Dışı Bırakma",
+      "description": "Bir Alarmo varlığını devre dışı bırak.",
+      "fields": {
+        "entity_id": {
+          "name": "Varlık Kimliği",
+          "description": "Devre dışı bırakılacak alarm varlığı."
+        },
+        "code": {
+          "name": "Kod",
+          "description": "Devre dışı bırakma için kullanılacak kod."
+        }
+      }
+    },
+    "skip_delay": {
+      "name": "Gecikmeyi Atla",
+      "description": "Çıkış/Giriş geri sayımının kalanını atla ve doğrudan bir sonraki duruma geç. Yalnızca alarm devreye alma veya bekleme durumundayken etkilidir.",
+      "fields": {
+        "entity_id": {
+          "name": "Varlık Kimliği",
+          "description": "Gecikmenin atlanacağı alarm varlığı."
+        }
+      }
+    },
+    "enable_user": {
+      "name": "Kullanıcıyı Etkinleştir",
+      "description": "Bir kullanıcının Alarmo’yu devreye almasına/devre dışı bırakmasına izin ver.",
+      "fields": {
+        "name": {
+          "name": "Adı",
+          "description": "Etkinleştirilecek kullanıcının adı."
+        }
+      }
+    },
+    "disable_user": {
+      "name": "Kullanıcıyı Devre Dışı Bırak",
+      "description": "Bir kullanıcının Alarmo’yu devreye almasını/devre dışı bırakmasını engelle.",
+      "fields": {
+        "name": {
+          "name": "Adı",
+          "description": "Devre dışı bırakılacak kullanıcının adı."
+        }
+      }
+    }
+  },
+  "selector": {
+    "arm_mode": {
+      "options": {
+        "away": "Uzakta",
+        "night": "Gece",
+        "home": "Ev",
+        "vacation": "Tatil",
+        "custom": "Özel"
+      }
+    }
+  }
+}
