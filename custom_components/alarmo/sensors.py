@@ -139,19 +139,31 @@ class SensorHandler:
             self._group_events = {}
             self.async_watch_sensor_states()
 
-        self._subscriptions.append(
-            async_dispatcher_connect(hass, "alarmo_state_updated", self.async_watch_sensor_states)
-        )
-        self._subscriptions.append(
-            async_dispatcher_connect(hass, "alarmo_sensors_updated", async_update_sensor_config)
-        )
-        async_update_sensor_config()
+        # Store the callback for later registration
+        self._async_update_sensor_config = async_update_sensor_config
+
+        def _setup_sensor_listeners():
+            """Register sensor listeners and perform initial setup."""
+            self._subscriptions.append(
+                async_dispatcher_connect(hass, "alarmo_state_updated", self.async_watch_sensor_states)
+            )
+            self._subscriptions.append(
+                async_dispatcher_connect(hass, "alarmo_sensors_updated", self._async_update_sensor_config)
+            )
+            # Do the initial sensor setup now that HA is running
+            self._async_update_sensor_config()
+
+            # Evaluate initial sensor states for all areas on startup
+            for area_id in self.hass.data[const.DOMAIN]["areas"].keys():
+                self.update_ready_to_arm_status(area_id)
 
         def handle_startup(_event):
             self._startup_complete = True
+            _setup_sensor_listeners()
 
         if hass.state == CoreState.running:
             self._startup_complete = True
+            _setup_sensor_listeners()
         else:
             hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STARTED, handle_startup)
 
