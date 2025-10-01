@@ -1,4 +1,5 @@
 import logging
+from types import SimpleNamespace
 
 import homeassistant.util.dt as dt_util
 
@@ -142,6 +143,7 @@ class SensorHandler:
         # Store the callback for later registration
         self._async_update_sensor_config = async_update_sensor_config
 
+        @callback
         def _setup_sensor_listeners():
             """Register sensor listeners and perform initial setup."""
             self._subscriptions.append(
@@ -156,14 +158,19 @@ class SensorHandler:
             # Evaluate initial sensor states for all areas on startup
             for area_id in self.hass.data[const.DOMAIN]["areas"].keys():
                 self.update_ready_to_arm_status(area_id)
+                # If area is armed, validate sensors and trigger if needed
+                # Schedule this to run in the event loop since it may call async methods
+                hass.async_create_task(self._async_evaluate_armed_state_on_startup(area_id))
 
         def handle_startup(_event):
             self._startup_complete = True
-            _setup_sensor_listeners()
+            # Schedule the setup to run in the event loop (from the thread pool executor)
+            hass.loop.call_soon_threadsafe(_setup_sensor_listeners)
 
         if hass.state == CoreState.running:
             self._startup_complete = True
-            _setup_sensor_listeners()
+            # Schedule in event loop since we're in __init__ (sync context)
+            hass.loop.call_soon_threadsafe(_setup_sensor_listeners)
         else:
             hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STARTED, handle_startup)
 
@@ -347,7 +354,7 @@ class SensorHandler:
             # if sensor was unavailable, check the state before that, do not act if the sensor reverted to its prior state.
             prior_state = self._unavailable_state_mem.pop(entity)
             if old_state == STATE_UNAVAILABLE and prior_state == new_state:
-                _LOGGER.debug("state transition from %s to % to %s detected, ignoring.",
+                _LOGGER.debug("state transition from %s to %s to %s detected, ignoring.",
                     prior_state,
                     old_state,
                     new_state,
@@ -563,3 +570,65 @@ class SensorHandler:
 
         if arm_modes != prev_arm_modes:
             alarm_entity.update_ready_to_arm_modes(arm_modes)
+
+    async def _async_evaluate_armed_state_on_startup(self, area_id):
+        """Evaluate sensors when alarm is armed on startup and trigger if necessary.
+
+        On startup, we don't know the actual previous state of sensors (they might have changed
+        while HA was down). This method simulates state changes for all sensors currently in
+        violation, allowing the standard async_sensor_state_changed logic to re-evaluate them
+        with full group logic, entry delays, etc.
+        """
+        alarm_entity = self.hass.data[const.DOMAIN]["areas"][area_id]
+
+        # Only evaluate if the alarm is in an armed state
+        if alarm_entity.state not in const.ARM_MODES:
+            return
+
+        _LOGGER.debug(
+            "Evaluating sensors on startup for area %s (state: %s)",
+            area_id,
+            alarm_entity.state,
+        )
+
+        # Get all active sensors for the current armed mode
+        sensors_list = self.active_sensors_for_alarm_state(area_id)
+
+        for entity_id in sensors_list:
+            sensor_config = self._config[entity_id]
+            state = self.hass.states.get(entity_id)
+            sensor_state = parse_sensor_state(state)
+
+            if sensor_state == STATE_UNKNOWN:
+                # Skip unknown sensors - they'll be handled when they become known
+                continue
+
+            # Check if sensor state is allowed in current alarm state
+            res = sensor_state_allowed(sensor_state, sensor_config, alarm_entity.state)
+
+            if not res:
+                # Sensor is in a violation state (open or unavailable when it shouldn't be)
+                # Simulate a state change to trigger standard processing
+                _LOGGER.info(
+                    "Sensor %s is %s on startup while alarm is %s - simulating state change for evaluation",
+                    entity_id,
+                    sensor_state,
+                    alarm_entity.state,
+                )
+
+                # Create a synthetic event that mimics a state change from closed to current state
+                # We use STATE_CLOSED as old state (not STATE_UNKNOWN which would trigger early return)
+                old_state = SimpleNamespace(state=STATE_CLOSED)
+
+                # Create event with the structure expected by async_sensor_state_changed
+                event = SimpleNamespace(
+                    data={
+                        "entity_id": entity_id,
+                        "old_state": old_state,
+                        "new_state": state,
+                    }
+                )
+
+                # Process through the standard sensor state change handler
+                # This will handle groups, entry delays, always-on sensors, etc.
+                self.async_sensor_state_changed(event)

@@ -156,6 +156,16 @@ OR to run a single test in a file:
 | `test_default_behavior_disabled_goes_to_disarmed_with_open_sensors` | Default behavior goes to disarmed with open sensors |
 | `test_default_behavior_disabled_re_arms_with_closed_sensors` | Default behavior re-arms with closed sensors |
 
+### **Startup Sensor Evaluation** (`test_startup_sensor_evaluation.py`)
+
+| Test Function | Feature Tested |
+|---------------|----------------|
+| `test_sensor_open_on_startup_triggers_alarm` | Open sensor on startup triggers alarm with entry delay |
+| `test_sensor_open_on_startup_immediate_trigger` | Open sensor on startup triggers alarm immediately (no entry delay) |
+| `test_sensor_group_on_startup_meets_threshold` | Sensor group on startup meets threshold and triggers alarm |
+| `test_sensor_group_on_startup_below_threshold` | Sensor group on startup below threshold does not trigger alarm |
+| `test_sensor_closed_on_startup_no_trigger` | Closed sensor on startup does not trigger alarm |
+
 ### **Not Covered:**
 
 | Feature/Test | Notes |
