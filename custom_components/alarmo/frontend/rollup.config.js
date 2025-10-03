@@ -22,10 +22,11 @@ export default [
   {
     input: 'src/alarm-panel.ts',
     output: {
-      dir: 'dist',
+      file: 'dist/alarm-panel.js',
       format: 'iife',
-      sourcemap: false
+      sourcemap: false,
     },
+    inlineDynamicImports: true,
     plugins: [...plugins],
     context: 'window'
   },

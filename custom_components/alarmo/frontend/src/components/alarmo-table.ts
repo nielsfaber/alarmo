@@ -31,7 +31,7 @@ export type TableFilterConfig = Record<string, TableFilterItem>;
 
 type MwcMenu = { close: Function; show: Function; anchor: HTMLElement; open: boolean };
 
-@customElement('alarmo-table')
+//@customElement('alarmo-table')
 export class AlarmoTable extends LitElement {
   @property()
   hass!: HomeAssistant;
@@ -452,4 +452,8 @@ export class AlarmoTable extends LitElement {
       align-items: center;
     }
   `;
+}
+
+if (!customElements.get('alarmo-table')) {
+  customElements.define('alarmo-table', AlarmoTable);
 }

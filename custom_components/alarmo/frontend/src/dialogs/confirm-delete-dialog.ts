@@ -1,13 +1,11 @@
 import { LitElement, html, css, CSSResultGroup } from 'lit';
-import { property, customElement, state } from 'lit/decorators.js';
+import { property, state } from 'lit/decorators.js';
 import { mdiClose } from '@mdi/js';
 import { commonStyle } from '../styles';
 import { HomeAssistant } from '../types';
 
-@customElement('confirm-delete-dialog')
 export class ConfirmDeleteDialog extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
-
   @state() private _params?: any;
 
   public async showDialog(params: any): Promise<void> {
@@ -59,4 +57,9 @@ export class ConfirmDeleteDialog extends LitElement {
       }
     `;
   }
+}
+
+// ✅ Safe Define
+if (!customElements.get('confirm-delete-dialog')) {
+  customElements.define('confirm-delete-dialog', ConfirmDeleteDialog);
 }
