@@ -6,7 +6,6 @@ import { HomeAssistant } from '../types';
 
 export class ConfirmDeleteDialog extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
-
   @state() private _params?: any;
 
   public async showDialog(params: any): Promise<void> {
@@ -58,8 +57,4 @@ export class ConfirmDeleteDialog extends LitElement {
       }
     `;
   }
-}
-
-if (!customElements.get('confirm-delete-dialog')) {
-  customElements.define('confirm-delete-dialog', ConfirmDeleteDialog);
 }
