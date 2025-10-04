@@ -265,6 +265,7 @@ function We(e,a){return(({finisher:e,descriptor:a})=>(t,i)=>{var n;if(void 0===i
     `}_getMinutes(){return Math.floor(this.value/60)}_getSeconds(){return this.value%60}_minutesChanged(e){let a=Number(e.target.value),t=60*a+this._getSeconds();t<this.min&&(t=this.min,a=Math.floor(t/60),e.target.value=String(a)),t>this.max&&(t=this.max,a=Math.floor(t/60),e.target.value=String(a)),this.value=t,this._valueChanged()}_secondsChanged(e){let a=Number(e.target.value);a>=60&&(a=59,e.target.value=String(a));let t=60*this._getMinutes()+a;t<this.min&&(t=this.min,a=this.value%60,e.target.value=String(a)),t>this.max&&(t=this.max,a=this.value%60,e.target.value=String(a)),this.value=t,this._valueChanged()}_validateMinutesInput(e,a){let t=null!==e.match(/^[0-9]+$/);return{valid:t,customError:!t}}_validateSecondsInput(e,a){let t=null!==e.match(/^[0-9]+$/);return{valid:t,customError:!t}}_secondsUpClick(){let e=Math.round(this.value/this.step)*this.step;e+=this.step,e>this.max&&(e=this.max),this.value=e,this._valueChanged()}_secondsDownClick(){let e=Math.round(this.value/this.step)*this.step;e-=this.step,e<this.min&&(e=this.min),this.value=e,this._valueChanged()}_toggleEnableClick(e){const a=e.target.checked;this.disabled=!a,e.target.blur(),this._valueChanged()}_onFocus(e){e.currentTarget.select()}_valueChanged(){let e=this.disabled?null:this.value;Un(this,"value-changed",{value:e})}};cs.styles=m`
     :host {
       display: flex;
+      padding: 8px 0px;
     }
     div.wrapper {
       display: flex;
@@ -694,12 +695,12 @@ const us=2,ps=6,gs=e=>(...a)=>({_$litDirective$:e,values:a});class vs{constructo
       }
       :host([nested]) {
         border: none;
-        padding: 8px 16px 16px 16px;
+        padding: 8px 16px 0px 16px;
         margin-top: -16px;
         min-height: 40px;
       }
       :host([nested]:not([narrow])) {
-        padding: 16px 16px 16px 32px;
+        padding: 16px 16px 0px 32px;
       }
       :host([first]) {
         border-top: none;
@@ -922,18 +923,16 @@ class Os extends vs{constructor(e){if(super(e),this.et=G,e.type!==us)throw Error
             .icon=${this.icon}
           ></ha-icon>
         </div>
-      `:Te}renderTrailingIcon(){return this.removable||this.badge?this.badge?$e`
+      `:Te}renderTrailingIcon(){if(!this.removable&&!this.badge)return Te;if(this.badge)return $e`
         <div class="badge">
           ${this.badge}
         </div>
-      `:$e`
+      `;const e=Math.random().toString(36).substring(2,9);return $e`
         <div class="trailing-icon" @click=${this._iconClick}>
-          <ha-tooltip content="${this.hass.localize("ui.common.remove")}">
-            <ha-icon icon="mdi:close"
-            ></ha-icon>
-          </ha-tooltip>
+          <ha-icon icon="mdi:close" id="${e}"></ha-icon>
+          <ha-tooltip for="${e}">${this.hass.localize("ui.common.remove")}</ha-tooltip>
         </div>
-      `:Te}_handleClick(e){if(this.toggleable){this.active=!this.active;const e=new CustomEvent("click",{detail:{active:this.active,value:this.value}});this.dispatchEvent(e)}else{const e=new CustomEvent("click",{detail:{value:this.value}});this.dispatchEvent(e)}e.stopPropagation()}_iconClick(e){const a=new CustomEvent("icon-clicked",{detail:{value:this.value}});this.dispatchEvent(a),e.stopPropagation()}static get styles(){return m`
+      `}_handleClick(e){if(this.toggleable){this.active=!this.active;const e=new CustomEvent("click",{detail:{active:this.active,value:this.value}});this.dispatchEvent(e)}else{const e=new CustomEvent("click",{detail:{value:this.value}});this.dispatchEvent(e)}e.stopPropagation()}_iconClick(e){const a=new CustomEvent("icon-clicked",{detail:{value:this.value}});this.dispatchEvent(a),e.stopPropagation()}static get styles(){return m`
       :host {
         margin: 4px;
       }
@@ -2153,19 +2152,26 @@ class Os extends vs{constructor(e){if(super(e),this.et=G,e.type!==us)throw Error
           ${Cn("panels.sensors.cards.sensors.table.no_items",this.hass.language)}
         </alarmo-table>
       </ha-card>
-    `:$e``}tableColumns(){const e=(e,a)=>$e`
-      ${a?$e`<ha-tooltip content="${a}">${e}</ha-tooltip>`:e}
-    `;return{icon:{width:"40px",renderer:a=>{const t=this.hass.states[a.entity_id],i=Object.keys(Pn).find(e=>Pn[e]==a.type),n=t?"on"===t.state?Bn[i]:Ln[i]:"hass:help-circle-outline";return a.area==ir?e($e`<ha-icon icon="mdi:alert" style="color: var(--error-color)"></ha-icon>`,Cn("panels.sensors.cards.sensors.table.no_area_warning",this.hass.language)):e($e`<ha-icon icon="${n}" class="${a.enabled?"":"disabled"}"></ha-icon>`,t?Cn(`panels.sensors.cards.editor.fields.device_type.choose.${a.type}.name`,this.hass.language):this.hass.localize("state_badge.default.entity_not_found"))}},name:{title:this.hass.localize("ui.components.entity.entity-picker.entity"),width:"60%",grow:!0,text:!0,renderer:a=>$e`
-          <span class="${a.enabled?"":"disabled"}">
-            ${e(a.name,a.area==ir?Cn("panels.sensors.cards.sensors.table.no_area_warning",this.hass.language):null)}
+    `:$e``}tableColumns(){const e=(...e)=>e.map(e=>e.replace(".","_")).join("_");return{icon:{width:"40px",renderer:a=>{const t=this.hass.states[a.entity_id],i=Object.keys(Pn).find(e=>Pn[e]==a.type),n=t?"on"===t.state?Bn[i]:Ln[i]:"hass:help-circle-outline";return a.area==ir?$e`
+              <ha-icon icon="mdi:alert" style="color: var(--error-color)" id="${e(a.entity_id,"icon")}"></ha-icon>
+              <ha-tooltip for="${e(a.entity_id,"icon")}">${Cn("panels.sensors.cards.sensors.table.no_area_warning",this.hass.language)}</ha-tooltip>
+            `:$e`
+              <ha-icon icon="${n}" class="${a.enabled?"":"disabled"}" id="${e(a.entity_id,"icon")}"></ha-icon>
+              <ha-tooltip for="${e(a.entity_id,"icon")}">${t?Cn(`panels.sensors.cards.editor.fields.device_type.choose.${a.type}.name`,this.hass.language):this.hass.localize("state_badge.default.entity_not_found")}</ha-tooltip>
+            `}},name:{title:this.hass.localize("ui.components.entity.entity-picker.entity"),width:"60%",grow:!0,text:!0,renderer:a=>$e`
+          <span class="${a.enabled?"":"disabled"}" id="${e(a.entity_id,"name")}">
+            ${a.name}
           </span>
-          <span class="secondary ${a.enabled?"":"disabled"}">
-            ${e(a.entity_id,a.area==ir?Cn("panels.sensors.cards.sensors.table.no_area_warning",this.hass.language):null)}
-        </span>
+          ${a.area==ir?$e`<ha-tooltip for="${e(a.entity_id,"name")}">${Cn("panels.sensors.cards.sensors.table.no_area_warning",this.hass.language)}</ha-tooltip>`:Te}
+          <span class="secondary ${a.enabled?"":"disabled"}" id="${e(a.entity_id,"name","secondary")}">
+            ${a.entity_id}
+          </span>
+          ${a.area==ir?$e`<ha-tooltip for="${e(a.entity_id,"name","secondary")}">${Cn("panels.sensors.cards.sensors.table.no_area_warning",this.hass.language)}</ha-tooltip>`:Te}
         `},modes:{title:Cn("panels.sensors.cards.sensors.table.arm_modes",this.hass.language),width:"25%",hide:this.narrow,text:!0,renderer:a=>$e`
-          <span class="${a.enabled?"":"disabled"}">
-            ${e(a.always_on?Cn("panels.sensors.cards.sensors.table.always_on",this.hass.language):a.modes.length?a.modes.map(e=>Cn("common.modes_short."+e,this.hass.language)).join(", "):this.hass.localize("state_attributes.climate.preset_mode.none"),a.area==ir?Cn("panels.sensors.cards.sensors.table.no_area_warning",this.hass.language):null)}
+          <span class="${a.enabled?"":"disabled"}" id="${e(a.entity_id,"modes")}">
+            ${a.always_on?Cn("panels.sensors.cards.sensors.table.always_on",this.hass.language):a.modes.length?a.modes.map(e=>Cn("common.modes_short."+e,this.hass.language)).join(", "):this.hass.localize("state_attributes.climate.preset_mode.none")}
           </span>
+          ${a.area==ir?$e`<ha-tooltip for="${e(a.entity_id,"modes")}">${Cn("panels.sensors.cards.sensors.table.no_area_warning",this.hass.language)}</ha-tooltip>`:Te}
         `},enabled:{title:Cn("common.enabled",this.hass.language),width:"68px",align:"center",renderer:e=>$e`
           <ha-switch
             @click=${e=>{e.stopPropagation()}}
@@ -3210,19 +3216,19 @@ class Os extends vs{constructor(e){if(super(e),this.et=G,e.type!==us)throw Error
             ${Cn("title",this.hass.language)}
           </div>
           <div class="version">
-            v${"1.10.11"}
+            v${"1.10.12"}
           </div>
         </div>
 
-        <sl-tab-group
-          @sl-tab-show=${this.handlePageSelected}
+        <ha-tab-group
+          @wa-tab-show=${this.handlePageSelected}
         >
           ${Object.values(Mr).map(a=>$e`
-            <sl-tab slot="nav" panel="${a}" .active=${e.page===a}>
+            <ha-tab-group-tab slot="nav" panel="${a}" .active=${e.page===a}>
               ${Cn(`panels.${a}.title`,this.hass.language)}
-            </sl-tab>
+            </ha-tab-group-tab>
           `)}
-        </sl-tab-group>
+        </ha-tab-group>
       </div>
       <div class="view">
         ${this.getView(e)}
@@ -3265,7 +3271,7 @@ class Os extends vs{constructor(e){if(super(e),this.et=G,e.type!==us)throw Error
         line-height: 20px;
         flex-grow: 1;
       }
-      sl-tab-group {
+      ha-tab-group {
         margin-left: max(env(safe-area-inset-left), 24px);
         margin-right: max(env(safe-area-inset-right), 24px);
         --ha-tab-active-text-color: var(--app-header-text-color, white);
