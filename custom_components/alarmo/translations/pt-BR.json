@@ -2,23 +2,23 @@
   "services": {
     "arm": {
       "name": "Armar",
-      "description": "Armar entidade Alarmo com configura��es personalizadas.",
+      "description": "Armar entidade Alarmo com configurações personalizadas.",
       "fields": {
         "entity_id": {
           "name": "ID",
           "description": "Entidade de alarme a ser armada."
         },
         "code": {
-          "name": "C�digo",
-          "description": "C�digo usado para armar."
+          "name": "Código",
+          "description": "Código usado para armar."
         },
         "mode": {
           "name": "Modo",
-          "description": "Modo no qual o alarme ser� armado."
+          "description": "Modo no qual o alarme será armado."
         },
         "skip_delay": {
           "name": "Ignorar Atraso",
-          "description": "Ignorar atraso de sa�da."
+          "description": "Ignorar atraso de saída."
         },
         "force": {
           "name": "For�ar",
@@ -35,14 +35,14 @@
           "description": "Entidade de alarme a ser desarmada."
         },
         "code": {
-          "name": "C�digo",
-          "description": "C�digo usado para desarmar."
+          "name": "Código",
+          "description": "Código usado para desarmar."
         }
       }
     },
     "skip_delay": {
       "name": "Ignorar Atraso",
-      "description": "Ignorar atraso de entrada/sa�da e ir direto ao pr�ximo estado (somente em armando ou pendente).",
+      "description": "Ignorar atraso de entrada/saída e ir direto ao próximo estado (somente em armando ou pendente).",
       "fields": {
         "entity_id": {
           "name": "ID",
@@ -51,22 +51,22 @@
       }
     },
     "enable_user": {
-      "name": "Habilitar Usu�rio",
+      "name": "Habilitar Usuário",
       "description": "Permitir que um usu�rio arme/desarme.",
       "fields": {
         "name": {
           "name": "Nome",
-          "description": "Nome do usu�rio a habilitar."
+          "description": "Nome do usuário a habilitar."
         }
       }
     },
     "disable_user": {
-      "name": "Desabilitar Usu�rio",
-      "description": "Bloquear um usu�rio de armar/desarmar.",
+      "name": "Desabilitar Usuário",
+      "description": "Bloquear um usuário de armar/desarmar.",
       "fields": {
         "name": {
           "name": "Nome",
-          "description": "Nome do usu�rio a desabilitar."
+          "description": "Nome do usuário a desabilitar."
         }
       }
     }
@@ -77,7 +77,7 @@
         "away": "Armado Fora",
         "night": "Armado Noite",
         "home": "Armado Casa",
-        "vacation": "Armado F�rias",
+        "vacation": "Armado Férias",
         "custom": "Armado Custom"
       }
     }
