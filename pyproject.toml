@@ -1,12 +1,11 @@
 [project]
 name = "alarmo"
 version = "0.1.0"
-description = "Add your description here"
+description = "an alarm system integration for Home Assistant."
 readme = "README.md"
 requires-python = ">=3.13.2"
 dependencies = [
-    "homeassistant>=2025.5.0",
-    "setuptools>=80.9.0",
+    "homeassistant~=2025.10.0",
 ]
 
 [dependency-groups]
