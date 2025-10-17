@@ -1035,6 +1035,8 @@ async def test_home_assistant_event_bus_ready_to_arm_event(
         hass.states.async_set("binary_sensor.test_door", "on")
         await hass.async_block_till_done()
         await advance_time(hass, PROCESSING_TIME)
+        # Ensure all event bus events have been processed
+        await hass.async_block_till_done()
 
         # Verify HA event bus events were fired
         ready_events = [
@@ -1073,6 +1075,8 @@ async def test_home_assistant_event_bus_ready_to_arm_event(
         hass.states.async_set("binary_sensor.test_door", "off")
         await hass.async_block_till_done()
         await advance_time(hass, PROCESSING_TIME)
+        # Ensure all event bus events have been processed
+        await hass.async_block_till_done()
 
         ready_events = [
             e
