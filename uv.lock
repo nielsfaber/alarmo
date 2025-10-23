@@ -160,7 +160,7 @@ wheels = [
 
 [[package]]
 name = "alarmo"
-version = "0.1.0"
+version = "1.10.12"
 source = { virtual = "." }
 dependencies = [
     { name = "homeassistant" },
