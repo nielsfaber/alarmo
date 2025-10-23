@@ -1,8 +1,8 @@
 """Factories for creating test objects with defaults."""
 
-import base64
 import copy
-from typing import Any, Dict, List, Optional
+import base64
+from typing import Any
 
 import bcrypt
 
@@ -45,7 +45,7 @@ class AreaFactory:
     def create_area(
         area_id: str = "area_1",
         name: str = "Test Area 1",
-        modes: Optional[list[str]] = None,
+        modes: list[str] | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         """Create an area with optional defaults.
@@ -87,7 +87,7 @@ class AreaFactory:
         return area
 
     @staticmethod
-    def create_area_2() -> Dict[str, Any]:
+    def create_area_2() -> dict[str, Any]:
         """Create a second area with defaults."""
         return AreaFactory.create_area(area_id="area_2", name="Test Area 2")
 
@@ -103,7 +103,7 @@ class ConfigFactory:
         code_arm_required: bool = True,
         code_disarm_required: bool = True,
         code_mode_change_required: bool = True,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create a master config with optional defaults."""
         return {
             "enabled": enabled,
@@ -115,12 +115,12 @@ class ConfigFactory:
         }
 
     @staticmethod
-    def create_mqtt_config(enabled: bool = False) -> Dict[str, bool]:
+    def create_mqtt_config(enabled: bool = False) -> dict[str, bool]:
         """Create a mqtt config with optional defaults."""
         return {"enabled": enabled}
 
     @staticmethod
-    def create_config() -> Dict[str, Dict[str, Any]]:
+    def create_config() -> dict[str, dict[str, Any]]:
         """Create a config with optional defaults."""
         return {
             "master": ConfigFactory.create_master_config(),
@@ -142,11 +142,11 @@ class UserFactory:
         name: str = "Test User",
         enabled: bool = True,
         code: str = "1234",
-        area_limit: Optional[str] = None,
+        area_limit: str | None = None,
         can_arm: bool = True,
         can_disarm: bool = True,
         is_override_code: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create a user with optional defaults."""
         return {
             "user_id": user_id,
@@ -160,14 +160,14 @@ class UserFactory:
         }
 
     @staticmethod
-    def create_arm_only_user(user_id: str = "arm_only_user") -> Dict[str, Any]:
+    def create_arm_only_user(user_id: str = "arm_only_user") -> dict[str, Any]:
         """Create a user that can arm but not disarm."""
         return UserFactory.create_user(
             user_id=user_id, name="Arm Only User", can_arm=True, can_disarm=False
         )
 
     @staticmethod
-    def create_disarm_only_user(user_id: str = "disarm_only_user") -> Dict[str, Any]:
+    def create_disarm_only_user(user_id: str = "disarm_only_user") -> dict[str, Any]:
         """Create a user that can disarm only"""
         return UserFactory.create_user(
             user_id=user_id, name="Disarm Only User", can_arm=False, can_disarm=True
@@ -183,17 +183,17 @@ class SensorFactory:
         name: str,
         enabled: bool = True,
         area: str = "area_1",
-        modes: Optional[List[str]] = None,
+        modes: list[str] | None = None,
         use_exit_delay: bool = True,
         use_entry_delay: bool = True,
         arm_on_close: bool = False,
         allow_open: bool = False,
         auto_bypass: bool = False,
-        auto_bypass_modes: Optional[List[str]] = None,
+        auto_bypass_modes: list[str] | None = None,
         trigger_unavailable: bool = False,
         always_on: bool = False,
-        entry_delay: Optional[int] = None,
-    ) -> Dict[str, Any]:
+        entry_delay: int | None = None,
+    ) -> dict[str, Any]:
         """Create a sensor with optional defaults."""
         if modes is None:
             modes = ["armed_away", "armed_home", "armed_night"]
@@ -223,17 +223,17 @@ class SensorFactory:
         name: str = "Generic Area 1 Door",
         enabled: bool = True,
         area: str = "area_1",
-        modes: Optional[List[str]] = None,
+        modes: list[str] | None = None,
         use_exit_delay: bool = True,
         use_entry_delay: bool = True,
         arm_on_close: bool = False,
         allow_open: bool = False,
         auto_bypass: bool = False,
-        auto_bypass_modes: Optional[List[str]] = None,
+        auto_bypass_modes: list[str] | None = None,
         trigger_unavailable: bool = False,
         always_on: bool = False,
-        entry_delay: Optional[int] = None,
-    ) -> Dict[str, Any]:
+        entry_delay: int | None = None,
+    ) -> dict[str, Any]:
         """Create a door sensor with optional defaults."""
         if modes is None:
             modes = ["armed_away", "armed_home", "armed_night"]
@@ -262,16 +262,16 @@ class SensorFactory:
         entity_id: str = "binary_sensor.generic_area_1_window_sensor",
         name: str = "Generic Area 1 Window",
         area: str = "area_1",
-        modes: Optional[List[str]] = None,
+        modes: list[str] | None = None,
         use_exit_delay: bool = True,
         use_entry_delay: bool = True,
         arm_on_close: bool = False,
         allow_open: bool = False,
         auto_bypass: bool = False,
-        auto_bypass_modes: Optional[List[str]] = None,
+        auto_bypass_modes: list[str] | None = None,
         trigger_unavailable: bool = False,
         always_on: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create a window sensor with optional defaults."""
         if modes is None:
             modes = ["armed_away", "armed_home", "armed_night"]
@@ -299,16 +299,16 @@ class SensorFactory:
         entity_id: str = "binary_sensor.generic_area_1_motion_sensor",
         name: str = "Generic Area 1 Motion",
         area: str = "area_1",
-        modes: Optional[List[str]] = None,
+        modes: list[str] | None = None,
         use_exit_delay: bool = True,
         use_entry_delay: bool = True,
         arm_on_close: bool = False,
         allow_open: bool = False,
         auto_bypass: bool = False,
-        auto_bypass_modes: Optional[List[str]] = None,
+        auto_bypass_modes: list[str] | None = None,
         trigger_unavailable: bool = False,
         always_on: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create a motion sensor with optional defaults."""
         if modes is None:
             modes = ["armed_away", "armed_night"]
@@ -336,8 +336,8 @@ class SensorFactory:
         entity_id: str = "binary_sensor.generic_area_1_door_sensor",
         name: str = "Door with Auto-Bypass",
         area: str = "area_1",
-        auto_bypass_modes: Optional[List[str]] = None,
-    ) -> Dict[str, Any]:
+        auto_bypass_modes: list[str] | None = None,
+    ) -> dict[str, Any]:
         """Create a bypass sensor with optional defaults."""
         if auto_bypass_modes is None:
             auto_bypass_modes = ["armed_away"]
@@ -348,7 +348,7 @@ class SensorFactory:
         return sensor
 
     @staticmethod
-    def create_all_sensors() -> Dict[str, Dict[str, Any]]:
+    def create_all_sensors() -> dict[str, dict[str, Any]]:
         """Create all sensors with optional defaults."""
         return {
             "binary_sensor.generic_area_1_door_sensor": SensorFactory.create_door_sensor(),
@@ -379,10 +379,10 @@ class SensorGroupFactory:
     def create_sensor_group(
         group_id: str = "group_1",
         name: str = "Test Group",
-        entities: Optional[List[str]] = None,
+        entities: list[str] | None = None,
         timeout: int = 300,
         event_count: int = 2,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create a sensor group with optional defaults."""
         if entities is None:
             entities = []
@@ -413,10 +413,10 @@ class MockStorage:
         self.areas = [AreaFactory.create_area(), AreaFactory.create_area_2()]
         self.config = ConfigFactory.create_config()
         self.users = {"user_1": UserFactory.create_user()}
-        self.sensors: Dict[str, Dict[str, Any]] = {}
+        self.sensors: dict[str, dict[str, Any]] = {}
         self._ensure_area_defaults()
 
-    async def async_load(self) -> Dict[str, Any]:
+    async def async_load(self) -> dict[str, Any]:
         """Load the mock storage."""
         return {
             "version": 1,
@@ -427,39 +427,39 @@ class MockStorage:
             "sensors": self.sensors,
         }
 
-    async def async_save(self, data: Dict[str, Any]) -> None:
+    async def async_save(self, data: dict[str, Any]) -> None:
         """Save the mock storage."""
         pass
 
-    def async_get_areas(self) -> Dict[str, Any]:
+    def async_get_areas(self) -> dict[str, Any]:
         """Get all areas."""
         result = {area["area_id"]: area for area in self.areas}
         return result
 
-    def async_get_area(self, area_id: str) -> Dict[str, Any]:
+    def async_get_area(self, area_id: str) -> dict[str, Any]:
         """Get an area by ID."""
-        area: Dict[str, Any] = next(
+        area: dict[str, Any] = next(
             (a for a in self.areas if a["area_id"] == area_id), {}
         )  # type: ignore[arg-type]
         return area
 
-    def async_get_sensors(self) -> Dict[str, Dict[str, Any]]:
+    def async_get_sensors(self) -> dict[str, dict[str, Any]]:
         """Get all sensors."""
         return self.sensors
 
-    def async_get_users(self) -> Dict[str, Any]:
+    def async_get_users(self) -> dict[str, Any]:
         """Get all users."""
         return self.users
 
-    def async_get_config(self) -> Dict[str, Any]:
+    def async_get_config(self) -> dict[str, Any]:
         """Get the config."""
         return self.config
 
-    def async_get_sensor_groups(self) -> Dict[str, Any]:
+    def async_get_sensor_groups(self) -> dict[str, Any]:
         """Get all sensor groups."""
         return {}
 
-    def async_get_automations(self) -> Dict[str, Any]:
+    def async_get_automations(self) -> dict[str, Any]:
         """Get all automations."""
         return {}
 
@@ -501,9 +501,9 @@ class StorageFactory:
 
     @staticmethod
     def create_storage(
-        areas: Optional[list[dict[str, Any]]] = None,
-        sensors: Optional[list[dict[str, Any]]] = None,
-        sensor_groups: Optional[list[dict[str, Any]]] = None,
+        areas: list[dict[str, Any]] | None = None,
+        sensors: list[dict[str, Any]] | None = None,
+        sensor_groups: list[dict[str, Any]] | None = None,
         master_enabled: bool = False,
     ) -> MockStorage:
         """Create a mock storage with optional defaults."""

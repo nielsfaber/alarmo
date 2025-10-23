@@ -4,14 +4,14 @@ from typing import Any
 
 import pytest
 
-from tests.factories import AreaFactory, SensorFactory
 from tests.helpers import (
     advance_time,
-    assert_alarm_state,
     cleanup_timers,
-    patch_alarmo_integration_dependencies,
+    assert_alarm_state,
     setup_alarmo_entry,
+    patch_alarmo_integration_dependencies,
 )
+from tests.factories import AreaFactory, SensorFactory
 
 ALARM_ENTITY = "alarm_control_panel.test_area_1"
 SMOKE_SENSOR = "binary_sensor.smoke_detector"
@@ -194,12 +194,12 @@ async def test_all_environmental_sensors(
             await hass.async_block_till_done()
             await advance_time(hass, 1)
             state = hass.states.get(ALARM_ENTITY)
-            assert (
-                state.state == "triggered"
-            ), f"Sensor {sensor_id} failed to trigger alarm"
-            assert sensor_id in str(
-                state.attributes.get("open_sensors")
-            ), f"Sensor {sensor_id} not found in open_sensors"
+            assert state.state == "triggered", (
+                f"Sensor {sensor_id} failed to trigger alarm"
+            )
+            assert sensor_id in str(state.attributes.get("open_sensors")), (
+                f"Sensor {sensor_id} not found in open_sensors"
+            )
             await cleanup_timers(hass)
             await hass.services.async_call(
                 "alarmo",
@@ -250,9 +250,9 @@ async def test_environmental_sensor_multiple_arm_modes(
             await hass.async_block_till_done()
             await advance_time(hass, 1)
             state = hass.states.get(ALARM_ENTITY)
-            assert (
-                state.state == "triggered"
-            ), f"Heat sensor did not trigger alarm in {mode} mode"
+            assert state.state == "triggered", (
+                f"Heat sensor did not trigger alarm in {mode} mode"
+            )
             await cleanup_timers(hass)
             await hass.services.async_call(
                 "alarmo",

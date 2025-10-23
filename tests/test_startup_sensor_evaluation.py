@@ -6,14 +6,14 @@ import pytest
 from homeassistant.core import State
 from pytest_homeassistant_custom_component.common import mock_restore_cache
 
-from tests.factories import AreaFactory, SensorFactory
 from tests.helpers import (
     advance_time,
-    assert_alarm_state,
     cleanup_timers,
-    patch_alarmo_integration_dependencies,
+    assert_alarm_state,
     setup_alarmo_entry,
+    patch_alarmo_integration_dependencies,
 )
+from tests.factories import AreaFactory, SensorFactory
 
 ALARM_ENTITY = "alarm_control_panel.test_area_1"
 GENERIC_DOOR_SENSOR = "binary_sensor.generic_area_1_door_sensor"
@@ -71,9 +71,12 @@ async def test_sensor_open_on_startup_triggers_alarm(
     )
 
     # Mock the alarm entity's last state (simulates it was armed before HA went down)
-    mock_restore_cache(hass, [
-        State(ALARM_ENTITY, "armed_away", {"arm_mode": "armed_away"}),
-    ])
+    mock_restore_cache(
+        hass,
+        [
+            State(ALARM_ENTITY, "armed_away", {"arm_mode": "armed_away"}),
+        ],
+    )
 
     with patch_alarmo_integration_dependencies(storage):
         # Set sensor to open BEFORE integration starts (simulates sensor opened while HA was down)
@@ -142,9 +145,12 @@ async def test_sensor_open_on_startup_immediate_trigger(
     )
 
     # Mock the alarm entity's last state
-    mock_restore_cache(hass, [
-        State(ALARM_ENTITY, "armed_away", {"arm_mode": "armed_away"}),
-    ])
+    mock_restore_cache(
+        hass,
+        [
+            State(ALARM_ENTITY, "armed_away", {"arm_mode": "armed_away"}),
+        ],
+    )
 
     with patch_alarmo_integration_dependencies(storage):
         # Set sensor to open BEFORE integration starts
@@ -226,9 +232,12 @@ async def test_sensor_group_threshold_not_met_on_startup(
     )
 
     # Mock the alarm entity's last state
-    mock_restore_cache(hass, [
-        State(ALARM_ENTITY, "armed_away", {"arm_mode": "armed_away"}),
-    ])
+    mock_restore_cache(
+        hass,
+        [
+            State(ALARM_ENTITY, "armed_away", {"arm_mode": "armed_away"}),
+        ],
+    )
 
     with patch_alarmo_integration_dependencies(storage):
         # Set only one sensor open BEFORE integration starts (threshold not met)
@@ -311,9 +320,12 @@ async def test_sensor_group_threshold_met_on_startup_triggers_alarm(
     )
 
     # Mock the alarm entity's last state
-    mock_restore_cache(hass, [
-        State(ALARM_ENTITY, "armed_away", {"arm_mode": "armed_away"}),
-    ])
+    mock_restore_cache(
+        hass,
+        [
+            State(ALARM_ENTITY, "armed_away", {"arm_mode": "armed_away"}),
+        ],
+    )
 
     with patch_alarmo_integration_dependencies(storage):
         # Set both sensors open BEFORE integration starts (threshold met)
@@ -378,9 +390,12 @@ async def test_sensor_closed_on_startup_no_trigger(
     )
 
     # Mock the alarm entity's last state
-    mock_restore_cache(hass, [
-        State(ALARM_ENTITY, "armed_away", {"arm_mode": "armed_away"}),
-    ])
+    mock_restore_cache(
+        hass,
+        [
+            State(ALARM_ENTITY, "armed_away", {"arm_mode": "armed_away"}),
+        ],
+    )
 
     with patch_alarmo_integration_dependencies(storage):
         # Set sensor closed BEFORE integration starts
@@ -410,4 +425,3 @@ async def test_sensor_closed_on_startup_no_trigger(
         await hass.async_block_till_done()
         assert_alarm_state(hass, ALARM_ENTITY, "disarmed")
         await cleanup_timers(hass)
-

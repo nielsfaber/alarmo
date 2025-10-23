@@ -4,12 +4,12 @@ from typing import Any
 
 import pytest
 
-from tests.factories import AreaFactory, SensorFactory, UserFactory
 from tests.helpers import (
     advance_time,
-    patch_alarmo_integration_dependencies,
     setup_alarmo_entry,
+    patch_alarmo_integration_dependencies,
 )
+from tests.factories import AreaFactory, UserFactory, SensorFactory
 
 ALARM_ENTITY = "alarm_control_panel.test_area_1"
 DOOR_SENSOR = "binary_sensor.door_sensor"

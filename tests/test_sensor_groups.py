@@ -4,14 +4,14 @@ from typing import Any
 
 import pytest
 
-from tests.factories import AreaFactory, SensorFactory
 from tests.helpers import (
     advance_time,
-    assert_alarm_state,
     cleanup_timers,
-    patch_alarmo_integration_dependencies,
+    assert_alarm_state,
     setup_alarmo_entry,
+    patch_alarmo_integration_dependencies,
 )
+from tests.factories import AreaFactory, SensorFactory
 
 ALARM_ENTITY = "alarm_control_panel.test_area_1"
 GENERIC_DOOR_SENSOR = "binary_sensor.generic_area_1_door_sensor"
@@ -113,7 +113,7 @@ async def test_single_sensor_in_group_does_not_trigger(
 
         # After a short delay (less than group timeout), the alarm should still be armed_away
         sensor_group_timeout = sensor_groups[0]["timeout"]
-        await advance_time(hass, sensor_group_timeout -1) # less than timeout
+        await advance_time(hass, sensor_group_timeout - 1)  # less than timeout
         assert_alarm_state(hass, ALARM_ENTITY, "armed_away")
 
         # Cleanup
@@ -179,7 +179,7 @@ async def test_two_sensors_in_group_trigger_within_timeout_triggers_alarm(
     sensor_group_timeout = sensor_groups[0]["timeout"]
     # Ensure S2 triggers within the timeout of S1
     delay_before_s2_trigger = sensor_group_timeout // 2
-    propagation_time = 1 # Time for S2 state to set and group to react
+    propagation_time = 1  # Time for S2 state to set and group to react
 
     with patch_alarmo_integration_dependencies(storage):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -213,7 +213,7 @@ async def test_two_sensors_in_group_trigger_within_timeout_triggers_alarm(
 
         hass.states.async_set(SENSOR_2, "on")
         await hass.async_block_till_done()
-        await advance_time(hass, propagation_time) # Allow group to react
+        await advance_time(hass, propagation_time)  # Allow group to react
         # The alarm should now be triggered as both sensors in the group fired within timeout
         assert_alarm_state(hass, ALARM_ENTITY, "triggered")
 
@@ -306,7 +306,9 @@ async def test_two_sensors_in_group_trigger_outside_timeout_does_not_trigger(
         await hass.async_block_till_done()
         # Advance time PAST the sensor group timeout (default 10s)
         sensor_group_timeout = sensor_groups[0]["timeout"]
-        buffer_time_after_timeout = 1 # Define a small buffer to ensure we are past the timeout
+        buffer_time_after_timeout = (
+            1  # Define a small buffer to ensure we are past the timeout
+        )
         await advance_time(hass, sensor_group_timeout + buffer_time_after_timeout)
 
         hass.states.async_set(SENSOR_2, "on")

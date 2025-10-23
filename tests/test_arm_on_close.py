@@ -4,13 +4,13 @@ from typing import Any
 
 import pytest
 
-from tests.factories import AreaFactory, SensorFactory
 from tests.helpers import (
     advance_time,
     assert_alarm_state,
-    patch_alarmo_integration_dependencies,
     setup_alarmo_entry,
+    patch_alarmo_integration_dependencies,
 )
+from tests.factories import AreaFactory, SensorFactory
 
 
 @pytest.mark.asyncio

@@ -4,20 +4,19 @@ NOTE: ready-to-arm event tests have been moved to test_ready_to_arm_events.py
 """
 
 from typing import Any
-import pytest
 
+import pytest
 from homeassistant.core import Event
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
-from tests.factories import AreaFactory, SensorFactory
 from tests.helpers import (
     advance_time,
-    assert_alarm_state,
     cleanup_timers,
-    patch_alarmo_integration_dependencies,
+    assert_alarm_state,
     setup_alarmo_entry,
+    patch_alarmo_integration_dependencies,
 )
-
+from tests.factories import AreaFactory, SensorFactory
 from custom_components.alarmo import const
 
 # Test constants
@@ -39,7 +38,6 @@ async def test_failed_to_arm_event_fired_when_sensor_blocks_arming(
     hass: Any, enable_custom_integrations: Any
 ) -> None:
     """Test that alarmo_failed_to_arm event is fired when a sensor blocks arming."""
-
     # Set up event capture
     events: list[Event] = []
     exit_delay = LONG_EXIT_DELAY
@@ -110,17 +108,27 @@ async def test_failed_to_arm_event_fired_when_sensor_blocks_arming(
         assert_alarm_state(hass, ALARM_ENTITY, "disarmed")
 
         # Verify that the alarmo_failed_to_arm event was fired
-        assert len(events) == EXPECTED_SINGLE_EVENT, f"Expected {EXPECTED_SINGLE_EVENT} event, got {len(events)}"
+        assert len(events) == EXPECTED_SINGLE_EVENT, (
+            f"Expected {EXPECTED_SINGLE_EVENT} event, got {len(events)}"
+        )
 
         event_data = events[0].data
 
         # Verify event data contains the expected information
-        assert event_data["reason"] == "open_sensors", f"Expected reason 'open_sensors', got {event_data.get('reason')}"
-        assert event_data["area_id"] == AREA_ID, f"Expected area_id '{AREA_ID}', got {event_data.get('area_id')}"
-        assert BLOCKING_SENSOR in event_data["sensors"], f"Expected {BLOCKING_SENSOR} in sensors list, got {event_data.get('sensors')}"
+        assert event_data["reason"] == "open_sensors", (
+            f"Expected reason 'open_sensors', got {event_data.get('reason')}"
+        )
+        assert event_data["area_id"] == AREA_ID, (
+            f"Expected area_id '{AREA_ID}', got {event_data.get('area_id')}"
+        )
+        assert BLOCKING_SENSOR in event_data["sensors"], (
+            f"Expected {BLOCKING_SENSOR} in sensors list, got {event_data.get('sensors')}"
+        )
 
         # Additional verification that the sensor is in the event
-        assert len(event_data["sensors"]) == EXPECTED_SINGLE_EVENT, f"Expected {EXPECTED_SINGLE_EVENT} sensor in event, got {len(event_data['sensors'])}"
+        assert len(event_data["sensors"]) == EXPECTED_SINGLE_EVENT, (
+            f"Expected {EXPECTED_SINGLE_EVENT} sensor in event, got {len(event_data['sensors'])}"
+        )
 
         await cleanup_timers(hass)
 
@@ -130,7 +138,6 @@ async def test_failed_to_arm_event_with_multiple_blocking_sensors(
     hass: Any, enable_custom_integrations: Any
 ) -> None:
     """Test that alarmo_failed_to_arm event includes all blocking sensors."""
-
     events: list[Event] = []
 
     def capture_event(event: Event) -> None:
@@ -203,14 +210,18 @@ async def test_failed_to_arm_event_with_multiple_blocking_sensors(
         assert_alarm_state(hass, ALARM_ENTITY, "disarmed")
 
         # Verify that the alarmo_failed_to_arm event was fired
-        assert len(events) == EXPECTED_SINGLE_EVENT, f"Expected {EXPECTED_SINGLE_EVENT} event, got {len(events)}"
+        assert len(events) == EXPECTED_SINGLE_EVENT, (
+            f"Expected {EXPECTED_SINGLE_EVENT} event, got {len(events)}"
+        )
 
         event_data = events[0].data
 
         # Verify event data
         assert event_data["reason"] == "open_sensors"
         assert event_data["area_id"] == AREA_ID
-        assert len(event_data["sensors"]) == EXPECTED_DUAL_EVENTS, f"Expected {EXPECTED_DUAL_EVENTS} sensors in event, got {len(event_data['sensors'])}"
+        assert len(event_data["sensors"]) == EXPECTED_DUAL_EVENTS, (
+            f"Expected {EXPECTED_DUAL_EVENTS} sensors in event, got {len(event_data['sensors'])}"
+        )
         assert sensor1 in event_data["sensors"], f"Expected {sensor1} in sensors list"
         assert sensor2 in event_data["sensors"], f"Expected {sensor2} in sensors list"
 
@@ -222,7 +233,6 @@ async def test_no_failed_to_arm_event_when_arming_succeeds(
     hass: Any, enable_custom_integrations: Any
 ) -> None:
     """Test that no alarmo_failed_to_arm event is fired when arming succeeds."""
-
     events: list[Event] = []
     exit_delay = SHORT_EXIT_DELAY
 
@@ -287,7 +297,9 @@ async def test_no_failed_to_arm_event_when_arming_succeeds(
         assert_alarm_state(hass, ALARM_ENTITY, "armed_away")
 
         # No failed to arm event should have been fired
-        assert len(events) == EXPECTED_NO_EVENTS, f"Expected no events, got {len(events)}"
+        assert len(events) == EXPECTED_NO_EVENTS, (
+            f"Expected no events, got {len(events)}"
+        )
 
         await cleanup_timers(hass)
 
@@ -297,17 +309,16 @@ async def test_backend_arm_event_dispatched_on_arming(
     hass: Any, enable_custom_integrations: Any
 ) -> None:
     """Test that backend ARM event is dispatched during arming process."""
-
     backend_events: list[dict[str, Any]] = []
     exit_delay = SHORT_EXIT_DELAY
 
-    def capture_backend_event(event_type: str, area_id: str, args: dict[str, Any]) -> None:
+    def capture_backend_event(
+        event_type: str, area_id: str, args: dict[str, Any]
+    ) -> None:
         """Capture backend dispatcher events."""
-        backend_events.append({
-            "event_type": event_type,
-            "area_id": area_id,
-            "args": args
-        })
+        backend_events.append(
+            {"event_type": event_type, "area_id": area_id, "args": args}
+        )
 
     # Create area with exit delay
     area = AreaFactory.create_area(
@@ -360,7 +371,9 @@ async def test_backend_arm_event_dispatched_on_arming(
 
         # Filter for ARM events
         arm_events = [e for e in backend_events if e["event_type"] == const.EVENT_ARM]
-        assert len(arm_events) >= EXPECTED_SINGLE_EVENT, f"Expected at least {EXPECTED_SINGLE_EVENT} ARM event, got {len(arm_events)}"
+        assert len(arm_events) >= EXPECTED_SINGLE_EVENT, (
+            f"Expected at least {EXPECTED_SINGLE_EVENT} ARM event, got {len(arm_events)}"
+        )
 
         # Verify the ARM event details
         arm_event = arm_events[0]
@@ -381,16 +394,15 @@ async def test_backend_disarm_event_dispatched_on_disarming(
     hass: Any, enable_custom_integrations: Any
 ) -> None:
     """Test that backend DISARM event is dispatched during disarming process."""
-
     backend_events: list[dict[str, Any]] = []
 
-    def capture_backend_event(event_type: str, area_id: str, args: dict[str, Any]) -> None:
+    def capture_backend_event(
+        event_type: str, area_id: str, args: dict[str, Any]
+    ) -> None:
         """Capture backend dispatcher events."""
-        backend_events.append({
-            "event_type": event_type,
-            "area_id": area_id,
-            "args": args
-        })
+        backend_events.append(
+            {"event_type": event_type, "area_id": area_id, "args": args}
+        )
 
     # Create area with no exit delay for quick arming
     area = AreaFactory.create_area(
@@ -450,8 +462,12 @@ async def test_backend_disarm_event_dispatched_on_disarming(
         await hass.async_block_till_done()
 
         # Filter for DISARM events
-        disarm_events = [e for e in backend_events if e["event_type"] == const.EVENT_DISARM]
-        assert len(disarm_events) >= EXPECTED_SINGLE_EVENT, f"Expected at least {EXPECTED_SINGLE_EVENT} DISARM event, got {len(disarm_events)}"
+        disarm_events = [
+            e for e in backend_events if e["event_type"] == const.EVENT_DISARM
+        ]
+        assert len(disarm_events) >= EXPECTED_SINGLE_EVENT, (
+            f"Expected at least {EXPECTED_SINGLE_EVENT} DISARM event, got {len(disarm_events)}"
+        )
 
         # Verify the DISARM event details
         disarm_event = disarm_events[0]
@@ -469,17 +485,16 @@ async def test_backend_trigger_event_dispatched_on_triggering(
     hass: Any, enable_custom_integrations: Any
 ) -> None:
     """Test that backend TRIGGER event is dispatched when alarm is triggered."""
-
     backend_events: list[dict[str, Any]] = []
     default_entry_delay = 30  # Default entry delay in seconds
 
-    def capture_backend_event(event_type: str, area_id: str, args: dict[str, Any]) -> None:
+    def capture_backend_event(
+        event_type: str, area_id: str, args: dict[str, Any]
+    ) -> None:
         """Capture backend dispatcher events."""
-        backend_events.append({
-            "event_type": event_type,
-            "area_id": area_id,
-            "args": args
-        })
+        backend_events.append(
+            {"event_type": event_type, "area_id": area_id, "args": args}
+        )
 
     area = AreaFactory.create_area(
         area_id=AREA_ID,
@@ -538,8 +553,12 @@ async def test_backend_trigger_event_dispatched_on_triggering(
         assert_alarm_state(hass, ALARM_ENTITY, "pending")
 
         # Filter for TRIGGER events
-        trigger_events = [e for e in backend_events if e["event_type"] == const.EVENT_TRIGGER]
-        assert len(trigger_events) >= EXPECTED_SINGLE_EVENT, f"Expected at least {EXPECTED_SINGLE_EVENT} TRIGGER event, got {len(trigger_events)}"
+        trigger_events = [
+            e for e in backend_events if e["event_type"] == const.EVENT_TRIGGER
+        ]
+        assert len(trigger_events) >= EXPECTED_SINGLE_EVENT, (
+            f"Expected at least {EXPECTED_SINGLE_EVENT} TRIGGER event, got {len(trigger_events)}"
+        )
 
         # Verify the TRIGGER event details
         trigger_event = trigger_events[0]
@@ -549,8 +568,9 @@ async def test_backend_trigger_event_dispatched_on_triggering(
 
         # Check that the triggering sensor is included
         open_sensors = trigger_event["args"]["open_sensors"]
-        assert "binary_sensor.front_door" in open_sensors, \
+        assert "binary_sensor.front_door" in open_sensors, (
             f"Expected front_door sensor in trigger event, got {open_sensors}"
+        )
 
         # Let the entry delay complete naturally to reach triggered state
         # Get the entry delay from the trigger event or use default

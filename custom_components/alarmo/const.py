@@ -1,19 +1,19 @@
 """Store constants."""
+
 import datetime
+
 import voluptuous as vol
-
 from homeassistant.const import (
-    ATTR_ENTITY_ID,
-    CONF_MODE,
-    CONF_CODE,
     ATTR_NAME,
-)
-
-from homeassistant.components.alarm_control_panel import (
-  AlarmControlPanelEntityFeature,
-  AlarmControlPanelState
+    CONF_CODE,
+    CONF_MODE,
+    ATTR_ENTITY_ID,
 )
 from homeassistant.helpers import config_validation as cv
+from homeassistant.components.alarm_control_panel import (
+    AlarmControlPanelState,
+    AlarmControlPanelEntityFeature,
+)
 
 VERSION = "1.10.12"
 NAME = "Alarmo"
@@ -51,7 +51,7 @@ ARM_MODES = [
     AlarmControlPanelState.ARMED_HOME,
     AlarmControlPanelState.ARMED_NIGHT,
     AlarmControlPanelState.ARMED_CUSTOM_BYPASS,
-    AlarmControlPanelState.ARMED_VACATION
+    AlarmControlPanelState.ARMED_VACATION,
 ]
 
 ARM_MODE_TO_STATE = {
@@ -59,7 +59,7 @@ ARM_MODE_TO_STATE = {
     "home": AlarmControlPanelState.ARMED_HOME,
     "night": AlarmControlPanelState.ARMED_NIGHT,
     "custom": AlarmControlPanelState.ARMED_CUSTOM_BYPASS,
-    "vacation": AlarmControlPanelState.ARMED_VACATION
+    "vacation": AlarmControlPanelState.ARMED_VACATION,
 }
 
 STATE_TO_ARM_MODE = {
@@ -67,7 +67,7 @@ STATE_TO_ARM_MODE = {
     AlarmControlPanelState.ARMED_HOME: "home",
     AlarmControlPanelState.ARMED_NIGHT: "night",
     AlarmControlPanelState.ARMED_CUSTOM_BYPASS: "custom",
-    AlarmControlPanelState.ARMED_VACATION: "vacation"
+    AlarmControlPanelState.ARMED_VACATION: "vacation",
 }
 
 COMMAND_ARM_NIGHT = "arm_night"
@@ -83,7 +83,7 @@ COMMANDS = [
     COMMAND_ARM_NIGHT,
     COMMAND_ARM_HOME,
     COMMAND_ARM_CUSTOM_BYPASS,
-    COMMAND_ARM_VACATION
+    COMMAND_ARM_VACATION,
 ]
 
 EVENT_DISARM = "disarm"
@@ -162,15 +162,15 @@ EVENT_ACTIONS = [
     EVENT_ACTION_ARM_HOME,
     EVENT_ACTION_ARM_NIGHT,
     EVENT_ACTION_ARM_VACATION,
-    EVENT_ACTION_ARM_CUSTOM_BYPASS
+    EVENT_ACTION_ARM_CUSTOM_BYPASS,
 ]
 
 MODES_TO_SUPPORTED_FEATURES = {
     AlarmControlPanelState.ARMED_AWAY: AlarmControlPanelEntityFeature.ARM_AWAY,
     AlarmControlPanelState.ARMED_HOME: AlarmControlPanelEntityFeature.ARM_HOME,
     AlarmControlPanelState.ARMED_NIGHT: AlarmControlPanelEntityFeature.ARM_NIGHT,
-    AlarmControlPanelState.ARMED_CUSTOM_BYPASS: AlarmControlPanelEntityFeature.ARM_CUSTOM_BYPASS,
-    AlarmControlPanelState.ARMED_VACATION: AlarmControlPanelEntityFeature.ARM_VACATION
+    AlarmControlPanelState.ARMED_CUSTOM_BYPASS: AlarmControlPanelEntityFeature.ARM_CUSTOM_BYPASS,  # noqa: E501
+    AlarmControlPanelState.ARMED_VACATION: AlarmControlPanelEntityFeature.ARM_VACATION,
 }
 
 SERVICE_ARM = "arm"
@@ -191,21 +191,23 @@ SERVICE_ARM_SCHEMA = cv.make_entity_service_schema(
     {
         vol.Required(ATTR_ENTITY_ID): cv.entity_id,
         vol.Optional(CONF_CODE, default=""): cv.string,
-        vol.Optional(CONF_MODE, default=AlarmControlPanelState.ARMED_AWAY): vol.In([
-            "away",
-            "home",
-            "night",
-            "custom",
-            "vacation",
-            CONF_ALARM_ARMED_AWAY,
-            CONF_ALARM_ARMED_HOME,
-            CONF_ALARM_ARMED_NIGHT,
-            CONF_ALARM_ARMED_CUSTOM_BYPASS,
-            CONF_ALARM_ARMED_VACATION,
-        ]),
+        vol.Optional(CONF_MODE, default=AlarmControlPanelState.ARMED_AWAY): vol.In(
+            [
+                "away",
+                "home",
+                "night",
+                "custom",
+                "vacation",
+                CONF_ALARM_ARMED_AWAY,
+                CONF_ALARM_ARMED_HOME,
+                CONF_ALARM_ARMED_NIGHT,
+                CONF_ALARM_ARMED_CUSTOM_BYPASS,
+                CONF_ALARM_ARMED_VACATION,
+            ]
+        ),
         vol.Optional(ATTR_SKIP_DELAY, default=False): cv.boolean,
         vol.Optional(ATTR_FORCE, default=False): cv.boolean,
-        vol.Optional(ATTR_CONTEXT_ID): int
+        vol.Optional(ATTR_CONTEXT_ID): int,
     }
 )
 
@@ -213,7 +215,7 @@ SERVICE_DISARM_SCHEMA = cv.make_entity_service_schema(
     {
         vol.Required(ATTR_ENTITY_ID): cv.entity_id,
         vol.Optional(CONF_CODE, default=""): cv.string,
-        vol.Optional(ATTR_CONTEXT_ID): int
+        vol.Optional(ATTR_CONTEXT_ID): int,
     }
 )
 

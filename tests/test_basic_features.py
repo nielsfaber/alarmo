@@ -3,18 +3,18 @@
 General feature tests for Alarmo (arming, disarming, state transitions, event firing).
 """
 
-from typing import Any, Dict, cast
+from typing import Any, cast
 
 import pytest
 
-from tests.factories import AreaFactory, SensorFactory
 from tests.helpers import (
     advance_time,
-    assert_alarm_state,
     cleanup_timers,
-    patch_alarmo_integration_dependencies,
+    assert_alarm_state,
     setup_alarmo_entry,
+    patch_alarmo_integration_dependencies,
 )
+from tests.factories import AreaFactory, SensorFactory
 
 ALARM_ENTITY = "alarm_control_panel.test_area_1"
 MASTER_ENTITY = "alarm_control_panel.master"
@@ -63,7 +63,9 @@ async def test_arm_immediate_arms_right_away_with_allow_open(
             blocking=True,
         )
         await hass.async_block_till_done()
-        await advance_time(hass, armed_away_exit_time + 1) # Use variable, +1 for clarity even if 0
+        await advance_time(
+            hass, armed_away_exit_time + 1
+        )  # Use variable, +1 for clarity even if 0
         state = hass.states.get(alarm_entity)
         assert state.state == "armed_away"
         await cleanup_timers(hass)
@@ -72,7 +74,6 @@ async def test_arm_immediate_arms_right_away_with_allow_open(
 @pytest.mark.asyncio
 async def test_arm_away_from_disarmed(hass: Any, enable_custom_integrations: Any):
     """Test arm away from disarmed"""
-
     sensor = get_generic_sensor()
     # Using default AreaFactory armed_away_exit_time = 10
     default_armed_away_exit_time = 10
@@ -103,17 +104,16 @@ async def test_arm_away_from_disarmed(hass: Any, enable_custom_integrations: Any
 def get_area_mode_time(area_id: str, mode: str, key: str) -> int:
     """Get the time value for a given area, mode, and key (exit_time, entry_time, trigger_time)."""
     if area_id == "area_1":
-
         area_config = AreaFactory.create_area()
     elif area_id == "area_2":
         area_config = AreaFactory.create_area_2()
     else:
         raise ValueError(f"Unknown area_id: {area_id}")
 
-    modes = cast(Dict[str, Dict[str, Any]], area_config["modes"])
+    modes = cast(dict[str, dict[str, Any]], area_config["modes"])
     if mode not in modes:
         # Fallback to default mode if specific mode config not found (e.g. always_on uses armed_away trigger)
-        if key == "trigger_time" and "armed_away" in modes :
+        if key == "trigger_time" and "armed_away" in modes:
             time_value = modes["armed_away"].get(key)
         else:
             raise ValueError(f"Unknown mode: {mode} for area {area_id}")
@@ -161,7 +161,9 @@ async def test_disarm_from_armed_away(hass: Any, enable_custom_integrations: Any
         {"entity_id": "alarm_control_panel.test_area_1", "code": "1234"},
         blocking=True,
     )
-    await advance_time(hass, default_armed_away_exit_time + 1) # Allow time for disarm to propagate if needed
+    await advance_time(
+        hass, default_armed_away_exit_time + 1
+    )  # Allow time for disarm to propagate if needed
     assert_alarm_state(hass, "alarm_control_panel.test_area_1", "disarmed")
 
 
@@ -275,7 +277,7 @@ async def test_armed_away_entry_delay_and_trigger(
         hass.states.async_set(sensor, "on")
         await hass.async_block_till_done()
         state = hass.states.get(ALARM_ENTITY)
-        if state.state != "pending": 
+        if state.state != "pending":
             await hass.async_block_till_done()
             state = hass.states.get(ALARM_ENTITY)
         assert state.state == "pending"
@@ -354,7 +356,7 @@ async def test_sensor_always_on_triggers_when_disarmed(
 
         hass.states.async_set(sensor, "on")
         await hass.async_block_till_done()
-        await advance_time(hass, 1) # Time for state to propagate
+        await advance_time(hass, 1)  # Time for state to propagate
         assert_alarm_state(hass, ALARM_ENTITY, "triggered")
         await cleanup_timers(hass)
 
@@ -481,6 +483,6 @@ async def test_sensor_trigger_unavailable(hass: Any, enable_custom_integrations:
 
         hass.states.async_set(sensor, "unavailable")
         await hass.async_block_till_done()
-        await advance_time(hass, 1) # Time for state to propagate
+        await advance_time(hass, 1)  # Time for state to propagate
         assert_alarm_state(hass, ALARM_ENTITY, "triggered")
         await cleanup_timers(hass)

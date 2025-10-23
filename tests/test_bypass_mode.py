@@ -4,13 +4,13 @@ from typing import Any
 
 import pytest
 
-from tests.factories import AreaFactory, SensorFactory
 from tests.helpers import (
     advance_time,
     assert_alarm_state,
-    patch_alarmo_integration_dependencies,
     setup_alarmo_entry,
+    patch_alarmo_integration_dependencies,
 )
+from tests.factories import AreaFactory, SensorFactory
 
 
 @pytest.mark.asyncio
@@ -393,9 +393,9 @@ async def test_auto_bypass_empty_modes(
         exit_time = area["modes"]["armed_away"]["exit_time"]
         await advance_time(hass, exit_time + 1)
         state = hass.states.get(alarm_entity)
-        assert (
-            state.state == "disarmed"
-        ), "System should not arm with an open, non-bypassed sensor"
+        assert state.state == "disarmed", (
+            "System should not arm with an open, non-bypassed sensor"
+        )
         bypassed = state.attributes.get("bypassed_sensors", [])
         msg = "Sensor should not be bypassed with empty auto_bypass_modes"
         assert not bypassed or bypass_sensor not in bypassed, msg

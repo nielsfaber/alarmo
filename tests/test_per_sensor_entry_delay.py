@@ -1,15 +1,17 @@
 """Tests for per-sensor entry delay override feature."""
+
 from typing import Any
+
 import pytest
 
-from tests.factories import AreaFactory, SensorFactory, SensorGroupFactory
 from tests.helpers import (
     advance_time,
-    assert_alarm_state,
     cleanup_timers,
-    patch_alarmo_integration_dependencies,
+    assert_alarm_state,
     setup_alarmo_entry,
+    patch_alarmo_integration_dependencies,
 )
+from tests.factories import AreaFactory, SensorFactory, SensorGroupFactory
 
 ALARM_ENTITY = "alarm_control_panel.test_area_1"
 GENERIC_DOOR_SENSOR = "binary_sensor.generic_area_1_door_sensor"
@@ -39,7 +41,7 @@ async def test_sensor_entry_delay_longer_than_area(
         name="Garage Door",
         use_exit_delay=False,
         use_entry_delay=True,
-        entry_delay=60
+        entry_delay=60,
     )
 
     storage, entry = setup_alarmo_entry(
@@ -99,9 +101,7 @@ async def test_sensor_entry_delay_shorter_than_area(
     )
 
     quick_sensor = SensorFactory.create_door_sensor(
-        entity_id="binary_sensor.quick_sensor",
-        name="Quick Sensor",
-        entry_delay=15
+        entity_id="binary_sensor.quick_sensor", name="Quick Sensor", entry_delay=15
     )
 
     storage, entry = setup_alarmo_entry(
@@ -165,7 +165,7 @@ async def test_backward_compatibility_no_override(
         entity_id="binary_sensor.existing_sensor",
         name="Existing Sensor",
         use_exit_delay=False,
-        use_entry_delay=True
+        use_entry_delay=True,
         # No entry_delay specified (None by default)
     )
 
@@ -247,7 +247,11 @@ async def test_sensor_group_with_no_entry_delay_triggers_immediately(
     ]
 
     storage, entry = setup_alarmo_entry(
-        hass, areas=[area], sensors=sensors, entry_id="test_sensor_group_no_delay", sensor_groups=sensor_groups
+        hass,
+        areas=[area],
+        sensors=sensors,
+        entry_id="test_sensor_group_no_delay",
+        sensor_groups=sensor_groups,
     )
 
     with patch_alarmo_integration_dependencies(storage):
@@ -895,7 +899,11 @@ async def test_three_member_group_event_count_2_paths(
     group = SensorGroupFactory.create_sensor_group(
         group_id="group_three_1",
         name="Three Group",
-        entities=[s_immediate["entity_id"], s_delayed_a["entity_id"], s_delayed_b["entity_id"]],
+        entities=[
+            s_immediate["entity_id"],
+            s_delayed_a["entity_id"],
+            s_delayed_b["entity_id"],
+        ],
         timeout=10,
         event_count=2,
     )
@@ -1065,7 +1073,9 @@ async def test_sensor_group_uses_area_default_entry_delay(
         assert_alarm_state(hass, ALARM_ENTITY, "armed_away")  # Group requires 2 sensors
 
         await advance_time(hass, 2)
-        hass.states.async_set(sensor_45s["entity_id"], "on")  # Second sensor triggers group
+        hass.states.async_set(
+            sensor_45s["entity_id"], "on"
+        )  # Second sensor triggers group
         await hass.async_block_till_done()
         await advance_time(hass, PROCESSING_TIME)
 
