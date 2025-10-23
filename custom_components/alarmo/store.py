@@ -1,3 +1,5 @@
+"""Storage handler for Alarmo integration."""
+
 import time
 import logging
 from typing import cast
@@ -173,6 +175,8 @@ class SensorGroupEntry:
 
 
 def parse_automation_entry(data: dict):
+    """Parse automation entry from dict to proper types."""
+
     def create_trigger_entity(config: dict):
         if "event" in config:
             return AlarmoTriggerEntry(**config)
@@ -196,6 +200,8 @@ def parse_automation_entry(data: dict):
 
 
 class MigratableStore(Store):
+    """Storage class that can migrate data between versions."""
+
     async def _async_migrate_func(
         self, old_major_version: int, old_minor_version: int, data: dict
     ):
@@ -211,9 +217,7 @@ class MigratableStore(Store):
                 ]
 
                 data["type"] = (
-                    "notification"
-                    if data.get("is_notification")
-                    else "action"
+                    "notification" if data.get("is_notification") else "action"
                 )
 
             if old_major_version <= 5:
@@ -334,7 +338,7 @@ class AlarmoStorage:
             minor_version=STORAGE_VERSION_MINOR,
         )
 
-    async def async_load(self) -> None:
+    async def async_load(self) -> None:  # noqa: PLR0912
         """Load the registry of schedule entries."""
         data = await self._store.async_load()
         config: Config = Config()
@@ -416,6 +420,7 @@ class AlarmoStorage:
             await self.async_factory_default()
 
     async def async_factory_default(self):
+        """Reset to factory default configuration."""
         self.async_create_area(
             {
                 "name": "Alarmo",
@@ -474,6 +479,7 @@ class AlarmoStorage:
 
     @callback
     def async_get_config(self):
+        """Get current config."""
         return attr.asdict(self.config)
 
     @callback

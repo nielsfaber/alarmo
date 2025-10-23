@@ -39,6 +39,7 @@ EVENT_ARM_FAILURE = "arm_failure"
 
 
 def validate_area(trigger, area_id, hass):
+    """Validate area for trigger."""
     if const.ATTR_AREA not in trigger:
         return False
     elif trigger[const.ATTR_AREA]:
@@ -50,6 +51,7 @@ def validate_area(trigger, area_id, hass):
 
 
 def validate_modes(trigger, mode):
+    """Validate modes for trigger."""
     if const.ATTR_MODES not in trigger:
         return False
     elif not trigger[const.ATTR_MODES]:
@@ -59,6 +61,7 @@ def validate_modes(trigger, mode):
 
 
 def validate_trigger(trigger, to_state, from_state=None):
+    """Validate trigger condition."""
     if const.ATTR_EVENT not in trigger:
         return False
     elif trigger[const.ATTR_EVENT] == "untriggered" and from_state == "triggered":
@@ -70,7 +73,10 @@ def validate_trigger(trigger, to_state, from_state=None):
 
 
 class AutomationHandler:
+    """Handle automations."""
+
     def __init__(self, hass: HomeAssistant):
+        """Initialize automation handler."""
         self.hass = hass
         self._config = None
         self._subscriptions = []
@@ -116,7 +122,8 @@ class AutomationHandler:
             )
 
             if new_state in const.ARM_MODES:
-                # we don't distinguish between armed modes for automations, they are handled separately
+                # we don't distinguish between armed modes for automations
+                #   they are handled separately
                 new_state = "armed"
 
             for automation_id, config in self._config.items():
@@ -166,13 +173,14 @@ class AutomationHandler:
         )
 
     def __del__(self):
-        """Prepare for removal"""
+        """Prepare for removal."""
         while len(self._subscriptions):
             self._subscriptions.pop()()
 
     async def async_execute_automation(
         self, automation_id: str, alarm_entity: AlarmoBaseEntity
     ):
+        """Execute the specified automation."""
         # automation is a dict of AutomationEntry
         _LOGGER.debug(
             "Executing automation %s",
@@ -222,6 +230,7 @@ class AutomationHandler:
                 )
 
     def get_automations_by_area(self, area_id: str):
+        """Get automations for specified area."""
         result = []
         for automation_id, config in self._config.items():
             if any(
@@ -294,7 +303,7 @@ class AutomationHandler:
     async def async_get_open_sensor_string(
         self, entity_id: str, state: str, language: str
     ):
-        """Get translation for sensor states"""
+        """Get translation for sensor states."""
         if self._sensorTranslationCache and self._sensorTranslationLang == language:
             translations = self._sensorTranslationCache
         else:
@@ -346,7 +355,7 @@ class AutomationHandler:
         return string
 
     async def async_get_arm_mode_string(self, arm_mode: str, language: str):
-        """Get translation for alarm arm mode"""
+        """Get translation for alarm arm mode."""
         if self._alarmTranslationCache and self._alarmTranslationLang == language:
             translations = self._alarmTranslationCache
         else:

@@ -1,4 +1,4 @@
-import logging
+"""WebSocket handler and registration for Alarmo configuration management."""
 
 import voluptuous as vol
 import homeassistant.util.dt as dt_util
@@ -55,8 +55,6 @@ from .sensors import (
     ATTR_AUTO_BYPASS_MODES,
     ATTR_TRIGGER_UNAVAILABLE,
 )
-
-_LOGGER = logging.getLogger(__name__)
 
 
 @callback
@@ -507,6 +505,7 @@ def websocket_get_ready_to_arm_modes(hass, connection, msg):
 
 
 async def async_register_websockets(hass):
+    """Register websocket handlers."""
     hass.http.register_view(AlarmoConfigView)
     hass.http.register_view(AlarmoSensorView)
     hass.http.register_view(AlarmoUserView)

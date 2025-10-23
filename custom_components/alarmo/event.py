@@ -1,13 +1,9 @@
 """fire events in HA for use with automations."""
 
-import logging
-
 from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
 from . import const
-
-_LOGGER = logging.getLogger(__name__)
 
 
 class EventHandler:

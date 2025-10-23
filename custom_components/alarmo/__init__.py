@@ -149,6 +149,7 @@ class AlarmoCoordinator(DataUpdateCoordinator):
 
     @callback
     def setup_alarm_entities(self):
+        """Set up alarm_control_panel entities based on areas in storage."""
         self.hass.data[const.DOMAIN]["sensor_handler"] = SensorHandler(self.hass)
         self.hass.data[const.DOMAIN]["automation_handler"] = AutomationHandler(
             self.hass
@@ -166,6 +167,7 @@ class AlarmoCoordinator(DataUpdateCoordinator):
             async_dispatcher_send(self.hass, "alarmo_register_master", config["master"])
 
     async def async_update_config(self, data):
+        """Update the main configuration."""
         if "master" in data:
             old_config = self.store.async_get_config()
             if old_config[const.ATTR_MASTER] != data["master"]:
@@ -187,7 +189,12 @@ class AlarmoCoordinator(DataUpdateCoordinator):
         self.store.async_update_config(data)
         async_dispatcher_send(self.hass, "alarmo_config_updated")
 
-    async def async_update_area_config(self, area_id: str = None, data: dict = {}):
+    async def async_update_area_config(
+        self,
+        area_id: str | None = None,
+        data: dict = {},
+    ):
+        """Update area configuration."""
         if const.ATTR_REMOVE in data:
             # delete an area
             res = self.store.async_get_area(area_id)
@@ -238,6 +245,7 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                 )
 
     def async_update_sensor_config(self, entity_id: str, data: dict):
+        """Update sensor configuration."""
         group = None
         if ATTR_GROUP in data:
             group = data[ATTR_GROUP]
@@ -288,7 +296,8 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                 return "User with same name already exists"
         return
 
-    def async_update_user_config(self, user_id: str = None, data: dict = {}):
+    def async_update_user_config(self, user_id: str | None = None, data: dict = {}):
+        """Update user configuration."""
         if const.ATTR_REMOVE in data:
             self.store.async_delete_user(user_id)
             return
@@ -325,7 +334,9 @@ class AlarmoCoordinator(DataUpdateCoordinator):
             self.store.async_update_user(user_id, data)
             return
 
-    def async_authenticate_user(self, code: str, user_id: str = None):
+    def async_authenticate_user(self, code: str, user_id: str | None = None):
+        """Authenticate a user by code."""
+
         def check_user_code(user, code):
             """Returns the supplied user object if the code matches, None otherwise."""
             if not user[const.ATTR_ENABLED]:
@@ -351,8 +362,11 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                     return future.result()
 
     def async_update_automation_config(
-        self, automation_id: str = None, data: dict = {}
+        self,
+        automation_id: str | None = None,
+        data: dict = {},
     ):
+        """Update automation configuration."""
         if const.ATTR_REMOVE in data:
             self.store.async_delete_automation(automation_id)
         elif not automation_id:
@@ -363,6 +377,8 @@ class AlarmoCoordinator(DataUpdateCoordinator):
         async_dispatcher_send(self.hass, "alarmo_automations_updated")
 
     def register_events(self):
+        """Register event handlers."""
+
         # handle push notifications with action buttons
         @callback
         async def async_handle_push_event(event):
@@ -380,7 +396,9 @@ class AlarmoCoordinator(DataUpdateCoordinator):
             if self.hass.data[const.DOMAIN]["master"]:
                 alarm_entity = self.hass.data[const.DOMAIN]["master"]
             elif len(self.hass.data[const.DOMAIN]["areas"]) == 1:
-                alarm_entity = list(self.hass.data[const.DOMAIN]["areas"].values())[0]
+                alarm_entity = next(
+                    iter(self.hass.data[const.DOMAIN]["areas"].values())
+                )
             else:
                 _LOGGER.info(
                     "Cannot process the push action, since there are multiple areas."
@@ -424,6 +442,7 @@ class AlarmoCoordinator(DataUpdateCoordinator):
         )
 
     async def async_remove_entity(self, area_id: str):
+        """Remove an alarm_control_panel entity."""
         entity_registry = er.async_get(self.hass)
         if area_id == "master":
             entity = self.hass.data[const.DOMAIN]["master"]
@@ -435,16 +454,18 @@ class AlarmoCoordinator(DataUpdateCoordinator):
             self.hass.data[const.DOMAIN]["areas"].pop(area_id, None)
 
     def async_get_sensor_groups(self):
-        """Fetch a list of sensor groups (websocket API hook)"""
+        """Fetch a list of sensor groups (websocket API hook)."""
         groups = self.store.async_get_sensor_groups()
         return list(groups.values())
 
     def async_get_group_for_sensor(self, entity_id: str):
+        """Fetch the group ID for a given sensor."""
         groups = self.async_get_sensor_groups()
         result = next((el for el in groups if entity_id in el[ATTR_ENTITIES]), None)
         return result["group_id"] if result else None
 
     def assign_sensor_to_group(self, entity_id: str, group_id: str):
+        """Assign a sensor to a group."""
         updated = False
         old_group = self.async_get_group_for_sensor(entity_id)
         if old_group and group_id != old_group:
@@ -475,7 +496,12 @@ class AlarmoCoordinator(DataUpdateCoordinator):
         if updated:
             async_dispatcher_send(self.hass, "alarmo_sensors_updated")
 
-    def async_update_sensor_group_config(self, group_id: str = None, data: dict = {}):
+    def async_update_sensor_group_config(
+        self,
+        group_id: str | None = None,
+        data: dict = {},
+    ):
+        """Update sensor group configuration."""
         if const.ATTR_REMOVE in data:
             self.store.async_delete_sensor_group(group_id)
         elif not group_id:
@@ -486,7 +512,7 @@ class AlarmoCoordinator(DataUpdateCoordinator):
         async_dispatcher_send(self.hass, "alarmo_sensors_updated")
 
     async def async_unload(self):
-        """Remove all alarmo objects"""
+        """Remove all alarmo objects."""
         # remove alarm_control_panel entities
         areas = list(self.hass.data[const.DOMAIN]["areas"].keys())
         for area in areas:
@@ -504,7 +530,7 @@ class AlarmoCoordinator(DataUpdateCoordinator):
             self._subscriptions.pop()()
 
     async def async_delete_config(self):
-        """Wipe alarmo storage"""
+        """Wipe alarmo storage."""
         await self.store.async_delete()
 
 
@@ -514,7 +540,7 @@ def register_services(hass):
     coordinator = hass.data[const.DOMAIN]["coordinator"]
 
     async def async_srv_toggle_user(call):
-        """Enable a user by service call"""
+        """Enable a user by service call."""
         name = call.data.get(ATTR_NAME)
         enable = True if call.service == const.SERVICE_ENABLE_USER else False
         users = coordinator.store.async_get_users()

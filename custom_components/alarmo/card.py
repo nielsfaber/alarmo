@@ -1,13 +1,9 @@
 """WebSocket handler and registration for Alarmo card update events."""
 
-import logging
-
 import voluptuous as vol
 from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.components.websocket_api import decorators, async_register_command
-
-_LOGGER = logging.getLogger(__name__)
 
 
 @decorators.websocket_command(

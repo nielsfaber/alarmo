@@ -1,12 +1,8 @@
 """Helper functions for Alarmo integration."""
 
-import logging
-
 from homeassistant.core import (
     HomeAssistant,
 )
-
-_LOGGER = logging.getLogger(__name__)
 
 
 def friendly_name_for_entity_id(entity_id: str, hass: HomeAssistant):
