@@ -18,7 +18,7 @@ jobs:
         with:
           category: "integration"
 
-  formatting_and_linting:
+  pytests:
     runs-on: ubuntu-latest
     steps:
       - uses: "actions/checkout@v4"
@@ -28,13 +28,10 @@ jobs:
         with:
           version: latest
 
-      - name: Setup Python Environment
-        run: uv sync
-
       - name: Run Tests
         run: uv run pytest tests
 
-  pytests:
+  formatting_and_linting:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
