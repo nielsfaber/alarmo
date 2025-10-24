@@ -1,7 +1,4 @@
-"""Test alarmo events.
-
-NOTE: ready-to-arm event tests have been moved to test_ready_to_arm_events.py
-"""
+"""Test alarmo events."""
 
 from typing import Any
 
@@ -122,12 +119,14 @@ async def test_failed_to_arm_event_fired_when_sensor_blocks_arming(
             f"Expected area_id '{AREA_ID}', got {event_data.get('area_id')}"
         )
         assert BLOCKING_SENSOR in event_data["sensors"], (
-            f"Expected {BLOCKING_SENSOR} in sensors list, got {event_data.get('sensors')}"
+            f"Expected {BLOCKING_SENSOR} in sensors list, "
+            f"got {event_data.get('sensors')}"
         )
 
         # Additional verification that the sensor is in the event
         assert len(event_data["sensors"]) == EXPECTED_SINGLE_EVENT, (
-            f"Expected {EXPECTED_SINGLE_EVENT} sensor in event, got {len(event_data['sensors'])}"
+            f"Expected {EXPECTED_SINGLE_EVENT} sensor in event, "
+            f"got {len(event_data['sensors'])}"
         )
 
         await cleanup_timers(hass)
@@ -220,7 +219,8 @@ async def test_failed_to_arm_event_with_multiple_blocking_sensors(
         assert event_data["reason"] == "open_sensors"
         assert event_data["area_id"] == AREA_ID
         assert len(event_data["sensors"]) == EXPECTED_DUAL_EVENTS, (
-            f"Expected {EXPECTED_DUAL_EVENTS} sensors in event, got {len(event_data['sensors'])}"
+            f"Expected {EXPECTED_DUAL_EVENTS} sensors in event, "
+            f"got {len(event_data['sensors'])}"
         )
         assert sensor1 in event_data["sensors"], f"Expected {sensor1} in sensors list"
         assert sensor2 in event_data["sensors"], f"Expected {sensor2} in sensors list"
@@ -372,7 +372,8 @@ async def test_backend_arm_event_dispatched_on_arming(
         # Filter for ARM events
         arm_events = [e for e in backend_events if e["event_type"] == const.EVENT_ARM]
         assert len(arm_events) >= EXPECTED_SINGLE_EVENT, (
-            f"Expected at least {EXPECTED_SINGLE_EVENT} ARM event, got {len(arm_events)}"
+            f"Expected at least {EXPECTED_SINGLE_EVENT} ARM event, "
+            f"got {len(arm_events)}"
         )
 
         # Verify the ARM event details
@@ -466,7 +467,8 @@ async def test_backend_disarm_event_dispatched_on_disarming(
             e for e in backend_events if e["event_type"] == const.EVENT_DISARM
         ]
         assert len(disarm_events) >= EXPECTED_SINGLE_EVENT, (
-            f"Expected at least {EXPECTED_SINGLE_EVENT} DISARM event, got {len(disarm_events)}"
+            f"Expected at least {EXPECTED_SINGLE_EVENT} DISARM event, "
+            f"got {len(disarm_events)}"
         )
 
         # Verify the DISARM event details
@@ -557,7 +559,8 @@ async def test_backend_trigger_event_dispatched_on_triggering(
             e for e in backend_events if e["event_type"] == const.EVENT_TRIGGER
         ]
         assert len(trigger_events) >= EXPECTED_SINGLE_EVENT, (
-            f"Expected at least {EXPECTED_SINGLE_EVENT} TRIGGER event, got {len(trigger_events)}"
+            f"Expected at least {EXPECTED_SINGLE_EVENT} TRIGGER event, "
+            f"got {len(trigger_events)}"
         )
 
         # Verify the TRIGGER event details
@@ -591,6 +594,3 @@ async def test_backend_trigger_event_dispatched_on_triggering(
         assert_alarm_state(hass, ALARM_ENTITY, "disarmed")
 
         await cleanup_timers(hass)
-
-
-# Motion sensor test moved to test_ready_to_arm_events.py

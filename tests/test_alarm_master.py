@@ -191,7 +191,10 @@ async def test_alarm_master_propagates_commands(
 async def test_alarm_master_priority_states(
     hass: Any, enable_custom_integrations: Any
 ) -> None:
-    """Test master alarm state priority: triggered > pending > arming > armed > disarmed."""
+    """Test master alarm state priority.
+
+    triggered > pending > arming > armed > disarmed.
+    """
     # Create areas with immediate arming
     area1 = AreaFactory.create_area(
         area_id="area_1",

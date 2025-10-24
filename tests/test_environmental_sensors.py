@@ -1,4 +1,4 @@
-"""Test environmental sensors that should always trigger the alarm regardless of arm state."""
+"""Test environmental sensors that should always trigger the alarm regardless of arm state."""  # noqa E501
 
 from typing import Any
 

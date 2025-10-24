@@ -2,7 +2,7 @@
 
 import copy
 import base64
-from typing import Any
+from typing import Any, ClassVar
 
 import bcrypt
 
@@ -10,7 +10,7 @@ import bcrypt
 class AreaFactory:
     """Factory for creating area test objects."""
 
-    _mode_defaults = {
+    _mode_defaults: ClassVar[dict[str, dict[str, Any]]] = {
         "armed_away": {
             "enabled": True,
             "exit_time": 10,
@@ -30,7 +30,7 @@ class AreaFactory:
             "trigger_time": 110,
         },
     }
-    _area_defaults = {
+    _area_defaults: ClassVar[dict[str, Any]] = {
         "area_id": "area_1",
         "name": "Test Area 1",
         "code_format": "number",
@@ -54,6 +54,7 @@ class AreaFactory:
             area_id: The ID of the area.
             name: The name of the area.
             modes: The alarm modes of the area.
+            kwargs: Additional area or mode-level overrides.
         """
         area = copy.deepcopy(AreaFactory._area_defaults)
         area: dict[str, Any]
@@ -168,7 +169,7 @@ class UserFactory:
 
     @staticmethod
     def create_disarm_only_user(user_id: str = "disarm_only_user") -> dict[str, Any]:
-        """Create a user that can disarm only"""
+        """Create a user that can disarm only."""
         return UserFactory.create_user(
             user_id=user_id, name="Disarm Only User", can_arm=False, can_disarm=True
         )
@@ -178,7 +179,7 @@ class SensorFactory:
     """Factory for creating sensor test objects."""
 
     @staticmethod
-    def create_sensor(
+    def create_sensor(  # noqa: PLR0913
         entity_id: str,
         name: str,
         enabled: bool = True,
@@ -218,7 +219,7 @@ class SensorFactory:
         }
 
     @staticmethod
-    def create_door_sensor(
+    def create_door_sensor(  # noqa: PLR0913
         entity_id: str = "binary_sensor.generic_area_1_door_sensor",
         name: str = "Generic Area 1 Door",
         enabled: bool = True,
@@ -258,7 +259,7 @@ class SensorFactory:
         }
 
     @staticmethod
-    def create_window_sensor(
+    def create_window_sensor(  # noqa: PLR0913
         entity_id: str = "binary_sensor.generic_area_1_window_sensor",
         name: str = "Generic Area 1 Window",
         area: str = "area_1",
@@ -295,7 +296,7 @@ class SensorFactory:
         }
 
     @staticmethod
-    def create_motion_sensor(
+    def create_motion_sensor(  # noqa: PLR0913
         entity_id: str = "binary_sensor.generic_area_1_motion_sensor",
         name: str = "Generic Area 1 Motion",
         area: str = "area_1",
@@ -351,20 +352,20 @@ class SensorFactory:
     def create_all_sensors() -> dict[str, dict[str, Any]]:
         """Create all sensors with optional defaults."""
         return {
-            "binary_sensor.generic_area_1_door_sensor": SensorFactory.create_door_sensor(),
-            "binary_sensor.generic_area_1_window_sensor": SensorFactory.create_window_sensor(),
-            "binary_sensor.generic_area_1_motion_sensor": SensorFactory.create_motion_sensor(),
-            "binary_sensor.generic_area_2_door_sensor": SensorFactory.create_door_sensor(
+            "binary_sensor.generic_area_1_door_sensor": SensorFactory.create_door_sensor(),  # noqa: E501
+            "binary_sensor.generic_area_1_window_sensor": SensorFactory.create_window_sensor(),  # noqa: E501
+            "binary_sensor.generic_area_1_motion_sensor": SensorFactory.create_motion_sensor(),  # noqa: E501
+            "binary_sensor.generic_area_2_door_sensor": SensorFactory.create_door_sensor(  # noqa: E501
                 entity_id="binary_sensor.generic_area_2_door_sensor",
                 name="Generic Area 2 Door",
                 area="area_2",
             ),
-            "binary_sensor.generic_area_2_window_sensor": SensorFactory.create_window_sensor(
+            "binary_sensor.generic_area_2_window_sensor": SensorFactory.create_window_sensor(  # noqa: E501
                 entity_id="binary_sensor.generic_area_2_window_sensor",
                 name="Generic Area 2 Window",
                 area="area_2",
             ),
-            "binary_sensor.generic_area_2_motion_sensor": SensorFactory.create_motion_sensor(
+            "binary_sensor.generic_area_2_motion_sensor": SensorFactory.create_motion_sensor(  # noqa: E501
                 entity_id="binary_sensor.generic_area_2_motion_sensor",
                 name="Generic Area 2 Motion",
                 area="area_2",
@@ -410,6 +411,7 @@ class MockStorage:
     """Mock storage for testing."""
 
     def __init__(self):
+        """Initialize the mock storage with default data."""
         self.areas = [AreaFactory.create_area(), AreaFactory.create_area_2()]
         self.config = ConfigFactory.create_config()
         self.users = {"user_1": UserFactory.create_user()}

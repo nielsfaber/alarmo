@@ -1,4 +1,4 @@
-"""Test that arming proceeds if a sensor with arm_on_close is opened and closed during exit delay."""
+"""Test that arming proceeds if a sensor with arm_on_close is opened and closed during exit delay."""  # noqa E501
 
 from typing import Any
 
@@ -65,7 +65,7 @@ async def test_arm_on_close_behavior(
 
 @pytest.mark.asyncio
 async def test_arm_on_close_timeout(hass: Any, enable_custom_integrations: Any) -> None:
-    """Test that arming fails if a door with arm_on_close=True remains open after the exit delay expires."""
+    """Test that arming fails if a door with arm_on_close=True remains open after the exit delay expires."""  # noqa E501
     alarm_entity = "alarm_control_panel.test_area_1"
     sensor = "binary_sensor.generic_area_1_door_sensor"
     area = AreaFactory.create_area(

@@ -6,7 +6,7 @@ This covers both the ignore_blocking_sensors_after_trigger feature and default b
 - When ignore_blocking_sensors_after_trigger=True: Re-arms to the previous mode regardless of open sensors
 - When ignore_blocking_sensors_after_trigger=False (default): Goes to disarmed state if
   sensors are still open, or re-arms if all sensors are closed
-"""
+"""  # noqa E501
 
 from typing import Any
 
@@ -32,7 +32,7 @@ def expected_lingering_timers():
 async def test_ignore_blocking_sensors_after_trigger_enabled_re_arms_with_open_sensors(
     hass: Any, enable_custom_integrations: Any
 ):
-    """Test that when ignore_blocking_sensors_after_trigger is enabled, the alarm re-arms after trigger timeout even with open sensors."""
+    """Test that when ignore_blocking_sensors_after_trigger is enabledthe alarm re-arms after trigger timeout even with open sensors."""  # noqa E501
     sensor = "binary_sensor.door_sensor"
     alarm_entity = "alarm_control_panel.test_area_1"
 
@@ -189,7 +189,7 @@ async def test_ignore_blocking_sensors_after_trigger_multiple_sensors(
 async def test_default_behavior_disabled_goes_to_disarmed_with_open_sensors(
     hass: Any, enable_custom_integrations: Any
 ):
-    """Test that when ignore_blocking_sensors_after_trigger is disabled (default), the alarm goes to disarmed if sensors are still open after trigger timeout."""
+    """Test that when ignore_blocking_sensors_after_trigger is disabled (default), the alarm goes to disarmed if sensors are still open after trigger timeout."""  # noqa E501
     sensor = "binary_sensor.door_sensor"
     alarm_entity = "alarm_control_panel.test_area_1"
 
@@ -249,8 +249,9 @@ async def test_default_behavior_disabled_goes_to_disarmed_with_open_sensors(
         # Wait for trigger timeout to expire
         await advance_time(hass, trigger_time + 1)
 
-        # With ignore_blocking_sensors_after_trigger=False (default) and sensor still open,
-        # the alarm should go to disarmed state (because re-arming is blocked by open sensor)
+        # With ignore_blocking_sensors_after_trigger=False (default)
+        #   and sensor still open, the alarm should go to disarmed state
+        #   (because re-arming is blocked by open sensor)
         assert_alarm_state(hass, alarm_entity, "disarmed")
 
         await cleanup_timers(hass)
@@ -260,7 +261,7 @@ async def test_default_behavior_disabled_goes_to_disarmed_with_open_sensors(
 async def test_default_behavior_disabled_re_arms_with_closed_sensors(
     hass: Any, enable_custom_integrations: Any
 ):
-    """Test that when ignore_blocking_sensors_after_trigger is disabled (default), the alarm can still re-arm if all sensors are closed after trigger timeout."""
+    """Test that when ignore_blocking_sensors_after_trigger is disabled (default), the alarm can still re-arm if all sensors are closed after trigger timeout."""  # noqa E501
     sensor = "binary_sensor.door_sensor"
     alarm_entity = "alarm_control_panel.test_area_1"
 
@@ -323,8 +324,8 @@ async def test_default_behavior_disabled_re_arms_with_closed_sensors(
         # Wait for trigger timeout to expire
         await advance_time(hass, trigger_time + 1)
 
-        # With ignore_blocking_sensors_after_trigger=False (default) but sensors now closed,
-        # the alarm should be able to re-arm successfully
+        # With ignore_blocking_sensors_after_trigger=False (default)
+        #   but sensors now closed, the alarm should be able to re-arm successfully
         assert_alarm_state(hass, alarm_entity, "armed_away")
 
         await cleanup_timers(hass)

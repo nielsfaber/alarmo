@@ -11,11 +11,14 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from tests.factories import StorageFactory
 
+from .common import async_fire_time_changed
+
 
 def update_sensor_config_in_entry(
     config_entry: ConfigEntry, sensor_entity_id: str, updates: dict[str, Any]
 ):
     """Update a sensor's configuration in config_entry.data.
+
     Assumes config_entry.data is a mutable dictionary.
     """
     if not isinstance(config_entry.data, dict):
@@ -128,7 +131,6 @@ async def advance_time(hass: Any, seconds: int) -> None:
     """Advance Home Assistant time by a given number of seconds and block till done."""
     now = utcnow()
     future = now + datetime.timedelta(seconds=seconds)
-    from .common import async_fire_time_changed
 
     async_fire_time_changed(hass, future)
     await hass.async_block_till_done()

@@ -111,7 +111,8 @@ async def test_single_sensor_in_group_does_not_trigger(
         await hass.async_block_till_done()
         # SENSOR_2 remains "off"
 
-        # After a short delay (less than group timeout), the alarm should still be armed_away
+        # After a short delay (less than group timeout),
+        #   the alarm should still be armed_away
         sensor_group_timeout = sensor_groups[0]["timeout"]
         await advance_time(hass, sensor_group_timeout - 1)  # less than timeout
         assert_alarm_state(hass, ALARM_ENTITY, "armed_away")
@@ -214,7 +215,8 @@ async def test_two_sensors_in_group_trigger_within_timeout_triggers_alarm(
         hass.states.async_set(SENSOR_2, "on")
         await hass.async_block_till_done()
         await advance_time(hass, propagation_time)  # Allow group to react
-        # The alarm should now be triggered as both sensors in the group fired within timeout
+        # The alarm should now be triggered
+        #   as both sensors in the group fired within timeout
         assert_alarm_state(hass, ALARM_ENTITY, "triggered")
 
         # Cleanup
@@ -233,7 +235,7 @@ async def test_two_sensors_in_group_trigger_within_timeout_triggers_alarm(
 async def test_two_sensors_in_group_trigger_outside_timeout_does_not_trigger(
     hass: Any, enable_custom_integrations: Any
 ) -> None:
-    """Test that two sensors in a group triggering outside timeout don't trigger the alarm."""
+    """Test that two sensors in a group triggering outside timeout don't trigger the alarm."""  # noqa E501
     area = AreaFactory.create_area(area_id="area_1", name="Test Area 1")
     sensors = [
         SensorFactory.create_door_sensor(
@@ -296,7 +298,8 @@ async def test_two_sensors_in_group_trigger_outside_timeout_does_not_trigger(
             blocking=True,
         )
         await hass.async_block_till_done()
-        # Advance time past any exit delay from area factory default (10s for armed_away)
+        # Advance time past any exit delay from area factory default
+        #   (10s for armed_away)
         # The area variable here will be the one created in the test setup
         await advance_time(hass, area["modes"]["armed_away"]["exit_time"] + 1)
         assert_alarm_state(hass, ALARM_ENTITY, "armed_away")

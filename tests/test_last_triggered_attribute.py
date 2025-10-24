@@ -1,7 +1,6 @@
 """Test last_triggered attribute feature (#1103)."""
 
 from typing import Any
-from datetime import datetime
 
 import pytest
 
@@ -77,9 +76,6 @@ async def test_last_triggered_attribute_set_on_alarm_trigger(
         # Verify last_triggered is still None before trigger
         state = hass.states.get(alarm_entity)
         assert state.attributes.get("last_triggered") is None
-
-        # Record time before triggering
-        before_trigger = datetime.now()
 
         # Trigger the alarm
         hass.states.async_set(trigger_sensor, "on")
@@ -215,7 +211,7 @@ async def test_last_triggered_attribute_persists_across_states(
 async def test_last_triggered_attribute_updated_on_multiple_triggers(
     hass: Any, enable_custom_integrations: Any
 ) -> None:
-    """Test that last_triggered attribute is properly managed across multiple triggers."""
+    """Test that last_triggered attribute is properly managed across multiple triggers."""  # noqa E501
     alarm_entity = "alarm_control_panel.test_area_1"
     trigger_sensor = "binary_sensor.test_door"
 

@@ -79,11 +79,13 @@ async def test_sensor_open_on_startup_triggers_alarm(
     )
 
     with patch_alarmo_integration_dependencies(storage):
-        # Set sensor to open BEFORE integration starts (simulates sensor opened while HA was down)
+        # Set sensor to open BEFORE integration starts
+        #   (simulates sensor opened while HA was down)
         hass.states.async_set(GENERIC_DOOR_SENSOR, "on")
         await hass.async_block_till_done()
 
-        # Now setup the integration - it should restore armed state and detect the open sensor
+        # Now setup the integration
+        #   it should restore armed state and detect the open sensor
         await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
 
