@@ -18,10 +18,13 @@ PROCESSING_TIME = 1  # Time to allow for event processing
 
 
 @pytest.mark.asyncio
-async def test_sensor_group_uses_triggering_sensor_entry_delay(
+async def test_sensor_group_uses_triggering_sensor_entry_delay(  # noqa: PLR0915
     hass: Any, enable_custom_integrations: Any
 ) -> None:
-    """Test that sensor groups derive entry delay from the final triggering sensor (per maintainer feedback)."""
+    """Test that sensor groups derive entry delay from the final triggering sensor.
+
+    (per maintainer feedback).
+    """
     area = AreaFactory.create_area(
         area_id="area_1",
         name="Test Area 1",
@@ -91,7 +94,8 @@ async def test_sensor_group_uses_triggering_sensor_entry_delay(
         await advance_time(hass, 11)
         assert_alarm_state(hass, ALARM_ENTITY, "armed_away")
 
-        # Test 1: Trigger sensor_15s first, then sensor_45s (45s should be triggering sensor)
+        # Test 1: Trigger sensor_15s first
+        #   then sensor_45s (45s should be triggering sensor)
         hass.states.async_set(sensor_15s["entity_id"], "on")
         await hass.async_block_till_done()
         assert_alarm_state(hass, ALARM_ENTITY, "armed_away")  # Group requires 2 sensors
@@ -140,7 +144,8 @@ async def test_sensor_group_uses_triggering_sensor_entry_delay(
         await advance_time(hass, 11)
         assert_alarm_state(hass, ALARM_ENTITY, "armed_away")
 
-        # Test 2: Trigger sensor_45s first, then sensor_15s (15s should be triggering sensor)
+        # Test 2: Trigger sensor_45s first
+        #   then sensor_15s (15s should be triggering sensor)
         hass.states.async_set(sensor_45s["entity_id"], "on")
         await hass.async_block_till_done()
         assert_alarm_state(hass, ALARM_ENTITY, "armed_away")

@@ -9,6 +9,7 @@ from unittest.mock import patch
 
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.util import dt as dt_util
+from homeassistant.util.async_ import get_scheduled_timer_handles
 
 
 def load_json_object_fixture(filename: str) -> dict[str, object]:
@@ -50,7 +51,6 @@ def _async_fire_time_changed(
     hass: HomeAssistant, utc_datetime: datetime | None, fire_all: bool
 ) -> None:
     timestamp = utc_datetime.timestamp() if utc_datetime else 0.0
-    from homeassistant.util.async_ import get_scheduled_timer_handles
 
     for task in list(get_scheduled_timer_handles(hass.loop)):
         if task.cancelled():
