@@ -1,6 +1,6 @@
 [project]
 name = "alarmo"
-version = "0.1.0"
+version = "1.10.12"
 description = "an alarm system integration for Home Assistant."
 readme = "README.md"
 requires-python = "==3.13.2"
@@ -14,7 +14,51 @@ dev = [
     "pytest>=8.3.5",
     "pytest-asyncio>=0.26.0",
     "pytest-homeassistant-custom-component>=0.13.243",
+    "ruff>=0.14.1",
 ]
 
 [tool.uv]
-required-version = ">=0.9.0"
+required-version = ">=0.8.0"
+
+[tool.ruff]
+line-length = 88         # Matches black
+show-fixes = true
+target-version = "py313"
+
+[tool.ruff.format]
+docstring-code-format = true
+docstring-code-line-length = "dynamic"
+line-ending = "auto"
+
+[tool.ruff.lint]
+ignore = [
+    "D105",    #missing-docstring-in-init
+    "PLR2004", #Magic Values
+    "D203",    #no-blank-line-before-class
+    "D212",    #multi-line-summary-first-line
+]
+select = [
+    "I",   # isort
+    "F",   # plake8-bugbear
+    "E",   # pycoyflakes
+    "W",
+    "D",   # pydocstyle
+    "PL",  # pylint
+    "RUF", # ruff
+    "UP",  # pyupgrade
+]
+[tool.ruff.lint.pylint]
+max-args = 10
+
+[tool.ruff.lint.isort]
+length-sort = true
+section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "first-party",
+    "local-folder",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"

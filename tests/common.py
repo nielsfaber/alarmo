@@ -1,14 +1,15 @@
-"""same as home assistant tests/common.py, a util for testing"""
+"""same as home assistant tests/common.py, a util for testing."""
 
 import json
 import time
-from datetime import datetime, timedelta, timezone
-from pathlib import Path
 from typing import Any
+from pathlib import Path
+from datetime import UTC, datetime, timedelta
 from unittest.mock import patch
 
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.util import dt as dt_util
+from homeassistant.util.async_ import get_scheduled_timer_handles
 
 
 def load_json_object_fixture(filename: str) -> dict[str, object]:
@@ -34,7 +35,7 @@ def async_fire_time_changed(
     for an exact microsecond, use async_fire_time_changed_exact.
     """
     if datetime_ is None:
-        utc_datetime = datetime.now(timezone.utc)
+        utc_datetime = datetime.now(UTC)
     else:
         utc_datetime = dt_util.as_utc(datetime_)
 
@@ -50,7 +51,6 @@ def _async_fire_time_changed(
     hass: HomeAssistant, utc_datetime: datetime | None, fire_all: bool
 ) -> None:
     timestamp = utc_datetime.timestamp() if utc_datetime else 0.0
-    from homeassistant.util.async_ import get_scheduled_timer_handles
 
     for task in list(get_scheduled_timer_handles(hass.loop)):
         if task.cancelled():

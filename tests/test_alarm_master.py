@@ -4,14 +4,14 @@ from typing import Any
 
 import pytest
 
-from tests.factories import AreaFactory, SensorFactory
 from tests.helpers import (
     advance_time,
-    assert_alarm_state,
     cleanup_timers,
-    patch_alarmo_integration_dependencies,
+    assert_alarm_state,
     setup_alarmo_entry,
+    patch_alarmo_integration_dependencies,
 )
+from tests.factories import AreaFactory, SensorFactory
 
 
 @pytest.mark.asyncio
@@ -19,7 +19,6 @@ async def test_alarm_master_state_mirroring(
     hass: Any, enable_custom_integrations: Any
 ) -> None:
     """Test that alarm master mirrors area states according to priority rules."""
-
     area1 = AreaFactory.create_area(
         area_id="area_1",
         name="Test Area 1",
@@ -192,8 +191,10 @@ async def test_alarm_master_propagates_commands(
 async def test_alarm_master_priority_states(
     hass: Any, enable_custom_integrations: Any
 ) -> None:
-    """Test master alarm state priority: triggered > pending > arming > armed > disarmed."""
+    """Test master alarm state priority.
 
+    triggered > pending > arming > armed > disarmed.
+    """
     # Create areas with immediate arming
     area1 = AreaFactory.create_area(
         area_id="area_1",
@@ -287,11 +288,13 @@ async def test_alarm_master_priority_states(
         await hass.async_block_till_done()
 
         # Ensure area1 also triggered (if not already disarmed by cleanup)
-        state_area1_after_cleanup = hass.states.get("alarm_control_panel.test_area_1_priority")
+        state_area1_after_cleanup = hass.states.get(
+            "alarm_control_panel.test_area_1_priority"
+        )
         if state_area1_after_cleanup and state_area1_after_cleanup.state != "disarmed":
-             assert_alarm_state(
-                 hass, "alarm_control_panel.test_area_1_priority", "triggered"
-             )
+            assert_alarm_state(
+                hass, "alarm_control_panel.test_area_1_priority", "triggered"
+            )
 
         # Disarm the master to clean up
         await hass.services.async_call(

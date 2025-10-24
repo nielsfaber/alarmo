@@ -1,3 +1,5 @@
+"""Class to handle MQTT integration."""
+
 import json
 import logging
 
@@ -5,18 +7,18 @@ from homeassistant.core import (
     HomeAssistant,
     callback,
 )
-
+from homeassistant.util import slugify
+from homeassistant.components import mqtt
+from homeassistant.helpers.json import JSONEncoder
 from homeassistant.components.mqtt import (
     DOMAIN as ATTR_MQTT,
+)
+from homeassistant.components.mqtt import (
     CONF_STATE_TOPIC,
     CONF_COMMAND_TOPIC,
 )
-
-import homeassistant.components.mqtt as mqtt
-from homeassistant.helpers.json import JSONEncoder
-
-from homeassistant.util import slugify
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
+
 from . import const
 from .helpers import (
     friendly_name_for_entity_id,
@@ -27,7 +29,10 @@ CONF_EVENT_TOPIC = "event_topic"
 
 
 class MqttHandler:
-    def __init__(self, hass: HomeAssistant):
+    """Class to handle MQTT integration."""
+
+    def __init__(self, hass: HomeAssistant):  # noqa: PLR0915
+        """Class constructor."""
         self.hass = hass
         self._config = None
         self._subscribed_topics = []
@@ -35,9 +40,11 @@ class MqttHandler:
 
         @callback
         def async_update_config(_args=None):
-            """mqtt config updated, reload the configuration."""
+            """Mqtt config updated, reload the configuration."""
             old_config = self._config
-            new_config = self.hass.data[const.DOMAIN]["coordinator"].store.async_get_config()
+            new_config = self.hass.data[const.DOMAIN][
+                "coordinator"
+            ].store.async_get_config()
 
             if old_config and old_config[ATTR_MQTT] == new_config[ATTR_MQTT]:
                 # only update MQTT config if some parameters are changed
@@ -45,7 +52,11 @@ class MqttHandler:
 
             self._config = new_config
 
-            if not old_config or old_config[ATTR_MQTT][CONF_COMMAND_TOPIC] != new_config[ATTR_MQTT][CONF_COMMAND_TOPIC]:
+            if (
+                not old_config
+                or old_config[ATTR_MQTT][CONF_COMMAND_TOPIC]
+                != new_config[ATTR_MQTT][CONF_COMMAND_TOPIC]
+            ):
                 # re-subscribing is only needed if the command topic has changed
                 self.hass.add_job(self._async_subscribe_topics())
 
@@ -58,7 +69,6 @@ class MqttHandler:
 
         @callback
         def async_alarm_state_changed(area_id: str, old_state: str, new_state: str):
-
             if not self._config[ATTR_MQTT][const.ATTR_ENABLED]:
                 return
 
@@ -70,17 +80,19 @@ class MqttHandler:
             if area_id and len(self.hass.data[const.DOMAIN]["areas"]) > 1:
                 # handle the sending of a state update for a specific area
                 area = self.hass.data[const.DOMAIN]["areas"][area_id]
-                topic = topic.rsplit('/', 1)
+                topic = topic.rsplit("/", 1)
                 topic.insert(1, slugify(area.name))
                 topic = "/".join(topic)
 
             payload_config = self._config[ATTR_MQTT][const.ATTR_STATE_PAYLOAD]
-            if new_state in payload_config and payload_config[new_state]:
+            if payload_config.get(new_state):
                 message = payload_config[new_state]
             else:
                 message = new_state
 
-            hass.async_create_task(mqtt.async_publish(self.hass, topic, message, retain=True))
+            hass.async_create_task(
+                mqtt.async_publish(self.hass, topic, message, retain=True)
+            )
             _LOGGER.debug(
                 "Published state '%s' on topic '%s'",
                 message,
@@ -88,12 +100,13 @@ class MqttHandler:
             )
 
         self._subscriptions.append(
-            async_dispatcher_connect(self.hass, "alarmo_state_updated", async_alarm_state_changed)
+            async_dispatcher_connect(
+                self.hass, "alarmo_state_updated", async_alarm_state_changed
+            )
         )
 
         @callback
         def async_handle_event(event: str, area_id: str, args: dict = {}):
-
             if not self._config[ATTR_MQTT][const.ATTR_ENABLED]:
                 return
 
@@ -105,13 +118,13 @@ class MqttHandler:
             if area_id and len(self.hass.data[const.DOMAIN]["areas"]) > 1:
                 # handle the sending of a state update for a specific area
                 area = self.hass.data[const.DOMAIN]["areas"][area_id]
-                topic = topic.rsplit('/', 1)
+                topic = topic.rsplit("/", 1)
                 topic.insert(1, slugify(area.name))
                 topic = "/".join(topic)
 
             if event == const.EVENT_ARM:
                 payload = {
-                    "event": f"{event.upper()}_{args["arm_mode"].split("_", 1).pop(1).upper()}",
+                    "event": f"{event.upper()}_{args['arm_mode'].split('_', 1).pop(1).upper()}",  # noqa: E501
                     "delay": args["delay"],
                 }
             elif event == const.EVENT_TRIGGER:
@@ -124,7 +137,7 @@ class MqttHandler:
                             "name": friendly_name_for_entity_id(entity, self.hass),
                         }
                         for (entity, state) in args["open_sensors"].items()
-                    ]
+                    ],
                 }
             elif event == const.EVENT_FAILED_TO_ARM:
                 payload = {
@@ -135,18 +148,19 @@ class MqttHandler:
                             "name": friendly_name_for_entity_id(entity, self.hass),
                         }
                         for (entity, state) in args["open_sensors"].items()
-                    ]
+                    ],
                 }
             elif event == const.EVENT_COMMAND_NOT_ALLOWED:
                 payload = {
                     "event": event.upper(),
                     "state": args["state"],
-                    "command": args["command"].upper()
+                    "command": args["command"].upper(),
                 }
-            elif event in [const.EVENT_INVALID_CODE_PROVIDED, const.EVENT_NO_CODE_PROVIDED]:
-                payload = {
-                    "event": event.upper()
-                }
+            elif event in [
+                const.EVENT_INVALID_CODE_PROVIDED,
+                const.EVENT_NO_CODE_PROVIDED,
+            ]:
+                payload = {"event": event.upper()}
             else:
                 return
 
@@ -158,15 +172,14 @@ class MqttHandler:
         )
 
     def __del__(self):
-        """prepare for removal"""
+        """Prepare for removal."""
         while len(self._subscribed_topics):
             self._subscribed_topics.pop()()
         while len(self._subscriptions):
             self._subscriptions.pop()()
 
     async def _async_subscribe_topics(self):
-        """install a listener for the command topic."""
-
+        """Install a listener for the command topic."""
         if len(self._subscribed_topics):
             while len(self._subscribed_topics):
                 self._subscribed_topics.pop()()
@@ -176,11 +189,11 @@ class MqttHandler:
             return
 
         self._subscribed_topics.append(
-                await mqtt.async_subscribe(
-                    self.hass,
-                    self._config[ATTR_MQTT][CONF_COMMAND_TOPIC],
-                    self.async_message_received,
-                )
+            await mqtt.async_subscribe(
+                self.hass,
+                self._config[ATTR_MQTT][CONF_COMMAND_TOPIC],
+                self.async_message_received,
+            )
         )
         _LOGGER.debug(
             "Subscribed to topic %s",
@@ -188,8 +201,8 @@ class MqttHandler:
         )
 
     @callback
-    async def async_message_received(self, msg):
-
+    async def async_message_received(self, msg):  # noqa: PLR0915, PLR0912
+        """Handle new MQTT messages."""
         command = None
         code = None
         area = None
@@ -218,13 +231,13 @@ class MqttHandler:
             elif "pincode" in payload:
                 code = payload["pincode"]
 
-            if "area" in payload and payload["area"]:
+            if payload.get("area"):
                 area = payload["area"]
 
-            if ("bypass_open_sensors" in payload and payload["bypass_open_sensors"]) or ("force" in payload and payload["force"]):
+            if (payload.get("bypass_open_sensors")) or (payload.get("force")):
                 bypass_open_sensors = payload["bypass_open_sensors"]
 
-            if const.ATTR_SKIP_DELAY in payload and payload[const.ATTR_SKIP_DELAY]:
+            if payload.get(const.ATTR_SKIP_DELAY):
                 skip_delay = payload[const.ATTR_SKIP_DELAY]
 
         except ValueError:
@@ -243,7 +256,7 @@ class MqttHandler:
 
         command_payloads = {}
         for item in const.COMMANDS:
-            if item in payload_config and payload_config[item]:
+            if payload_config.get(item):
                 command_payloads[item] = payload_config[item].lower()
             else:
                 command_payloads[item] = item.lower()
@@ -253,7 +266,12 @@ class MqttHandler:
             return
 
         if area:
-            res = list(filter(lambda el: slugify(el.name) == area, self.hass.data[const.DOMAIN]["areas"].values()))
+            res = list(
+                filter(
+                    lambda el: slugify(el.name) == area,
+                    self.hass.data[const.DOMAIN]["areas"].values(),
+                )
+            )
             if not res:
                 _LOGGER.warning(
                     "Area %s does not exist",
@@ -261,14 +279,16 @@ class MqttHandler:
                 )
                 return
             entity = res[0]
+        elif (
+            self._config[const.ATTR_MASTER][const.ATTR_ENABLED]
+            and len(self.hass.data[const.DOMAIN]["areas"]) > 1
+        ):
+            entity = self.hass.data[const.DOMAIN]["master"]
+        elif len(self.hass.data[const.DOMAIN]["areas"]) == 1:
+            entity = next(iter(self.hass.data[const.DOMAIN]["areas"].values()))
         else:
-            if self._config[const.ATTR_MASTER][const.ATTR_ENABLED] and len(self.hass.data[const.DOMAIN]["areas"]) > 1:
-                entity = self.hass.data[const.DOMAIN]["master"]
-            elif len(self.hass.data[const.DOMAIN]["areas"]) == 1:
-                entity = list(self.hass.data[const.DOMAIN]["areas"].values())[0]
-            else:
-                _LOGGER.warning("No area specified")
-                return
+            _LOGGER.warning("No area specified")
+            return
 
         _LOGGER.debug(
             "Received command %s",
@@ -278,12 +298,22 @@ class MqttHandler:
         if command == command_payloads[const.COMMAND_DISARM]:
             entity.alarm_disarm(code, skip_code=skip_code)
         elif command == command_payloads[const.COMMAND_ARM_AWAY]:
-            await entity.async_alarm_arm_away(code, skip_code, bypass_open_sensors, skip_delay)
+            await entity.async_alarm_arm_away(
+                code, skip_code, bypass_open_sensors, skip_delay
+            )
         elif command == command_payloads[const.COMMAND_ARM_NIGHT]:
-            await entity.async_alarm_arm_night(code, skip_code, bypass_open_sensors, skip_delay)
+            await entity.async_alarm_arm_night(
+                code, skip_code, bypass_open_sensors, skip_delay
+            )
         elif command == command_payloads[const.COMMAND_ARM_HOME]:
-            await entity.async_alarm_arm_home(code, skip_code, bypass_open_sensors, skip_delay)
+            await entity.async_alarm_arm_home(
+                code, skip_code, bypass_open_sensors, skip_delay
+            )
         elif command == command_payloads[const.COMMAND_ARM_CUSTOM_BYPASS]:
-            await entity.async_alarm_arm_custom_bypass(code, skip_code, bypass_open_sensors, skip_delay)
+            await entity.async_alarm_arm_custom_bypass(
+                code, skip_code, bypass_open_sensors, skip_delay
+            )
         elif command == command_payloads[const.COMMAND_ARM_VACATION]:
-            await entity.async_alarm_arm_vacation(code, skip_code, bypass_open_sensors, skip_delay)
+            await entity.async_alarm_arm_vacation(
+                code, skip_code, bypass_open_sensors, skip_delay
+            )

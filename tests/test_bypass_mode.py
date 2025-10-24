@@ -4,20 +4,20 @@ from typing import Any
 
 import pytest
 
-from tests.factories import AreaFactory, SensorFactory
 from tests.helpers import (
     advance_time,
     assert_alarm_state,
-    patch_alarmo_integration_dependencies,
     setup_alarmo_entry,
+    patch_alarmo_integration_dependencies,
 )
+from tests.factories import AreaFactory, SensorFactory
 
 
 @pytest.mark.asyncio
 async def test_auto_bypass_true_integration(
     hass: Any, enable_custom_integrations: Any
 ) -> None:
-    """Test that a sensor with auto_bypass true and correct mode is bypassed and alarm arms."""
+    """Test that a sensor with auto_bypass true and correct mode is bypassed and alarm arms."""  # noqa E501
     alarm_entity = "alarm_control_panel.test_area_1"
     bypass_sensor = "binary_sensor.generic_area_1_door_sensor"
     block_sensor = "binary_sensor.generic_area_1_motion_sensor"
@@ -99,7 +99,7 @@ async def test_auto_bypass_true_integration(
 async def test_auto_bypass_false_single_sensor(
     hass: Any, enable_custom_integrations: Any
 ) -> None:
-    """Test that a single sensor with auto_bypass false blocks arming if open (area_1 only)."""
+    """Test that a single sensor with auto_bypass false blocks arming if open (area_1 only)."""  # noqa E501
     alarm_entity = "alarm_control_panel.test_area_1"
     bypass_sensor = "binary_sensor.generic_area_1_door_sensor"
     block_sensor = "binary_sensor.generic_area_1_motion_sensor"
@@ -153,10 +153,7 @@ async def test_auto_bypass_false_single_sensor(
 async def test_auto_bypass_false_multiple_areas_exit_delay(
     hass: Any, enable_custom_integrations: Any
 ) -> None:
-    """
-    Test that arming both areas with open, non-bypassable sensors, results
-    in both areas being disarmed after exit delay.
-    """
+    """Test that arming both areas with open, non-bypassable sensors, results in both areas being disarmed after exit delay."""  # noqa E501
     alarm_entity_1 = "alarm_control_panel.test_area_1"
     alarm_entity_2 = "alarm_control_panel.test_area_2"
     bypass_sensor = "binary_sensor.generic_area_1_door_sensor"
@@ -239,10 +236,7 @@ async def test_auto_bypass_false_multiple_areas_exit_delay(
 async def test_auto_bypass_modes_not_matched(
     hass: Any, enable_custom_integrations: Any
 ) -> None:
-    """
-    Test that a sensor with auto_bypass=True but arming in a mode NOT in auto_bypass_modes
-    doesn't get bypassed.
-    """
+    """Test that a sensor with auto_bypass=True but arming in a mode NOT in auto_bypass_modes doesn't get bypassed."""  # noqa E501
     alarm_entity = "alarm_control_panel.test_area_1"
     bypass_sensor = "binary_sensor.generic_area_1_door_sensor"
     area_1 = AreaFactory.create_area(
@@ -291,10 +285,7 @@ async def test_auto_bypass_modes_not_matched(
 async def test_auto_bypass_multiple_modes(
     hass: Any, enable_custom_integrations: Any
 ) -> None:
-    """
-    Test that a sensor with multiple modes in auto_bypass_modes
-     gets bypassed in each specified mode.
-    """
+    """Test that a sensor with multiple modes in auto_bypass_modes gets bypassed in each specified mode."""  # noqa E501
     alarm_entity = "alarm_control_panel.test_area_1"
     bypass_sensor = "binary_sensor.generic_area_1_door_sensor"
     area_1 = AreaFactory.create_area(
@@ -353,9 +344,9 @@ async def test_auto_bypass_empty_modes(
 ) -> None:
     """
     Test for a sensor with auto_bypass=True but empty auto_bypass_modes.
+
     This scenario is restricted in the UI and the sensor config service but
-    it should not fail in unexpected ways
-    Verify the sensor is not bypassed
+    it should not fail in unexpected ways. Verify the sensor is not bypassed.
     """
     alarm_entity = "alarm_control_panel.test_area_1"
     bypass_sensor = "binary_sensor.generic_area_1_door_sensor"
@@ -393,9 +384,9 @@ async def test_auto_bypass_empty_modes(
         exit_time = area["modes"]["armed_away"]["exit_time"]
         await advance_time(hass, exit_time + 1)
         state = hass.states.get(alarm_entity)
-        assert (
-            state.state == "disarmed"
-        ), "System should not arm with an open, non-bypassed sensor"
+        assert state.state == "disarmed", (
+            "System should not arm with an open, non-bypassed sensor"
+        )
         bypassed = state.attributes.get("bypassed_sensors", [])
         msg = "Sensor should not be bypassed with empty auto_bypass_modes"
         assert not bypassed or bypass_sensor not in bypassed, msg

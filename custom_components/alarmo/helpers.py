@@ -1,14 +1,12 @@
-import logging
+"""Helper functions for Alarmo integration."""
 
 from homeassistant.core import (
     HomeAssistant,
 )
 
-_LOGGER = logging.getLogger(__name__)
-
 
 def friendly_name_for_entity_id(entity_id: str, hass: HomeAssistant):
-    """helper to get friendly name for entity"""
+    """Helper to get friendly name for entity."""
     state = hass.states.get(entity_id)
     if state and state.attributes.get("friendly_name"):
         return state.attributes["friendly_name"]
@@ -17,8 +15,5 @@ def friendly_name_for_entity_id(entity_id: str, hass: HomeAssistant):
 
 
 def omit(obj: dict, blacklisted_keys: list):
-    return {
-        key: val
-        for key, val in obj.items()
-        if key not in blacklisted_keys
-    }
+    """Helper to omit blacklisted keys from a dict."""
+    return {key: val for key, val in obj.items() if key not in blacklisted_keys}
