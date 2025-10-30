@@ -1,73 +1,68 @@
-import voluptuous as vol
-import logging
+"""WebSocket handler and registration for Alarmo configuration management."""
 
-from homeassistant.components import websocket_api
+import voluptuous as vol
+import homeassistant.util.dt as dt_util
 from homeassistant.core import callback
-from homeassistant.components.http.data_validator import RequestDataValidator
-from homeassistant.helpers import config_validation as cv
-from homeassistant.components.http import HomeAssistantView
 from homeassistant.const import (
+    ATTR_CODE,
+    ATTR_NAME,
+    ATTR_STATE,
+    ATTR_SERVICE,
     ATTR_ENTITY_ID,
     ATTR_CODE_FORMAT,
-    ATTR_NAME,
-    ATTR_CODE,
-    ATTR_SERVICE,
     CONF_SERVICE_DATA,
-    ATTR_STATE,
 )
-
-from homeassistant.components.alarm_control_panel import (
-    CodeFormat,
-    ATTR_CODE_ARM_REQUIRED,
-    AlarmControlPanelState
-)
-from homeassistant.components.websocket_api import (decorators, async_register_command)
-
-from homeassistant.helpers.dispatcher import (
-    async_dispatcher_connect,
-    async_dispatcher_send,
-)
-
-from . import const
-
+from homeassistant.helpers import config_validation as cv
+from homeassistant.components import websocket_api
+from homeassistant.components.http import HomeAssistantView
 from homeassistant.components.mqtt import (
     DOMAIN as ATTR_MQTT,
+)
+from homeassistant.components.mqtt import (
     CONF_STATE_TOPIC,
     CONF_COMMAND_TOPIC,
 )
+from homeassistant.helpers.dispatcher import (
+    async_dispatcher_send,
+    async_dispatcher_connect,
+)
+from homeassistant.components.websocket_api import decorators, async_register_command
+from homeassistant.components.alarm_control_panel import (
+    ATTR_CODE_ARM_REQUIRED,
+    CodeFormat,
+)
+from homeassistant.components.http.data_validator import RequestDataValidator
 
-import homeassistant.util.dt as dt_util
-
+from . import const
 from .mqtt import (
     CONF_EVENT_TOPIC,
 )
-
 from .sensors import (
+    ATTR_GROUP,
+    ATTR_TIMEOUT,
+    SENSOR_TYPES,
+    ATTR_ENTITIES,
+    ATTR_GROUP_ID,
+    ATTR_ALWAYS_ON,
+    ATTR_ALLOW_OPEN,
+    ATTR_AUTO_BYPASS,
+    ATTR_ENTRY_DELAY,
+    ATTR_EVENT_COUNT,
+    ATTR_ARM_ON_CLOSE,
+    ATTR_NEW_ENTITY_ID,
     ATTR_USE_EXIT_DELAY,
     ATTR_USE_ENTRY_DELAY,
-    ATTR_ALWAYS_ON,
-    ATTR_ARM_ON_CLOSE,
-    ATTR_ALLOW_OPEN,
-    ATTR_TRIGGER_UNAVAILABLE,
-    ATTR_AUTO_BYPASS,
     ATTR_AUTO_BYPASS_MODES,
-    ATTR_GROUP,
-    ATTR_GROUP_ID,
-    ATTR_TIMEOUT,
-    ATTR_EVENT_COUNT,
-    ATTR_ENTITIES,
-    ATTR_NEW_ENTITY_ID,
-    ATTR_ENTRY_DELAY,
-    SENSOR_TYPES,
+    ATTR_TRIGGER_UNAVAILABLE,
 )
-
-_LOGGER = logging.getLogger(__name__)
 
 
 @callback
-@decorators.websocket_command({
-    vol.Required("type"): "alarmo_config_updated",
-})
+@decorators.websocket_command(
+    {
+        vol.Required("type"): "alarmo_config_updated",
+    }
+)
 @decorators.async_response
 async def handle_subscribe_updates(hass, connection, msg):
     """Handle subscribe updates."""
@@ -75,14 +70,15 @@ async def handle_subscribe_updates(hass, connection, msg):
     @callback
     def async_handle_event():
         """Forward events to websocket."""
-        connection.send_message({
-            "id": msg["id"],
-            "type": "event",
-        })
+        connection.send_message(
+            {
+                "id": msg["id"],
+                "type": "event",
+            }
+        )
+
     connection.subscriptions[msg["id"]] = async_dispatcher_connect(
-        hass,
-        "alarmo_update_frontend",
-        async_handle_event
+        hass, "alarmo_update_frontend", async_handle_event
     )
     connection.send_result(msg["id"])
 
@@ -98,44 +94,60 @@ class AlarmoConfigView(HomeAssistantView):
             {
                 vol.Optional(ATTR_CODE_ARM_REQUIRED): cv.boolean,
                 vol.Optional(const.ATTR_CODE_DISARM_REQUIRED): cv.boolean,
-                vol.Optional(const.ATTR_IGNORE_BLOCKING_SENSORS_AFTER_TRIGGER): cv.boolean,
+                vol.Optional(
+                    const.ATTR_IGNORE_BLOCKING_SENSORS_AFTER_TRIGGER
+                ): cv.boolean,
                 vol.Optional(const.ATTR_CODE_MODE_CHANGE_REQUIRED): cv.boolean,
                 vol.Optional(ATTR_CODE_FORMAT): vol.In(
                     [CodeFormat.NUMBER, CodeFormat.TEXT]
                 ),
                 vol.Optional(const.ATTR_TRIGGER_TIME): cv.positive_int,
                 vol.Optional(const.ATTR_DISARM_AFTER_TRIGGER): cv.boolean,
-                vol.Optional(ATTR_MQTT): vol.Schema({
-                    vol.Required(const.ATTR_ENABLED): cv.boolean,
-                    vol.Required(CONF_STATE_TOPIC): cv.string,
-                    vol.Optional(const.ATTR_STATE_PAYLOAD): vol.Schema({
-                        vol.Optional(const.CONF_ALARM_DISARMED): cv.string,
-                        vol.Optional(const.CONF_ALARM_ARMED_HOME): cv.string,
-                        vol.Optional(const.CONF_ALARM_ARMED_AWAY): cv.string,
-                        vol.Optional(const.CONF_ALARM_ARMED_NIGHT): cv.string,
-                        vol.Optional(const.CONF_ALARM_ARMED_CUSTOM_BYPASS): cv.string,
-                        vol.Optional(const.CONF_ALARM_ARMED_VACATION): cv.string,
-                        vol.Optional(const.CONF_ALARM_PENDING): cv.string,
-                        vol.Optional(const.CONF_ALARM_ARMING): cv.string,
-                        #vol.Optional(const.CONF_ALARM_DISARMING): cv.string,
-                        vol.Optional(const.CONF_ALARM_TRIGGERED): cv.string
-                    }),
-                    vol.Required(CONF_COMMAND_TOPIC): cv.string,
-                    vol.Optional(const.ATTR_COMMAND_PAYLOAD): vol.Schema({
-                        vol.Optional(const.COMMAND_ARM_AWAY): cv.string,
-                        vol.Optional(const.COMMAND_ARM_HOME): cv.string,
-                        vol.Optional(const.COMMAND_ARM_NIGHT): cv.string,
-                        vol.Optional(const.COMMAND_ARM_CUSTOM_BYPASS): cv.string,
-                        vol.Optional(const.COMMAND_ARM_VACATION): cv.string,
-                        vol.Optional(const.COMMAND_DISARM): cv.string,
-                    }),
-                    vol.Required(const.ATTR_REQUIRE_CODE): cv.boolean,
-                    vol.Required(CONF_EVENT_TOPIC): cv.string,
-                }),
-                vol.Optional(const.ATTR_MASTER): vol.Schema({
-                    vol.Required(const.ATTR_ENABLED): cv.boolean,
-                    vol.Optional(ATTR_NAME): cv.string,
-                })
+                vol.Optional(ATTR_MQTT): vol.Schema(
+                    {
+                        vol.Required(const.ATTR_ENABLED): cv.boolean,
+                        vol.Required(CONF_STATE_TOPIC): cv.string,
+                        vol.Optional(const.ATTR_STATE_PAYLOAD): vol.Schema(
+                            {
+                                vol.Optional(const.CONF_ALARM_DISARMED): cv.string,
+                                vol.Optional(const.CONF_ALARM_ARMED_HOME): cv.string,
+                                vol.Optional(const.CONF_ALARM_ARMED_AWAY): cv.string,
+                                vol.Optional(const.CONF_ALARM_ARMED_NIGHT): cv.string,
+                                vol.Optional(
+                                    const.CONF_ALARM_ARMED_CUSTOM_BYPASS
+                                ): cv.string,
+                                vol.Optional(
+                                    const.CONF_ALARM_ARMED_VACATION
+                                ): cv.string,
+                                vol.Optional(const.CONF_ALARM_PENDING): cv.string,
+                                vol.Optional(const.CONF_ALARM_ARMING): cv.string,
+                                # vol.Optional(const.CONF_ALARM_DISARMING): cv.string,
+                                vol.Optional(const.CONF_ALARM_TRIGGERED): cv.string,
+                            }
+                        ),
+                        vol.Required(CONF_COMMAND_TOPIC): cv.string,
+                        vol.Optional(const.ATTR_COMMAND_PAYLOAD): vol.Schema(
+                            {
+                                vol.Optional(const.COMMAND_ARM_AWAY): cv.string,
+                                vol.Optional(const.COMMAND_ARM_HOME): cv.string,
+                                vol.Optional(const.COMMAND_ARM_NIGHT): cv.string,
+                                vol.Optional(
+                                    const.COMMAND_ARM_CUSTOM_BYPASS
+                                ): cv.string,
+                                vol.Optional(const.COMMAND_ARM_VACATION): cv.string,
+                                vol.Optional(const.COMMAND_DISARM): cv.string,
+                            }
+                        ),
+                        vol.Required(const.ATTR_REQUIRE_CODE): cv.boolean,
+                        vol.Required(CONF_EVENT_TOPIC): cv.string,
+                    }
+                ),
+                vol.Optional(const.ATTR_MASTER): vol.Schema(
+                    {
+                        vol.Required(const.ATTR_ENABLED): cv.boolean,
+                        vol.Optional(ATTR_NAME): cv.string,
+                    }
+                ),
             }
         )
     )
@@ -154,12 +166,14 @@ class AlarmoAreaView(HomeAssistantView):
     url = "/api/alarmo/area"
     name = "api:alarmo:area"
 
-    mode_schema = vol.Schema({
-        vol.Required(const.ATTR_ENABLED): cv.boolean,
-        vol.Required(const.ATTR_EXIT_TIME): vol.Any(cv.positive_int, None),
-        vol.Required(const.ATTR_ENTRY_TIME): vol.Any(cv.positive_int, None),
-        vol.Optional(const.ATTR_TRIGGER_TIME): vol.Any(cv.positive_int, None),
-    })
+    mode_schema = vol.Schema(
+        {
+            vol.Required(const.ATTR_ENABLED): cv.boolean,
+            vol.Required(const.ATTR_EXIT_TIME): vol.Any(cv.positive_int, None),
+            vol.Required(const.ATTR_ENTRY_TIME): vol.Any(cv.positive_int, None),
+            vol.Optional(const.ATTR_TRIGGER_TIME): vol.Any(cv.positive_int, None),
+        }
+    )
 
     @RequestDataValidator(
         vol.Schema(
@@ -167,13 +181,15 @@ class AlarmoAreaView(HomeAssistantView):
                 vol.Optional("area_id"): cv.string,
                 vol.Optional(ATTR_NAME): cv.string,
                 vol.Optional(const.ATTR_REMOVE): cv.boolean,
-                vol.Optional(const.ATTR_MODES): vol.Schema({
-                    vol.Optional(const.CONF_ALARM_ARMED_AWAY): mode_schema,
-                    vol.Optional(const.CONF_ALARM_ARMED_HOME): mode_schema,
-                    vol.Optional(const.CONF_ALARM_ARMED_NIGHT): mode_schema,
-                    vol.Optional(const.CONF_ALARM_ARMED_CUSTOM_BYPASS): mode_schema,
-                    vol.Optional(const.CONF_ALARM_ARMED_VACATION): mode_schema
-                })
+                vol.Optional(const.ATTR_MODES): vol.Schema(
+                    {
+                        vol.Optional(const.CONF_ALARM_ARMED_AWAY): mode_schema,
+                        vol.Optional(const.CONF_ALARM_ARMED_HOME): mode_schema,
+                        vol.Optional(const.CONF_ALARM_ARMED_NIGHT): mode_schema,
+                        vol.Optional(const.CONF_ALARM_ARMED_CUSTOM_BYPASS): mode_schema,
+                        vol.Optional(const.CONF_ALARM_ARMED_VACATION): mode_schema,
+                    }
+                ),
             }
         )
     )
@@ -204,8 +220,7 @@ class AlarmoSensorView(HomeAssistantView):
                 vol.Optional(const.ATTR_REMOVE): cv.boolean,
                 vol.Optional(const.ATTR_TYPE): vol.In(SENSOR_TYPES),
                 vol.Optional(const.ATTR_MODES): vol.All(
-                    cv.ensure_list,
-                    [vol.In(const.ARM_MODES)]
+                    cv.ensure_list, [vol.In(const.ARM_MODES)]
                 ),
                 vol.Optional(ATTR_USE_EXIT_DELAY): cv.boolean,
                 vol.Optional(ATTR_USE_ENTRY_DELAY): cv.boolean,
@@ -215,17 +230,13 @@ class AlarmoSensorView(HomeAssistantView):
                 vol.Optional(ATTR_TRIGGER_UNAVAILABLE): cv.boolean,
                 vol.Optional(ATTR_AUTO_BYPASS): cv.boolean,
                 vol.Optional(ATTR_AUTO_BYPASS_MODES): vol.All(
-                    cv.ensure_list,
-                    [vol.In(const.ARM_MODES)]
+                    cv.ensure_list, [vol.In(const.ARM_MODES)]
                 ),
                 vol.Optional(const.ATTR_AREA): cv.string,
                 vol.Optional(const.ATTR_ENABLED): cv.boolean,
-                vol.Optional(ATTR_GROUP): vol.Any(
-                    cv.string,
-                    None
-                ),
+                vol.Optional(ATTR_GROUP): vol.Any(cv.string, None),
                 vol.Optional(ATTR_ENTRY_DELAY): vol.Any(cv.positive_int, None),
-                vol.Optional(ATTR_NEW_ENTITY_ID): cv.string
+                vol.Optional(ATTR_NEW_ENTITY_ID): cv.string,
             }
         )
     )
@@ -259,9 +270,8 @@ class AlarmoUserView(HomeAssistantView):
                 vol.Optional(const.ATTR_CAN_DISARM): cv.boolean,
                 vol.Optional(const.ATTR_IS_OVERRIDE_CODE): cv.boolean,
                 vol.Optional(const.ATTR_AREA_LIMIT): vol.All(
-                    cv.ensure_list,
-                    [cv.string]
-                )
+                    cv.ensure_list, [cv.string]
+                ),
             }
         )
     )
@@ -292,37 +302,40 @@ class AlarmoAutomationView(HomeAssistantView):
                 vol.Optional(const.ATTR_TYPE): cv.string,
                 vol.Optional(const.ATTR_TRIGGERS): vol.All(
                     cv.ensure_list,
-                    [vol.Any(
-                        vol.Schema(
-                            {
-                                vol.Required(const.ATTR_EVENT): cv.string,
-                                vol.Optional(const.ATTR_AREA): vol.Any(
-                                    int,
-                                    cv.string,
-                                ),
-                                vol.Optional(const.ATTR_MODES): vol.All(
-                                    cv.ensure_list,
-                                    [vol.In(const.ARM_MODES)]
-                                ),
-                            }
-                        ),
-                        vol.Schema(
-                            {
-                                vol.Required(ATTR_ENTITY_ID): cv.string,
-                                vol.Required(ATTR_STATE): cv.string,
-                            }
+                    [
+                        vol.Any(
+                            vol.Schema(
+                                {
+                                    vol.Required(const.ATTR_EVENT): cv.string,
+                                    vol.Optional(const.ATTR_AREA): vol.Any(
+                                        int,
+                                        cv.string,
+                                    ),
+                                    vol.Optional(const.ATTR_MODES): vol.All(
+                                        cv.ensure_list, [vol.In(const.ARM_MODES)]
+                                    ),
+                                }
+                            ),
+                            vol.Schema(
+                                {
+                                    vol.Required(ATTR_ENTITY_ID): cv.string,
+                                    vol.Required(ATTR_STATE): cv.string,
+                                }
+                            ),
                         )
-                    )]
+                    ],
                 ),
                 vol.Optional(const.ATTR_ACTIONS): vol.All(
                     cv.ensure_list,
-                    [vol.Schema(
-                        {
-                            vol.Optional(ATTR_ENTITY_ID): cv.string,
-                            vol.Required(ATTR_SERVICE): cv.string,
-                            vol.Optional(CONF_SERVICE_DATA): dict,
-                        }
-                    )]
+                    [
+                        vol.Schema(
+                            {
+                                vol.Optional(ATTR_ENTITY_ID): cv.string,
+                                vol.Required(ATTR_SERVICE): cv.string,
+                                vol.Optional(CONF_SERVICE_DATA): dict,
+                            }
+                        )
+                    ],
                 ),
                 vol.Optional(const.ATTR_ENABLED): cv.boolean,
                 vol.Optional(const.ATTR_REMOVE): cv.boolean,
@@ -354,9 +367,7 @@ class AlarmoSensorGroupView(HomeAssistantView):
                 vol.Optional(ATTR_GROUP_ID): cv.string,
                 vol.Optional(ATTR_NAME): cv.string,
                 vol.Optional(ATTR_ENTITIES): vol.All(
-                    cv.ensure_list,
-                    vol.Unique(),
-                    [cv.string]
+                    cv.ensure_list, vol.Unique(), [cv.string]
                 ),
                 vol.Optional(ATTR_TIMEOUT): cv.positive_int,
                 vol.Optional(ATTR_EVENT_COUNT): cv.positive_int,
@@ -424,17 +435,13 @@ def websocket_get_automations(hass, connection, msg):
 def websocket_get_alarm_entities(hass, connection, msg):
     """Publish alarm entity data."""
     result = [
-        {
-            "entity_id": entity.entity_id,
-            "area_id": area_id
-        }
+        {"entity_id": entity.entity_id, "area_id": area_id}
         for (area_id, entity) in hass.data[const.DOMAIN]["areas"].items()
     ]
     if hass.data[const.DOMAIN]["master"]:
-        result.append({
-            "entity_id": hass.data[const.DOMAIN]["master"].entity_id,
-            "area_id": 0
-        })
+        result.append(
+            {"entity_id": hass.data[const.DOMAIN]["master"].entity_id, "area_id": 0}
+        )
     connection.send_result(msg["id"], result)
 
 
@@ -450,13 +457,26 @@ def websocket_get_sensor_groups(hass, connection, msg):
 def websocket_get_countdown(hass, connection, msg):
     """Publish countdown time for alarm entity."""
     entity_id = msg["entity_id"]
-    item = next((entity for entity in hass.data[const.DOMAIN]["areas"].values() if entity.entity_id == entity_id), None)
-    if hass.data[const.DOMAIN]["master"] and not item and hass.data[const.DOMAIN]["master"].entity_id == entity_id:
+    item = next(
+        (
+            entity
+            for entity in hass.data[const.DOMAIN]["areas"].values()
+            if entity.entity_id == entity_id
+        ),
+        None,
+    )
+    if (
+        hass.data[const.DOMAIN]["master"]
+        and not item
+        and hass.data[const.DOMAIN]["master"].entity_id == entity_id
+    ):
         item = hass.data[const.DOMAIN]["master"]
 
     data = {
         "delay": item.delay if item else 0,
-        "remaining": round((item.expiration - dt_util.utcnow()).total_seconds(),2) if item and item.expiration else 0
+        "remaining": round((item.expiration - dt_util.utcnow()).total_seconds(), 2)
+        if item and item.expiration
+        else 0,
     }
     connection.send_result(msg["id"], data)
 
@@ -465,18 +485,27 @@ def websocket_get_countdown(hass, connection, msg):
 def websocket_get_ready_to_arm_modes(hass, connection, msg):
     """Publish ready_to_arm_modes for alarm entity."""
     entity_id = msg["entity_id"]
-    item = next((entity for entity in hass.data[const.DOMAIN]["areas"].values() if entity.entity_id == entity_id), None)
-    if hass.data[const.DOMAIN]["master"] and not item and hass.data[const.DOMAIN]["master"].entity_id == entity_id:
+    item = next(
+        (
+            entity
+            for entity in hass.data[const.DOMAIN]["areas"].values()
+            if entity.entity_id == entity_id
+        ),
+        None,
+    )
+    if (
+        hass.data[const.DOMAIN]["master"]
+        and not item
+        and hass.data[const.DOMAIN]["master"].entity_id == entity_id
+    ):
         item = hass.data[const.DOMAIN]["master"]
 
-    data = {
-        "modes": item._ready_to_arm_modes if item else None
-    }
+    data = {"modes": item._ready_to_arm_modes if item else None}
     connection.send_result(msg["id"], data)
 
 
 async def async_register_websockets(hass):
-
+    """Register websocket handlers."""
     hass.http.register_view(AlarmoConfigView)
     hass.http.register_view(AlarmoSensorView)
     hass.http.register_view(AlarmoUserView)
@@ -484,10 +513,7 @@ async def async_register_websockets(hass):
     hass.http.register_view(AlarmoAreaView)
     hass.http.register_view(AlarmoSensorGroupView)
 
-    async_register_command(
-        hass,
-        handle_subscribe_updates
-    )
+    async_register_command(hass, handle_subscribe_updates)
 
     async_register_command(
         hass,
@@ -552,7 +578,7 @@ async def async_register_websockets(hass):
         websocket_api.BASE_COMMAND_MESSAGE_SCHEMA.extend(
             {
                 vol.Required("type"): "alarmo/countdown",
-                vol.Required("entity_id"): cv.entity_id
+                vol.Required("entity_id"): cv.entity_id,
             }
         ),
     )
@@ -563,8 +589,7 @@ async def async_register_websockets(hass):
         websocket_api.BASE_COMMAND_MESSAGE_SCHEMA.extend(
             {
                 vol.Required("type"): "alarmo/ready_to_arm_modes",
-                vol.Required("entity_id"): cv.entity_id
+                vol.Required("entity_id"): cv.entity_id,
             }
         ),
     )
-

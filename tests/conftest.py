@@ -1,4 +1,4 @@
-"""Configure test framework"""
+"""Configure test framework."""
 
 import sys
 import types
@@ -15,6 +15,7 @@ import custom_components.alarmo  # noqa: F401 # pylint: disable=unused-import # 
 
 @pytest.fixture(autouse=True)
 def patch_dispatcher_send_for_teardown():
+    """Patch dispatcher_send to prevent side effects during teardown."""
     yield
     patch(
         "homeassistant.helpers.dispatcher.dispatcher_send", lambda *a, **kw: None
@@ -23,7 +24,7 @@ def patch_dispatcher_send_for_teardown():
 
 @pytest.fixture(autouse=True, scope="session")
 def patch_frontend_and_panel_custom():
-    """Patch frontend and panel_custom"""
+    """Patch frontend and panel_custom."""
     hass_frontend = types.ModuleType("hass_frontend")
     setattr(hass_frontend, "where", lambda: Path("/tmp"))  # type: ignore[attr-defined]
     sys.modules["hass_frontend"] = hass_frontend

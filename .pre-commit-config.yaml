@@ -1,29 +1,37 @@
 repos:
   # Pre-commit hooks for essential file checks only
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
-    hooks:
+  - hooks:
       - id: check-yaml
         exclude: '\..*_cache/.*|dist/.*|venv/.*'
       - id: check-toml
         exclude: '\..*_cache/.*|dist/.*|venv/.*'
       - id: check-json
         exclude: '\..*_cache/.*|dist/.*|venv/.*'
+    repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
 
   # Check for common security issues
-  - repo: https://github.com/PyCQA/bandit
-    rev: 1.8.6
-    hooks:
+  - hooks:
       - id: bandit
         args: ["-c", "pyproject.toml"]
         additional_dependencies: ["bandit[toml]"]
         exclude: '^tests/.*|^scripts/.*|\..*_cache/.*|dist/.*|venv/.*'
-
-  - repo: local
-    hooks:
+    repo: https://github.com/PyCQA/bandit
+    rev: 1.8.6
+  # Ruff for linting and formatting
+  - hooks:
+    -   id: ruff-check
+    -   id: ruff-format
+    repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.1
+  # Run all tests
+  - hooks:
       - id: run-pytest
         name: Run pytest tests
         entry: uv
         language: python
         args: ["run", "pytest", "--quiet", "--tb=short", "tests/"]
         pass_filenames: false
+    repo: local
+    
+    

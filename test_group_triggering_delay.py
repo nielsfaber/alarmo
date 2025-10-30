@@ -1,25 +1,30 @@
 """Test for group entry delay derivation from triggering sensor."""
+
 from typing import Any
+
 import pytest
 
-from tests.factories import AreaFactory, SensorFactory, SensorGroupFactory
 from tests.helpers import (
     advance_time,
-    assert_alarm_state,
     cleanup_timers,
-    patch_alarmo_integration_dependencies,
+    assert_alarm_state,
     setup_alarmo_entry,
+    patch_alarmo_integration_dependencies,
 )
+from tests.factories import AreaFactory, SensorFactory, SensorGroupFactory
 
 ALARM_ENTITY = "alarm_control_panel.test_area_1"
 PROCESSING_TIME = 1  # Time to allow for event processing
 
 
 @pytest.mark.asyncio
-async def test_sensor_group_uses_triggering_sensor_entry_delay(
+async def test_sensor_group_uses_triggering_sensor_entry_delay(  # noqa: PLR0915
     hass: Any, enable_custom_integrations: Any
 ) -> None:
-    """Test that sensor groups derive entry delay from the final triggering sensor (per maintainer feedback)."""
+    """Test that sensor groups derive entry delay from the final triggering sensor.
+
+    (per maintainer feedback).
+    """
     area = AreaFactory.create_area(
         area_id="area_1",
         name="Test Area 1",
@@ -65,7 +70,9 @@ async def test_sensor_group_uses_triggering_sensor_entry_delay(
     )
 
     # Manually add entry_delay to the motion sensor in storage
-    storage.sensors[sensor_45s["entity_id"]] = storage.sensors[sensor_45s["entity_id"]]._replace(entry_delay=45)
+    storage.sensors[sensor_45s["entity_id"]] = storage.sensors[
+        sensor_45s["entity_id"]
+    ]._replace(entry_delay=45)
 
     with patch_alarmo_integration_dependencies(storage):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -87,13 +94,16 @@ async def test_sensor_group_uses_triggering_sensor_entry_delay(
         await advance_time(hass, 11)
         assert_alarm_state(hass, ALARM_ENTITY, "armed_away")
 
-        # Test 1: Trigger sensor_15s first, then sensor_45s (45s should be triggering sensor)
+        # Test 1: Trigger sensor_15s first
+        #   then sensor_45s (45s should be triggering sensor)
         hass.states.async_set(sensor_15s["entity_id"], "on")
         await hass.async_block_till_done()
         assert_alarm_state(hass, ALARM_ENTITY, "armed_away")  # Group requires 2 sensors
 
         await advance_time(hass, 2)
-        hass.states.async_set(sensor_45s["entity_id"], "on")  # This is the triggering sensor
+        hass.states.async_set(
+            sensor_45s["entity_id"], "on"
+        )  # This is the triggering sensor
         await hass.async_block_till_done()
         await advance_time(hass, PROCESSING_TIME)
 
@@ -110,7 +120,10 @@ async def test_sensor_group_uses_triggering_sensor_entry_delay(
 
         # Reset for test 2
         await hass.services.async_call(
-            "alarmo", "disarm", {"entity_id": ALARM_ENTITY, "code": "1234"}, blocking=True
+            "alarmo",
+            "disarm",
+            {"entity_id": ALARM_ENTITY, "code": "1234"},
+            blocking=True,
         )
         await hass.async_block_till_done()
         await advance_time(hass, 11)  # Let group events expire
@@ -131,13 +144,16 @@ async def test_sensor_group_uses_triggering_sensor_entry_delay(
         await advance_time(hass, 11)
         assert_alarm_state(hass, ALARM_ENTITY, "armed_away")
 
-        # Test 2: Trigger sensor_45s first, then sensor_15s (15s should be triggering sensor)
+        # Test 2: Trigger sensor_45s first
+        #   then sensor_15s (15s should be triggering sensor)
         hass.states.async_set(sensor_45s["entity_id"], "on")
         await hass.async_block_till_done()
         assert_alarm_state(hass, ALARM_ENTITY, "armed_away")
 
         await advance_time(hass, 2)
-        hass.states.async_set(sensor_15s["entity_id"], "on")  # This is the triggering sensor
+        hass.states.async_set(
+            sensor_15s["entity_id"], "on"
+        )  # This is the triggering sensor
         await hass.async_block_till_done()
         await advance_time(hass, PROCESSING_TIME)
 

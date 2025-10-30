@@ -1,15 +1,17 @@
 """Tests for per-sensor entry delay override feature."""
+
 from typing import Any
+
 import pytest
 
-from tests.factories import AreaFactory, SensorFactory, SensorGroupFactory
 from tests.helpers import (
     advance_time,
-    assert_alarm_state,
     cleanup_timers,
-    patch_alarmo_integration_dependencies,
+    assert_alarm_state,
     setup_alarmo_entry,
+    patch_alarmo_integration_dependencies,
 )
+from tests.factories import AreaFactory, SensorFactory, SensorGroupFactory
 
 ALARM_ENTITY = "alarm_control_panel.test_area_1"
 GENERIC_DOOR_SENSOR = "binary_sensor.generic_area_1_door_sensor"
@@ -39,7 +41,7 @@ async def test_sensor_entry_delay_longer_than_area(
         name="Garage Door",
         use_exit_delay=False,
         use_entry_delay=True,
-        entry_delay=60
+        entry_delay=60,
     )
 
     storage, entry = setup_alarmo_entry(
@@ -99,9 +101,7 @@ async def test_sensor_entry_delay_shorter_than_area(
     )
 
     quick_sensor = SensorFactory.create_door_sensor(
-        entity_id="binary_sensor.quick_sensor",
-        name="Quick Sensor",
-        entry_delay=15
+        entity_id="binary_sensor.quick_sensor", name="Quick Sensor", entry_delay=15
     )
 
     storage, entry = setup_alarmo_entry(
@@ -165,7 +165,7 @@ async def test_backward_compatibility_no_override(
         entity_id="binary_sensor.existing_sensor",
         name="Existing Sensor",
         use_exit_delay=False,
-        use_entry_delay=True
+        use_entry_delay=True,
         # No entry_delay specified (None by default)
     )
 
@@ -216,7 +216,7 @@ async def test_backward_compatibility_no_override(
 async def test_sensor_group_with_no_entry_delay_triggers_immediately(
     hass: Any, enable_custom_integrations: Any
 ) -> None:
-    """Test that sensor groups respect individual sensor's use_entry_delay=False setting."""
+    """Test that sensor groups respect individual sensor's use_entry_delay=False setting."""  # noqa E501
     area = AreaFactory.create_area(area_id="area_1", name="Test Area 1")
     sensors = [
         SensorFactory.create_door_sensor(
@@ -247,7 +247,11 @@ async def test_sensor_group_with_no_entry_delay_triggers_immediately(
     ]
 
     storage, entry = setup_alarmo_entry(
-        hass, areas=[area], sensors=sensors, entry_id="test_sensor_group_no_delay", sensor_groups=sensor_groups
+        hass,
+        areas=[area],
+        sensors=sensors,
+        entry_id="test_sensor_group_no_delay",
+        sensor_groups=sensor_groups,
     )
 
     with patch_alarmo_integration_dependencies(storage):
@@ -306,7 +310,7 @@ async def test_sensor_group_with_no_entry_delay_triggers_immediately(
 async def test_sensor_group_mixed_immediate_and_delayed_triggers_immediately(
     hass: Any, enable_custom_integrations: Any
 ) -> None:
-    """If any member is immediate (use_entry_delay=False), group trigger is immediate."""
+    """If any member is immediate (use_entry_delay=False), group trigger is immediate."""  # noqa E501
     area = AreaFactory.create_area(area_id="area_1", name="Test Area 1")
 
     door_immediate = SensorFactory.create_door_sensor(
@@ -382,7 +386,7 @@ async def test_sensor_group_mixed_immediate_and_delayed_triggers_immediately(
 async def test_sensor_group_two_delayed_members_fall_back_to_area_default(
     hass: Any, enable_custom_integrations: Any
 ) -> None:
-    """When no group override and all members use entry delay, fall back to area default (30s)."""
+    """When no group override and all members use entry delay, fall back to area default (30s)."""  # noqa E501
     area = AreaFactory.create_area(
         area_id="area_1",
         name="Test Area 1",
@@ -450,7 +454,8 @@ async def test_sensor_group_two_delayed_members_fall_back_to_area_default(
         hass.states.async_set(motion_45["entity_id"], "on")
         await hass.async_block_till_done()
 
-        # Should go pending with area default (30s) since no immediate member and no group override
+        # Should go pending with area default (30s)
+        #   since no immediate member and no group override
         await advance_time(hass, PROCESSING_TIME)
         assert_alarm_state(hass, ALARM_ENTITY, "pending")
 
@@ -465,7 +470,10 @@ async def test_sensor_group_two_delayed_members_fall_back_to_area_default(
 async def test_sensor_group_ignores_group_override_with_immediate_member(
     hass: Any, enable_custom_integrations: Any
 ) -> None:
-    """New behavior: group-level override is ignored; immediate member causes immediate trigger."""
+    """Group-level override is ignored.
+
+    immediate member causes immediate trigger.
+    """
     area = AreaFactory.create_area(
         area_id="area_1",
         name="Test Area 1",
@@ -542,7 +550,7 @@ async def test_sensor_group_ignores_group_override_with_immediate_member(
 async def test_sensor_group_ignores_group_override_falls_back_to_area_default(
     hass: Any, enable_custom_integrations: Any
 ) -> None:
-    """New behavior: group with only delayed sensors ignores group override, uses area default."""
+    """Group with only delayed sensors ignores group override, uses area default."""
     area = AreaFactory.create_area(
         area_id="area_1",
         name="Test Area 1",
@@ -625,7 +633,10 @@ async def test_sensor_group_ignores_group_override_falls_back_to_area_default(
 async def test_timer_shortening_longer_to_shorter_delay(
     hass: Any, enable_custom_integrations: Any
 ) -> None:
-    """Test timer shortening: longer delay sensor triggers first, then shorter delay sensor shortens timer."""
+    """Test timer shortening: longer delay sensor triggers first.
+
+    then shorter delay sensor shortens timer.
+    """
     area = AreaFactory.create_area(
         area_id="area_1",
         name="Test Area 1",
@@ -777,7 +788,10 @@ async def test_timer_shortening_immediate_sensor_during_pending(
 async def test_timer_no_shortening_longer_delay_during_pending(
     hass: Any, enable_custom_integrations: Any
 ) -> None:
-    """Test longer delay sensor during pending is ignored (no shortening, no immediate trigger)."""
+    """Test longer delay sensor during pending is ignored.
+
+    (no shortening, no immediate trigger).
+    """
     area = AreaFactory.create_area(
         area_id="area_1",
         name="Test Area 1",
@@ -843,7 +857,8 @@ async def test_timer_no_shortening_longer_delay_during_pending(
         # Should remain pending (longer delay is ignored)
         assert_alarm_state(hass, ALARM_ENTITY, "pending")
 
-        # Wait for original timer to complete (15s total - 5s already passed - 1s processing = 9s remaining)
+        # Wait for original timer to complete
+        #   (15s total - 5s already passed - 1s processing = 9s remaining)
         await advance_time(hass, 10)  # Try 10s instead of 9s
 
         # Check if still pending, if so clean up timers to force completion
@@ -861,7 +876,10 @@ async def test_timer_no_shortening_longer_delay_during_pending(
 async def test_three_member_group_event_count_2_paths(
     hass: Any, enable_custom_integrations: Any
 ) -> None:
-    """3-member group (event_count=2): immediate+delayed -> immediate; delayed+delayed -> area default."""
+    """3-member group (event_count=2).
+
+    immediate+delayed -> immediate; delayed+delayed -> area default.
+    """
     area = AreaFactory.create_area(
         area_id="area_1",
         name="Test Area 1",
@@ -895,7 +913,11 @@ async def test_three_member_group_event_count_2_paths(
     group = SensorGroupFactory.create_sensor_group(
         group_id="group_three_1",
         name="Three Group",
-        entities=[s_immediate["entity_id"], s_delayed_a["entity_id"], s_delayed_b["entity_id"]],
+        entities=[
+            s_immediate["entity_id"],
+            s_delayed_a["entity_id"],
+            s_delayed_b["entity_id"],
+        ],
         timeout=10,
         event_count=2,
     )
@@ -994,7 +1016,10 @@ async def test_three_member_group_event_count_2_paths(
 async def test_sensor_group_uses_area_default_entry_delay(
     hass: Any, enable_custom_integrations: Any
 ) -> None:
-    """Test that sensor groups always use area default entry delay (per maintainer feedback)."""
+    """Test that sensor groups always use area default entry delay.
+
+    (per maintainer feedback).
+    """
     area = AreaFactory.create_area(
         area_id="area_1",
         name="Test Area 1",
@@ -1065,7 +1090,9 @@ async def test_sensor_group_uses_area_default_entry_delay(
         assert_alarm_state(hass, ALARM_ENTITY, "armed_away")  # Group requires 2 sensors
 
         await advance_time(hass, 2)
-        hass.states.async_set(sensor_45s["entity_id"], "on")  # Second sensor triggers group
+        hass.states.async_set(
+            sensor_45s["entity_id"], "on"
+        )  # Second sensor triggers group
         await hass.async_block_till_done()
         await advance_time(hass, PROCESSING_TIME)
 
