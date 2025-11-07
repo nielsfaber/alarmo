@@ -845,19 +845,8 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
                 if entry_delay < current_remaining:
                     # TIMER SHORTENING: Clear current timer and restart with shorter delay
                     _LOGGER.debug(f"Timer shortened from {current_remaining:.0f}s to {entry_delay}s")
-                    self.async_clear_timer()
-
-                    @callback
-                    def async_entry_timer_shortened(_now: datetime.datetime) -> None:
-                        """Update state at a scheduled point in time."""
-                        self.async_clear_timer()
-                        _LOGGER.debug("async_entry_timer_shortened")
-                        self.async_trigger(entry_delay=0)
-
-                    self.async_set_timer(entry_delay, async_entry_timer_shortened)
-                    self.delay = entry_delay
-                    # Stay in PENDING state with new shorter timer
-                    return
+                    # setting effective_entry_delay to provided delay, timer will be updated below with async_set_timer
+                    effective_entry_delay = entry_delay
                 else:
                     # Ignore longer delay while pending - don't interfere with existing timer
                     _LOGGER.debug(f"Ignoring longer delay {entry_delay}s while pending (current: {current_remaining:.0f}s remaining)")
