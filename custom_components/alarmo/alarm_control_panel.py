@@ -1004,6 +1004,19 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
             else:
                 # First trigger: use provided delay
                 effective_entry_delay = entry_delay
+        elif self._state == AlarmControlPanelState.PENDING:
+            # entry_delay is None but alarm is already PENDING - check for timer shortening using area default
+            area_default_delay = int(self._config[const.ATTR_MODES][self.arm_mode]["entry_time"] or 0)
+            current_remaining = (self.expiration - dt_util.utcnow()).total_seconds() if self.expiration else 0
+            if area_default_delay < current_remaining:
+                # TIMER SHORTENING: Clear current timer and restart with area default delay
+                _LOGGER.debug(f"Timer shortened from {current_remaining:.0f}s to {area_default_delay}s (area default)")
+                # Stay in PENDING state with new shorter timer, setting effective_entry_delay, the set_timer will be done below
+                effective_entry_delay = area_default_delay
+            else:
+                # Ignore longer delay while pending
+                _LOGGER.debug(f"Ignoring longer area default delay {area_default_delay}s while pending (current: {current_remaining:.0f}s remaining)")
+                return
         else:
             # Fall back to area default (entry_delay is not provided)
             effective_entry_delay = int(
