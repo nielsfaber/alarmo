@@ -965,7 +965,11 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
         """Trigger request. Can be called multiple times for timer shortening or immediate triggers."""  # noqa: E501
         if not self.arm_mode:
             effective_entry_delay = 0
-        elif entry_delay is not None:
+        else:
+            # Resolve entry_delay to actual value (None means use area default)
+            if entry_delay is None:
+                entry_delay = int(self._config[const.ATTR_MODES][self.arm_mode]["entry_time"] or 0)
+            
             if entry_delay == 0:
                 # Immediate trigger (was skip_delay=True)
                 effective_entry_delay = 0
@@ -977,23 +981,10 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
                     else 0
                 )
                 if entry_delay < current_remaining:
-                    # TIMER SHORTENING: Clear timer and restart with shorter delay
-                    _LOGGER.debug(
-                        f"Timer shortened from {current_remaining:.0f}s to {entry_delay}s"  # noqa: E501
-                    )
-                    self.async_clear_timer()
-
-                    @callback
-                    def async_entry_timer_shortened(_now: datetime.datetime) -> None:
-                        """Update state at a scheduled point in time."""
-                        self.async_clear_timer()
-                        _LOGGER.debug("async_entry_timer_shortened")
-                        self.async_trigger(entry_delay=0)
-
-                    self.async_set_timer(entry_delay, async_entry_timer_shortened)
-                    self.delay = entry_delay
-                    # Stay in PENDING state with new shorter timer
-                    return
+                    # TIMER SHORTENING: Clear current timer and restart with shorter delay
+                    _LOGGER.debug(f"Timer shortened from {current_remaining:.0f}s to {entry_delay}s")
+                    # setting effective_entry_delay to provided delay, timer will be updated below with async_set_timer
+                    effective_entry_delay = entry_delay
                 else:
                     # Ignore longer delay while pending
                     #   don't interfere with existing timer
@@ -1004,24 +995,6 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
             else:
                 # First trigger: use provided delay
                 effective_entry_delay = entry_delay
-        elif self._state == AlarmControlPanelState.PENDING:
-            # entry_delay is None but alarm is already PENDING - check for timer shortening using area default
-            area_default_delay = int(self._config[const.ATTR_MODES][self.arm_mode]["entry_time"] or 0)
-            current_remaining = (self.expiration - dt_util.utcnow()).total_seconds() if self.expiration else 0
-            if area_default_delay < current_remaining:
-                # TIMER SHORTENING: Clear current timer and restart with area default delay
-                _LOGGER.debug(f"Timer shortened from {current_remaining:.0f}s to {area_default_delay}s (area default)")
-                # Stay in PENDING state with new shorter timer, setting effective_entry_delay, the set_timer will be done below
-                effective_entry_delay = area_default_delay
-            else:
-                # Ignore longer delay while pending
-                _LOGGER.debug(f"Ignoring longer area default delay {area_default_delay}s while pending (current: {current_remaining:.0f}s remaining)")
-                return
-        else:
-            # Fall back to area default (entry_delay is not provided)
-            effective_entry_delay = int(
-                self._config[const.ATTR_MODES][self.arm_mode]["entry_time"] or 0
-            )
 
         if self.arm_mode:
             trigger_time = int(
