@@ -42,6 +42,9 @@ from . import const
 
 _LOGGER = logging.getLogger(__name__)
 
+# Store per-config-entry unsubscribe callbacks for platform-level dispatcher listeners
+PLATFORM_UNSUBS = "platform_unsubs"
+
 
 async def async_setup(hass, config):
     """Track states and offer events for alarm_control_panel."""
@@ -61,6 +64,13 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
         """Add each entity as Alarm Control Panel."""
         entity_id = f"{PLATFORM}.{slugify(config['name'])}"
 
+        # Guard against duplicate registration (reloads/upgrade timing)
+        if config["area_id"] in hass.data[const.DOMAIN]["areas"]:
+            existing = hass.data[const.DOMAIN]["areas"][config["area_id"]]
+            if existing and getattr(existing, "entity_id", None) == entity_id:
+                _LOGGER.debug("Area %s already registered as %s; skipping duplicate add", config["area_id"], entity_id)
+                return
+
         alarm_entity = AlarmoAreaEntity(
             hass=hass,
             entity_id=entity_id,
@@ -70,12 +80,20 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
         hass.data[const.DOMAIN]["areas"][config["area_id"]] = alarm_entity
         async_add_devices([alarm_entity])
 
-    async_dispatcher_connect(hass, "alarmo_register_entity", async_add_alarm_entity)
+    unsub_area = async_dispatcher_connect(hass, "alarmo_register_entity", async_add_alarm_entity)
 
     @callback
     def async_add_alarm_master(config: dict):
         """Add each entity as Alarm Control Panel."""
-        entity_id = f"{PLATFORM}.{slugify(config['name'])}"
+        entity_id = f"{PLATFORM}.{slugify(config["name"])}"
+
+        # Guard against duplicate master registration
+        if hass.data[const.DOMAIN]["master"] is not None:
+            existing = hass.data[const.DOMAIN]["master"]
+            if existing and getattr(existing, "entity_id", None) == entity_id:
+                _LOGGER.debug("Master already registered as %s; skipping duplicate add", entity_id)
+                return
+
         alarm_entity = AlarmoMasterEntity(
             hass=hass,
             entity_id=entity_id,
@@ -84,7 +102,9 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
         hass.data[const.DOMAIN]["master"] = alarm_entity
         async_add_devices([alarm_entity])
 
-    async_dispatcher_connect(hass, "alarmo_register_master", async_add_alarm_master)
+    unsub_master = async_dispatcher_connect(hass, "alarmo_register_master", async_add_alarm_master)
+    # Track unsubs per config entry for proper cleanup on unload
+    hass.data.setdefault(const.DOMAIN, {}).setdefault(PLATFORM_UNSUBS, {})[config_entry.entry_id] = [unsub_area, unsub_master]
     async_dispatcher_send(hass, "alarmo_platform_loaded")
 
     # Register services
@@ -104,6 +124,17 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
         const.SERVICE_SKIP_DELAY_SCHEMA,
         "async_service_skip_delay_handler",
     )
+
+
+async def async_unload_entry(hass, config_entry):
+    """Unload the Alarmo alarm_control_panel platform for a config entry."""
+    unsubs = hass.data.get(const.DOMAIN, {}).get(PLATFORM_UNSUBS, {}).pop(config_entry.entry_id, [])
+    for unsub in unsubs:
+        try:
+            unsub()
+        except Exception:  # defensive: ensure unload proceeds
+            _LOGGER.debug("Error while unsubscribing platform listener", exc_info=True)
+    return True
 
 
 class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
