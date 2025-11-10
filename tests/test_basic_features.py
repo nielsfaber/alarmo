@@ -1,20 +1,20 @@
-"""test_basic_features.py
+"""test_basic_features.py.
 
 General feature tests for Alarmo (arming, disarming, state transitions, event firing).
 """
 
-from typing import Any, Dict, cast
+from typing import Any, cast
 
 import pytest
 
-from tests.factories import AreaFactory, SensorFactory
 from tests.helpers import (
     advance_time,
-    assert_alarm_state,
     cleanup_timers,
-    patch_alarmo_integration_dependencies,
+    assert_alarm_state,
     setup_alarmo_entry,
+    patch_alarmo_integration_dependencies,
 )
+from tests.factories import AreaFactory, SensorFactory
 
 ALARM_ENTITY = "alarm_control_panel.test_area_1"
 MASTER_ENTITY = "alarm_control_panel.master"
@@ -35,7 +35,7 @@ def get_generic_sensor():
 async def test_arm_immediate_arms_right_away_with_allow_open(
     hass: Any, enable_custom_integrations: Any
 ):
-    """Test that alarm arms immediately if area exit_time=0"""
+    """Test that alarm arms immediately if area exit_time=0."""
     sensor = "binary_sensor.generic_area_1_door_sensor"
     alarm_entity = "alarm_control_panel.test_area_1"
     armed_away_exit_time = 0
@@ -63,7 +63,9 @@ async def test_arm_immediate_arms_right_away_with_allow_open(
             blocking=True,
         )
         await hass.async_block_till_done()
-        await advance_time(hass, armed_away_exit_time + 1) # Use variable, +1 for clarity even if 0
+        await advance_time(
+            hass, armed_away_exit_time + 1
+        )  # Use variable, +1 for clarity even if 0
         state = hass.states.get(alarm_entity)
         assert state.state == "armed_away"
         await cleanup_timers(hass)
@@ -71,8 +73,7 @@ async def test_arm_immediate_arms_right_away_with_allow_open(
 
 @pytest.mark.asyncio
 async def test_arm_away_from_disarmed(hass: Any, enable_custom_integrations: Any):
-    """Test arm away from disarmed"""
-
+    """Test arm away from disarmed."""
     sensor = get_generic_sensor()
     # Using default AreaFactory armed_away_exit_time = 10
     default_armed_away_exit_time = 10
@@ -101,19 +102,22 @@ async def test_arm_away_from_disarmed(hass: Any, enable_custom_integrations: Any
 
 
 def get_area_mode_time(area_id: str, mode: str, key: str) -> int:
-    """Get the time value for a given area, mode, and key (exit_time, entry_time, trigger_time)."""
-    if area_id == "area_1":
+    """Get the time value for a given area, mode, and key.
 
+    (exit_time, entry_time, trigger_time).
+    """
+    if area_id == "area_1":
         area_config = AreaFactory.create_area()
     elif area_id == "area_2":
         area_config = AreaFactory.create_area_2()
     else:
         raise ValueError(f"Unknown area_id: {area_id}")
 
-    modes = cast(Dict[str, Dict[str, Any]], area_config["modes"])
+    modes = cast(dict[str, dict[str, Any]], area_config["modes"])
     if mode not in modes:
-        # Fallback to default mode if specific mode config not found (e.g. always_on uses armed_away trigger)
-        if key == "trigger_time" and "armed_away" in modes :
+        # Fallback to default mode if specific mode config not found
+        #   (e.g. always_on uses armed_away trigger)
+        if key == "trigger_time" and "armed_away" in modes:
             time_value = modes["armed_away"].get(key)
         else:
             raise ValueError(f"Unknown mode: {mode} for area {area_id}")
@@ -128,7 +132,7 @@ def get_area_mode_time(area_id: str, mode: str, key: str) -> int:
 
 @pytest.mark.asyncio
 async def test_disarm_from_armed_away(hass: Any, enable_custom_integrations: Any):
-    """Test disarm from armed away"""
+    """Test disarm from armed away."""
     sensor = get_generic_sensor()
     # Using default AreaFactory armed_away_exit_time = 10
     default_armed_away_exit_time = 10
@@ -161,13 +165,15 @@ async def test_disarm_from_armed_away(hass: Any, enable_custom_integrations: Any
         {"entity_id": "alarm_control_panel.test_area_1", "code": "1234"},
         blocking=True,
     )
-    await advance_time(hass, default_armed_away_exit_time + 1) # Allow time for disarm to propagate if needed
+    await advance_time(
+        hass, default_armed_away_exit_time + 1
+    )  # Allow time for disarm to propagate if needed
     assert_alarm_state(hass, "alarm_control_panel.test_area_1", "disarmed")
 
 
 @pytest.mark.asyncio
 async def test_arm_home_from_disarmed(hass: Any, enable_custom_integrations: Any):
-    """Test arm home from disarmed with immediate arming (no exit delay)"""
+    """Test arm home from disarmed with immediate arming (no exit delay)."""
     sensor = get_generic_sensor()
     armed_home_exit_time = 0
     area = AreaFactory.create_area(
@@ -207,7 +213,7 @@ async def test_arm_home_from_disarmed(hass: Any, enable_custom_integrations: Any
 
 @pytest.mark.asyncio
 async def test_arm_with_invalid_code(hass: Any, enable_custom_integrations: Any):
-    """Test arm with invalid code"""
+    """Test arm with invalid code."""
     sensor = get_generic_sensor()
     # Using default AreaFactory, no specific times needed for this test logic
     area = AreaFactory.create_area(area_id="area_1")
@@ -275,7 +281,7 @@ async def test_armed_away_entry_delay_and_trigger(
         hass.states.async_set(sensor, "on")
         await hass.async_block_till_done()
         state = hass.states.get(ALARM_ENTITY)
-        if state.state != "pending": 
+        if state.state != "pending":
             await hass.async_block_till_done()
             state = hass.states.get(ALARM_ENTITY)
         assert state.state == "pending"
@@ -290,7 +296,7 @@ async def test_armed_away_entry_delay_and_trigger(
 async def test_arm_with_exit_delay_and_allow_open(
     hass: Any, enable_custom_integrations: Any
 ):
-    """Test arming with a sensor that has use_exit_delay=True and allow_open=True"""
+    """Test arming with a sensor that has use_exit_delay=True and allow_open=True."""
     sensor = get_generic_sensor()
     armed_away_exit_time = 20
 
@@ -354,14 +360,14 @@ async def test_sensor_always_on_triggers_when_disarmed(
 
         hass.states.async_set(sensor, "on")
         await hass.async_block_till_done()
-        await advance_time(hass, 1) # Time for state to propagate
+        await advance_time(hass, 1)  # Time for state to propagate
         assert_alarm_state(hass, ALARM_ENTITY, "triggered")
         await cleanup_timers(hass)
 
 
 @pytest.mark.asyncio
 async def test_arm_away_with_exit_delay(hass: Any, enable_custom_integrations: Any):
-    """Test arm away with exit delay"""
+    """Test arm away with exit delay."""
     sensor = get_generic_sensor()
     armed_away_exit_time = 30
 
@@ -402,7 +408,7 @@ async def test_arm_away_with_exit_delay(hass: Any, enable_custom_integrations: A
 async def test_arm_blocked_with_triggered_sensor_and_no_allow_open(
     hass: Any, enable_custom_integrations: Any
 ):
-    """Test arm blocked with triggered sensor and no allow open"""
+    """Test arm blocked with triggered sensor and no allow open."""
     sensor = get_generic_sensor()
     armed_away_exit_time = 30
 
@@ -441,7 +447,7 @@ async def test_arm_blocked_with_triggered_sensor_and_no_allow_open(
 @pytest.mark.asyncio
 @pytest.mark.usefixtures("expected_lingering_timers")
 async def test_sensor_trigger_unavailable(hass: Any, enable_custom_integrations: Any):
-    """Test that a sensor with trigger_unavailable, True triggers the alarm when unavailable."""
+    """Test that a sensor with trigger_unavailable, True triggers the alarm when unavailable."""  # noqa E501
     sensor = get_generic_sensor()
     armed_away_exit_time = 0
 
@@ -481,6 +487,6 @@ async def test_sensor_trigger_unavailable(hass: Any, enable_custom_integrations:
 
         hass.states.async_set(sensor, "unavailable")
         await hass.async_block_till_done()
-        await advance_time(hass, 1) # Time for state to propagate
+        await advance_time(hass, 1)  # Time for state to propagate
         assert_alarm_state(hass, ALARM_ENTITY, "triggered")
         await cleanup_timers(hass)

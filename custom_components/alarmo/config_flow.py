@@ -1,11 +1,12 @@
 """Config flow for the Alarmo component."""
+
 import secrets
 
 from homeassistant import config_entries
 
 from .const import (
-    DOMAIN,
     NAME,
+    DOMAIN,
 )
 
 
@@ -17,7 +18,6 @@ class AlarmoConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_user(self, user_input=None):
         """Handle a flow initialized by the user."""
-
         # Only a single instance of the integration
         if self._async_current_entries():
             return self.async_abort(reason="single_instance_allowed")

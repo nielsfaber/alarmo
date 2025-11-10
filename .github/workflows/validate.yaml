@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  validate:
-    runs-on: "ubuntu-latest"
+  hacs_validation:
+    runs-on: ubuntu-latest
     steps:
       - uses: "actions/checkout@v4"
 
@@ -18,13 +18,21 @@ jobs:
         with:
           category: "integration"
 
+  pytests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: "actions/checkout@v4"
+
       - name: Install uv
         uses: astral-sh/setup-uv@v6
         with:
           version: latest
 
-      - name: Setup Python Environment
-        run: uv sync
-
       - name: Run Tests
         run: uv run pytest tests
+
+  formatting_and_linting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/ruff-action@v3

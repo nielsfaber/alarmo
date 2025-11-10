@@ -4,12 +4,12 @@ from typing import Any
 
 import pytest
 
-from tests.factories import AreaFactory, SensorFactory, UserFactory
 from tests.helpers import (
     advance_time,
-    patch_alarmo_integration_dependencies,
     setup_alarmo_entry,
+    patch_alarmo_integration_dependencies,
 )
+from tests.factories import AreaFactory, UserFactory, SensorFactory
 
 ALARM_ENTITY = "alarm_control_panel.test_area_1"
 DOOR_SENSOR = "binary_sensor.door_sensor"
@@ -20,7 +20,7 @@ MOTION_SENSOR = "binary_sensor.motion_sensor"
 async def test_arm_with_authorized_user(
     hass: Any, enable_custom_integrations: Any
 ) -> None:
-    """Test arm with authorized user"""
+    """Test arm with authorized user."""
     users = {
         "admin_user": UserFactory.create_user(
             user_id="admin_user",
@@ -101,7 +101,7 @@ async def test_arm_with_authorized_user(
 async def test_disarm_with_unauthorized_user(
     hass: Any, enable_custom_integrations: Any
 ) -> None:
-    """Test disarm with unauthorized user"""
+    """Test disarm with unauthorized user."""
     users = {
         "admin_user": UserFactory.create_user(
             user_id="admin_user",
@@ -188,7 +188,7 @@ async def test_disarm_with_unauthorized_user(
 
 @pytest.mark.asyncio
 async def test_area_limited_user(hass: Any, enable_custom_integrations: Any) -> None:
-    """Test area limited user"""
+    """Test area limited user."""
     users = {
         "admin_user": UserFactory.create_user(
             user_id="admin_user",
@@ -284,7 +284,7 @@ async def test_area_limited_user(hass: Any, enable_custom_integrations: Any) -> 
 
 @pytest.mark.asyncio
 async def test_disabled_user(hass: Any, enable_custom_integrations: Any) -> None:
-    """Test disabled user"""
+    """Test disabled user."""
     users = {
         "admin_user": UserFactory.create_user(
             user_id="admin_user",
@@ -360,7 +360,7 @@ async def test_disabled_user(hass: Any, enable_custom_integrations: Any) -> None
 
 @pytest.mark.asyncio
 async def test_text_code_format(hass: Any, enable_custom_integrations: Any) -> None:
-    """Test text code format"""
+    """Test text code format."""
     users = {
         "admin_user": UserFactory.create_user(
             user_id="admin_user",
