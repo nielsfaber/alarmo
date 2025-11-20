@@ -68,7 +68,11 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
         if config["area_id"] in hass.data[const.DOMAIN]["areas"]:
             existing = hass.data[const.DOMAIN]["areas"][config["area_id"]]
             if existing and getattr(existing, "entity_id", None) == entity_id:
-                _LOGGER.debug("Area %s already registered as %s; skipping duplicate add", config["area_id"], entity_id)
+                _LOGGER.debug(
+                    "Area %s already registered as %s; skipping duplicate add",
+                    config["area_id"],
+                    entity_id,
+                )
                 return
 
         alarm_entity = AlarmoAreaEntity(
@@ -80,18 +84,22 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
         hass.data[const.DOMAIN]["areas"][config["area_id"]] = alarm_entity
         async_add_devices([alarm_entity])
 
-    unsub_area = async_dispatcher_connect(hass, "alarmo_register_entity", async_add_alarm_entity)
+    unsub_area = async_dispatcher_connect(
+        hass, "alarmo_register_entity", async_add_alarm_entity
+    )
 
     @callback
     def async_add_alarm_master(config: dict):
         """Add each entity as Alarm Control Panel."""
-        entity_id = f"{PLATFORM}.{slugify(config["name"])}"
+        entity_id = f"{PLATFORM}.{slugify(config['name'])}"
 
         # Guard against duplicate master registration
         if hass.data[const.DOMAIN]["master"] is not None:
             existing = hass.data[const.DOMAIN]["master"]
             if existing and getattr(existing, "entity_id", None) == entity_id:
-                _LOGGER.debug("Master already registered as %s; skipping duplicate add", entity_id)
+                _LOGGER.debug(
+                    "Master already registered as %s; skipping duplicate add", entity_id
+                )
                 return
 
         alarm_entity = AlarmoMasterEntity(
@@ -102,9 +110,13 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
         hass.data[const.DOMAIN]["master"] = alarm_entity
         async_add_devices([alarm_entity])
 
-    unsub_master = async_dispatcher_connect(hass, "alarmo_register_master", async_add_alarm_master)
+    unsub_master = async_dispatcher_connect(
+        hass, "alarmo_register_master", async_add_alarm_master
+    )
     # Track unsubs per config entry for proper cleanup on unload
-    hass.data.setdefault(const.DOMAIN, {}).setdefault(PLATFORM_UNSUBS, {})[config_entry.entry_id] = [unsub_area, unsub_master]
+    hass.data.setdefault(const.DOMAIN, {}).setdefault(PLATFORM_UNSUBS, {})[
+        config_entry.entry_id
+    ] = [unsub_area, unsub_master]
     async_dispatcher_send(hass, "alarmo_platform_loaded")
 
     # Register services
@@ -128,7 +140,11 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 
 async def async_unload_entry(hass, config_entry):
     """Unload the Alarmo alarm_control_panel platform for a config entry."""
-    unsubs = hass.data.get(const.DOMAIN, {}).get(PLATFORM_UNSUBS, {}).pop(config_entry.entry_id, [])
+    unsubs = (
+        hass.data.get(const.DOMAIN, {})
+        .get(PLATFORM_UNSUBS, {})
+        .pop(config_entry.entry_id, [])
+    )
     for unsub in unsubs:
         try:
             unsub()
@@ -968,8 +984,10 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
         else:
             # Resolve entry_delay to actual value (None means use area default)
             if entry_delay is None:
-                entry_delay = int(self._config[const.ATTR_MODES][self.arm_mode]["entry_time"] or 0)
-            
+                entry_delay = int(
+                    self._config[const.ATTR_MODES][self.arm_mode]["entry_time"] or 0
+                )
+
             if entry_delay == 0:
                 # Immediate trigger (was skip_delay=True)
                 effective_entry_delay = 0
@@ -981,9 +999,12 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
                     else 0
                 )
                 if entry_delay < current_remaining:
-                    # TIMER SHORTENING: Clear current timer and restart with shorter delay
-                    _LOGGER.debug(f"Timer shortened from {current_remaining:.0f}s to {entry_delay}s")
-                    # setting effective_entry_delay to provided delay, timer will be updated below with async_set_timer
+                    # TIMER SHORTENING: Clear current timer, restart with shorter delay
+                    _LOGGER.debug(
+                        f"Timer shortened {current_remaining:.0f}s -> {entry_delay}s"
+                    )
+                    # setting effective_entry_delay to provided delay
+                    # timer will be updated below with async_set_timer
                     effective_entry_delay = entry_delay
                 else:
                     # Ignore longer delay while pending
