@@ -20,7 +20,6 @@ export enum AlarmStates {
   STATE_ALARM_ARMED_VACATION = 'armed_vacation',
   STATE_ALARM_PENDING = 'pending',
   STATE_ALARM_ARMING = 'arming',
-  STATE_ALARM_DISARMING = 'disarming',
   STATE_ALARM_TRIGGERED = 'triggered',
 }
 

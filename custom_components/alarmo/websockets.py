@@ -121,7 +121,6 @@ class AlarmoConfigView(HomeAssistantView):
                                 ): cv.string,
                                 vol.Optional(const.CONF_ALARM_PENDING): cv.string,
                                 vol.Optional(const.CONF_ALARM_ARMING): cv.string,
-                                # vol.Optional(const.CONF_ALARM_DISARMING): cv.string,
                                 vol.Optional(const.CONF_ALARM_TRIGGERED): cv.string,
                             }
                         ),
