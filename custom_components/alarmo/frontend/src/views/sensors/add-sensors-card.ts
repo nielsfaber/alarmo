@@ -153,7 +153,7 @@ export class AddSensorsCard extends SubscribeMixin(LitElement) {
       .map(e => defaultSensorConfig(this.hass!.states[e], modeList))
       .map(e =>
         Object.keys(this.areas).length == 1
-          ? Object.assign(e, {
+          ? Object.assign(e as any, {
             area: Object.keys(this.areas)[0],
           })
           : e
