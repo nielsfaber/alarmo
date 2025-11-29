@@ -13,7 +13,7 @@ import {
 import { property, customElement, state, query } from 'lit/decorators.js';
 import { mdiClose, mdiMenuUp, mdiMenuDown } from '@mdi/js';
 import { IsEqual, isDefined } from '../helpers';
-import { directive, Directive, DirectiveResult, PartInfo, PartType } from 'lit-html/directive';
+import { directive, Directive, DirectiveResult, PartInfo, PartType } from 'lit/directive.js';
 import { fireEvent } from '../fire_event';
 
 export type Option = {
@@ -198,9 +198,9 @@ export class AlarmoSelect extends LitElement {
           if (
             mutation.type === 'attributes' &&
             mutation.attributeName === 'inert' &&
-            overlay.inert === true
+            (overlay as any).inert === true
           ) {
-            overlay.inert = false;
+            (overlay as any).inert = false;
             this._overlayMutationObserver?.disconnect();
             this._overlayMutationObserver = undefined;
           } else if (mutation.type === 'childList') {

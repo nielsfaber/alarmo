@@ -1,5 +1,5 @@
 import { css, html, LitElement, PropertyValues } from 'lit';
-import { customElement, property } from 'lit/decorators';
+import { customElement, property } from 'lit/decorators.js';
 
 @customElement('alarmo-collapsible-group')
 class AlarmoCollabsibleGroup extends LitElement {
@@ -29,7 +29,7 @@ class AlarmoCollabsibleGroup extends LitElement {
 
     let active = this.querySelectorAll('alarmo-collapsible-header[active]');
 
-    active.forEach(function(i) {
+    active.forEach(function (i) {
       if (i !== el) i.removeAttribute('active');
     });
   }

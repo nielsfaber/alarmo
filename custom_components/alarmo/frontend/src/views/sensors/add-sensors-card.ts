@@ -1,6 +1,6 @@
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
 import { html, LitElement } from 'lit';
-import { customElement, property } from 'lit/decorators';
+import { customElement, property } from 'lit/decorators.js';
 import { localize } from '../../../localize/localize';
 import { TableColumn, TableData, TableFilterConfig } from '../../components/alarmo-table';
 import { defaultSensorConfig, getConfigurableSensors, sensorClassToType } from '../../data/sensors';
