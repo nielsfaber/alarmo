@@ -12,9 +12,21 @@ import {
 } from 'lit';
 import { property, customElement, state, query } from 'lit/decorators.js';
 import { mdiClose, mdiMenuUp, mdiMenuDown } from '@mdi/js';
-import { IsEqual, isDefined } from '../helpers';
+import { isDefined } from '../helpers';
 import { directive, Directive, DirectiveResult, PartInfo, PartType } from 'lit/directive.js';
 import { fireEvent } from '../fire_event';
+
+let _vaadinComboBoxReady: Promise<void> | undefined;
+const ensureVaadinComboBox = (): Promise<void> => {
+  if (!_vaadinComboBoxReady) {
+    _vaadinComboBoxReady = (async () => {
+      if (!customElements.get('vaadin-combo-box-light')) {
+        await import('@vaadin/combo-box/vaadin-combo-box-light.js');
+      }
+    })();
+  }
+  return _vaadinComboBoxReady;
+};
 
 export type Option = {
   name: string;
@@ -38,7 +50,19 @@ export class AlarmoMultiSelect extends LitElement {
   @property({ type: Boolean })
   invalid = false;
 
+  @state() private _vaadinReady = Boolean(customElements.get('vaadin-combo-box-light'));
+
   @query('vaadin-combo-box-light', true) private _comboBox!: HTMLElement;
+
+  public connectedCallback() {
+    super.connectedCallback();
+    if (!this._vaadinReady) {
+      ensureVaadinComboBox().then(() => {
+        this._vaadinReady = true;
+      });
+    }
+  }
+
   public open() {
     this.updateComplete.then(() => {
       (this.shadowRoot?.querySelector('vaadin-combo-box-light') as any)?.open();
@@ -61,33 +85,41 @@ export class AlarmoMultiSelect extends LitElement {
     });
   }
 
-  shouldUpdate(changedProps: PropertyValues) {
-    if (changedProps.get('items')) {
-      if (!IsEqual(this.items, changedProps.get('items') as Option[])) this.firstUpdated();
-      else if (changedProps.size == 1) return false;
+  protected updated(changedProps: PropertyValues) {
+    super.updated(changedProps);
+    if (changedProps.has('items')) {
+      (this._comboBox as any).items = this.items;
     }
-    return true;
-  }
-
-  protected firstUpdated() {
-    (this._comboBox as any).items = this.items;
   }
 
   protected render(): TemplateResult {
-    const hasValue = isDefined(this._value) && this.items.find(e => e.value == this._value);
+    if (!this._vaadinReady) {
+      return html`
+        <ha-textfield
+          .label=${this.label}
+          class="input"
+          autocapitalize="none"
+          autocomplete="off"
+          autocorrect="off"
+          spellcheck="false"
+          disabled></ha-textfield>
+      `;
+    }
+
+    const hasValue = this.value.length > 0;
 
     return html`
       <vaadin-combo-box-light
         item-value-path="value"
         item-id-path="value"
         item-label-path="name"
-        .value=${this._value}
+        .items=${this.items}
+        .value=${''}
         ${comboBoxRenderer(this.rowRenderer)}
         .allowCustomValue=${this.allowCustomValue}
         ?disabled=${this.disabled}
         @opened-changed=${this._openedChanged}
-        @value-changed=${this._valueChanged}
-      >
+        @value-changed=${this._valueChanged}>
         <ha-textfield
           .label=${this.label}
           class="input"
@@ -97,24 +129,21 @@ export class AlarmoMultiSelect extends LitElement {
           spellcheck="false"
           ?disabled=${this.disabled}
           ?invalid=${this.invalid}
-          .value=${this._valueDisplay()}
-        >
-        </ha-textfield>
+          .value=${this._valueDisplay()}></ha-textfield>
         <ha-svg-icon
           class="toggle-button ${this.items.length ? '' : 'disabled'}"
           .path=${this._opened && this.items.length ? mdiMenuUp : mdiMenuDown}
-          @click=${this._toggleOpen}
-        ></ha-svg-icon>
+          @click=${this._toggleOpen}></ha-svg-icon>
         ${this.clearable && hasValue
-        ? html`
+          ? html`
               <ha-svg-icon class="clear-button" @click=${this._clearValue} .path=${mdiClose}></ha-svg-icon>
             `
-        : ''}
+          : ''}
       </vaadin-combo-box-light>
     `;
   }
 
-  private rowRenderer: ComboBoxLitRenderer<Option> = item => {
+  private rowRenderer: ComboBoxLitRenderer<Option> = (item) => {
     const hasDescription = isDefined(item.description);
 
     return html`
@@ -130,10 +159,10 @@ export class AlarmoMultiSelect extends LitElement {
         <ha-icon .icon="${this.value.includes(item.value) ? 'mdi:check' : ''}" slot="graphic"></ha-icon>
         <span>${item.name}</span>
         ${hasDescription
-        ? html`
+          ? html`
               <span slot="secondary">${item.description}</span>
             `
-        : ''}
+          : ''}
       </mwc-list-item>
     `;
   };
@@ -141,10 +170,6 @@ export class AlarmoMultiSelect extends LitElement {
   private _clearValue(ev: Event) {
     ev.stopPropagation();
     this._setValue([]);
-  }
-
-  private get _value() {
-    return isDefined(this.value) ? this.value : '';
   }
 
   private _toggleOpen(ev: Event) {
@@ -168,18 +193,14 @@ export class AlarmoMultiSelect extends LitElement {
 
       if (!overlay) return;
 
-      this._overlayMutationObserver = new MutationObserver(mutations => {
-        mutations.forEach(mutation => {
-          if (
-            mutation.type === 'attributes' &&
-            mutation.attributeName === 'inert' &&
-            (overlay as any).inert === true
-          ) {
+      this._overlayMutationObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'inert' && (overlay as any).inert === true) {
             (overlay as any).inert = false;
             this._overlayMutationObserver?.disconnect();
             this._overlayMutationObserver = undefined;
           } else if (mutation.type === 'childList') {
-            mutation.removedNodes.forEach(node => {
+            mutation.removedNodes.forEach((node) => {
               if (node.nodeName === 'VAADIN-COMBO-BOX-OVERLAY') {
                 this._overlayMutationObserver?.disconnect();
                 this._overlayMutationObserver = undefined;
@@ -201,7 +222,7 @@ export class AlarmoMultiSelect extends LitElement {
   private _valueChanged(ev: CustomEvent) {
     const newValue: string | [] = ev.detail.value;
     if (newValue === '' || typeof newValue === 'object') return;
-    if (this.value.includes(newValue)) this._setValue(this.value.filter(e => e !== newValue));
+    if (this.value.includes(newValue)) this._setValue(this.value.filter((e) => e !== newValue));
     else this._setValue([...this.value, newValue]);
     ev.stopPropagation();
   }
@@ -266,7 +287,6 @@ type ComboBoxItemModel<T> = { item: T };
  * From lit-vaadin-helpers
  */
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AbstractLitRenderer = (...args: any[]) => TemplateResult;
 
 // A sentinel that indicates renderer hasn't been initialized

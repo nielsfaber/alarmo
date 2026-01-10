@@ -8,6 +8,7 @@ from homeassistant.components.http import StaticPathConfig
 
 from .const import (
     DOMAIN,
+    VERSION,
     PANEL_URL,
     PANEL_ICON,
     PANEL_NAME,
@@ -27,6 +28,11 @@ async def async_register_panel(hass):
     panel_dir = os.path.join(root_dir, PANEL_FOLDER)
     view_url = os.path.join(panel_dir, PANEL_FILENAME)
 
+    try:
+        cache_bust = int(os.path.getmtime(view_url))
+    except OSError:
+        cache_bust = 0
+
     await hass.http.async_register_static_paths(
         [StaticPathConfig(PANEL_URL, view_url, cache_headers=False)]
     )
@@ -35,7 +41,7 @@ async def async_register_panel(hass):
         hass,
         webcomponent_name=PANEL_NAME,
         frontend_url_path=DOMAIN,
-        module_url=PANEL_URL,
+        module_url=f"{PANEL_URL}?v={VERSION}&m={cache_bust}",
         sidebar_title=PANEL_TITLE,
         sidebar_icon=PANEL_ICON,
         require_admin=True,

@@ -7,9 +7,10 @@ import { visualizer } from 'rollup-plugin-visualizer';
 export default {
   input: 'src/alarm-panel.ts',
   output: {
-    dir: 'dist',
+    file: 'dist/alarm-panel.js',
     format: 'esm',
     sourcemap: false,
+    inlineDynamicImports: true,
   },
   plugins: [
     resolve({ browser: true }),
