@@ -1,0 +1,85 @@
+{
+  "services": {
+    "arm": {
+      "name": "Inserire",
+      "description": "Inserire un'entità Alarmo con impostazioni personalizzate.",
+      "fields": {
+        "entity_id": {
+          "name": "ID entità",
+          "description": "Entità d'allarme da inserire."
+        },
+        "code": {
+          "name": "Codice",
+          "description": "Codice da usare per l'inserimento."
+        },
+        "mode": {
+          "name": "Modo",
+          "description": "Modo in cui inserire l'allarme."
+        },
+        "skip_delay": {
+          "name": "Salta ritardo",
+          "description": "Saltare il ritardo per l'uscita."
+        },
+        "force": {
+          "name": "Forzare",
+          "description": "Ignorare automaticamente tutti i sensori che prevengono l'inserimento dell'allarme."
+        }
+      }
+    },
+    "disarm": {
+      "name": "Disinserire",
+      "description": "Disinserire un'entità Alarmo.",
+      "fields": {
+        "entity_id": {
+          "name": "ID Entità",
+          "description": "Entità d'allarme da disinserire."
+        },
+        "code": {
+          "name": "Codice",
+          "description": "Codice da usare per il disinserimento."
+        }
+      }
+    },
+    "skip_delay": {
+      "name": "Salta ritardo",
+      "description": "Salta il resto del ritardo di uscita/ingresso e passa direttamente allo stato successivo. Ha effetto solo quando l'allarme è in stato di attivazione o in attesa.",
+      "fields": {
+        "entity_id": {
+          "name": "ID Entità",
+          "description": "Entità di allarme per la quale il ritardo deve essere saltato."
+        }
+      }
+    },
+    "enable_user": {
+      "name": "Abilitare Utente",
+      "description": "Abilitare un utente ad inserire/disinserire Alarmo.",
+      "fields": {
+        "name": {
+          "name": "Nome",
+          "description": "Nome dell'utente da abilitare."
+        }
+      }
+    },
+    "disable_user": {
+      "name": "Disabilitare Utente",
+      "description": "Disabilitare un utente dall'inserimento/disinserimento di Alarmo.",
+      "fields": {
+        "name": {
+          "name": "Nome",
+          "description": "Nome dell'utente da disabilitare."
+        }
+      }
+    }
+  },
+  "selector": {
+    "arm_mode": {
+      "options": {
+        "away": "Attivo Fuori Casa",
+        "night": "Attivo Notte",
+        "home": "Attivo In Casa",
+        "vacation": "Attivo Vacanza",
+        "custom": "Attivo Bypass Personalizzato"
+      }
+    }
+  }
+}
