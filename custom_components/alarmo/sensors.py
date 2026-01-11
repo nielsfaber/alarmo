@@ -205,28 +205,36 @@ class SensorHandler:
         state: str | None = None,
     ):
         """Watch sensors based on the state of the alarm entities."""
-        sensors_list = []
+        watched_sensors_list = []
         for area in self.hass.data[const.DOMAIN]["areas"].keys():
-            sensors_list.extend(self.active_sensors_for_alarm_state(area))
+            watched_sensors_list.extend(
+                self.active_sensors_for_alarm_state(area, None, True)
+            )
 
         if self._state_listener:
             self._state_listener()
 
-        if sensors_list:
+        if watched_sensors_list:
             self._state_listener = async_track_state_change_event(
-                self.hass, sensors_list, self.async_sensor_state_changed
+                self.hass, watched_sensors_list, self.async_sensor_state_changed
             )
         else:
             self._state_listener = None
 
         # clear previous sensor group events that are not active for current alarm state
-        for group_id in self._group_events.keys():
-            self._group_events[group_id] = dict(
-                filter(
-                    lambda el: el[0] in sensors_list,
-                    self._group_events[group_id].items(),
+        if self._group_events:
+            active_sensors_list = []
+            for area in self.hass.data[const.DOMAIN]["areas"].keys():
+                active_sensors_list.extend(
+                    self.active_sensors_for_alarm_state(area, None, False)
                 )
-            )
+            for group_id in self._group_events.keys():
+                self._group_events[group_id] = dict(
+                    filter(
+                        lambda el: el[0] in active_sensors_list,
+                        self._group_events[group_id].items(),
+                    )
+                )
 
         # handle initial sensor states
         if area_id and old_state is None:
@@ -244,7 +252,12 @@ class SensorHandler:
         if area_id:
             self.update_ready_to_arm_status(area_id)
 
-    def active_sensors_for_alarm_state(self, area_id: str, to_state: str | None = None):
+    def active_sensors_for_alarm_state(
+        self,
+        area_id: str,
+        to_state: str | None = None,
+        watch_ready_to_arm: bool = False,
+    ):
         """Compose a list of sensors that are active for the state."""
         alarm_entity = self.hass.data[const.DOMAIN]["areas"][area_id]
 
@@ -266,7 +279,11 @@ class SensorHandler:
                 continue
             elif state in config[const.ATTR_MODES] or config[ATTR_ALWAYS_ON]:
                 entities.append(entity)
-            elif not to_state and config["type"] != SENSOR_TYPE_MOTION:
+            elif (
+                not to_state
+                and config["type"] != SENSOR_TYPE_MOTION
+                and watch_ready_to_arm
+            ):
                 # always watch all sensors other than motion sensors,
                 #   to indicate readiness for arming
                 entities.append(entity)
@@ -421,19 +438,7 @@ class SensorHandler:
                 self.stop_arm_timer(entity)
 
         if res:
-            # sensor state is OK,
-            #   but we still need to clean up group events for closed sensors
-            # A sensor that has closed should not contribute to future group triggers
-            #   until it opens again
-            # Clear closed sensors from group events to
-            #   prevent stale events from triggering groups later
-            if new_state == STATE_CLOSED:
-                for group_id in list(self._group_events.keys()):
-                    if entity in self._group_events[group_id]:
-                        del self._group_events[group_id][entity]
-                        # Clean up empty group entries
-                        if not self._group_events[group_id]:
-                            del self._group_events[group_id]
+            # nothing to do here, sensor state is OK
             self.update_ready_to_arm_status(sensor_config["area"])
             return
 
@@ -468,7 +473,8 @@ class SensorHandler:
             entry_delay = self.get_entry_delay_for_trigger(
                 open_sensors, sensor_config["area"], alarm_entity.arm_mode
             )
-
+            # remove group_id from open_sensors (only used for entry delay calculation)
+            open_sensors.pop(ATTR_GROUP_ID, None)
             if entry_delay == 0:
                 # immediate trigger (no entry delay)
                 alarm_entity.async_trigger(entry_delay=0, open_sensors=open_sensors)
@@ -488,6 +494,8 @@ class SensorHandler:
             entry_delay = self.get_entry_delay_for_trigger(
                 open_sensors, sensor_config["area"], alarm_entity.arm_mode
             )
+            # remove group_id from open_sensors (only used for entry delay calculation)
+            open_sensors.pop(ATTR_GROUP_ID, None)
 
             if entry_delay == 0:
                 # immediate trigger
@@ -564,8 +572,9 @@ class SensorHandler:
             )
             return {}
         else:
-            for key in recent_events.keys():
-                open_sensors[key] = group_events[key][ATTR_STATE]
+            # add all (recently) triggered sensors to open_sensors
+            for entity_id in recent_events.keys():
+                open_sensors[entity_id] = group_events[entity_id][ATTR_STATE]
 
             # Add group info for override delay calculation
             open_sensors[ATTR_GROUP_ID] = group_id
