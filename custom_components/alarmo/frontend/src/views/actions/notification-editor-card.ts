@@ -132,6 +132,7 @@ export class NotificationEditorCard extends LitElement {
               .value=${this.config.triggers[0].event}
               @value-changed=${this._setEvent}
               ?invalid=${this.errors.event}
+              showSearch
             ></alarmo-select>
           </alarmo-settings-row>
 
@@ -152,7 +153,7 @@ export class NotificationEditorCard extends LitElement {
         )}
                     clearable=${true}
                     label=${localize('panels.actions.cards.new_action.fields.area.heading', this.hass.language)}
-                    .value=${this.config.triggers[0].area}
+                    .value=${String(this.config.triggers[0].area)}
                     @value-changed=${this._setArea}
                     ?invalid=${this.errors.area || (!this.config.triggers[0].area && !this.alarmoConfig.master.enabled)}
                   ></alarmo-select>
@@ -200,11 +201,10 @@ export class NotificationEditorCard extends LitElement {
                     .items=${computeServiceDisplay(this.hass, ...getNotifyServices(this.hass))}
                     ?disabled=${!getNotifyServices(this.hass).length}
                     label=${localize('panels.actions.cards.new_notification.fields.target.heading', this.hass.language)}
-                    icons=${true}
                     .value=${getNotifyServices(this.hass).find(e => e.entity_id == this.config.actions[0].entity_id && e.service == this.config.actions[0].service)?.entity_id || getNotifyServices(this.hass).find(e => e.service == this.config.actions[0].service)?.service || undefined}
                     @value-changed=${this._setService}
                     ?invalid=${this.errors.service}
-                    allow-custom-value
+                    showSearch
                   ></alarmo-select>
                 </alarmo-settings-row>
 
@@ -244,12 +244,13 @@ export class NotificationEditorCard extends LitElement {
                         </span>
 
                         <alarmo-select
+                          .hass=${this.hass}
                           .items=${computeEntityDisplay(this.config.actions[0].service == 'tts.speak' ? getEntitiesByDomain(this.hass, 'tts') : getEntitiesByDomain(this.hass, 'media_player', 'tts'), this.hass)}
                           label=${localize('panels.actions.cards.new_action.fields.entity.heading', this.hass.language)}
                           .value=${this.config.actions[0].data?.entity_id || ''}
                           @value-changed=${this._setEntity}
-                          .icons=${true}
                           ?invalid=${this.errors.entity}
+                          showSearch
                         ></alarmo-select>
                       </alarmo-settings-row>
                     `
@@ -267,6 +268,7 @@ export class NotificationEditorCard extends LitElement {
                         </span>
 
                         <alarmo-select
+                          .hass=${this.hass}
                           .items=${computeEntityDisplay(getEntitiesByDomain(this.hass, 'media_player'), this.hass)}
                           label=${localize('panels.actions.cards.new_notification.fields.media_player_entity.heading', this.hass.language)}
                           .value=${this.config.actions[0].data?.media_player_entity_id || ''}
@@ -335,6 +337,7 @@ export class NotificationEditorCard extends LitElement {
                         </span>
 
                         <alarmo-select
+                          .hass=${this.hass}
                           .items=${getOpenSensorsWildCardOptions(this.hass)}
                           .value=${this._getOpenSensorsFormat(true)}
                           @value-changed=${this._setOpenSensorsFormat}
@@ -363,6 +366,7 @@ export class NotificationEditorCard extends LitElement {
                         </span>
 
                         <alarmo-select
+                          .hass=${this.hass}
                           .items=${getArmModeWildCardOptions(this.hass)}
                           .value=${this._getArmModeFormat(true)}
                           @value-changed=${this._setArmModeFormat}
@@ -462,9 +466,9 @@ export class NotificationEditorCard extends LitElement {
     `;
   }
 
-  private _setEvent(ev: CustomEvent) {
+  private _setEvent(ev: Event) {
     ev.stopPropagation();
-    const value = ev.detail.value as EAlarmEvent;
+    const value = (ev.target as HTMLInputElement).value;
     let triggerConfig = this.config.triggers;
     Object.assign(triggerConfig, { [0]: { ...triggerConfig[0], event: value } });
     this.config = { ...this.config, triggers: triggerConfig };
@@ -473,7 +477,7 @@ export class NotificationEditorCard extends LitElement {
 
   private _setArea(ev: CustomEvent) {
     ev.stopPropagation();
-    const value = ev.detail.value;
+    const value = Number(ev.detail.value);
     let triggerConfig = this.config.triggers;
     Object.assign(triggerConfig, { [0]: { ...triggerConfig[0], area: value } });
     const armModes = getArmModeOptions(value, this.areas!);

@@ -74,6 +74,7 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
           ${Object.keys(this.areas).length > 1
         ? html`
                 <alarmo-select
+                  .hass=${this.hass}
                   .items=${Object.values(this.areas).map(e => Object({ value: e.area_id, name: e.name }))}
                   value=${this.selectedArea}
                   label=${this.hass.localize('ui.components.area-picker.area')}

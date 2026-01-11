@@ -133,6 +133,7 @@ export class AutomationEditorCard extends LitElement {
               .value=${this.config.triggers[0].event}
               @value-changed=${this._setEvent}
               ?invalid=${this.errors.event}
+              showSearch
             ></alarmo-select>
           </alarmo-settings-row>
 
@@ -153,7 +154,7 @@ export class AutomationEditorCard extends LitElement {
         )}
                     clearable=${true}
                     label=${localize('panels.actions.cards.new_action.fields.area.heading', this.hass.language)}
-                    .value=${this.config.triggers[0].area}
+                    .value=${String(this.config.triggers[0].area)}
                     @value-changed=${this._setArea}
                     ?invalid=${this.errors.area}
                   ></alarmo-select>
@@ -204,6 +205,7 @@ export class AutomationEditorCard extends LitElement {
                     .value=${this._getEntities()}
                     @value-changed=${this._setEntity}
                     ?invalid=${this.errors.entity_id}
+                    showSearch
                   ></alarmo-selector>
                 </alarmo-settings-row>
 
@@ -367,7 +369,7 @@ export class AutomationEditorCard extends LitElement {
 
   private _setArea(ev: CustomEvent) {
     ev.stopPropagation();
-    const value = ev.detail.value;
+    const value = Number(ev.detail.value);
     let triggerConfig = this.config.triggers;
     Object.assign(triggerConfig, { [0]: { ...triggerConfig[0], area: value } });
     const armModes = getArmModeOptions(value, this.areas!);

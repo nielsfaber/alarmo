@@ -1,16 +1,11 @@
-import { LitElement, html, TemplateResult, css, PropertyValues, CSSResultGroup } from 'lit';
+import { LitElement, html, TemplateResult, PropertyValues } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 import { fireEvent } from '../fire_event';
 import { isDefined, IsEqual } from '../helpers';
 import { HomeAssistant } from '../types';
+import { Option } from './alarmo-select';
 
 import './alarmo-chip-set';
-
-export type Option = {
-  value: string;
-  name: string;
-  icon: string;
-};
 
 @customElement('alarmo-selector')
 export class AlarmoSelector extends LitElement {
@@ -28,6 +23,9 @@ export class AlarmoSelector extends LitElement {
 
   @property({ type: Boolean })
   invalid = false;
+
+  @property({ type: Boolean })
+  showSearch = false;
 
   shouldUpdate(changedProps: PropertyValues) {
     if (changedProps.get('items')) {
@@ -61,6 +59,7 @@ export class AlarmoSelector extends LitElement {
         icons=${true}
         @value-changed=${this._addClick}
         ?invalid=${this.invalid && this.value.length != this.items.length}
+        ?showSearch=${this.showSearch}
       ></alarmo-select>
     `;
   }

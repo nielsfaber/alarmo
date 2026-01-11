@@ -87,6 +87,7 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
           ${!this.area_id
         ? html`
                 <alarmo-select
+                  .hass=${this.hass}
                   .items=${Object.values(this.areas).map(e => Object({ value: e.area_id, name: e.name }))}
                   value=${this.selectedArea}
                   label="${localize('panels.general.dialogs.create_area.fields.copy_from', this.hass.language)}"

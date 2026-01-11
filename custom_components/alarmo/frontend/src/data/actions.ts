@@ -122,17 +122,17 @@ export const computeAreaDisplay = (
   if (area == 0) {
     return {
       name: alarmoConfig.master.name,
-      value: 0,
+      value: "0",
     };
   } else if (Object.keys(areaConfig).includes(String(area))) {
     return {
       name: areaConfig[area].name,
-      value: area,
+      value: String(area),
     };
   } else {
     return {
       name: String(area),
-      value: area,
+      value: String(area),
     };
   }
 };

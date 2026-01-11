@@ -109,6 +109,7 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
 
           <div style="display: flex; flex-direction: row">
             <alarmo-select
+              .hass=${this.hass}
               style="flex: 1"
               .items=${sensorsList}
               .value=${this.data!.entity_id}
@@ -141,6 +142,7 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
                 </span>
 
                 <alarmo-select
+                  .hass=${this.hass}
                   .items=${Object.values(this.areas).map(e => Object({ value: e.area_id, name: e.name }))}
                   value=${this.data.area}
                   label=${localize('panels.sensors.cards.editor.fields.area.heading', this.hass.language)}
@@ -169,6 +171,7 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
             value=${this.data['type']}
             @value-changed=${(ev: Event) =>
         this.setType(((ev.target as HTMLInputElement).value || ESensorTypes.Other) as ESensorTypes)}
+            showSearch
           ></alarmo-select>
         </alarmo-settings-row>
 
@@ -207,10 +210,11 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
             ${localize('panels.sensors.cards.editor.fields.group.description', this.hass.language)}
           </span>
 
-          <div>
+          <div style="padding: 8px 0px; max-width: 250px">
             ${Object.keys(this.sensorGroups).length
         ? html`
                   <alarmo-select
+                    .hass=${this.hass}
                     .clearable=${true}
                     .items=${this.getSensorGroups()}
                     value=${this.data.group}
@@ -221,7 +225,7 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
                   ></alarmo-select>
                 `
         : ''}
-            <ha-button appearance="filled" @click=${this.manageGroupsClick}>
+            <ha-button appearance="filled" @click=${this.manageGroupsClick} style="margin-top: 4px">
               ${localize('panels.sensors.cards.editor.actions.setup_groups', this.hass.language)}
               <ha-icon slot="end" icon="mdi:open-in-new"></ha-icon>
             </ha-button>
