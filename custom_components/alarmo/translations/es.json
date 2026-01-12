@@ -10,7 +10,7 @@
         },
         "code": {
           "name": "Código",
-          "description": "Código a usar para el armado."
+          "description": "Código a usar para el proceso armado."
         },
         "mode": {
           "name": "Modo",
@@ -22,7 +22,7 @@
         },
         "force": {
           "name": "Forzar",
-          "description": "Ignorar automáticamente todos los sensores que impiden la operación de armado."
+          "description": "Ignorar automáticamente todos los sensores que impiden la operación del proceso armado."
         }
       }
     },
@@ -36,13 +36,13 @@
         },
         "code": {
           "name": "Código",
-          "description": "Código a usar para el desarme."
+          "description": "Código a usar para el proceso de desarme."
         }
       }
     },
     "skip_delay": {
       "name": "Saltar retardo",
-      "description": "Omitir el resto del retardo de salida/entrada y pasar directamente al siguiente estado. Solo tiene efecto mientras la alarma está en estado de armado o pendiente.",
+      "description": "Omitir el resto del retardo de salida/entrada y pasar directamente al siguiente estado. Solo tiene efecto mientras la alarma está en estado de proceso de armado o pendiente.",
       "fields": {
         "entity_id": {
           "name": "ID de entidad",
