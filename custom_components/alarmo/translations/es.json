@@ -41,12 +41,12 @@
       }
     },
     "skip_delay": {
-      "name": "Skip Delay",
-      "description": "Skip the remainder of the exit/entry delay and proceed directly to the next state. Only has effect whilst the alarm is in arming or pending state.",
+      "name": "Saltar retardo",
+      "description": "Omitir el resto del retardo de salida/entrada y pasar directamente al siguiente estado. Solo tiene efecto mientras la alarma está en estado de armado o pendiente.",
       "fields": {
         "entity_id": {
-          "name": "Entity ID",
-          "description": "Alarm entity for which the delay should be skipped."
+          "name": "ID de entidad",
+          "description": "Entidad de alarma para la que se debe omitir el retardo."
         }
       }
     },
