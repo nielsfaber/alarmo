@@ -1,6 +1,7 @@
 """Sensor handling for Alarmo integration."""
 
 import logging
+import datetime
 from types import SimpleNamespace
 
 import homeassistant.util.dt as dt_util
@@ -48,6 +49,7 @@ ATTR_EVENT_COUNT = "event_count"
 ATTR_ENTITIES = "entities"
 ATTR_NEW_ENTITY_ID = "new_entity_id"
 ATTR_ENTRY_DELAY = "entry_delay"
+ATTR_TRIGGER_DELAY = "trigger_delay"
 
 SENSOR_STATES_OPEN = [STATE_ON, STATE_OPEN, LockState.UNLOCKED]
 SENSOR_STATES_CLOSED = [STATE_OFF, STATE_CLOSED, LockState.LOCKED]
@@ -135,6 +137,7 @@ class SensorHandler:
         self._arm_timers = {}
         self._groups = {}
         self._group_events = {}
+        self._trigger_delay_timers = {}
         self._startup_complete = False
         self._unavailable_state_mem = {}
 
@@ -367,7 +370,7 @@ class SensorHandler:
         return None
 
     @callback
-    def async_sensor_state_changed(self, event):  # noqa: PLR0915, PLR0912
+    def async_sensor_state_changed(self, event):  # noqa: PLR0912
         """Callback fired when a sensor state has changed."""
         entity = event.data["entity_id"]
         old_state = parse_sensor_state(event.data["old_state"])
@@ -393,6 +396,10 @@ class SensorHandler:
             old_state,
             new_state,
         )
+
+        # Cancel any pending trigger delay timer when sensor turns off
+        if new_state == STATE_CLOSED and entity in self._trigger_delay_timers:
+            self.stop_trigger_delay_timer(entity)
 
         if (
             new_state == STATE_UNAVAILABLE
@@ -441,6 +448,108 @@ class SensorHandler:
             # nothing to do here, sensor state is OK
             self.update_ready_to_arm_status(sensor_config["area"])
             return
+
+        # Check if trigger_delay is configured
+        trigger_delay = sensor_config.get(ATTR_TRIGGER_DELAY) or 0
+
+        if trigger_delay > 0:
+            # Start trigger delay timer instead of immediate trigger
+            if self.start_trigger_delay_timer(entity, new_state):
+                self.update_ready_to_arm_status(sensor_config["area"])
+                return
+
+        # No trigger delay or timer failed to start - execute immediately
+        self._execute_sensor_trigger(entity, new_state)
+
+    def start_arm_timer(self, entity):
+        """Start timer for automatical arming."""
+
+        @callback
+        def timer_finished(now):
+            _LOGGER.debug("timer finished")
+            sensor_config = self._config[entity]
+            alarm_entity = self.hass.data[const.DOMAIN]["areas"][sensor_config["area"]]
+            if alarm_entity.state == AlarmControlPanelState.ARMING:
+                alarm_entity.async_arm(alarm_entity.arm_mode, skip_delay=True)
+
+        now = dt_util.utcnow()
+
+        if entity in self._arm_timers:
+            self.stop_arm_timer(entity)
+
+        self._arm_timers[entity] = async_track_point_in_time(
+            self.hass, timer_finished, now + const.SENSOR_ARM_TIME
+        )
+
+    def stop_arm_timer(self, entity=None):
+        """Cancel timer(s) for automatical arming."""
+        if entity and entity in self._arm_timers:
+            self._arm_timers[entity]()
+        elif not entity:
+            for key in self._arm_timers.keys():
+                self._arm_timers[key]()
+
+    def start_trigger_delay_timer(self, entity: str, new_state: str):
+        """Start timer for delayed sensor trigger."""
+        sensor_config = self._config[entity]
+        delay = sensor_config.get(ATTR_TRIGGER_DELAY) or 0
+
+        if delay <= 0:
+            return False
+
+        @callback
+        def timer_finished(now):
+            """Handle trigger delay timer expiration."""
+            self._trigger_delay_timers.pop(entity, None)
+            # Re-check if sensor is still in violation state
+            current_state = self.hass.states.get(entity)
+            current_sensor_state = parse_sensor_state(current_state)
+            if current_sensor_state != STATE_OPEN and not (
+                current_sensor_state == STATE_UNAVAILABLE
+                and sensor_config[ATTR_TRIGGER_UNAVAILABLE]
+            ):
+                _LOGGER.debug(
+                    "Trigger delay finished for %s but sensor no longer in violation",
+                    entity,
+                )
+                return
+            _LOGGER.debug(
+                "Trigger delay finished for %s, proceeding with trigger",
+                entity,
+            )
+            self._execute_sensor_trigger(entity, new_state)
+
+        now = dt_util.utcnow()
+
+        # Cancel any existing timer for this entity
+        self.stop_trigger_delay_timer(entity)
+
+        self._trigger_delay_timers[entity] = async_track_point_in_time(
+            self.hass, timer_finished, now + datetime.timedelta(seconds=delay)
+        )
+        _LOGGER.debug(
+            "Started trigger delay timer for %s (%s seconds)",
+            entity,
+            delay,
+        )
+        return True
+
+    def stop_trigger_delay_timer(self, entity=None):
+        """Cancel trigger delay timer(s)."""
+        if entity and entity in self._trigger_delay_timers:
+            self._trigger_delay_timers[entity]()
+            del self._trigger_delay_timers[entity]
+            _LOGGER.debug("Cancelled trigger delay timer for %s", entity)
+        elif not entity:
+            for key in list(self._trigger_delay_timers.keys()):
+                self._trigger_delay_timers[key]()
+            self._trigger_delay_timers.clear()
+
+    def _execute_sensor_trigger(self, entity: str, new_state: str):
+        """Execute sensor trigger logic (called directly or after trigger delay)."""
+        sensor_config = self._config[entity]
+        alarm_entity = self.hass.data[const.DOMAIN]["areas"][sensor_config["area"]]
+        alarm_state = alarm_entity.state
 
         open_sensors = self.process_group_event(entity, new_state)
         if not open_sensors:
@@ -507,34 +616,6 @@ class SensorHandler:
                 )
 
         self.update_ready_to_arm_status(sensor_config["area"])
-
-    def start_arm_timer(self, entity):
-        """Start timer for automatical arming."""
-
-        @callback
-        def timer_finished(now):
-            _LOGGER.debug("timer finished")
-            sensor_config = self._config[entity]
-            alarm_entity = self.hass.data[const.DOMAIN]["areas"][sensor_config["area"]]
-            if alarm_entity.state == AlarmControlPanelState.ARMING:
-                alarm_entity.async_arm(alarm_entity.arm_mode, skip_delay=True)
-
-        now = dt_util.utcnow()
-
-        if entity in self._arm_timers:
-            self.stop_arm_timer(entity)
-
-        self._arm_timers[entity] = async_track_point_in_time(
-            self.hass, timer_finished, now + const.SENSOR_ARM_TIME
-        )
-
-    def stop_arm_timer(self, entity=None):
-        """Cancel timer(s) for automatical arming."""
-        if entity and entity in self._arm_timers:
-            self._arm_timers[entity]()
-        elif not entity:
-            for key in self._arm_timers.keys():
-                self._arm_timers[key]()
 
     def process_group_event(self, entity: str, state: str) -> dict:
         """Check if sensor entity is member of a group to evaluate trigger."""
