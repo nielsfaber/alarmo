@@ -1,0 +1,87 @@
+```json
+{
+  "services": {
+    "arm": {
+      "name": "Armar",
+      "description": "Armar unha entidade Alarmo con configuracións personalizadas.",
+      "fields": {
+        "entity_id": {
+          "name": "ID de entidade",
+          "description": "Entidade de alarma que debe ser armada."
+        },
+        "code": {
+          "name": "Código",
+          "description": "Código a usar para o proceso de armado."
+        },
+        "mode": {
+          "name": "Modo",
+          "description": "Modo para armar a alarma."
+        },
+        "skip_delay": {
+          "name": "Saltar Retardo",
+          "description": "Saltar o retardo de saída."
+        },
+        "force": {
+          "name": "Forzar",
+          "description": "Ignorar automaticamente todos os sensores que impiden a operación do proceso de armado."
+        }
+      }
+    },
+    "disarm": {
+      "name": "Desarmar",
+      "description": "Desarmar unha entidade Alarmo.",
+      "fields": {
+        "entity_id": {
+          "name": "ID de entidade",
+          "description": "Entidade de alarma que debe ser desarmada."
+        },
+        "code": {
+          "name": "Código",
+          "description": "Código a usar para o proceso de desarme."
+        }
+      }
+    },
+    "skip_delay": {
+      "name": "Saltar retardo",
+      "description": "Omitir o resto do retardo de saída/entrada e pasar directamente ao seguinte estado. Só ten efecto mentres a alarma está en estado de proceso de armado ou pendente.",
+      "fields": {
+        "entity_id": {
+          "name": "ID de entidade",
+          "description": "Entidade de alarma para a que se debe omitir o retardo."
+        }
+      }
+    },
+    "enable_user": {
+      "name": "Habilitar Usuario",
+      "description": "Permitir a un usuario armar/desarmar Alarmo.",
+      "fields": {
+        "name": {
+          "name": "Nome",
+          "description": "Nome do usuario a habilitar."
+        }
+      }
+    },
+    "disable_user": {
+      "name": "Deshabilitar Usuario",
+      "description": "Bloquear a un usuario para que non poida armar/desarmar Alarmo.",
+      "fields": {
+        "name": {
+          "name": "Nome",
+          "description": "Nome do usuario a deshabilitar."
+        }
+      }
+    }
+  },
+  "selector": {
+    "arm_mode": {
+      "options": {
+        "away": "Armado Fóra",
+        "night": "Armado Noite",
+        "home": "Armado Fogar",
+        "vacation": "Armado Vacacións",
+        "custom": "Armado Bypass Personalizado"
+      }
+    }
+  }
+}
+```
