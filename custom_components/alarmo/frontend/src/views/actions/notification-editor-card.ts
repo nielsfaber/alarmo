@@ -477,7 +477,8 @@ export class NotificationEditorCard extends LitElement {
 
   private _setArea(ev: CustomEvent) {
     ev.stopPropagation();
-    const value = Number(ev.detail.value);
+    let value = ev.detail.value;
+    if (value === '0') value = 0;
     let triggerConfig = this.config.triggers;
     Object.assign(triggerConfig, { [0]: { ...triggerConfig[0], area: value } });
     const armModes = getArmModeOptions(value, this.areas!);

@@ -369,7 +369,8 @@ export class AutomationEditorCard extends LitElement {
 
   private _setArea(ev: CustomEvent) {
     ev.stopPropagation();
-    const value = Number(ev.detail.value);
+    let value = ev.detail.value;
+    if (value === '0') value = 0;
     let triggerConfig = this.config.triggers;
     Object.assign(triggerConfig, { [0]: { ...triggerConfig[0], area: value } });
     const armModes = getArmModeOptions(value, this.areas!);
@@ -387,7 +388,7 @@ export class AutomationEditorCard extends LitElement {
 
   private _setModes(ev: CustomEvent) {
     ev.stopPropagation();
-    const value = ev.detail.value as EArmModes[0];
+    const value = ev.detail.value as EArmModes[];
     const triggerConfig = this.config.triggers;
     Object.assign(triggerConfig, { [0]: { ...triggerConfig[0], modes: value } });
     this.config = { ...this.config, triggers: triggerConfig };

@@ -74,8 +74,9 @@ export class AlarmoSelector extends LitElement {
     ev.stopPropagation();
     const target = ev.target as HTMLInputElement;
     const value = target.value;
+    if (value === '') return;
     if (!this.value.includes(value)) this.value = [...this.value, value];
-    target.value = '';
     fireEvent(this, 'value-changed', { value: [...this.value] });
+    (target as any).clearValue();
   }
 }

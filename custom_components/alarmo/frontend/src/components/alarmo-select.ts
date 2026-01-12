@@ -139,6 +139,20 @@ export class AlarmoSelect extends LitElement {
     fireEvent(this, "value-changed", { value: this.value });
   }
 
+  public clearValue(): void {
+    if (!this.showSearch) {
+      const target = this.shadowRoot!.querySelector('ha-select') as HTMLInputElement;
+      (target as any).select(-1);
+      setTimeout(() => {
+        target.blur();
+      }, 50);
+    } else {
+      const target = this.shadowRoot!.querySelector('ha-generic-picker') as HTMLInputElement;
+      this.value = '';
+      target.blur();
+    }
+  }
+
   static styles = css`
     ha-select {
       width: 100%;
