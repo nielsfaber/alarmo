@@ -338,6 +338,29 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
               `
         : ''}
 
+          ${!this.data.type ||
+        [ESensorTypes.Window, ESensorTypes.Door, ESensorTypes.Motion, ESensorTypes.Other].includes(this.data.type)
+        ? html`
+                <alarmo-settings-row .narrow=${this.narrow}>
+                  <span slot="heading">
+                    ${localize('panels.sensors.cards.editor.fields.trigger_delay.heading', this.hass.language)}
+                  </span>
+                  <span slot="description">
+                    ${localize('panels.sensors.cards.editor.fields.trigger_delay.description', this.hass.language)}
+                  </span>
+
+                  <alarmo-duration-picker
+                    .hass=${this.hass}
+                    max="60"
+                    placeholder="-"
+                    ?disabled=${!isDefined(this.data.trigger_delay)}
+                    value=${this.data.trigger_delay}
+                    @value-changed=${(ev: CustomEvent) => this._SetData({ trigger_delay: ev.detail.value })}
+                  ></alarmo-duration-picker>
+                </alarmo-settings-row>
+              `
+        : ''}
+
           ${!this.data.type || [ESensorTypes.Door, ESensorTypes.Other].includes(this.data.type)
         ? html`
                 <alarmo-settings-row .narrow=${this.narrow}>
@@ -507,6 +530,9 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
           break;
         case 'entry_delay':
           this.data = { ...this.data, entry_delay: val as number | null };
+          break;
+        case 'trigger_delay':
+          this.data = { ...this.data, trigger_delay: val as number | null };
           break;
       }
     }
