@@ -194,6 +194,7 @@ class SensorFactory:
         trigger_unavailable: bool = False,
         always_on: bool = False,
         entry_delay: int | None = None,
+        trigger_delay: int | None = None,
     ) -> dict[str, Any]:
         """Create a sensor with optional defaults."""
         if modes is None:
@@ -216,6 +217,7 @@ class SensorFactory:
             "always_on": always_on,
             "type": "door",
             "entry_delay": entry_delay,
+            "trigger_delay": trigger_delay,
         }
 
     @staticmethod
@@ -234,6 +236,7 @@ class SensorFactory:
         trigger_unavailable: bool = False,
         always_on: bool = False,
         entry_delay: int | None = None,
+        trigger_delay: int | None = None,
     ) -> dict[str, Any]:
         """Create a door sensor with optional defaults."""
         if modes is None:
@@ -256,6 +259,7 @@ class SensorFactory:
             "trigger_unavailable": trigger_unavailable,
             "always_on": always_on,
             "entry_delay": entry_delay,
+            "trigger_delay": trigger_delay,
         }
 
     @staticmethod
