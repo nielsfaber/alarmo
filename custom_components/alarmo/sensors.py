@@ -94,8 +94,8 @@ def sensor_state_allowed(state, sensor_config, alarm_state):  # noqa: PLR0911
         return True
 
     elif alarm_state == AlarmControlPanelState.TRIGGERED:
-        # alarm is already triggered
-        return True
+        # alarm is already triggered, count new open sensors
+        return False
 
     elif sensor_config[ATTR_ALWAYS_ON]:
         # alarm should always be triggered by always-on sensor
@@ -394,6 +394,25 @@ class SensorHandler:
             new_state,
         )
 
+        alarm_entity = self.hass.data[const.DOMAIN]["areas"][sensor_config["area"]]
+
+        if (
+            alarm_entity.open_sensors
+            and entity in alarm_entity.open_sensors
+            and alarm_entity.open_sensors.get(entity) != new_state
+        ):
+            _LOGGER.debug(
+                "Updating state of sensor %s in open_sensors to %s", entity, new_state
+            )
+            open_sensors = alarm_entity.open_sensors.copy()
+            open_sensors[entity] = new_state
+            alarm_entity.open_sensors = open_sensors
+            alarm_entity.schedule_update_ha_state()
+
+            master = self.hass.data[const.DOMAIN].get("master")
+            if master:
+                master.async_update_state()
+
         if (
             new_state == STATE_UNAVAILABLE
             and not sensor_config[ATTR_TRIGGER_UNAVAILABLE]
@@ -413,7 +432,6 @@ class SensorHandler:
                 )
                 return
 
-        alarm_entity = self.hass.data[const.DOMAIN]["areas"][sensor_config["area"]]
         alarm_state = alarm_entity.state
 
         if (
@@ -483,6 +501,14 @@ class SensorHandler:
                 alarm_entity.async_trigger(
                     entry_delay=entry_delay, open_sensors=open_sensors
                 )
+
+        elif alarm_state == AlarmControlPanelState.TRIGGERED:
+            # subsequent trigger while alarm is already triggered
+            _LOGGER.info(
+                "Alarm is re-triggered due to sensor: %s",
+                entity,
+            )
+            alarm_entity.async_trigger(entry_delay=0, open_sensors=open_sensors)
 
         elif alarm_state == AlarmControlPanelState.PENDING:
             # trigger while in pending state

@@ -979,6 +979,16 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
         self, entry_delay: int | None = None, open_sensors: dict[str, str] | None = None
     ):
         """Trigger request. Can be called multiple times for timer shortening or immediate triggers."""  # noqa: E501
+        if self._state == AlarmControlPanelState.TRIGGERED:
+            if open_sensors:
+                current_open_sensors = self.open_sensors.copy() if self.open_sensors else {}
+                current_open_sensors.update(open_sensors)
+                self.open_sensors = current_open_sensors
+                self.schedule_update_ha_state()
+                if self.hass.data[const.DOMAIN]["master"]:
+                    self.hass.data[const.DOMAIN]["master"].async_update_state()
+            return
+
         if not self.arm_mode:
             effective_entry_delay = 0
         else:
