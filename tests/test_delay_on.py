@@ -1,4 +1,4 @@
-"""Tests for sensor trigger delay feature."""
+"""Tests for sensor delay_on feature."""
 
 from typing import Any
 
@@ -24,10 +24,10 @@ def expected_lingering_timers():
 
 
 @pytest.mark.asyncio
-async def test_trigger_delay_brief_activation_no_trigger(
+async def test_delay_on_brief_activation_no_trigger(
     hass: Any, enable_custom_integrations: Any
 ):
-    """Test that brief sensor activation shorter than trigger_delay does not trigger."""
+    """Test that brief sensor activation shorter than delay_on does not trigger."""
     area = AreaFactory.create_area(
         area_id="area_1",
         modes=["armed_away"],
@@ -39,11 +39,11 @@ async def test_trigger_delay_brief_activation_no_trigger(
         name="Front Door",
         use_exit_delay=False,
         use_entry_delay=True,
-        trigger_delay=5,
+        delay_on=5,
     )
 
     storage, entry = setup_alarmo_entry(
-        hass, areas=[area], sensors=[sensor], entry_id="test_trigger_delay_brief"
+        hass, areas=[area], sensors=[sensor], entry_id="test_delay_on_brief"
     )
 
     with patch_alarmo_integration_dependencies(storage):
@@ -64,15 +64,15 @@ async def test_trigger_delay_brief_activation_no_trigger(
         await advance_time(hass, 11)
         assert_alarm_state(hass, ALARM_ENTITY, "armed_away")
 
-        # Activate sensor briefly (less than trigger_delay)
+        # Activate sensor briefly (less than delay_on)
         hass.states.async_set("binary_sensor.front_door", "on")
         await hass.async_block_till_done()
-        await advance_time(hass, 2)  # Only 2 seconds, trigger_delay is 5
+        await advance_time(hass, 2)  # Only 2 seconds, delay_on is 5
 
-        # Deactivate sensor before trigger_delay expires
+        # Deactivate sensor before delay_on expires
         hass.states.async_set("binary_sensor.front_door", "off")
         await hass.async_block_till_done()
-        await advance_time(hass, 5)  # Wait past original trigger_delay time
+        await advance_time(hass, 5)  # Wait past original delay_on time
 
         # Should still be armed_away, no trigger occurred
         assert_alarm_state(hass, ALARM_ENTITY, "armed_away")
@@ -81,10 +81,10 @@ async def test_trigger_delay_brief_activation_no_trigger(
 
 
 @pytest.mark.asyncio
-async def test_trigger_delay_sustained_activation_triggers(
+async def test_delay_on_sustained_activation_triggers(
     hass: Any, enable_custom_integrations: Any
 ):
-    """Test that sustained sensor activation longer than trigger_delay triggers alarm."""
+    """Test that sustained sensor activation longer than delay_on triggers alarm."""
     area = AreaFactory.create_area(
         area_id="area_1",
         modes=["armed_away"],
@@ -96,11 +96,11 @@ async def test_trigger_delay_sustained_activation_triggers(
         name="Front Door",
         use_exit_delay=False,
         use_entry_delay=True,
-        trigger_delay=5,
+        delay_on=5,
     )
 
     storage, entry = setup_alarmo_entry(
-        hass, areas=[area], sensors=[sensor], entry_id="test_trigger_delay_sustained"
+        hass, areas=[area], sensors=[sensor], entry_id="test_delay_on_sustained"
     )
 
     with patch_alarmo_integration_dependencies(storage):
@@ -125,8 +125,8 @@ async def test_trigger_delay_sustained_activation_triggers(
         hass.states.async_set("binary_sensor.front_door", "on")
         await hass.async_block_till_done()
 
-        # Wait for trigger_delay to expire
-        await advance_time(hass, 6)  # trigger_delay is 5 seconds
+        # Wait for delay_on to expire
+        await advance_time(hass, 6)  # delay_on is 5 seconds
         await hass.async_block_till_done()
 
         # Should now be pending (entry delay started)
@@ -136,10 +136,10 @@ async def test_trigger_delay_sustained_activation_triggers(
 
 
 @pytest.mark.asyncio
-async def test_trigger_delay_multiple_concurrent_sensors(
+async def test_delay_on_multiple_concurrent_sensors(
     hass: Any, enable_custom_integrations: Any
 ):
-    """Test multiple sensors with different trigger_delays activating concurrently."""
+    """Test multiple sensors with different delay_ons activating concurrently."""
     area = AreaFactory.create_area(
         area_id="area_1",
         modes=["armed_away"],
@@ -151,7 +151,7 @@ async def test_trigger_delay_multiple_concurrent_sensors(
         name="Front Door",
         use_exit_delay=False,
         use_entry_delay=True,
-        trigger_delay=10,  # 10 second delay
+        delay_on=10,  # 10 second delay
     )
 
     sensor2 = SensorFactory.create_door_sensor(
@@ -159,14 +159,14 @@ async def test_trigger_delay_multiple_concurrent_sensors(
         name="Back Door",
         use_exit_delay=False,
         use_entry_delay=True,
-        trigger_delay=3,  # 3 second delay
+        delay_on=3,  # 3 second delay
     )
 
     storage, entry = setup_alarmo_entry(
         hass,
         areas=[area],
         sensors=[sensor1, sensor2],
-        entry_id="test_trigger_delay_concurrent",
+        entry_id="test_delay_on_concurrent",
     )
 
     with patch_alarmo_integration_dependencies(storage):
@@ -206,7 +206,7 @@ async def test_trigger_delay_multiple_concurrent_sensors(
 
 
 @pytest.mark.asyncio
-async def test_trigger_delay_cancellation_on_sensor_off(
+async def test_delay_on_cancellation_on_sensor_off(
     hass: Any, enable_custom_integrations: Any
 ):
     """Test that trigger delay timer is cancelled when sensor turns off."""
@@ -221,11 +221,11 @@ async def test_trigger_delay_cancellation_on_sensor_off(
         name="Front Door",
         use_exit_delay=False,
         use_entry_delay=True,
-        trigger_delay=10,
+        delay_on=10,
     )
 
     storage, entry = setup_alarmo_entry(
-        hass, areas=[area], sensors=[sensor], entry_id="test_trigger_delay_cancel"
+        hass, areas=[area], sensors=[sensor], entry_id="test_delay_on_cancel"
     )
 
     with patch_alarmo_integration_dependencies(storage):
@@ -266,10 +266,10 @@ async def test_trigger_delay_cancellation_on_sensor_off(
 
 
 @pytest.mark.asyncio
-async def test_trigger_delay_with_always_on_sensor(
+async def test_delay_on_with_always_on_sensor(
     hass: Any, enable_custom_integrations: Any
 ):
-    """Test that always_on sensor respects trigger_delay."""
+    """Test that always_on sensor respects delay_on."""
     area = AreaFactory.create_area(
         area_id="area_1",
         modes=["armed_away"],
@@ -282,11 +282,11 @@ async def test_trigger_delay_with_always_on_sensor(
         use_exit_delay=False,
         use_entry_delay=False,
         always_on=True,
-        trigger_delay=5,
+        delay_on=5,
     )
 
     storage, entry = setup_alarmo_entry(
-        hass, areas=[area], sensors=[sensor], entry_id="test_trigger_delay_always_on"
+        hass, areas=[area], sensors=[sensor], entry_id="test_delay_on_always_on"
     )
 
     with patch_alarmo_integration_dependencies(storage):
@@ -311,11 +311,11 @@ async def test_trigger_delay_with_always_on_sensor(
         hass.states.async_set("binary_sensor.smoke_detector", "on")
         await hass.async_block_till_done()
 
-        # After 2 seconds, should still be armed (trigger_delay not expired)
+        # After 2 seconds, should still be armed (delay_on not expired)
         await advance_time(hass, 2)
         assert_alarm_state(hass, ALARM_ENTITY, "armed_away")
 
-        # After trigger_delay expires, should trigger immediately (no entry delay)
+        # After delay_on expires, should trigger immediately (no entry delay)
         await advance_time(hass, 5)
         await hass.async_block_till_done()
         assert_alarm_state(hass, ALARM_ENTITY, "triggered")
@@ -324,10 +324,10 @@ async def test_trigger_delay_with_always_on_sensor(
 
 
 @pytest.mark.asyncio
-async def test_trigger_delay_no_delay_configured(
+async def test_delay_on_no_delay_configured(
     hass: Any, enable_custom_integrations: Any
 ):
-    """Test sensor without trigger_delay triggers immediately."""
+    """Test sensor without delay_on triggers immediately."""
     area = AreaFactory.create_area(
         area_id="area_1",
         modes=["armed_away"],
@@ -339,11 +339,11 @@ async def test_trigger_delay_no_delay_configured(
         name="Front Door",
         use_exit_delay=False,
         use_entry_delay=True,
-        trigger_delay=None,  # No trigger delay
+        delay_on=None,  # No trigger delay
     )
 
     storage, entry = setup_alarmo_entry(
-        hass, areas=[area], sensors=[sensor], entry_id="test_no_trigger_delay"
+        hass, areas=[area], sensors=[sensor], entry_id="test_no_delay_on"
     )
 
     with patch_alarmo_integration_dependencies(storage):
@@ -376,10 +376,10 @@ async def test_trigger_delay_no_delay_configured(
 
 
 @pytest.mark.asyncio
-async def test_trigger_delay_with_sensor_group(
+async def test_delay_on_with_sensor_group(
     hass: Any, enable_custom_integrations: Any
 ):
-    """Test trigger_delay with sensor groups - each sensor delay applies individually."""
+    """Test delay_on with sensor groups - each sensor delay applies individually."""
     area = AreaFactory.create_area(
         area_id="area_1",
         modes=["armed_away"],
@@ -391,7 +391,7 @@ async def test_trigger_delay_with_sensor_group(
         name="Motion 1",
         use_exit_delay=False,
         use_entry_delay=True,
-        trigger_delay=3,
+        delay_on=3,
     )
 
     sensor2 = SensorFactory.create_door_sensor(
@@ -399,7 +399,7 @@ async def test_trigger_delay_with_sensor_group(
         name="Motion 2",
         use_exit_delay=False,
         use_entry_delay=True,
-        trigger_delay=3,
+        delay_on=3,
     )
 
     group = SensorGroupFactory.create_sensor_group(
@@ -415,7 +415,7 @@ async def test_trigger_delay_with_sensor_group(
         areas=[area],
         sensors=[sensor1, sensor2],
         sensor_groups=[group],
-        entry_id="test_trigger_delay_group",
+        entry_id="test_delay_on_group",
     )
 
     with patch_alarmo_integration_dependencies(storage):
@@ -441,7 +441,7 @@ async def test_trigger_delay_with_sensor_group(
         hass.states.async_set("binary_sensor.motion_1", "on")
         await hass.async_block_till_done()
 
-        # Wait for first sensor's trigger_delay
+        # Wait for first sensor's delay_on
         await advance_time(hass, 4)
         # Single sensor in group doesn't trigger
         assert_alarm_state(hass, ALARM_ENTITY, "armed_away")
@@ -450,21 +450,21 @@ async def test_trigger_delay_with_sensor_group(
         hass.states.async_set("binary_sensor.motion_2", "on")
         await hass.async_block_till_done()
 
-        # Wait for second sensor's trigger_delay
+        # Wait for second sensor's delay_on
         await advance_time(hass, 4)
         await hass.async_block_till_done()
 
-        # Now both sensors have passed their trigger_delay, group should trigger
+        # Now both sensors have passed their delay_on, group should trigger
         assert_alarm_state(hass, ALARM_ENTITY, "pending")
 
         await cleanup_timers(hass)
 
 
 @pytest.mark.asyncio
-async def test_trigger_delay_with_entry_delay_interaction(
+async def test_delay_on_with_entry_delay_interaction(
     hass: Any, enable_custom_integrations: Any
 ):
-    """Test trigger_delay followed by entry_delay - delays are sequential."""
+    """Test delay_on followed by entry_delay - delays are sequential."""
     area = AreaFactory.create_area(
         area_id="area_1",
         modes=["armed_away"],
@@ -476,7 +476,7 @@ async def test_trigger_delay_with_entry_delay_interaction(
         name="Front Door",
         use_exit_delay=False,
         use_entry_delay=True,
-        trigger_delay=5,  # 5 second trigger delay
+        delay_on=5,  # 5 second trigger delay
     )
 
     storage, entry = setup_alarmo_entry(
@@ -505,11 +505,11 @@ async def test_trigger_delay_with_entry_delay_interaction(
         hass.states.async_set("binary_sensor.front_door", "on")
         await hass.async_block_till_done()
 
-        # Wait for trigger_delay to expire (5s) plus buffer
+        # Wait for delay_on to expire (5s) plus buffer
         await advance_time(hass, 6)
         await hass.async_block_till_done()
 
-        # Should now be pending (trigger_delay expired, entry_delay started)
+        # Should now be pending (delay_on expired, entry_delay started)
         assert_alarm_state(hass, ALARM_ENTITY, "pending")
 
         # After entry_delay expires (10s) - triggered
@@ -521,7 +521,7 @@ async def test_trigger_delay_with_entry_delay_interaction(
 
 
 @pytest.mark.asyncio
-async def test_trigger_delay_rapid_on_off_cycles(
+async def test_delay_on_rapid_on_off_cycles(
     hass: Any, enable_custom_integrations: Any
 ):
     """Test rapid on/off cycles don't accumulate or cause false triggers."""
@@ -536,7 +536,7 @@ async def test_trigger_delay_rapid_on_off_cycles(
         name="Front Door",
         use_exit_delay=False,
         use_entry_delay=True,
-        trigger_delay=5,
+        delay_on=5,
     )
 
     storage, entry = setup_alarmo_entry(

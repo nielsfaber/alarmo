@@ -343,19 +343,19 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
         ? html`
                 <alarmo-settings-row .narrow=${this.narrow}>
                   <span slot="heading">
-                    ${localize('panels.sensors.cards.editor.fields.trigger_delay.heading', this.hass.language)}
+                    ${localize('panels.sensors.cards.editor.fields.delay_on.heading', this.hass.language)}
                   </span>
                   <span slot="description">
-                    ${localize('panels.sensors.cards.editor.fields.trigger_delay.description', this.hass.language)}
+                    ${localize('panels.sensors.cards.editor.fields.delay_on.description', this.hass.language)}
                   </span>
 
                   <alarmo-duration-picker
                     .hass=${this.hass}
                     max="60"
                     placeholder="-"
-                    ?disabled=${!isDefined(this.data.trigger_delay)}
-                    value=${this.data.trigger_delay}
-                    @value-changed=${(ev: CustomEvent) => this._SetData({ trigger_delay: ev.detail.value })}
+                    ?disabled=${!isDefined(this.data.delay_on)}
+                    value=${this.data.delay_on}
+                    @value-changed=${(ev: CustomEvent) => this._SetData({ delay_on: ev.detail.value })}
                   ></alarmo-duration-picker>
                 </alarmo-settings-row>
               `
@@ -531,8 +531,8 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
         case 'entry_delay':
           this.data = { ...this.data, entry_delay: val as number | null };
           break;
-        case 'trigger_delay':
-          this.data = { ...this.data, trigger_delay: val as number | null };
+        case 'delay_on':
+          this.data = { ...this.data, delay_on: val as number | null };
           break;
       }
     }

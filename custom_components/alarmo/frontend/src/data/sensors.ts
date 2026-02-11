@@ -137,7 +137,7 @@ export function defaultSensorConfig(stateObj: HassEntity | undefined, modeList: 
     use_entry_delay: true,
     use_exit_delay: true,
     entry_delay: null,
-    trigger_delay: null,
+    delay_on: null,
     arm_on_close: false,
     allow_open: false,
     always_on: false,

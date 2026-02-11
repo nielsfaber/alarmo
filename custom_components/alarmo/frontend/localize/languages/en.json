@@ -250,8 +250,8 @@
               "heading": "Entry delay",
               "description": "Override the entry delay (as configured for the arm mode) with a delay specific to the sensor."
             },
-            "trigger_delay": {
-              "heading": "Trigger delay",
+            "delay_on": {
+              "heading": "Delay on",
               "description": "Sensor must remain active for this duration before triggering. Resets if sensor deactivates."
             },
             "allow_open": {
