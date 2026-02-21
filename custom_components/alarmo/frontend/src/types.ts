@@ -114,6 +114,7 @@ export type AlarmoSensor = {
   group?: string | null;
   new_entity_id?: string;
   entry_delay: number | null;
+  delay_on: number | null;
 };
 
 export type AlarmoUser = {

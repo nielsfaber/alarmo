@@ -41,6 +41,7 @@ from .sensors import (
     ATTR_GROUP,
     ATTR_TIMEOUT,
     SENSOR_TYPES,
+    ATTR_DELAY_ON,
     ATTR_ENTITIES,
     ATTR_GROUP_ID,
     ATTR_ALWAYS_ON,
@@ -235,6 +236,7 @@ class AlarmoSensorView(HomeAssistantView):
                 vol.Optional(const.ATTR_ENABLED): cv.boolean,
                 vol.Optional(ATTR_GROUP): vol.Any(cv.string, None),
                 vol.Optional(ATTR_ENTRY_DELAY): vol.Any(cv.positive_int, None),
+                vol.Optional(ATTR_DELAY_ON): vol.Any(cv.positive_int, None),
                 vol.Optional(ATTR_NEW_ENTITY_ID): cv.string,
             }
         )
