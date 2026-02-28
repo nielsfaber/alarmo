@@ -107,6 +107,7 @@ class SensorEntry:
     area = attr.ib(type=str, default=None)
     enabled = attr.ib(type=bool, default=True)
     entry_delay = attr.ib(type=int, default=None)
+    delay_on = attr.ib(type=int, default=None)
 
 
 @attr.s(slots=True, frozen=True)

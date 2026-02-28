@@ -50,7 +50,7 @@ def create_default_sensor_config(
     config = {
         "entity_id": entity_id,
         "enabled": True,
-        "name": entity_id.split(".")[-1].replace("_", " ").title(),
+        "name": entity_id.rsplit(".", maxsplit=1)[-1].replace("_", " ").title(),
         "type": sensor_type,
         "modes": ["armed_away", "armed_home", "armed_night"],
         "use_exit_delay": True,
