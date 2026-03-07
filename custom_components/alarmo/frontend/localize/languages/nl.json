@@ -250,6 +250,10 @@
               "heading": "Binnenkomst vertraging",
               "description": "Vervang de vertraging (zoals ingesteld voor de beveiligingsmodus) door een specifieke waarde."
             },
+            "delay_on": {
+              "heading": "Filtertijd",
+              "description": "Minimale tijdsduur dat de sensor actief moet zijn om het alarm te activeren."
+            },
             "allow_open": {
               "heading": "Actieve toestand toestaan bij inschakelen",
               "description": "Initiële toestand bij inschakelen van het alarm wordt genegeerd."

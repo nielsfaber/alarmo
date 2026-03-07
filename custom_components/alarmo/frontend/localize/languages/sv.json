@@ -250,6 +250,10 @@
               "heading": "Ankomst fördröjning",
               "description": "Ersätt fördröjningen (som inställd för säkerhetsläget) med ett specifikt värde."
             },
+            "delay_on": {
+              "heading": "Delay on",
+              "description": "Sensor must remain active for this duration before triggering. Resets if sensor deactivates."
+            },
             "allow_open": {
               "heading": "Tillåt öppnad efter larmning.",
               "description": "Om sensorn fortfarande är aktiv efter lämna fördröjningen kommer det inte misslyckas att larma."

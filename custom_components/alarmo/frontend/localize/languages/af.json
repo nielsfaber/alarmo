@@ -250,6 +250,10 @@
               "heading": "Afsit-wagperiode",
               "description": "Vervang die vertraging (soos ingestel vir die sekuriteitsmodus) met 'n spesifieke waarde."
             },
+            "delay_on": {
+              "heading": "Delay on",
+              "description": "Sensor must remain active for this duration before triggering. Resets if sensor deactivates."
+            },
             "allow_open": {
               "heading": "Laat toe om aanvanklik oop te wees",
               "description": "Open state while arming is ignored (subsequent sensor activation will trigger alarm)."

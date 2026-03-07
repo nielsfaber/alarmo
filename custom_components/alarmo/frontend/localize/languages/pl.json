@@ -246,6 +246,10 @@
               "heading": "Opóźnienie wejścia",
               "description": "Zastąp opóźnienie (ustawione dla trybu bezpieczeństwa) konkretną wartością."
             },
+            "delay_on": {
+              "heading": "Delay on",
+              "description": "Sensor must remain active for this duration before triggering. Resets if sensor deactivates."
+            },
             "allow_open": {
               "heading": "Pozwól na otwarcie",
               "description": "Stan otwarty czujnika podczas uzbrajania jest ignorowany (kolejna aktywacja czujnika wyzwoli alarm)."

@@ -250,6 +250,10 @@
               "heading": "Entry delay",
               "description": "Override the entry delay (as configured for the arm mode) with a delay specific to the sensor."
             },
+            "delay_on": {
+              "heading": "Delay on",
+              "description": "Sensor must remain active for this duration before triggering. Resets if sensor deactivates."
+            },
             "allow_open": {
               "heading": "Permet obrir mentre s'arma l'alarma",
               "description": "Permeteu que aquest sensor estigui actiu poc després de configurar-lo de manera que no bloquegi l'activació de l'alarma."

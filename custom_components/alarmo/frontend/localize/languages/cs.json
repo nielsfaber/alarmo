@@ -250,6 +250,10 @@
               "heading": "Zpoždění při příjezdu",
               "description": "Přepsat vstupní zpoždění (nakonfigurované pro režim zapnutí) zpožděním specifickým pro daný senzor."
             },
+            "delay_on": {
+              "heading": "Delay on",
+              "description": "Sensor must remain active for this duration before triggering. Resets if sensor deactivates."
+            },
             "allow_open": {
               "heading": "Povolit aktivní senzor po zajištění",
               "description": "Pokud je senzor stále aktivní i po čekání na odchod, nezpůsobí chybu zajištění."

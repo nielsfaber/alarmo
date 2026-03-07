@@ -250,6 +250,10 @@
               "heading": "Vstupné oneskorenie",
               "description": "Nahraďte oneskorenie (nastavené pre bezpečnostný režim) konkrétnou hodnotou."
             },
+            "delay_on": {
+              "heading": "Delay on",
+              "description": "Sensor must remain active for this duration before triggering. Resets if sensor deactivates."
+            },
             "allow_open": {
               "heading": "Po aktivácii povoliť otvorené",
               "description": "Ak je senzor aktívny aj po odchodovom oneskorení, nespôsobí to zlyhanie stráženia."

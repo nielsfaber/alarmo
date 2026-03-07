@@ -250,6 +250,10 @@
               "heading": "Đếm giờ đi vào",
               "description": "Ghi đè độ trễ nhập cảnh (được cấu hình cho chế độ kích hoạt) bằng độ trễ cụ thể cho cảm biến."
             },
+            "delay_on": {
+              "heading": "Delay on",
+              "description": "Sensor must remain active for this duration before triggering. Resets if sensor deactivates."
+            },
             "allow_open": {
               "heading": "Cho phép mở lúc đầu",
               "description": "Trạng thái mở lúc bật bảo vệ sẽ được bỏ qua (những lần kích hoạt cảm biến sau đó sẽ kích hoạt báo động)."

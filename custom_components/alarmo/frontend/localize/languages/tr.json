@@ -250,6 +250,10 @@
               "heading": "Giriş gecikmesi",
               "description": "Giriş gecikmesini (kol modu için yapılandırıldığı gibi) sensöre özgü bir gecikmeyle geçersiz kılın."
             },
+            "delay_on": {
+              "heading": "Delay on",
+              "description": "Sensor must remain active for this duration before triggering. Resets if sensor deactivates."
+            },
             "allow_open": {
               "heading": "Başlangıçta açık olmasına izin verin",
               "description": "Devreye alma sırasında açık durum göz ardı edilir (sonraki sensör aktivasyonu alarmı tetikleyecektir)."

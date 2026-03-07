@@ -252,6 +252,10 @@
               "heading": "进入延迟",
               "description": "使用特定于传感器的延迟覆盖进入延迟（如为布防模式配置的）。"
             },
+            "delay_on": {
+              "heading": "Delay on",
+              "description": "Sensor must remain active for this duration before triggering. Resets if sensor deactivates."
+            },
             "allow_open": {
               "heading": "允许在警戒后打开",
               "description": "在警戒时，传感器的初始状态将被忽略。"

@@ -250,6 +250,10 @@
               "heading": "Retardo de entrada",
               "description": "Reemplace el retraso (como se establece para el modo de seguridad) con un valor específico."
             },
+            "delay_on": {
+              "heading": "Delay on",
+              "description": "Sensor must remain active for this duration before triggering. Resets if sensor deactivates."
+            },
             "allow_open": {
               "heading": "Permitir abrir mientras se arma",
               "description": "Si el sensor aún está activo después del retardo de salida, esto no hará que falle el armado."

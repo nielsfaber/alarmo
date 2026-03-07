@@ -250,6 +250,10 @@
               "heading": "Ritardo di ingresso",
               "description": "Sostituire il ritardo (impostato per la modalità di sicurezza) con un valore specifico."
             },
+            "delay_on": {
+              "heading": "Delay on",
+              "description": "Sensor must remain active for this duration before triggering. Resets if sensor deactivates."
+            },
             "allow_open": {
               "heading": "Permetti apertura",
               "description": "Consentire a questo sensore di rimanere attivo poco dopo essere usciti."

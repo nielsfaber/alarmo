@@ -250,6 +250,10 @@
               "heading": "Задержка входа",
               "description": "Переопределите задержку на вход (настроенную для режима охраны) на задержку, специфичную для датчика."
             },
+            "delay_on": {
+              "heading": "Delay on",
+              "description": "Sensor must remain active for this duration before triggering. Resets if sensor deactivates."
+            },
             "allow_open": {
               "heading": "Разрешить открытие после постановки на охрану",
               "description": "Начальное состояние датчика игнорируется при постановке на охрану."

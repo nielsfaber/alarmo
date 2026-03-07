@@ -250,6 +250,10 @@
               "heading": "Délai pour entrer",
               "description": "Remplacez le délai (tel que défini pour le mode de sécurité) par une valeur spécifique."
             },
+            "delay_on": {
+              "heading": "Delay on",
+              "description": "Sensor must remain active for this duration before triggering. Resets if sensor deactivates."
+            },
             "allow_open": {
               "heading": "Autoriser l'ouverture lors de l'activation",
               "description": "Permet à ce capteur d'être actif, peu de temps après votre départ afin qu'il ne bloque pas l'armement."

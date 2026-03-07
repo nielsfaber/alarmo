@@ -250,6 +250,10 @@
               "heading": "Indgangstid",
               "description": "Tilsidesæt forsinkelsen (som konfigureret for aktiveringstilstand) med en specifik værdi."
             },
+            "delay_on": {
+              "heading": "Delay on",
+              "description": "Sensor must remain active for this duration before triggering. Resets if sensor deactivates."
+            },
             "allow_open": {
               "heading": "Tillad åbning efter tilkobling",
               "description": "Oprindelige tilstand på sensoren ignoreres ved tilkobling."
