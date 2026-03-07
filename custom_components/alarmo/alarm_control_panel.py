@@ -15,6 +15,8 @@ from homeassistant.util import slugify
 from homeassistant.const import (
     ATTR_NAME,
     ATTR_CODE_FORMAT,
+    STATE_UNAVAILABLE,
+    STATE_UNKNOWN,
 )
 from homeassistant.helpers import entity_platform
 from homeassistant.exceptions import HomeAssistantError
@@ -768,7 +770,7 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
 
         # restore previous state
         state = await self.async_get_last_state()
-        if state:
+        if state and state.state not in (STATE_UNAVAILABLE, STATE_UNKNOWN):
             initial_state = state.state
             _LOGGER.debug(
                 "Initial state for %s is %s",
