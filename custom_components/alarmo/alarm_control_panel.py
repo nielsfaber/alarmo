@@ -14,9 +14,9 @@ from homeassistant.core import (
 from homeassistant.util import slugify
 from homeassistant.const import (
     ATTR_NAME,
+    STATE_UNKNOWN,
     ATTR_CODE_FORMAT,
     STATE_UNAVAILABLE,
-    STATE_UNKNOWN,
 )
 from homeassistant.helpers import entity_platform
 from homeassistant.exceptions import HomeAssistantError

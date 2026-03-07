@@ -1,6 +1,6 @@
 import { mdiAirplane, mdiAlertCircle, mdiCheckCircle, mdiCropPortrait, mdiDoorClosed, mdiDoorOpen, mdiFire, mdiFireAlert, mdiHome, mdiLock, mdiMoonWaningCrescent, mdiMotionSensor, mdiMotionSensorOff, mdiShield, mdiVibrate, mdiWindowClosed, mdiWindowOpen } from "@mdi/js";
 
-export const VERSION = '1.10.15';
+export const VERSION = '1.10.16';
 
 export const platform = 'alarmo';
 export const editConfigService = 'edit_config';

@@ -164,8 +164,7 @@ export class MyAlarmPanel extends LitElement {
       }
       .version {
         font-size: 14px;
-        font-weight: 500;
-        color: rgba(var(--rgb-text-primary-color), 0.9);
+        color: var(--primary-text-color);
       }
     `;
   }
