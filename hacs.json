@@ -4,5 +4,5 @@
   "zip_release": true,
   "filename": "alarmo.zip",
   "hide_default_branch": true,
-  "homeassistant": "2026.1.0"
+  "homeassistant": "2026.3.0"
 }

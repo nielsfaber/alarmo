@@ -25,6 +25,14 @@ const SEARCH_KEYS = [
   { name: "secondary", weight: 8 }
 ];
 
+interface HaSelectOption {
+  value: string;
+  label?: string;
+  secondary?: string;
+  iconPath?: string;
+  disabled?: boolean;
+}
+
 @customElement('alarmo-select')
 export class AlarmoSelect extends LitElement {
 
@@ -51,6 +59,12 @@ export class AlarmoSelect extends LitElement {
 
   protected render() {
     if (!this.showSearch) {
+      const options = this.items.map(e => <HaSelectOption>{
+        value: e.value,
+        label: e.name,
+        secondary: e.description,
+        iconPath: e.icon
+      });
       return html`
         <ha-select
           .label=${this.label}
@@ -59,12 +73,12 @@ export class AlarmoSelect extends LitElement {
           .helper=${this.helper}
           ?clearable=${this.clearable}
           ?invalid=${this.invalid}
+          .options=${options}
           @selected=${this._selectChanged}
           @closed=${(ev: Event) => { ev.stopPropagation() }}
           fixedMenuPosition
           naturalMenuWidth
         >
-          ${this._renderOptions()}
         </ha-select>
         ${this.invalid
           ? html`<span class="invalid">Invalid</span>`
@@ -98,13 +112,14 @@ export class AlarmoSelect extends LitElement {
   private _renderOptions() {
     const useIcons = this.items.some(e => e.icon);
     return this.items.map(e => html`
-      <ha-list-item
+      <ha-dropdown-item
         .graphic=${useIcons ? 'icon' : ''}
         .value=${e.value}
+        ?selected=${this.value === e.value}
       >
         ${e.icon ? html`<ha-icon slot="graphic" .icon=${e.icon}></ha-icon>` : nothing}
         <span>${e.name}</span>
-      </ha-list-item>
+      </ha-dropdown-item>
     `)
   }
 
@@ -127,9 +142,9 @@ export class AlarmoSelect extends LitElement {
     }));
   }
 
-  private _selectChanged(ev: InputEvent): void {
+  private _selectChanged(ev: CustomEvent): void {
     ev.stopPropagation();
-    this.value = (ev.target as HTMLInputElement).value;
+    this.value = ev.detail.value;
     fireEvent(this, "value-changed", { value: this.value });
   }
 
@@ -142,7 +157,7 @@ export class AlarmoSelect extends LitElement {
   public clearValue(): void {
     if (!this.showSearch) {
       const target = this.shadowRoot!.querySelector('ha-select') as HTMLInputElement;
-      (target as any).select(-1);
+      this.value = undefined;
       setTimeout(() => {
         target.blur();
       }, 50);
@@ -173,6 +188,12 @@ export class AlarmoSelect extends LitElement {
       font-size: 0.75rem;
       color: var(--mdc-theme-error, red);
       margin: 6px 16px 0px 16px;
+    }
+    ha-select {
+      --ha-space-10: var(--ha-space-13);
+    }
+    :host([icons]) ha-select {
+      --ha-space-10: var(--ha-space-15);
     }
   `;
 }

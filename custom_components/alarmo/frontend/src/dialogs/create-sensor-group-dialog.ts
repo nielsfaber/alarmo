@@ -66,11 +66,18 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
   render() {
     if (!this._params) return html``;
     return html`
-      <ha-dialog open .heading=${true} @closed=${this.closeDialog} @close-dialog=${this.closeDialog}>
-      <ha-dialog-header slot="heading">
-          <ha-icon-button slot="navigationIcon" dialogAction="close" .path=${mdiClose}>
-          </ha-icon-button>
-          <span slot="title">
+      <ha-dialog
+        open
+        @closed=${this.closeDialog}
+      >
+        <ha-dialog-header slot="header">
+          <ha-icon-button
+            slot="navigationIcon"
+            data-dialog="close"
+            .label=${this.hass.localize("ui.common.close")}
+            .path=${mdiClose}
+          ></ha-icon-button>
+          <div slot="title">
             ${this.data.group_id
         ? localize(
           'panels.sensors.dialogs.edit_group.title',
@@ -79,7 +86,7 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
           this.sensorGroups[this.data.group_id!].name
         )
         : localize('panels.sensors.dialogs.create_group.title', this.hass.language)}
-          </span>
+          </div>
         </ha-dialog-header>
         <div class="wrapper">
           <alarmo-settings-row dialog>
@@ -90,7 +97,7 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
               ${localize('panels.sensors.dialogs.create_group.fields.name.description', this.hass.language)}
             </span>
             <ha-textfield
-              label=${this.hass.localize('ui.components.area-picker.add_dialog.name')}
+              label=${this.hass.localize('ui.common.name')}
               @input=${(ev: Event) =>
         (this.data = { ...this.data, name: String((ev.target as HTMLInputElement).value).trim() })}
               value="${this.data.name}"
@@ -148,16 +155,18 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
         : ''
       }
         </div>
-        <ha-button appearance="plain" slot="secondaryAction" @click=${this.saveClick}>
-          ${this.hass.localize('ui.common.save')}
-        </ha-button>
-        ${this.data.group_id
+        <ha-dialog-footer slot="footer">
+          <ha-button appearance="plain" slot="secondaryAction" @click=${this.saveClick}>
+            ${this.hass.localize('ui.common.save')}
+          </ha-button>
+          ${this.data.group_id
         ? html`
-              <ha-button appearance="plain" slot="secondaryAction" @click=${this.deleteClick} variant="danger">
-                ${this.hass.localize('ui.common.delete')}
-              </ha-button>
-            `
+                <ha-button appearance="plain" slot="secondaryAction" @click=${this.deleteClick} variant="danger">
+                  ${this.hass.localize('ui.common.delete')}
+                </ha-button>
+              `
         : ''}
+        </ha-dialog-footer>
       </ha-dialog>
     `;
   }

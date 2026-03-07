@@ -53,9 +53,10 @@ export class AlarmoChip extends LitElement {
     }
     return html`
         <div class="icon filled">
-          <ha-icon
-            .icon=${this.icon}
-          ></ha-icon>
+          ${this.icon?.startsWith('mdi:')
+        ? html`<ha-icon .icon=${this.icon}></ha-icon>`
+        : html`<ha-svg-icon .path=${this.icon}></ha-svg-icon>`
+      }
         </div>
       `;
   }

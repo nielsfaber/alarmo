@@ -14,6 +14,7 @@ import { getModesList, modesByArea } from '../../common/modes';
 import { exportPath } from '../../common/navigation';
 
 import '../../components/alarmo-table';
+import { mdiHelpCircleOutline } from '@mdi/js';
 
 const noArea = 'no_area';
 
@@ -97,14 +98,14 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
         renderer: (data: AlarmoSensor) => {
           const stateObj = this.hass.states[data.entity_id];
           const type = Object.keys(ESensorTypes).find(e => ESensorTypes[e] == data.type) as ESensorTypes;
-          const icon = stateObj ? stateObj.state === "on" ? ESensorIconsActive[type] : ESensorIcons[type] : 'hass:help-circle-outline';
+          const icon = stateObj ? stateObj.state === "on" ? ESensorIconsActive[type] : ESensorIcons[type] : mdiHelpCircleOutline;
           return data.area == noArea
             ? html`
               <ha-icon icon="mdi:alert" style="color: var(--error-color)" id="${formatId(data.entity_id, 'icon')}"></ha-icon>
               <ha-tooltip for="${formatId(data.entity_id, 'icon')}">${localize('panels.sensors.cards.sensors.table.no_area_warning', this.hass.language)}</ha-tooltip>
             `
             : html`
-              <ha-icon icon="${icon}" class="${!data.enabled ? 'disabled' : ''}" id="${formatId(data.entity_id, 'icon')}"></ha-icon>
+              <ha-svg-icon .path=${icon} class="${!data.enabled ? 'disabled' : ''}" id="${formatId(data.entity_id, 'icon')}"></ha-svg-icon>
               <ha-tooltip for="${formatId(data.entity_id, 'icon')}">${stateObj
                 ? localize(`panels.sensors.cards.editor.fields.device_type.choose.${data.type}.name`, this.hass!.language)
                 : this.hass.localize('state_badge.default.entity_not_found')}</ha-tooltip>

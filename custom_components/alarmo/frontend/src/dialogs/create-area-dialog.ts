@@ -56,12 +56,19 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
   render() {
     if (!this._params) return html``;
     return html`
-      <ha-dialog open .heading=${true} @closed=${this.closeDialog} @close-dialog=${this.closeDialog}>
-        <ha-dialog-header slot="heading">
-          <ha-icon-button slot="navigationIcon" dialogAction="cancel" .path=${mdiClose}>
-          </ha-icon-button>
-            <span slot="title">
-              ${this.area_id
+      <ha-dialog
+        open
+        @closed=${this.closeDialog}
+      >
+        <ha-dialog-header slot="header">
+          <ha-icon-button
+            slot="navigationIcon"
+            data-dialog="close"
+            .label=${this.hass.localize("ui.common.close")}
+            .path=${mdiClose}
+          ></ha-icon-button>
+          <div slot="title">
+            ${this.area_id
         ? localize(
           'panels.general.dialogs.edit_area.title',
           this.hass.language,
@@ -69,11 +76,11 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
           this.areas[this.area_id!].name
         )
         : localize('panels.general.dialogs.create_area.title', this.hass.language)}
-            </span>
+          </div>
         </ha-dialog-header>
         <div class="wrapper">
           <ha-textfield
-            label=${this.hass.localize('ui.components.area-picker.add_dialog.name')}
+            label=${this.hass.localize('ui.common.name')}
             @input=${(ev: Event) => (this.name = (ev.target as HTMLInputElement).value)}
             value="${this.name}"
           ></ha-textfield>
@@ -86,33 +93,35 @@ export class CreateAreaDialog extends SubscribeMixin(LitElement) {
         : ''}
           ${!this.area_id
         ? html`
-                <alarmo-select
-                  .hass=${this.hass}
-                  .items=${Object.values(this.areas).map(e => Object({ value: e.area_id, name: e.name }))}
-                  value=${this.selectedArea}
-                  label="${localize('panels.general.dialogs.create_area.fields.copy_from', this.hass.language)}"
-                  clearable=${true}
-                  @value-changed=${(ev: Event) => (this.selectedArea = (ev.target as HTMLInputElement).value)}
-                ></alarmo-select>
+          <alarmo-select
+            .hass=${this.hass}
+            .items=${Object.values(this.areas).map(e => Object({ value: e.area_id, name: e.name }))}
+            value=${this.selectedArea}
+            label="${localize('panels.general.dialogs.create_area.fields.copy_from', this.hass.language)}"
+            clearable=${true}
+            @value-changed=${(ev: Event) => (this.selectedArea = (ev.target as HTMLInputElement).value)}
+          ></alarmo-select>
               `
         : ''}
         </div>
-        <ha-button appearance="plain" slot="primaryAction" @click=${this.saveClick}>
-          ${this.hass.localize('ui.common.save')}
-        </ha-button>
-        ${this.area_id
+        <ha-dialog-footer slot="footer">
+          <ha-button appearance="plain" slot="primaryAction" @click=${this.saveClick}>
+            ${this.hass.localize('ui.common.save')}
+          </ha-button>
+          ${this.area_id
         ? html`
-              <ha-button
-                appearance="plain"
-                slot="secondaryAction"
-                @click=${this.deleteClick}
-                variant="danger"
-                ?disabled=${Object.keys(this.areas!).length == 1}
-              >
-                ${this.hass.localize('ui.common.delete')}
-              </ha-button>
-            `
+            <ha-button
+              appearance="plain"
+              slot="secondaryAction"
+              @click=${this.deleteClick}
+              variant="danger"
+              ?disabled=${Object.keys(this.areas!).length == 1}
+            >
+              ${this.hass.localize('ui.common.delete')}
+            </ha-button>
+              `
         : ''}
+        </ha-dialog-footer>
       </ha-dialog>
     `;
   }

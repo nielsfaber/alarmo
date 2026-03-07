@@ -29,7 +29,7 @@ interface TableFilterItem {
 
 export type TableFilterConfig = Record<string, TableFilterItem>;
 
-type MwcMenu = { close: Function; show: Function; anchor: HTMLElement; open: boolean };
+type HaDropdown = { open: boolean };
 
 @customElement('alarmo-table')
 export class AlarmoTable extends LitElement {
@@ -56,8 +56,8 @@ export class AlarmoTable extends LitElement {
   @property({ type: Boolean })
   selectable?: boolean;
 
-  @query('mwc-menu', true)
-  private _menu?: MwcMenu;
+  @query('ha-dropdown', true)
+  private _menu?: HaDropdown;
 
   shouldUpdate(changedProps: PropertyValues) {
     if (changedProps.get('filters') && !this.filterConfig) {
@@ -156,15 +156,19 @@ export class AlarmoTable extends LitElement {
 
     return html`
       <div class="table-filter">
-        <ha-icon-button
-          .path=${mdiFilterVariant}
-          ?disabled=${!this.data?.length}
-          label=${localize('components.table.filter.label', this.hass.language)}
-          @click=${this._toggleFilterMenu}
-        ></ha-icon-button>
-        <mwc-menu .corner=${'BOTTOM_START'} .fixed=${true} @closed=${this._applyFilterSelection}>
+        <ha-dropdown
+          @wa-show=${this._showFilterMenu}
+          @wa-after-hide=${this._applyFilterSelection}
+          placement="bottom-start"
+        >
+          <ha-icon-button
+            slot="trigger"
+            .path=${mdiFilterVariant}
+            ?disabled=${!this.data?.length}
+            label=${localize('components.table.filter.label', this.hass.language)}
+          ></ha-icon-button>
           ${this.renderFilterMenu()}
-        </mwc-menu>
+        </ha-dropdown>
 
         ${this._getFilteredItems()
         ? html`
@@ -188,17 +192,11 @@ export class AlarmoTable extends LitElement {
     `;
   }
 
-  private _toggleFilterMenu(ev: Event) {
-    const el = ev.target as HTMLElement;
-    this._menu!.anchor = el;
-    if (this._menu!.open) this._menu!.close();
-    else {
-      this.filterSelection = Object.entries(this.filterConfig!).reduce(
-        (acc, [k, v]) => ({ ...acc, [k]: pick(v, ['value']) }),
-        {}
-      );
-      this._menu!.show();
-    }
+  private _showFilterMenu() {
+    this.filterSelection = Object.entries(this.filterConfig!).reduce(
+      (acc, [k, v]) => ({ ...acc, [k]: pick(v, ['value']) }),
+      {}
+    );
   }
 
   renderFilterMenu() {
@@ -209,10 +207,12 @@ export class AlarmoTable extends LitElement {
         ${localize('components.table.filter.label', this.hass.language)}
       </span>
       <ha-icon-button
+        class="close"
         .path=${mdiClose}
-        @click=${() => {
-        this._menu!.close();
-        setTimeout(() => this._menu!.anchor.blur(), 50);
+        @click=${(ev: Event) => {
+        let target = ((ev.target as HTMLElement).parentElement as HTMLElement).parentElement as HTMLElement;
+        const triggerBtn = target.querySelector("ha-icon-button") as HTMLInputElement;
+        triggerBtn.click();
       }}
       ></ha-icon-button>
       ${Object.keys(this.filterConfig).map(key => {
@@ -261,8 +261,7 @@ export class AlarmoTable extends LitElement {
     if (typeof value == 'boolean') {
       value = (value ? this.filterConfig![key].items[0].value : []) as string[];
       if (Object.keys(this.filterConfig!).length == 1) {
-        this._menu!.close();
-        setTimeout(() => this._menu!.anchor.blur(), 50);
+        this._menu!.open = false;
       }
     }
     this.filterSelection = { ...this.filterSelection!, [key]: { value: value } };
@@ -383,7 +382,7 @@ export class AlarmoTable extends LitElement {
       color: var(--error-color);
     }
 
-    ha-icon {
+    ha-icon, ha-svg-icon {
       color: var(--state-icon-color);
       padding: 8px;
     }
@@ -405,7 +404,7 @@ export class AlarmoTable extends LitElement {
     span.secondary.disabled {
       color: var(--disabled-text-color);
     }
-    ha-icon.disabled {
+    ha-icon.disabled, ha-svg-icon.disabled {
       color: var(--state-unavailable-color);
     }
 
@@ -421,12 +420,12 @@ export class AlarmoTable extends LitElement {
       flex-direction: row;
       align-items: center;
     }
-    mwc-menu .header {
+    ha-dropdown .header {
       display: flex;
       padding: 8px 16px;
       font-weight: bold;
     }
-    mwc-menu ha-icon-button {
+    ha-dropdown ha-icon-button.close {
       position: absolute;
       top: 8px;
       right: 8px;

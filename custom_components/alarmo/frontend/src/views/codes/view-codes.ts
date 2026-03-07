@@ -165,7 +165,7 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
         width: '40px',
       },
       name: {
-        title: this.hass.localize('ui.components.area-picker.add_dialog.name'),
+        title: this.hass.localize('ui.common.name'),
         width: '40%',
         grow: true,
         text: true,
@@ -187,17 +187,25 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
       const output: TableData = {
         id: item.user_id!,
         icon: html`
-          <ha-icon icon="mdi:account-outline"></ha-icon>
+          <ha-icon icon="mdi:account-outline" class="${item.enabled ? '' : 'disabled'}"></ha-icon>
         `,
-        name: prettyPrint(item.name),
-        code_format:
-          item.code_format == 'number'
+        name: html`
+          <span class="${item.enabled ? '' : 'disabled'}">
+            ${prettyPrint(item.name)}
+          </span>
+        `,
+        code_format: html`
+          <span class="${item.enabled ? '' : 'disabled'}">
+          ${item.code_format == 'number'
             ? prettyPrint(
               localize('panels.codes.cards.codes.fields.code_format.code_format_number', this.hass!.language)
             )
             : item.code_format == 'text'
               ? prettyPrint(localize('panels.codes.cards.codes.fields.code_format.code_format_text', this.hass!.language))
-              : this.hass!.localize('state.default.unknown'),
+              : this.hass!.localize('state.default.unknown')
+          }
+          </span>
+        `,
         enabled: html`
           <ha-switch
             @click=${(ev: Event) => {

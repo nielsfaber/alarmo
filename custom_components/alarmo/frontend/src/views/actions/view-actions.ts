@@ -120,7 +120,7 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
                 `,
         },
         name: {
-          title: this.hass.localize('ui.components.area-picker.add_dialog.name'),
+          title: this.hass.localize('ui.common.name'),
           renderer: (item: AlarmoAutomation & { area: string }) => html`
             ${item.area == noArea && !this.config.master.enabled ? warningTooltip() : ''}
             <span class="${!item.enabled ? 'disabled' : ''}">${item.name}</span>

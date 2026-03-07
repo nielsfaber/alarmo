@@ -152,7 +152,6 @@ export class AutomationEditorCard extends LitElement {
                     .items=${getAreaOptions(this.areas, this.alarmoConfig!).map(e =>
           computeAreaDisplay(e, this.areas, this.alarmoConfig!)
         )}
-                    clearable=${true}
                     label=${localize('panels.actions.cards.new_action.fields.area.heading', this.hass.language)}
                     .value=${String(this.config.triggers[0].area)}
                     @value-changed=${this._setArea}

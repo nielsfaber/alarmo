@@ -73,15 +73,14 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
 
           ${Object.keys(this.areas).length > 1
         ? html`
-                <alarmo-select
-                  .hass=${this.hass}
-                  .items=${Object.values(this.areas).map(e => Object({ value: e.area_id, name: e.name }))}
-                  value=${this.selectedArea}
-                  label=${this.hass.localize('ui.components.area-picker.area')}
-                  @value-changed=${(ev: Event) => this.selectArea((ev.target as HTMLInputElement).value)}
-                ></alarmo-select>
-              `
-        : ''}
+          <alarmo-select
+            .hass=${this.hass}
+            .items=${Object.values(this.areas).map(e => Object({ value: e.area_id, name: e.name }))}
+            value=${this.selectedArea}
+            label=${this.hass.localize('ui.components.area-picker.area')}
+            @value-changed=${(ev: Event) => this.selectArea((ev.target as HTMLInputElement).value)}
+          ></alarmo-select>
+        ` : ''}
         </div>
         <div class="card-content">
           ${localize('panels.general.cards.modes.description', this.hass.language)}
@@ -93,7 +92,7 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
             html`
                 <alarmo-collapsible-item>
                   <alarmo-collapsible-header>
-                    <ha-icon slot="icon" icon="${EArmModeIcons[k]}"></ha-icon>
+                    <ha-svg-icon slot="icon" .path=${EArmModeIcons[k]}></ha-svg-icon>
                     <span slot="title">
                       ${this.hass.localize(`component.alarm_control_panel.entity_component._.state.${mode}`)}
                     </span>
@@ -291,6 +290,10 @@ export class AlarmModeCard extends SubscribeMixin(LitElement) {
         float: left;
         margin-right: 12px;
         align-self: flex-start;
+      }
+      alarmo-select {
+        display: flex;
+        min-width: 180px;
       }
     `;
   }

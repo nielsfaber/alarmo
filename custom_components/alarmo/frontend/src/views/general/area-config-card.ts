@@ -53,7 +53,7 @@ export class AreaConfigCard extends SubscribeMixin(LitElement) {
         width: '48px',
       },
       name: {
-        title: this.hass.localize('ui.components.area-picker.add_dialog.name'),
+        title: this.hass.localize('ui.common.name'),
         width: '40%',
         grow: true,
         text: true,

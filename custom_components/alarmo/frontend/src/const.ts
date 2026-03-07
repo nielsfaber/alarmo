@@ -1,14 +1,16 @@
+import { mdiAirplane, mdiAlertCircle, mdiCheckCircle, mdiCropPortrait, mdiDoorClosed, mdiDoorOpen, mdiFire, mdiFireAlert, mdiHome, mdiLock, mdiMoonWaningCrescent, mdiMotionSensor, mdiMotionSensorOff, mdiShield, mdiVibrate, mdiWindowClosed, mdiWindowOpen } from "@mdi/js";
+
 export const VERSION = '1.10.15';
 
 export const platform = 'alarmo';
 export const editConfigService = 'edit_config';
 
-export enum EArmModeIcons {
-  ArmedAway = 'mdi:lock',
-  ArmedHome = 'mdi:home',
-  ArmedNight = 'mdi:moon-waning-crescent',
-  ArmedCustom = 'mdi:shield',
-  ArmedVacation = 'mdi:airplane',
+export const EArmModeIcons = {
+  ArmedAway: mdiLock,
+  ArmedHome: mdiHome,
+  ArmedNight: mdiMoonWaningCrescent,
+  ArmedCustom: mdiShield,
+  ArmedVacation: mdiAirplane
 }
 
 export enum AlarmStates {
@@ -41,22 +43,22 @@ export enum ESensorTypes {
   Other = 'other',
 }
 
-export enum ESensorIcons {
-  Door = 'mdi:door-closed',
-  Window = 'mdi:window-closed',
-  Motion = 'mdi:motion-sensor-off',
-  Tamper = 'mdi:crop-portrait',
-  Environmental = 'mdi:fire',
-  Other = 'mdi:check-circle',
+export const ESensorIcons = {
+  Door: mdiDoorClosed,
+  Window: mdiWindowClosed,
+  Motion: mdiMotionSensorOff,
+  Tamper: mdiCropPortrait,
+  Environmental: mdiFire,
+  Other: mdiCheckCircle
 }
 
-export enum ESensorIconsActive {
-  Door = 'mdi:door-open',
-  Window = 'mdi:window-open',
-  Motion = 'mdi:motion-sensor',
-  Tamper = 'mdi:vibrate',
-  Environmental = 'mdi:fire-alert',
-  Other = 'mdi:alert-circle',
+export const ESensorIconsActive = {
+  Door: mdiDoorOpen,
+  Window: mdiWindowOpen,
+  Motion: mdiMotionSensor,
+  Tamper: mdiVibrate,
+  Environmental: mdiFireAlert,
+  Other: mdiAlertCircle
 }
 
 export enum EAutomationTypes {

@@ -1,4 +1,4 @@
-import { LitElement, html, TemplateResult, CSSResultGroup, css } from 'lit';
+import { LitElement, html, TemplateResult, CSSResultGroup, css, nothing } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 import { mdiClose } from '@mdi/js';
 import {
@@ -151,7 +151,6 @@ export class NotificationEditorCard extends LitElement {
                     .items=${getAreaOptions(this.areas, this.alarmoConfig!).map(e =>
           computeAreaDisplay(e, this.areas, this.alarmoConfig!)
         )}
-                    clearable=${true}
                     label=${localize('panels.actions.cards.new_action.fields.area.heading', this.hass.language)}
                     .value=${String(this.config.triggers[0].area)}
                     @value-changed=${this._setArea}
@@ -288,7 +287,9 @@ export class NotificationEditorCard extends LitElement {
                     ${localize('panels.actions.cards.new_notification.fields.message.description', this.hass.language)}
                   </span>
 
-                  <ha-textarea
+                  <ha-selector
+                    .hass=${this.hass}
+                    .selector=${Object({ text: { multiline: true, type: 'text' } })}
                     id="message"
                     label="${localize(
               'panels.actions.cards.new_notification.fields.message.heading',
@@ -296,10 +297,14 @@ export class NotificationEditorCard extends LitElement {
             )}"
                     placeholder=${this._messagePlaceholder()}
                     .value=${this.config.actions[0].data?.message || ''}
-                    @input=${(ev: Event) => this._setMessage((ev.target as HTMLInputElement).value)}
+                    @value-changed=${(ev: CustomEvent) => { this._setMessage(ev.detail.value); }}
                     ?invalid=${this.errors.message}
-                  ></ha-textarea>
-
+                  ></ha-selector>
+                  ${this.errors.message ? html`
+                   <span class="error-message">
+                      ${this.hass.localize('ui.common.error_required')}
+                    </span>
+                  ` : nothing}
                   ${this.config.triggers[0].event
             ? html`
                         <div style="margin-top: 10px">
@@ -651,11 +656,17 @@ export class NotificationEditorCard extends LitElement {
   }
 
   private _insertWildCard(value: string) {
-    const field = this.shadowRoot!.querySelector('#message') as HTMLInputElement | undefined;
-    if (field) field.focus();
+    let field = this.shadowRoot!.querySelector('#message') as HTMLInputElement | undefined;
     let message = this.config.actions[0].data?.message || '';
+    if (field) {
+      let subfield = field.shadowRoot?.querySelector('ha-selector-text') as HTMLInputElement;
+      if (subfield) field = subfield;
+      subfield = field.shadowRoot?.querySelector('ha-textarea') as HTMLInputElement;
+      if (subfield) field = subfield;
+      field.focus();
+    }
     message =
-      field && field.selectionStart !== null && field.selectionEnd !== null
+      field && isDefined(field.selectionStart) && isDefined(field.selectionEnd)
         ? message.substring(0, field.selectionStart) + value + message.substring(field.selectionEnd, message.length)
         : message + value;
     this._setMessage(message);

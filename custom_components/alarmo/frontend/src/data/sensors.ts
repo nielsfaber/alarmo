@@ -3,6 +3,7 @@ import { AlarmoSensor, EArmModes, Dictionary, HomeAssistant } from '../types';
 import { computeDomain, computeName, getDomain, sortAlphabetically } from '../helpers';
 import { ESensorTypes, ESensorIcons } from '../const';
 import { localize } from '../../localize/localize';
+import { mdiAlertCircle, mdiBattery, mdiBatteryCharging, mdiBatteryOutline, mdiBrightness5, mdiBrightness7, mdiCheck, mdiCheckboxMarkedCircle, mdiCheckCircle, mdiCrop, mdiCropPortrait, mdiDoorClosed, mdiDoorOpen, mdiFire, mdiGarage, mdiGarageOpen, mdiHome, mdiHomeOutline, mdiLock, mdiLockOpen, mdiMusic, mdiMusicNote, mdiMusicNoteOff, mdiPackage, mdiPackageUp, mdiPlay, mdiPower, mdiPowerPlug, mdiPowerPlugOff, mdiRadioboxBlank, mdiRun, mdiServer, mdiServerNetwork, mdiServerNetworkOff, mdiSmoke, mdiSnowflake, mdiSquare, mdiSquareOutline, mdiStop, mdiThermometer, mdiVibrate, mdiWalk, mdiWater, mdiWaterOff, mdiWindowClosed, mdiWindowOpen } from '@mdi/js';
 
 export const isValidSensor = (entity: HassEntity, showAllDeviceClasses: boolean) => {
   const domain = getDomain(entity.entity_id);
@@ -197,55 +198,55 @@ export const binarySensorIcon = (stateObj: HassEntity, state?: string) => {
   const is_off = state === 'off';
   switch (stateObj?.attributes.device_class) {
     case 'battery':
-      return is_off ? 'mdi:battery' : 'mdi:battery-outline';
+      return is_off ? mdiBattery : mdiBatteryOutline;
     case 'battery_charging':
-      return is_off ? 'mdi:battery' : 'mdi:battery-charging';
+      return is_off ? mdiBattery : mdiBatteryCharging;
     case 'cold':
-      return is_off ? 'mdi:thermometer' : 'mdi:snowflake';
+      return is_off ? mdiThermometer : mdiSnowflake;
     case 'connectivity':
-      return is_off ? 'mdi:server-network-off' : 'mdi:server-network';
+      return is_off ? mdiServerNetworkOff : mdiServerNetwork;
     case 'door':
-      return is_off ? 'mdi:door-closed' : 'mdi:door-open';
+      return is_off ? mdiDoorClosed : mdiDoorOpen;
     case 'garage_door':
-      return is_off ? 'mdi:garage' : 'mdi:garage-open';
+      return is_off ? mdiGarage : mdiGarageOpen;
     case 'power':
-      return is_off ? 'mdi:power-plug-off' : 'mdi:power-plug';
+      return is_off ? mdiPowerPlugOff : mdiPowerPlug;
     case 'gas':
     case 'problem':
     case 'safety':
     case 'tamper':
-      return is_off ? 'mdi:check-circle' : 'mdi:alert-circle';
+      return is_off ? mdiCheckCircle : mdiAlertCircle;
     case 'smoke':
-      return is_off ? 'mdi:check-circle' : 'mdi:smoke';
+      return is_off ? mdiCheckCircle : mdiSmoke;
     case 'heat':
-      return is_off ? 'mdi:thermometer' : 'mdi:fire';
+      return is_off ? mdiThermometer : mdiFire;
     case 'light':
-      return is_off ? 'mdi:brightness-5' : 'mdi:brightness-7';
+      return is_off ? mdiBrightness5 : mdiBrightness7;
     case 'lock':
-      return is_off ? 'mdi:lock' : 'mdi:lock-open';
+      return is_off ? mdiLock : mdiLockOpen;
     case 'moisture':
-      return is_off ? 'mdi:water-off' : 'mdi:water';
+      return is_off ? mdiWaterOff : mdiWater;
     case 'motion':
-      return is_off ? 'mdi:walk' : 'mdi:run';
+      return is_off ? mdiWalk : mdiRun;
     case 'occupancy':
-      return is_off ? 'mdi:home-outline' : 'mdi:home';
+      return is_off ? mdiHomeOutline : mdiHome;
     case 'opening':
-      return is_off ? 'mdi:square' : 'mdi:square-outline';
+      return is_off ? mdiSquare : mdiSquareOutline;
     case 'plug':
-      return is_off ? 'mdi:power-plug-off' : 'mdi:power-plug';
+      return is_off ? mdiPowerPlugOff : mdiPowerPlug;
     case 'presence':
-      return is_off ? 'mdi:home-outline' : 'mdi:home';
+      return is_off ? mdiHomeOutline : mdiHome;
     case 'running':
-      return is_off ? 'mdi:stop' : 'mdi:play';
+      return is_off ? mdiStop : mdiPlay;
     case 'sound':
-      return is_off ? 'mdi:music-note-off' : 'mdi:music-note';
+      return is_off ? mdiMusicNoteOff : mdiMusicNote;
     case 'update':
-      return is_off ? 'mdi:package' : 'mdi:package-up';
+      return is_off ? mdiPackage : mdiPackageUp;
     case 'vibration':
-      return is_off ? 'mdi:crop-portrait' : 'mdi:vibrate';
+      return is_off ? mdiCropPortrait : mdiVibrate;
     case 'window':
-      return is_off ? 'mdi:window-closed' : 'mdi:window-open';
+      return is_off ? mdiWindowClosed : mdiWindowOpen;
     default:
-      return is_off ? 'mdi:radiobox-blank' : 'mdi:checkbox-marked-circle';
+      return is_off ? mdiRadioboxBlank : mdiCheckboxMarkedCircle;
   }
 };

@@ -1,13 +1,13 @@
 import { LitElement, html } from 'lit';
 import { property, customElement, state } from 'lit/decorators.js';
-import { mdiClose, mdiLock, mdiLockOpen } from '@mdi/js';
+import { mdiClose, mdiHelpCircleOutline, mdiLock, mdiLockOpen } from '@mdi/js';
 import { commonStyle } from '../../styles';
 import { AlarmoSensor, EArmModes, Dictionary, AlarmoArea, SensorGroup, HomeAssistant } from '../../types';
 import { fetchSensors, saveSensor, deleteSensor, fetchAreas, fetchSensorGroups } from '../../data/websockets';
 import { localize } from '../../../localize/localize';
 import { Unique, Without, handleError, showErrorDialog, computeName, navigate, omit, isDefined } from '../../helpers';
 import { HassEntity, UnsubscribeFunc } from 'home-assistant-js-websocket';
-import { sensorConfigByType, getSensorTypeOptions, getConfigurableSensors } from '../../data/sensors';
+import { sensorConfigByType, getSensorTypeOptions, getConfigurableSensors, binarySensorIcon } from '../../data/sensors';
 import { EArmModeIcons, ESensorTypes } from '../../const';
 import { Option } from '../../components/alarmo-select';
 import { SubscribeMixin } from '../../subscribe-mixin';
@@ -78,7 +78,7 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
         value: this.data!.entity_id,
         description: this.data!.entity_id,
         name: computeName(this.hass.states[this.item]),
-        icon: 'hass:help-circle-outline',
+        icon: binarySensorIcon(this.hass.states[this.item]),
       }, ...sensorsList];
     }
 
@@ -171,7 +171,6 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
             value=${this.data['type']}
             @value-changed=${(ev: Event) =>
         this.setType(((ev.target as HTMLInputElement).value || ESensorTypes.Other) as ESensorTypes)}
-            showSearch
           ></alarmo-select>
         </alarmo-settings-row>
 
@@ -194,7 +193,7 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
             }}
                   ?disabled=${this.data!.always_on}
                 >
-                  <ha-icon slot="start" icon="${EArmModeIcons[Object.entries(EArmModes).find(([, v]) => v == el)![0]]}"></ha-icon>
+                  <ha-svg-icon slot="start" .path=${EArmModeIcons[Object.entries(EArmModes).find(([, v]) => v == el)![0]]}></ha-svg-icon>
                   ${localize(`common.modes_short.${el}`, this.hass.language)}
                 </ha-button>
               `
@@ -413,10 +412,10 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
                   this.setBypassMode(el);
                 }}
                               >
-                                <ha-icon
+                                <ha-svg-icon
                                   slot="start"
-                                  icon="${EArmModeIcons[Object.entries(EArmModes).find(([, v]) => v == el)![0]]}"
-                                ></ha-icon>
+                                  .path=${EArmModeIcons[Object.entries(EArmModes).find(([, v]) => v == el)![0]]}
+                                ></ha-svg-icon>
                                 ${localize(`common.modes_short.${el}`, this.hass.language)}
                               </ha-button>
                             `

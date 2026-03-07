@@ -26,26 +26,35 @@ export class EditMasterDialog extends LitElement {
   render() {
     if (!this._params) return html``;
     return html`
-      <ha-dialog open .heading=${true} @closed=${this.closeDialog} @close-dialog=${this.closeDialog}>
-        <ha-dialog-header slot="heading">
-          <ha-icon-button slot="navigationIcon" dialogAction="cancel" .path=${mdiClose}>
-          </ha-icon-button>
-            <span slot="title">${localize('panels.general.dialogs.edit_master.title', this.hass.language)}</span>
+      <ha-dialog
+        open
+        @closed=${this.closeDialog}
+      >
+        <ha-dialog-header slot="header">
+          <ha-icon-button
+            slot="navigationIcon"
+            data-dialog="close"
+            .label=${this.hass.localize("ui.common.close")}
+            .path=${mdiClose}
+          ></ha-icon-button>
+          <div slot="title">${localize('panels.general.dialogs.edit_master.title', this.hass.language)}</div>
         </ha-dialog-header>
         <div class="wrapper">
           <ha-textfield
-            label=${this.hass.localize('ui.components.area-picker.add_dialog.name')}
+            label=${this.hass.localize('ui.common.name')}
             @input=${(ev: Event) => (this.name = (ev.target as HTMLInputElement).value)}
             value="${this.name}"
           ></ha-textfield>
           <span class="note">${localize('panels.general.dialogs.edit_area.name_warning', this.hass.language)}</span>
         </div>
-        <ha-button appearance="plain" slot="primaryAction" @click=${this.saveClick}>
-          ${this.hass.localize('ui.common.save')}
-        </ha-button>
-        <ha-button appearance="plain" slot="secondaryAction" @click=${this.closeDialog}>
-          ${this.hass.localize('ui.common.cancel')}
-        </ha-button>
+        <ha-dialog-footer slot="footer">
+          <ha-button appearance="plain" slot="primaryAction" @click=${this.saveClick}>
+            ${this.hass.localize('ui.common.save')}
+          </ha-button>
+          <ha-button appearance="plain" slot="secondaryAction" @click=${this.closeDialog}>
+            ${this.hass.localize('ui.common.cancel')}
+          </ha-button>
+        </ha-dialog-footer>
       </ha-dialog>
     `;
   }

@@ -120,9 +120,10 @@ class AlarmoCollabsibleHeader extends LitElement {
       :host([active]) mwc-list-item:active::before {
         opacity: 0.14;
       }
-      ::slotted(ha-icon) {
-        width: 40px;
-        height: 40px;
+      ::slotted(ha-icon), ::slotted(ha-svg-icon) {
+        width: 24px;
+        height: 24px;
+        padding: 6px;
         display: flex;
         align-items: center;
         justify-content: center;
