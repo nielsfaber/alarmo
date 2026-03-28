@@ -393,10 +393,10 @@ async def test_auto_bypass_empty_modes(
 
 
 @pytest.mark.asyncio
-async def test_bypassed_sensor_reintegrated_on_close(
+async def test_bypassed_sensor_reintegrated_on_close_when_enabled(
     hass: Any, enable_custom_integrations: Any
 ) -> None:
-    """Test that a bypassed sensor is reintegrated when closed and can trigger on reopen."""  # noqa E501
+    """Test that a bypassed sensor is reintegrated when auto_reintegrate option is enabled."""  # noqa E501
     alarm_entity = "alarm_control_panel.test_area_1"
     bypass_sensor = "binary_sensor.generic_area_1_door_sensor"
     area_1 = AreaFactory.create_area(area_id="area_1")
@@ -414,7 +414,8 @@ async def test_bypassed_sensor_reintegrated_on_close(
         hass,
         areas=[area_1],
         sensors=sensors,
-        entry_id="test_bypassed_sensor_reintegrated_on_close",
+        entry_id="test_bypassed_sensor_reintegrated_on_close_when_enabled",
+        auto_reintegrate_bypassed_sensors=True,
     )
     with patch_alarmo_integration_dependencies(storage):
         await hass.config_entries.async_setup(entry.entry_id)
@@ -473,3 +474,78 @@ async def test_bypassed_sensor_reintegrated_on_close(
 
         # Verify alarm is triggered
         assert_alarm_state(hass, alarm_entity, "triggered")
+
+
+@pytest.mark.asyncio
+async def test_bypassed_sensor_stays_bypassed_on_close_when_disabled(
+    hass: Any, enable_custom_integrations: Any
+) -> None:
+    """Test that a bypassed sensor stays bypassed when auto_reintegrate is disabled (default)."""  # noqa E501
+    alarm_entity = "alarm_control_panel.test_area_1"
+    bypass_sensor = "binary_sensor.generic_area_1_door_sensor"
+    area_1 = AreaFactory.create_area(area_id="area_1")
+    sensors = [
+        SensorFactory.create_door_sensor(
+            entity_id=bypass_sensor,
+            name="Generic Area 1 Door",
+            area="area_1",
+            modes=["armed_away"],
+            auto_bypass=True,
+            auto_bypass_modes=["armed_away"],
+        )
+    ]
+    storage, entry = setup_alarmo_entry(
+        hass,
+        areas=[area_1],
+        sensors=sensors,
+        entry_id="test_bypassed_sensor_stays_bypassed_on_close_when_disabled",
+        auto_reintegrate_bypassed_sensors=False,
+    )
+    with patch_alarmo_integration_dependencies(storage):
+        await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+        # Setup: sensor starts closed
+        hass.states.async_set(bypass_sensor, "off")
+        await hass.async_block_till_done()
+
+        # Open sensor before arming
+        hass.states.async_set(bypass_sensor, "on")
+        await hass.async_block_till_done()
+
+        # Arm with open sensor (will be auto-bypassed)
+        await hass.services.async_call(
+            "alarmo",
+            "arm",
+            {"entity_id": alarm_entity, "code": "1234"},
+            blocking=True,
+        )
+        await hass.async_block_till_done()
+
+        # Wait for exit delay
+        area = AreaFactory.create_area(area_id="area_1")
+        exit_time = area["modes"]["armed_away"]["exit_time"]
+        await advance_time(hass, exit_time + 1)
+
+        # Verify armed and sensor is bypassed
+        state = hass.states.get(alarm_entity)
+        assert state.state == "armed_away"
+        assert "bypassed_sensors" in state.attributes
+        assert bypass_sensor in (state.attributes["bypassed_sensors"] or [])
+
+        # Close the bypassed sensor
+        hass.states.async_set(bypass_sensor, "off")
+        await hass.async_block_till_done()
+
+        # Verify sensor is STILL in bypassed list (not removed)
+        state = hass.states.get(alarm_entity)
+        assert bypass_sensor in (state.attributes.get("bypassed_sensors") or []), (
+            "Sensor should remain in bypassed_sensors when auto_reintegrate is disabled"
+        )
+
+        # Reopen sensor - should NOT trigger alarm (still bypassed)
+        hass.states.async_set(bypass_sensor, "on")
+        await hass.async_block_till_done()
+
+        # Verify alarm is still armed (NOT in pending state)
+        assert_alarm_state(hass, alarm_entity, "armed_away")

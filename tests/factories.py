@@ -121,11 +121,14 @@ class ConfigFactory:
         return {"enabled": enabled}
 
     @staticmethod
-    def create_config() -> dict[str, dict[str, Any]]:
+    def create_config(
+        auto_reintegrate_bypassed_sensors: bool = False,
+    ) -> dict[str, dict[str, Any]]:
         """Create a config with optional defaults."""
         return {
             "master": ConfigFactory.create_master_config(),
             "mqtt": ConfigFactory.create_mqtt_config(),
+            "auto_reintegrate_bypassed_sensors": auto_reintegrate_bypassed_sensors,
         }
 
 
@@ -511,6 +514,7 @@ class StorageFactory:
         sensors: list[dict[str, Any]] | None = None,
         sensor_groups: list[dict[str, Any]] | None = None,
         master_enabled: bool = False,
+        auto_reintegrate_bypassed_sensors: bool = False,
     ) -> MockStorage:
         """Create a mock storage with optional defaults."""
         if areas is None:
@@ -533,6 +537,9 @@ class StorageFactory:
                 self._ensure_area_defaults()
                 if master_enabled:
                     self.master = {"enabled": True}
+                self.config["auto_reintegrate_bypassed_sensors"] = (
+                    auto_reintegrate_bypassed_sensors
+                )
 
             def async_get_sensor_groups(self) -> dict[str, Any]:
                 return self.sensor_groups

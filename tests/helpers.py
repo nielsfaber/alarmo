@@ -149,6 +149,7 @@ def setup_alarmo_entry(
     sensor_groups: list[dict[str, Any]] | None = None,
     users: dict[str, dict[str, Any]] | None = None,
     master_enabled: bool = False,
+    auto_reintegrate_bypassed_sensors: bool = False,
 ):
     """Create storage and entry, add entry to hass, and return (storage, entry)."""
     storage = StorageFactory.create_storage(
@@ -156,6 +157,7 @@ def setup_alarmo_entry(
         sensors=sensors,
         sensor_groups=sensor_groups or [],
         master_enabled=master_enabled,
+        auto_reintegrate_bypassed_sensors=auto_reintegrate_bypassed_sensors,
     )
     if users is not None:
         storage.users = users

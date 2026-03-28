@@ -85,6 +85,7 @@ class Config:
     code_format = attr.ib(type=str, default=CodeFormat.NUMBER)
     disarm_after_trigger = attr.ib(type=bool, default=False)
     ignore_blocking_sensors_after_trigger = attr.ib(type=bool, default=False)
+    auto_reintegrate_bypassed_sensors = attr.ib(type=bool, default=False)
     master = attr.ib(type=MasterConfig, default=MasterConfig())
     mqtt = attr.ib(type=MqttConfig, default=MqttConfig())
 
@@ -358,6 +359,9 @@ class AlarmoStorage:
                 disarm_after_trigger=data["config"]["disarm_after_trigger"],
                 ignore_blocking_sensors_after_trigger=data["config"].get(
                     "ignore_blocking_sensors_after_trigger", False
+                ),
+                auto_reintegrate_bypassed_sensors=data["config"].get(
+                    "auto_reintegrate_bypassed_sensors", False
                 ),
             )
 

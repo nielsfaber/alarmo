@@ -428,10 +428,13 @@ class SensorHandler:
         alarm_entity = self.hass.data[const.DOMAIN]["areas"][sensor_config["area"]]
         alarm_state = alarm_entity.state
 
-        # Handle bypassed sensors: reintegrate when they close, inhibit when they open
+        # Handle bypassed sensors: reintegrate when closed (if enabled)
+        # or inhibit trigger when open
         if alarm_entity.bypassed_sensors and entity in alarm_entity.bypassed_sensors:
-            if new_state == STATE_CLOSED:
-                # Sensor closed: remove from bypass and reintegrate into monitoring
+            if new_state == STATE_CLOSED and alarm_entity._config.get(
+                const.ATTR_AUTO_REINTEGRATE_BYPASSED_SENSORS, False
+            ):
+                # Sensor closed and auto-reintegration enabled: remove from bypass
                 updated_bypassed = [
                     s for s in alarm_entity.bypassed_sensors if s != entity
                 ]
@@ -455,7 +458,7 @@ class SensorHandler:
 
                 self.hass.async_create_task(_run_rebuild())
                 return
-            # Sensor is bypassed but not closing: inhibit trigger
+            # Sensor is bypassed: inhibit trigger
             _LOGGER.debug(
                 "Sensor %s changed to %s but is bypassed, inhibiting",
                 entity,

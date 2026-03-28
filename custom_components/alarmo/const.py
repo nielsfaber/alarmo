@@ -108,6 +108,7 @@ ATTR_OLD_CODE = "old_code"
 ATTR_TRIGGER_TIME = "trigger_time"
 ATTR_EXIT_TIME = "exit_time"
 ATTR_ENTRY_TIME = "entry_time"
+ATTR_AUTO_REINTEGRATE_BYPASSED_SENSORS = "auto_reintegrate_bypassed_sensors"
 
 ATTR_ENABLED = "enabled"
 ATTR_USER_ID = "user_id"
