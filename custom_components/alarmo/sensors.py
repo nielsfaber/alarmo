@@ -201,6 +201,14 @@ class SensorHandler:
         while len(self._subscriptions):
             self._subscriptions.pop()()
 
+    def _rebuild_listeners_after_bypass_change(self, area_id: str) -> None:
+        """Rebuild sensor state listeners after bypass status change.
+
+        Called asynchronously to avoid blocking the state change callback.
+        """
+        self.async_watch_sensor_states()
+        self.update_ready_to_arm_status(area_id)
+
     def async_watch_sensor_states(
         self,
         area_id: str | None = None,
@@ -275,12 +283,9 @@ class SensorHandler:
         for entity, config in self._config.items():
             if config["area"] != area_id or not config["enabled"]:
                 continue
-            elif (
-                alarm_entity.bypassed_sensors
-                and entity in alarm_entity.bypassed_sensors
-            ):
-                continue
             elif state in config[const.ATTR_MODES] or config[ATTR_ALWAYS_ON]:
+                # Include all relevant sensors (including bypassed ones) so state
+                # changes can be monitored and handled appropriately
                 entities.append(entity)
             elif (
                 not to_state
@@ -370,7 +375,7 @@ class SensorHandler:
         return None
 
     @callback
-    def async_sensor_state_changed(self, event):  # noqa: PLR0912
+    def async_sensor_state_changed(self, event):  # noqa: PLR0912, PLR0911
         """Callback fired when a sensor state has changed."""
         entity = event.data["entity_id"]
         old_state = parse_sensor_state(event.data["old_state"])
@@ -423,6 +428,42 @@ class SensorHandler:
         alarm_entity = self.hass.data[const.DOMAIN]["areas"][sensor_config["area"]]
         alarm_state = alarm_entity.state
 
+        # Handle bypassed sensors: reintegrate when they close, inhibit when they open
+        if alarm_entity.bypassed_sensors and entity in alarm_entity.bypassed_sensors:
+            if new_state == STATE_CLOSED:
+                # Sensor closed: remove from bypass and reintegrate into monitoring
+                updated_bypassed = [
+                    s for s in alarm_entity.bypassed_sensors if s != entity
+                ]
+                alarm_entity.bypassed_sensors = updated_bypassed or None
+                _LOGGER.info(
+                    "Sensor %s closed: removed from bypassed_sensors for area %s",
+                    entity,
+                    sensor_config["area"],
+                )
+                # Update HA state with new bypassed_sensors list
+                alarm_entity.schedule_update_ha_state()
+
+                # Schedule listener rebuild to pick up the reintegrated sensor
+                # Wrap the executor call in an async coroutine since
+                # `async_create_task` expects a coroutine, not a Future.
+                async def _run_rebuild():
+                    await self.hass.async_add_executor_job(
+                        self._rebuild_listeners_after_bypass_change,
+                        sensor_config["area"],
+                    )
+
+                self.hass.async_create_task(_run_rebuild())
+                return
+            # Sensor is bypassed but not closing: inhibit trigger
+            _LOGGER.debug(
+                "Sensor %s changed to %s but is bypassed, inhibiting",
+                entity,
+                new_state,
+            )
+            self.update_ready_to_arm_status(sensor_config["area"])
+            return
+
         if (
             alarm_entity.arm_mode
             and alarm_entity.arm_mode not in sensor_config[const.ATTR_MODES]
@@ -452,14 +493,16 @@ class SensorHandler:
         # Check if delay_on is configured
         delay_on = sensor_config.get(ATTR_DELAY_ON) or 0
 
+        should_execute = True
         if delay_on > 0:
             # Start delay_on timer instead of immediate trigger
             if self._start_delay_on_timer(entity, new_state):
                 self.update_ready_to_arm_status(sensor_config["area"])
-                return
+                should_execute = False
 
-        # No trigger delay or timer failed to start - execute immediately
-        self._execute_sensor_trigger(entity, new_state)
+        if should_execute:
+            # No trigger delay or timer failed to start - execute immediately
+            self._execute_sensor_trigger(entity, new_state)
 
     def _start_entity_timer(
         self,

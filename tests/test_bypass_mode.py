@@ -390,3 +390,86 @@ async def test_auto_bypass_empty_modes(
         bypassed = state.attributes.get("bypassed_sensors", [])
         msg = "Sensor should not be bypassed with empty auto_bypass_modes"
         assert not bypassed or bypass_sensor not in bypassed, msg
+
+
+@pytest.mark.asyncio
+async def test_bypassed_sensor_reintegrated_on_close(
+    hass: Any, enable_custom_integrations: Any
+) -> None:
+    """Test that a bypassed sensor is reintegrated when closed and can trigger on reopen."""  # noqa E501
+    alarm_entity = "alarm_control_panel.test_area_1"
+    bypass_sensor = "binary_sensor.generic_area_1_door_sensor"
+    area_1 = AreaFactory.create_area(area_id="area_1")
+    sensors = [
+        SensorFactory.create_door_sensor(
+            entity_id=bypass_sensor,
+            name="Generic Area 1 Door",
+            area="area_1",
+            modes=["armed_away"],
+            auto_bypass=True,
+            auto_bypass_modes=["armed_away"],
+        )
+    ]
+    storage, entry = setup_alarmo_entry(
+        hass,
+        areas=[area_1],
+        sensors=sensors,
+        entry_id="test_bypassed_sensor_reintegrated_on_close",
+    )
+    with patch_alarmo_integration_dependencies(storage):
+        await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+        # Setup: sensor starts closed
+        hass.states.async_set(bypass_sensor, "off")
+        await hass.async_block_till_done()
+
+        # Open sensor before arming
+        hass.states.async_set(bypass_sensor, "on")
+        await hass.async_block_till_done()
+
+        # Arm with open sensor (will be auto-bypassed)
+        await hass.services.async_call(
+            "alarmo",
+            "arm",
+            {"entity_id": alarm_entity, "code": "1234"},
+            blocking=True,
+        )
+        await hass.async_block_till_done()
+
+        # Wait for exit delay
+        area = AreaFactory.create_area(area_id="area_1")
+        exit_time = area["modes"]["armed_away"]["exit_time"]
+        await advance_time(hass, exit_time + 1)
+
+        # Verify armed and sensor is bypassed
+        state = hass.states.get(alarm_entity)
+        assert state.state == "armed_away"
+        assert "bypassed_sensors" in state.attributes
+        assert bypass_sensor in (state.attributes["bypassed_sensors"] or [])
+
+        # Close the bypassed sensor
+        hass.states.async_set(bypass_sensor, "off")
+        await hass.async_block_till_done()
+
+        # Verify sensor is removed from bypassed list
+        state = hass.states.get(alarm_entity)
+        assert not state.attributes.get("bypassed_sensors"), (
+            "Sensor should be removed from bypassed_sensors after closing"
+        )
+
+        # Reopen sensor - should trigger alarm (entry delay)
+        hass.states.async_set(bypass_sensor, "on")
+        await hass.async_block_till_done()
+        # Extra blocks to ensure state updates and timers are processed
+        await hass.async_block_till_done()
+
+        # Verify alarm is in pending state (entry delay active)
+        assert_alarm_state(hass, alarm_entity, "pending")
+
+        # Wait for entry delay to expire
+        entry_delay = area["modes"]["armed_away"]["entry_time"]
+        await advance_time(hass, entry_delay + 1)
+
+        # Verify alarm is triggered
+        assert_alarm_state(hass, alarm_entity, "triggered")
