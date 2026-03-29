@@ -44,6 +44,10 @@
               "heading": "Ignorer blokeringssensorer ved genaktivering",
               "description": "Gå tilbage til aktiveret tilstand uden at kontrollere for sensorer, der stadig kan være aktive."
             },
+            "auto_reintegrate_bypassed_sensors": {
+              "heading": "Automatisk genintegration af omgåede sensorer",
+              "description": "Når aktiveret, vil sensorer, der blev omgået under armering, automatisk genoptage overvågning, når de lukker."
+            },
             "enable_mqtt": {
               "heading": "Aktiver MQTT",
               "description": "Tillad at alarmpanelet blive styret igennem MQTT."

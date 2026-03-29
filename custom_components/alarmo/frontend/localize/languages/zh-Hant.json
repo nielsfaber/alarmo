@@ -44,6 +44,10 @@
               "heading": "重新布防期間忽略阻擋感應器",
               "description": "返回武裝狀態，而不檢查可能仍處於活動狀態的感測器。"
             },
+            "auto_reintegrate_bypassed_sensors": {
+              "heading": "自動重新接入被繞過的感測器",
+              "description": "啟用後，在布防期間被繞過的感測器在關閉後會自動重新加入監控。"
+            },
             "enable_mqtt": {
               "heading": "啟用MQTT",
               "description": "允許通過MQTT控制警戒面板。"

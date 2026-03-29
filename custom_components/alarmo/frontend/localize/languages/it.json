@@ -44,6 +44,10 @@
               "heading": "Ignora i sensori di blocco durante il riarmo",
               "description": "Ritornare allo stato armato senza controllare i sensori che potrebbero essere ancora attivi."
             },
+            "auto_reintegrate_bypassed_sensors": {
+              "heading": "Reintegra automaticamente i sensori esclusi",
+              "description": "Se abilitato, i sensori esclusi durante l'armamento torneranno automaticamente sotto monitoraggio una volta che saranno chiusi."
+            },
             "enable_mqtt": {
               "heading": "Abilita MQTT",
               "description": "Permetti al pannello allarme di essere controllato attraverso MQTT."

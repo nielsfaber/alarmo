@@ -48,6 +48,10 @@
               "heading": "MQTT engedélyezése",
               "description": "Engedélyezi a riasztópanel MQTT-n keresztüli vezérlését."
             },
+              "auto_reintegrate_bypassed_sensors": {
+                "heading": "Automatikus reintegrálás a megkerült érzékelőkhöz",
+                "description": "Ha engedélyezve van, a megkerült érzékelők automatikusan újra csatlakoznak a megfigyeléshez, amint bezáródnak."
+              },
             "enable_master": {
               "heading": "Főriasztó engedélyezése",
               "description": "Létrehoz egy entitást az összes zóna egyidejű vezérléséhez."

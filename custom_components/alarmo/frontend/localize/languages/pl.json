@@ -40,6 +40,10 @@
               "heading": "Rozbrojenie po wywołaniu alarmu",
               "description": "Po upływie zdefiniowanego czasu od wywołania alarmu zostanie on rozbrojony."
             },
+            "auto_reintegrate_bypassed_sensors": {
+              "heading": "Automatyczne reintegrowanie pominiętych czujników",
+              "description": "Po włączeniu czujniki pominięte podczas uzbrajania zostaną automatycznie ponownie objęte nadzorem po ich zamknięciu."
+            },
             "enable_mqtt": {
               "heading": "Włącz MQTT",
               "description": "Pozwala na sterowanie panelem alarmu za pomocą protokołu MQTT."

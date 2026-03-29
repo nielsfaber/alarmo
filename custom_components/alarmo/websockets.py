@@ -104,6 +104,7 @@ class AlarmoConfigView(HomeAssistantView):
                 ),
                 vol.Optional(const.ATTR_TRIGGER_TIME): cv.positive_int,
                 vol.Optional(const.ATTR_DISARM_AFTER_TRIGGER): cv.boolean,
+                vol.Optional(const.ATTR_AUTO_REINTEGRATE_BYPASSED_SENSORS): cv.boolean,
                 vol.Optional(ATTR_MQTT): vol.Schema(
                     {
                         vol.Required(const.ATTR_ENABLED): cv.boolean,

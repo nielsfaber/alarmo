@@ -44,6 +44,10 @@
               "heading": "Yeniden silahlandırırken bloke eden sensörleri yok sayın",
               "description": "Hala aktif olabilecek sensörleri kontrol etmeden silahlı duruma geri dönün."
             },
+            "auto_reintegrate_bypassed_sensors": {
+              "heading": "Atlanan sensörleri otomatik olarak yeniden entegre et",
+              "description": "Etkinleştirildiğinde, kurulum sırasında atlanan sensörler kapandıklarında otomatik olarak izlemeye geri katılacaktır."
+            },
             "enable_mqtt": {
               "heading": "MQTT'yi Etkinleştir",
               "description": "Alarm panelinin MQTT aracılığıyla kontrol edilmesine izin verin."

@@ -44,6 +44,10 @@
               "heading": "Ignorera blockeringssensorer vid återaktivering",
               "description": "Återgå till tillkopplat läge utan att kontrollera om det finns sensorer som fortfarande kan vara aktiva."
             },
+            "auto_reintegrate_bypassed_sensors": {
+              "heading": "Automatisk återintegrering av förbikopplade sensorer",
+              "description": "När aktiverat kommer sensorer som förbikopplades vid inarming automatiskt att återgå till övervakning när de stängs."
+            },
             "enable_mqtt": {
               "heading": "Aktivera MQTT",
               "description": "Tillåt alarm panelen att kontrolleras via MQTT."

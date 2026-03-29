@@ -44,6 +44,10 @@
               "heading": "Ignora els sensors de bloqueig en rearmar",
               "description": "Torna a l'estat armat sense comprovar si hi ha sensors que encara puguin estar actius."
             },
+              "auto_reintegrate_bypassed_sensors": {
+                "heading": "Reintegració automàtica dels sensors ignorats",
+                "description": "Quan està activat, els sensors que es van ignorar durant l'armament es reincorporaran automàticament a la supervisió quan es tanquin."
+              },
             "enable_mqtt": {
               "heading": "Activa MQTT",
               "description": "Permet controlar el tauler d'alarma mitjançant MQTT."

@@ -44,6 +44,10 @@
               "heading": "Blockierende Sensoren beim erneuten Scharfschalten ignorieren",
               "description": "Kehren Sie in den scharfgeschalteten Zustand zurück, ohne zu prüfen, ob die Sensoren noch aktiv sind."
             },
+            "auto_reintegrate_bypassed_sensors": {
+              "heading": "Automatische Wiedereingliederung umgangener Sensoren",
+              "description": "Wenn aktiviert, werden Sensoren, die beim Scharfschalten umgangen wurden, automatisch wieder in die Überwachung aufgenommen, sobald sie geschlossen sind."
+            },
             "enable_mqtt": {
               "heading": "MQTT aktivieren",
               "description": "Erlaubt die Steuerung der Alarmzentrale über MQTT."

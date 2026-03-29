@@ -48,6 +48,10 @@
               "heading": "Luba MQTT juhtimine",
               "description": "Luba nupustiku juhtimist MQTT abil."
             },
+              "auto_reintegrate_bypassed_sensors": {
+                "heading": "Automaatne kõrvale jäetud andurite taasliitmine",
+                "description": "Kui lubatud, liituvad andurid, mis armeerimisel kõrvale jäeti, pärast sulgemist automaatselt jälgimisega."
+              },
             "enable_master": {
               "heading": "Luba põhivalvestus",
               "description": "Loob olemi mis haldab kõiki valvestamise alasid korraga."

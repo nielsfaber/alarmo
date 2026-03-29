@@ -44,6 +44,10 @@
               "heading": "Ignorovať blokujúce senzory počas opätovného zapínania stráženia",
               "description": "Návrat do zapnutého stavu bez kontroly senzorov, ktoré môžu byť stále aktívne."
             },
+            "auto_reintegrate_bypassed_sensors": {
+              "heading": "Automatické opätovné zaradenie obchádzaných senzorov",
+              "description": "Ak je povolené, senzory, ktoré boli pri zapínaní obchádzané, sa po zatvorení automaticky opäť zaradia do monitorovania."
+            },
             "enable_mqtt": {
               "heading": "Povoliť MQTT",
               "description": "Umožnite, aby bol panel alarmu ovládaný cez MQTT."

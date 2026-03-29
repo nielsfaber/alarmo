@@ -44,6 +44,10 @@
               "heading": "Ignorar los sensores de bloqueo al rearmar",
               "description": "Regresar al estado armado sin verificar si hay sensores que aún puedan estar activos."
             },
+            "auto_reintegrate_bypassed_sensors": {
+              "heading": "Reintegrar automáticamente sensores omitidos",
+              "description": "Cuando está activado, los sensores que fueron omitidos durante el armado volverán a unirse automáticamente a la supervisión una vez se cierren."
+            },
             "enable_mqtt": {
               "heading": "Habilitar MQTT",
               "description": "Permitir que el panel de alarma se controle a través de MQTT."

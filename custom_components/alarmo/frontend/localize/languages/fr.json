@@ -44,6 +44,10 @@
               "heading": "Ignorer les capteurs de blocage lors du réarmement",
               "description": "Revenez à l'état armé sans vérifier les capteurs qui peuvent encore être actifs."
             },
+            "auto_reintegrate_bypassed_sensors": {
+              "heading": "Réintégration automatique des capteurs ignorés",
+              "description": "Si activé, les capteurs ignorés lors de l'armement seront automatiquement réintégrés à la surveillance dès qu'ils se referment."
+            },
             "enable_mqtt": {
               "heading": "Utilisation avec MQTT",
               "description": "Permet au panneau d'alarme d'être contrôlé via MQTT."

@@ -44,6 +44,10 @@
               "heading": "Bỏ qua các cảm biến chặn khi kích hoạt lại",
               "description": "Trở lại trạng thái bật chế độ cảnh báo mà không cần kiểm tra các cảm biến có thể vẫn đang hoạt động."
             },
+            "auto_reintegrate_bypassed_sensors": {
+              "heading": "Tự động tích hợp lại cảm biến bị bỏ qua",
+              "description": "Khi bật, các cảm biến bị bỏ qua trong quá trình kích hoạt sẽ tự động tham gia lại giám sát khi chúng đóng."
+            },
             "enable_mqtt": {
               "heading": "Bật MQTT",
               "description": "Cho phép quản lý bảng điều khiển báo động qua MQTT."

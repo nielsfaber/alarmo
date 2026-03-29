@@ -44,6 +44,10 @@
               "heading": "Ignoreer aktiewe sensors voor aktivering",
               "description": "Aktiveer weer die alarm sonder om seker te maak dat daar nog aktiewe sensors is."
             },
+            "auto_reintegrate_bypassed_sensors": {
+              "heading": "Herintegreer outomaties sensors wat omseil is",
+              "description": "Wanneer aangeskakel, sal sensors wat tydens die inskakeling omseil is, outomaties weer by die toesig aansluit sodra hulle toesluit."
+            },
             "enable_mqtt": {
               "heading": "Aktiveer MQTT",
               "description": "Laat toe dat die alarm-paneel deur MQTT beheer kan word."
