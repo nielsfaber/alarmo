@@ -49,17 +49,13 @@ export class ManageSensorGroupsDialog extends SubscribeMixin(LitElement) {
   render() {
     if (!this._params) return html``;
     return html`
-      <ha-dialog
-        open
-        @closed=${this.closeDialog}
-      >
+      <ha-dialog open @closed=${this.closeDialog}>
         <ha-dialog-header slot="header">
           <ha-icon-button
             slot="navigationIcon"
             data-dialog="close"
-            .label=${this.hass.localize("ui.common.close")}
-            .path=${mdiClose}
-          ></ha-icon-button>
+            .label=${this.hass.localize('ui.common.close')}
+            .path=${mdiClose}></ha-icon-button>
           <div slot="title">${localize('panels.sensors.dialogs.manage_groups.title', this.hass.language)}</div>
         </ha-dialog-header>
         <div class="wrapper">
@@ -68,8 +64,8 @@ export class ManageSensorGroupsDialog extends SubscribeMixin(LitElement) {
           </div>
           <div class="container">
             ${Object.keys(this.sensorGroups).length
-        ? Object.values(this.sensorGroups).map(e => this.renderGroup(e))
-        : localize('panels.sensors.dialogs.manage_groups.no_items', this.hass.language)}
+              ? Object.values(this.sensorGroups).map((e) => this.renderGroup(e))
+              : localize('panels.sensors.dialogs.manage_groups.no_items', this.hass.language)}
           </div>
         </div>
         <ha-button appearance="plain" @click=${this.createGroupClick}>
@@ -90,11 +86,11 @@ export class ManageSensorGroupsDialog extends SubscribeMixin(LitElement) {
       <div>
         <span class="name">${item.name}</span>
         <span class="description">${localize(
-      'panels.general.cards.areas.table.summary_sensors',
-      this.hass!.language,
-      '{number}',
-      String(item.entities.length)
-    )}
+          'panels.general.cards.areas.table.summary_sensors',
+          this.hass!.language,
+          '{number}',
+          String(item.entities.length)
+        )}
       </div>
       <ha-icon-button .path=${mdiChevronRight}>
       </ha-icon-button>

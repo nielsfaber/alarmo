@@ -61,7 +61,7 @@ export const deleteSensor = (hass: HomeAssistant, entity_id: string): Promise<bo
   });
 };
 
-type saveUserResult = { success: boolean, error?: string };
+type saveUserResult = { success: boolean; error?: string };
 export const saveUser = (hass: HomeAssistant, config: Partial<AlarmoUser>): Promise<saveUserResult> => {
   return hass.callApi('POST', 'alarmo/users', config);
 };

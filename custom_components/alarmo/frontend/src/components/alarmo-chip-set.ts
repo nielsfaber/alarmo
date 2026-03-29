@@ -6,7 +6,6 @@ import { HomeAssistant } from '../types';
 
 @customElement('alarmo-chip-set')
 export class AlarmoChipSet extends LitElement {
-
   @property({ attribute: false })
   hass!: HomeAssistant;
 
@@ -30,7 +29,7 @@ export class AlarmoChipSet extends LitElement {
 
     return html`
       ${Object.values(this.items).map(
-        e => html`
+        (e) => html`
           <alarmo-chip
             .hass=${this.hass}
             .value=${e.value || e.name}
@@ -41,8 +40,7 @@ export class AlarmoChipSet extends LitElement {
             ?toggleable=${this.toggleable}
             ?removable=${this.removable}
             @click=${this._handleClick}
-            @icon-clicked=${this._handleClick}
-          >
+            @icon-clicked=${this._handleClick}>
             ${e.name}
           </alarmo-chip>
         `
@@ -51,15 +49,14 @@ export class AlarmoChipSet extends LitElement {
   }
 
   private _handleClick(ev: CustomEvent) {
-    if(this.toggleable) {
+    if (this.toggleable) {
       const value = ev.detail.value;
       const active = ev.detail.active;
-      if (this.value.includes(value) && !active) this.value = this.value.filter(e => e != value);
+      if (this.value.includes(value) && !active) this.value = this.value.filter((e) => e != value);
       else if (!this.value.includes(value) && value) this.value = [...this.value, value];
       const myEvent = new CustomEvent('value-changed', { detail: this.value });
       this.dispatchEvent(myEvent);
-    }
-    else {
+    } else {
       const myEvent = new CustomEvent('value-changed', { detail: ev.detail.value });
       this.dispatchEvent(myEvent);
     }

@@ -27,7 +27,7 @@ class AlarmoCollabsibleGroup extends LitElement {
     if (el.getAttribute('active')) el.removeAttribute('active');
     else el.setAttribute('active', 'true');
 
-    let active = this.querySelectorAll('alarmo-collapsible-header[active]');
+    const active = this.querySelectorAll('alarmo-collapsible-header[active]');
 
     active.forEach(function (i) {
       if (i !== el) i.removeAttribute('active');
@@ -120,7 +120,8 @@ class AlarmoCollabsibleHeader extends LitElement {
       :host([active]) mwc-list-item:active::before {
         opacity: 0.14;
       }
-      ::slotted(ha-icon), ::slotted(ha-svg-icon) {
+      ::slotted(ha-icon),
+      ::slotted(ha-svg-icon) {
         width: 24px;
         height: 24px;
         padding: 6px;

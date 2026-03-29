@@ -1,7 +1,7 @@
-import { css, html, LitElement, nothing } from "lit";
-import { customElement, property, query } from "lit/decorators.js";
-import { HomeAssistant } from "../types";
-import { fireEvent } from "../fire_event";
+import { css, html, LitElement, nothing } from 'lit';
+import { customElement, property, query } from 'lit/decorators.js';
+import { HomeAssistant } from '../types';
+import { fireEvent } from '../fire_event';
 
 export type Option = {
   name: string;
@@ -21,8 +21,8 @@ export interface PickerComboBoxItem {
 }
 
 const SEARCH_KEYS = [
-  { name: "primary", weight: 10 },
-  { name: "secondary", weight: 8 }
+  { name: 'primary', weight: 10 },
+  { name: 'secondary', weight: 8 },
 ];
 
 interface HaSelectOption {
@@ -35,7 +35,6 @@ interface HaSelectOption {
 
 @customElement('alarmo-select')
 export class AlarmoSelect extends LitElement {
-
   @property() hass!: HomeAssistant;
 
   @property() public label = '';
@@ -59,12 +58,15 @@ export class AlarmoSelect extends LitElement {
 
   protected render() {
     if (!this.showSearch) {
-      const options = this.items.map(e => <HaSelectOption>{
-        value: e.value,
-        label: e.name,
-        secondary: e.description,
-        iconPath: e.icon
-      });
+      const options = this.items.map(
+        (e) =>
+          <HaSelectOption>{
+            value: e.value,
+            label: e.name,
+            secondary: e.description,
+            iconPath: e.icon,
+          }
+      );
       return html`
         <ha-select
           .label=${this.label}
@@ -75,83 +77,90 @@ export class AlarmoSelect extends LitElement {
           ?invalid=${this.invalid}
           .options=${options}
           @selected=${this._selectChanged}
-          @closed=${(ev: Event) => { ev.stopPropagation() }}
+          @closed=${(ev: Event) => {
+            ev.stopPropagation();
+          }}
           fixedMenuPosition
-          naturalMenuWidth
-        >
-        </ha-select>
+          naturalMenuWidth></ha-select>
         ${this.invalid
-          ? html`<span class="invalid">Invalid</span>`
+          ? html`
+              <span class="invalid">Invalid</span>
+            `
           : nothing}
       `;
-    }
-    else {
+    } else {
       return html`
-      <ha-generic-picker
-        .hass=${this.hass}
-        .autofocus=${this.autofocus}
-        .notFoundLabel=${this.hass.localize("ui.components.combo-box.no_match")}
-        .label=${this.label}
-        .value=${this.value}
-        .valueRenderer=${this._valueRenderer}
-        .disabled=${this.disabled}
-        .helper=${this.helper}
-        .getItems=${this._getItems}
-        .searchKeys=${SEARCH_KEYS}
-        @value-changed=${this._pickerChanged}
-        hide-clear-icon
-      >
-      </ha-generic-picker>
-      ${this.invalid
-          ? html`<span class="invalid">Invalid</span>`
+        <ha-generic-picker
+          .hass=${this.hass}
+          .autofocus=${this.autofocus}
+          .notFoundLabel=${this.hass.localize('ui.components.combo-box.no_match')}
+          .label=${this.label}
+          .value=${this.value}
+          .valueRenderer=${this._valueRenderer}
+          .disabled=${this.disabled}
+          .helper=${this.helper}
+          .getItems=${this._getItems}
+          .searchKeys=${SEARCH_KEYS}
+          @value-changed=${this._pickerChanged}
+          hide-clear-icon></ha-generic-picker>
+        ${this.invalid
+          ? html`
+              <span class="invalid">Invalid</span>
+            `
           : nothing}
-   `;
+      `;
     }
   }
 
   private _renderOptions() {
-    const useIcons = this.items.some(e => e.icon);
-    return this.items.map(e => html`
-      <ha-dropdown-item
-        .graphic=${useIcons ? 'icon' : ''}
-        .value=${e.value}
-        ?selected=${this.value === e.value}
-      >
-        ${e.icon ? html`<ha-icon slot="graphic" .icon=${e.icon}></ha-icon>` : nothing}
-        <span>${e.name}</span>
-      </ha-dropdown-item>
-    `)
+    const useIcons = this.items.some((e) => e.icon);
+    return this.items.map(
+      (e) => html`
+        <ha-dropdown-item .graphic=${useIcons ? 'icon' : ''} .value=${e.value} ?selected=${this.value === e.value}>
+          ${e.icon
+            ? html`
+                <ha-icon slot="graphic" .icon=${e.icon}></ha-icon>
+              `
+            : nothing}
+          <span>${e.name}</span>
+        </ha-dropdown-item>
+      `
+    );
   }
 
   private _valueRenderer = (value) => {
-    const res = this.items.find(e => e.value === value);
+    const res = this.items.find((e) => e.value === value);
     return html`
-      ${res?.icon ? html`<ha-icon slot="start" .icon=${res.icon}></ha-icon>` : nothing}
-      <span slot="headline">
-        ${res ? res.name : value}
-      </span>
+      ${res?.icon
+        ? html`
+            <ha-icon slot="start" .icon=${res.icon}></ha-icon>
+          `
+        : nothing}
+      <span slot="headline">${res ? res.name : value}</span>
     `;
-  }
+  };
 
   private _getItems = () => {
-    return this.items.map(e => <PickerComboBoxItem>Object({
-      id: e.value,
-      primary: e.name,
-      secondary: e.description,
-      icon: e.icon
-    }));
-  }
+    return this.items.map(
+      (e) => <PickerComboBoxItem>Object({
+          id: e.value,
+          primary: e.name,
+          secondary: e.description,
+          icon: e.icon,
+        })
+    );
+  };
 
   private _selectChanged(ev: CustomEvent): void {
     ev.stopPropagation();
     this.value = ev.detail.value;
-    fireEvent(this, "value-changed", { value: this.value });
+    fireEvent(this, 'value-changed', { value: this.value });
   }
 
   private _pickerChanged(ev: CustomEvent): void {
     ev.stopPropagation();
     this.value = ev.detail.value;
-    fireEvent(this, "value-changed", { value: this.value });
+    fireEvent(this, 'value-changed', { value: this.value });
   }
 
   public clearValue(): void {

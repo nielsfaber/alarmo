@@ -122,7 +122,7 @@ export const computeAreaDisplay = (
   if (area == 0) {
     return {
       name: alarmoConfig.master.name,
-      value: "0",
+      value: '0',
     };
   } else if (Object.keys(areaConfig).includes(String(area))) {
     return {
@@ -137,12 +137,11 @@ export const computeAreaDisplay = (
   }
 };
 
-export const computeServiceDisplay = (hass: HomeAssistant, ...actions: { service?: string, entity_id?: string }[]) => {
+export const computeServiceDisplay = (hass: HomeAssistant, ...actions: { service?: string; entity_id?: string }[]) => {
   const output = actions
-    .map(action => {
-
+    .map((action) => {
       if (action.entity_id) {
-        let data = computeEntityDisplay([action.entity_id], hass).pop();
+        const data = computeEntityDisplay([action.entity_id], hass).pop();
         return data;
       }
 
@@ -155,7 +154,7 @@ export const computeServiceDisplay = (hass: HomeAssistant, ...actions: { service
         name: domainService
           .replace(/_/g, ' ')
           .split(' ')
-          .map(e => e.substring(0, 1).toUpperCase() + e.substring(1))
+          .map((e) => e.substring(0, 1).toUpperCase() + e.substring(1))
           .join(' '),
         icon: 'hass:home',
         description: action.service,
@@ -166,10 +165,10 @@ export const computeServiceDisplay = (hass: HomeAssistant, ...actions: { service
           const stateObj = hass.states[`device_tracker.${domainService.replace('mobile_app_', '')}`];
           data = stateObj
             ? {
-              ...data,
-              name: stateObj.attributes.friendly_name || computeEntity(stateObj.entity_id),
-              icon: stateObj.attributes.icon || 'hass:cellphone-text',
-            }
+                ...data,
+                name: stateObj.attributes.friendly_name || computeEntity(stateObj.entity_id),
+                icon: stateObj.attributes.icon || 'hass:cellphone-text',
+              }
             : { ...data, icon: 'hass:comment-alert' };
           break;
         case 'tts':
@@ -194,7 +193,7 @@ export const computeServiceDisplay = (hass: HomeAssistant, ...actions: { service
 export const getAreaOptions = (areaConfig: Dictionary<AlarmoArea>, alarmoConfig: AlarmoConfig) => {
   let areas: (string | number)[] = [];
 
-  const area_ids = Object.keys(areaConfig).filter(e => Object.values(areaConfig[e].modes).some(v => v.enabled));
+  const area_ids = Object.keys(areaConfig).filter((e) => Object.values(areaConfig[e].modes).some((v) => v.enabled));
   if (alarmoConfig.master.enabled && area_ids.length > 1) areas = [...areas, 0];
 
   areas = [...areas, ...area_ids];
@@ -203,22 +202,25 @@ export const getAreaOptions = (areaConfig: Dictionary<AlarmoArea>, alarmoConfig:
 
 export const getArmModeOptions = (area: string | number | undefined, areaConfig: Dictionary<AlarmoArea>) => {
   const areaList = (areaCfg: AlarmoArea) =>
-    (Object.keys(areaCfg.modes) as EArmModes[]).filter(mode => areaCfg.modes[mode].enabled);
+    (Object.keys(areaCfg.modes) as EArmModes[]).filter((mode) => areaCfg.modes[mode].enabled);
 
   if (!isDefined(area) || !Object.keys(areaConfig).includes(String(area))) {
-    const modeLists = Object.keys(areaConfig).map(e => areaList(areaConfig[e]));
-    return modeLists[0].filter(e => modeLists.every(m => m.includes(e)));
+    const modeLists = Object.keys(areaConfig).map((e) => areaList(areaConfig[e]));
+    return modeLists[0].filter((e) => modeLists.every((m) => m.includes(e)));
   } else {
     return areaList(areaConfig[area]);
   }
 };
 
 export const computeEntityDisplay = (entity_id: string[], hass: HomeAssistant) => {
-  const data = entity_id.map(e => {
+  const data = entity_id.map((e) => {
     const output = {
       value: e,
       name: e in hass.states ? hass.states[e].attributes.friendly_name || computeEntity(e) : e,
-      icon: e in hass.states ? hass.states[e].attributes.icon || domainIcon(computeDomain(e)) : domainIcon(computeDomain(e)),
+      icon:
+        e in hass.states
+          ? hass.states[e].attributes.icon || domainIcon(computeDomain(e))
+          : domainIcon(computeDomain(e)),
       description: e,
     };
     return output;
@@ -227,50 +229,48 @@ export const computeEntityDisplay = (entity_id: string[], hass: HomeAssistant) =
   return data;
 };
 
-export const getNotifyServices = (hass: HomeAssistant): { service: string, entity_id?: string }[] => {
-  let res: { service: string, entity_id?: string }[] = [];
+export const getNotifyServices = (hass: HomeAssistant): { service: string; entity_id?: string }[] => {
+  let res: { service: string; entity_id?: string }[] = [];
   if ('notify' in hass.services)
     res = [
       ...res,
       ...Object.keys(hass.services.notify)
-        .filter(e => e != 'send_message')
-        .map(service => Object({ service: `notify.${service}` }))
+        .filter((e) => e != 'send_message')
+        .map((service) => Object({ service: `notify.${service}` })),
     ];
 
   if ('tts' in hass.services)
     res = [
       ...res,
       ...Object.keys(hass.services.tts)
-        .filter(e => e != 'clear_cache')
-        .map(service => Object({ service: `tts.${service}` }))
+        .filter((e) => e != 'clear_cache')
+        .map((service) => Object({ service: `tts.${service}` })),
     ];
 
-  if ('telegram_bot' in hass.services)
-    res = [
-      ...res,
-      { service: 'telegram_bot.send_message' }
-    ];
+  if ('telegram_bot' in hass.services) res = [...res, { service: 'telegram_bot.send_message' }];
 
-  Object.keys(hass.states).filter(e => computeDomain(e) == 'notify')
-    .map(entityId => {
-      res = [...res,
-      {
-        service: 'notify.send_message',
-        entity_id: entityId
-      }
-      ]
+  Object.keys(hass.states)
+    .filter((e) => computeDomain(e) == 'notify')
+    .map((entityId) => {
+      res = [
+        ...res,
+        {
+          service: 'notify.send_message',
+          entity_id: entityId,
+        },
+      ];
     });
   return res;
 };
 
 export const computeMergedActions = (...actionLists: string[][]) => {
-  if (!actionLists.length || !actionLists.every(e => e.length)) return [];
+  if (!actionLists.length || !actionLists.every((e) => e.length)) return [];
   if (actionLists.length == 1 && actionLists[0].length > 1 && Unique(actionLists[0].map(computeDomain)).length > 1)
-    return computeMergedActions(...actionLists[0].map(e => Array(e)));
+    return computeMergedActions(...actionLists[0].map((e) => Array(e)));
   let intersection = [...actionLists[0]];
-  actionLists.forEach(list => {
+  actionLists.forEach((list) => {
     intersection = intersection
-      .map(e => {
+      .map((e) => {
         if (list.includes(e)) return e;
         else if (computeDomain(e) == 'script' && list.map(computeDomain).includes('script')) return `script.script`;
         else if (list.map(computeEntity).includes(computeEntity(e))) return `homeassistant.${computeEntity(e)}`;
@@ -288,7 +288,7 @@ export const computeActions = (
 ): string[] => {
   if (recursionDepth > 10) return [];
   if (Array.isArray(entity_id)) {
-    const actionLists = entity_id.map(e => computeActions(e, hass, recursionDepth + 1));
+    const actionLists = entity_id.map((e) => computeActions(e, hass, recursionDepth + 1));
     return computeMergedActions(...actionLists);
   } else if (!isDefined(entity_id)) return [];
 
@@ -313,15 +313,17 @@ export const computeActions = (
 };
 
 export const getAutomationEntities = (hass: HomeAssistant, additionalEntities?: string[]) => {
-  let entities = [...Object.keys(hass.states).filter(e => computeDomain(e) != 'script' && computeActions(e, hass).length)];
+  let entities = [
+    ...Object.keys(hass.states).filter((e) => computeDomain(e) != 'script' && computeActions(e, hass).length),
+  ];
 
   const scriptEntities = Object.keys(hass.services.script || {})
-    .filter(e => !['turn_on', 'turn_off', 'reload', 'toggle'].includes(e))
-    .map(e => `script.${e}`);
+    .filter((e) => !['turn_on', 'turn_off', 'reload', 'toggle'].includes(e))
+    .map((e) => `script.${e}`);
   entities = [...entities, ...scriptEntities];
 
   if (additionalEntities && additionalEntities.length) {
-    entities = [...entities, ...additionalEntities.filter(e => !entities.includes(e))];
+    entities = [...entities, ...additionalEntities.filter((e) => !entities.includes(e))];
   }
 
   entities.sort(sortAlphabetically);
@@ -329,10 +331,10 @@ export const getAutomationEntities = (hass: HomeAssistant, additionalEntities?: 
 };
 
 export const getEntitiesByDomain = (hass: HomeAssistant, ...domains: string[]) => {
-  let entities = [...Object.keys(hass.states).filter(e => domains.includes(computeDomain(e)))];
+  const entities = [...Object.keys(hass.states).filter((e) => domains.includes(computeDomain(e)))];
   entities.sort(sortAlphabetically);
   return entities;
-}
+};
 
 export const getWildcardOptions = (event?: EAlarmEvent, alarmoConfig?: AlarmoConfig) => {
   let options: { name: string; value: string }[] = [];
@@ -477,7 +479,10 @@ export const isValidService = (input: any, hass: HomeAssistant) => {
 };
 
 export const isValidEntity = (input: any, hass: HomeAssistant) => {
-  return isValidString(input) && (hass.states[input] || (computeDomain(input) == 'script' && hass.services.script[computeEntity(input)]));
+  return (
+    isValidString(input) &&
+    (hass.states[input] || (computeDomain(input) == 'script' && hass.services.script[computeEntity(input)]))
+  );
 };
 
 export const isObject = (input: any) => typeof input === 'object' && input !== null && !Array.isArray(input);
@@ -507,7 +512,7 @@ export const computeActionDisplay = (action: string, hass: HomeAssistant) => {
 };
 
 export const findMatchingAction = (actionList: string[], matchedAction: string) => {
-  return actionList.find(action => {
+  return actionList.find((action) => {
     return (
       action == matchedAction ||
       (computeEntity(matchedAction) == 'turn_on' && computeEntity(action) == 'turn_on') ||

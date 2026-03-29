@@ -53,7 +53,7 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
         name: '',
         entities: [],
         timeout: 600,
-        event_count: 2
+        event_count: 2,
       };
     }
     await this.updateComplete;
@@ -66,26 +66,22 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
   render() {
     if (!this._params) return html``;
     return html`
-      <ha-dialog
-        open
-        @closed=${this.closeDialog}
-      >
+      <ha-dialog open @closed=${this.closeDialog}>
         <ha-dialog-header slot="header">
           <ha-icon-button
             slot="navigationIcon"
             data-dialog="close"
-            .label=${this.hass.localize("ui.common.close")}
-            .path=${mdiClose}
-          ></ha-icon-button>
+            .label=${this.hass.localize('ui.common.close')}
+            .path=${mdiClose}></ha-icon-button>
           <div slot="title">
             ${this.data.group_id
-        ? localize(
-          'panels.sensors.dialogs.edit_group.title',
-          this.hass.language,
-          '{name}',
-          this.sensorGroups[this.data.group_id!].name
-        )
-        : localize('panels.sensors.dialogs.create_group.title', this.hass.language)}
+              ? localize(
+                  'panels.sensors.dialogs.edit_group.title',
+                  this.hass.language,
+                  '{name}',
+                  this.sensorGroups[this.data.group_id!].name
+                )
+              : localize('panels.sensors.dialogs.create_group.title', this.hass.language)}
           </div>
         </ha-dialog-header>
         <div class="wrapper">
@@ -99,9 +95,8 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
             <ha-textfield
               label=${this.hass.localize('ui.common.name')}
               @input=${(ev: Event) =>
-        (this.data = { ...this.data, name: String((ev.target as HTMLInputElement).value).trim() })}
-              value="${this.data.name}"
-            ></ha-textfield>
+                (this.data = { ...this.data, name: String((ev.target as HTMLInputElement).value).trim() })}
+              value="${this.data.name}"></ha-textfield>
           </alarmo-settings-row>
 
           <alarmo-settings-row large dialog>
@@ -111,9 +106,7 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
             <span slot="description">
               ${localize('panels.sensors.dialogs.create_group.fields.sensors.description', this.hass.language)}
             </span>
-            <div>
-              ${this.renderSensorOptions()}
-            </div>
+            <div>${this.renderSensorOptions()}</div>
           </alarmo-settings-row>
 
           <alarmo-settings-row dialog>
@@ -130,42 +123,48 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
               .value=${this.data.timeout}
               ?required=${true}
               @value-changed=${(ev: CustomEvent) =>
-        (this.data = { ...this.data, timeout: ev.detail.value })}
-            ></alarmo-duration-picker>
+                (this.data = { ...this.data, timeout: ev.detail.value })}></alarmo-duration-picker>
           </alarmo-settings-row>
 
           ${this.data.entities.length > 2
-        ? html`
-          <alarmo-settings-row dialog>
-            <span slot="heading">
-              ${localize('panels.sensors.dialogs.create_group.fields.event_count.heading', this.hass.language)}
-            </span>
-            <span slot="description">
-              ${localize('panels.sensors.dialogs.create_group.fields.event_count.description', this.hass.language)}
-            </span>
-            <alarmo-select
-              .hass=${this.hass}
-              .items=${this.renderSensorCountOptions()}
-              ?disabled=${this.data.entities.length <= 2}
-              @value-changed=${(ev: CustomEvent) => { this.data = { ...this.data, event_count: Number(ev.detail.value) } }}
-              .value=${String(this.data.event_count > this.data.entities.length ? this.data.entities.length : this.data.event_count)}
-            ></alarmo-select>
-          </alarmo-settings-row>
-          `
-        : ''
-      }
+            ? html`
+                <alarmo-settings-row dialog>
+                  <span slot="heading">
+                    ${localize('panels.sensors.dialogs.create_group.fields.event_count.heading', this.hass.language)}
+                  </span>
+                  <span slot="description">
+                    ${localize(
+                      'panels.sensors.dialogs.create_group.fields.event_count.description',
+                      this.hass.language
+                    )}
+                  </span>
+                  <alarmo-select
+                    .hass=${this.hass}
+                    .items=${this.renderSensorCountOptions()}
+                    ?disabled=${this.data.entities.length <= 2}
+                    @value-changed=${(ev: CustomEvent) => {
+                      this.data = { ...this.data, event_count: Number(ev.detail.value) };
+                    }}
+                    .value=${String(
+                      this.data.event_count > this.data.entities.length
+                        ? this.data.entities.length
+                        : this.data.event_count
+                    )}></alarmo-select>
+                </alarmo-settings-row>
+              `
+            : ''}
         </div>
         <ha-dialog-footer slot="footer">
           <ha-button appearance="plain" slot="secondaryAction" @click=${this.saveClick}>
             ${this.hass.localize('ui.common.save')}
           </ha-button>
           ${this.data.group_id
-        ? html`
+            ? html`
                 <ha-button appearance="plain" slot="secondaryAction" @click=${this.deleteClick} variant="danger">
                   ${this.hass.localize('ui.common.delete')}
                 </ha-button>
               `
-        : ''}
+            : ''}
         </ha-dialog-footer>
       </ha-dialog>
     `;
@@ -173,8 +172,8 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
 
   renderSensorOptions() {
     const sensors = Object.keys(this.sensors)
-      .filter(e => !isDefined(this.sensors[e].group) || this.sensors[e].group === this.data.group_id)
-      .map(e => {
+      .filter((e) => !isDefined(this.sensors[e].group) || this.sensors[e].group === this.data.group_id)
+      .map((e) => {
         const stateObj = this.hass!.states[e];
         const type = Object.entries(ESensorTypes).find(([, v]) => v == this.sensors[e].type)![0];
         return {
@@ -193,18 +192,20 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
         .items=${sensors}
         .value=${this.data.entities}
         toggleable
-        @value-changed=${(ev: CustomEvent) => (this.data = { ...this.data, entities: ev.detail })}
-      ></alarmo-chip-set>
+        @value-changed=${(ev: CustomEvent) => (this.data = { ...this.data, entities: ev.detail })}></alarmo-chip-set>
     `;
   }
 
   renderSensorCountOptions() {
     let options: Option[] = [];
     for (let i = 2; i <= this.data.entities.length; i++) {
-      options = [...options, {
-        name: `${i}`,
-        value: `${i}`
-      }]
+      options = [
+        ...options,
+        {
+          name: `${i}`,
+          value: `${i}`,
+        },
+      ];
     }
     return options;
   }
@@ -214,7 +215,7 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
       showErrorDialog(ev, localize('panels.sensors.dialogs.create_group.errors.invalid_name', this.hass.language));
     else if (
       (!this.data.group_id || this.data.name != this.sensorGroups[this.data.group_id].name) &&
-      Object.values(this.sensorGroups).find(e => e.name.toLowerCase() == this.data.name.toLowerCase())
+      Object.values(this.sensorGroups).find((e) => e.name.toLowerCase() == this.data.name.toLowerCase())
     )
       showErrorDialog(ev, localize('panels.sensors.dialogs.create_group.errors.invalid_name', this.hass.language));
     else if (this.data.entities.length < 2)
@@ -223,9 +224,10 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
         localize('panels.sensors.dialogs.create_group.errors.insufficient_sensors', this.hass.language)
       );
     else {
-      if (this.data.event_count > this.data.entities.length) this.data = { ...this.data, event_count: this.data.entities.length };
+      if (this.data.event_count > this.data.entities.length)
+        this.data = { ...this.data, event_count: this.data.entities.length };
       saveSensorGroup(this.hass, this.data)
-        .catch(e => handleError(e, ev))
+        .catch((e) => handleError(e, ev))
         .then(() => {
           this.closeDialog();
         });
@@ -235,7 +237,7 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
   private deleteClick(ev: Event) {
     if (!this.data.group_id) return;
     deleteSensorGroup(this.hass, this.data.group_id!)
-      .catch(e => handleError(e, ev))
+      .catch((e) => handleError(e, ev))
       .then(() => {
         this.closeDialog();
       });

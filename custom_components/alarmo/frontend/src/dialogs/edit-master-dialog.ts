@@ -26,25 +26,20 @@ export class EditMasterDialog extends LitElement {
   render() {
     if (!this._params) return html``;
     return html`
-      <ha-dialog
-        open
-        @closed=${this.closeDialog}
-      >
+      <ha-dialog open @closed=${this.closeDialog}>
         <ha-dialog-header slot="header">
           <ha-icon-button
             slot="navigationIcon"
             data-dialog="close"
-            .label=${this.hass.localize("ui.common.close")}
-            .path=${mdiClose}
-          ></ha-icon-button>
+            .label=${this.hass.localize('ui.common.close')}
+            .path=${mdiClose}></ha-icon-button>
           <div slot="title">${localize('panels.general.dialogs.edit_master.title', this.hass.language)}</div>
         </ha-dialog-header>
         <div class="wrapper">
           <ha-textfield
             label=${this.hass.localize('ui.common.name')}
             @input=${(ev: Event) => (this.name = (ev.target as HTMLInputElement).value)}
-            value="${this.name}"
-          ></ha-textfield>
+            value="${this.name}"></ha-textfield>
           <span class="note">${localize('panels.general.dialogs.edit_area.name_warning', this.hass.language)}</span>
         </div>
         <ha-dialog-footer slot="footer">

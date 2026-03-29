@@ -23,27 +23,26 @@ export class ConfirmDeleteDialog extends LitElement {
   render() {
     if (!this._params) return html``;
     return html`
-      <ha-dialog
-        open
-        @closed=${this.closeDialog}
-      >
+      <ha-dialog open @closed=${this.closeDialog}>
         <ha-dialog-header slot="header">
           <ha-icon-button
             slot="navigationIcon"
             data-dialog="close"
-            .label=${this.hass.localize("ui.common.close")}
-            .path=${mdiClose}
-          ></ha-icon-button>
+            .label=${this.hass.localize('ui.common.close')}
+            .path=${mdiClose}></ha-icon-button>
           <div slot="title">${this._params.title}</div>
         </ha-dialog-header>
-        <div class="wrapper">
-          ${this._params.description}
-        </div>
+        <div class="wrapper">${this._params.description}</div>
         <ha-dialog-footer slot="footer">
           <ha-button appearance="plain" slot="primaryAction" @click=${this.cancelClick} dialogAction="close">
             ${this.hass.localize('ui.dialogs.generic.cancel')}
           </ha-button>
-          <ha-button appearance="plain" slot="secondaryAction" style="float: left" @click=${this.confirmClick} dialogAction="close">
+          <ha-button
+            appearance="plain"
+            slot="secondaryAction"
+            style="float: left"
+            @click=${this.confirmClick}
+            dialogAction="close">
             ${this.hass.localize('ui.dialogs.generic.ok')}
           </ha-button>
         </ha-dialog-footer>

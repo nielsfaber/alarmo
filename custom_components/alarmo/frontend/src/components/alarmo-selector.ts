@@ -36,8 +36,8 @@ export class AlarmoSelector extends LitElement {
 
   protected firstUpdated() {
     //remove items from selection which are not in the list (anymore)
-    if (this.value.some(e => !this.items.map(v => v.value).includes(e))) {
-      this.value = this.value.filter(e => this.items.map(v => v.value).includes(e));
+    if (this.value.some((e) => !this.items.map((v) => v.value).includes(e))) {
+      this.value = this.value.filter((e) => this.items.map((v) => v.value).includes(e));
       fireEvent(this, 'value-changed', { value: this.value });
     }
   }
@@ -46,27 +46,24 @@ export class AlarmoSelector extends LitElement {
     return html`
       <alarmo-chip-set
         .hass=${this.hass}
-        .items=${this.value.map(val => this.items.find(e => e.value == val)).filter(isDefined)}
+        .items=${this.value.map((val) => this.items.find((e) => e.value == val)).filter(isDefined)}
         removable
-        @value-changed=${this._removeClick}
-      >
-      </alarmo-chip-set>
+        @value-changed=${this._removeClick}></alarmo-chip-set>
       <alarmo-select
         .hass=${this.hass}
-        .items=${this.items.filter(e => !this.value.includes(e.value))}
+        .items=${this.items.filter((e) => !this.value.includes(e.value))}
         ?disabled=${this.value.length == this.items.length}
         label=${this.label}
         icons=${true}
         @value-changed=${this._addClick}
         ?invalid=${this.invalid && this.value.length != this.items.length}
-        ?showSearch=${this.showSearch}
-      ></alarmo-select>
+        ?showSearch=${this.showSearch}></alarmo-select>
     `;
   }
 
   private _removeClick(ev: CustomEvent) {
     const value = ev.detail;
-    this.value = this.value.filter(e => e !== value);
+    this.value = this.value.filter((e) => e !== value);
     fireEvent(this, 'value-changed', { value: this.value });
   }
 

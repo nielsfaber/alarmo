@@ -4,7 +4,6 @@ import { HomeAssistant } from '../types';
 
 @customElement('alarmo-chip')
 export class AlarmoChip extends LitElement {
-
   @property({ attribute: false })
   hass!: HomeAssistant;
 
@@ -45,38 +44,37 @@ export class AlarmoChip extends LitElement {
     if (this.toggleable) {
       return html`
         <div class="icon">
-          <ha-icon
-            icon="mdi:check"
-          ></ha-icon>
+          <ha-icon icon="mdi:check"></ha-icon>
         </div>
       `;
     }
     return html`
-        <div class="icon filled">
-          ${this.icon?.startsWith('mdi:')
-        ? html`<ha-icon .icon=${this.icon}></ha-icon>`
-        : html`<ha-svg-icon .path=${this.icon}></ha-svg-icon>`
-      }
-        </div>
-      `;
+      <div class="icon filled">
+        ${this.icon?.startsWith('mdi:')
+          ? html`
+              <ha-icon .icon=${this.icon}></ha-icon>
+            `
+          : html`
+              <ha-svg-icon .path=${this.icon}></ha-svg-icon>
+            `}
+      </div>
+    `;
   }
 
   private renderTrailingIcon() {
     if (!this.removable && !this.badge) return nothing;
     if (this.badge) {
       return html`
-        <div class="badge">
-          ${this.badge}
-        </div>
+        <div class="badge">${this.badge}</div>
       `;
     }
-    const uniqueId = Math.random().toString(36).substring(2, 9)
+    const uniqueId = Math.random().toString(36).substring(2, 9);
     return html`
-        <div class="trailing-icon" @click=${this._iconClick}>
-          <ha-icon icon="mdi:close" id="${uniqueId}"></ha-icon>
-          <ha-tooltip for="${uniqueId}">${this.hass.localize('ui.common.remove')}</ha-tooltip>
-        </div>
-      `;
+      <div class="trailing-icon" @click=${this._iconClick}>
+        <ha-icon icon="mdi:close" id="${uniqueId}"></ha-icon>
+        <ha-tooltip for="${uniqueId}">${this.hass.localize('ui.common.remove')}</ha-tooltip>
+      </div>
+    `;
   }
 
   private _handleClick(ev: Event) {
@@ -86,15 +84,14 @@ export class AlarmoChip extends LitElement {
         detail: {
           active: this.active,
           value: this.value,
-        }
+        },
       });
       this.dispatchEvent(myEvent);
-    }
-    else {
+    } else {
       const myEvent = new CustomEvent('click', {
         detail: {
           value: this.value,
-        }
+        },
       });
       this.dispatchEvent(myEvent);
     }
@@ -105,7 +102,7 @@ export class AlarmoChip extends LitElement {
     const myEvent = new CustomEvent('icon-clicked', {
       detail: {
         value: this.value,
-      }
+      },
     });
     this.dispatchEvent(myEvent);
     ev.stopPropagation();
@@ -209,7 +206,8 @@ export class AlarmoChip extends LitElement {
       .trailing-icon:active:before {
         opacity: 0.3;
       }
-      :host([selectable]) .chip, :host([toggleable]) .chip {
+      :host([selectable]) .chip,
+      :host([toggleable]) .chip {
         cursor: pointer;
       }
       .overlay {
@@ -221,29 +219,36 @@ export class AlarmoChip extends LitElement {
         z-index: -1;
         background: rgba(0, 0, 0, 0);
         border-radius: var(--chip-border-radius, 32px);
-        transition: background-color 0.1s ease-in-out, border 0.1s ease-in-out;
+        transition:
+          background-color 0.1s ease-in-out,
+          border 0.1s ease-in-out;
         border: 1px solid rgba(0, 0, 0, 0);
       }
-      :host([selectable]) .chip:hover .overlay, :host([toggleable]) .chip:hover .overlay {
+      :host([selectable]) .chip:hover .overlay,
+      :host([toggleable]) .chip:hover .overlay {
         border: 1px solid rgba(0, 0, 0, 0.05);
         background: rgba(0, 0, 0, 0.05);
       }
-      :host([selectable]) .chip:active .overlay, :host([toggleable]) .chip:active .overlay {
+      :host([selectable]) .chip:active .overlay,
+      :host([toggleable]) .chip:active .overlay {
         border: 1px solid rgba(0, 0, 0, 0.1);
         background: rgba(0, 0, 0, 0.1);
       }
-      :host([selectable]) .chip:hover .value, :host([toggleable]) .chip:hover .value {
+      :host([selectable]) .chip:hover .value,
+      :host([toggleable]) .chip:hover .value {
         opacity: 1;
       }
-      :host([active]):host([selectable]) .chip:hover .overlay, :host([active]):host([toggleable]) .chip:hover .overlay {
+      :host([active]):host([selectable]) .chip:hover .overlay,
+      :host([active]):host([toggleable]) .chip:hover .overlay {
         background: rgba(0, 0, 0, 0.1);
         border: 1px solid rgba(0, 0, 0, 0);
       }
-      :host([active]):host([selectable]) .chip:active .overlay, :host([active]):host([toggleable]) .chip:active .overlay {
+      :host([active]):host([selectable]) .chip:active .overlay,
+      :host([active]):host([toggleable]) .chip:active .overlay {
         background: rgba(0, 0, 0, 0.2);
         border: 1px solid rgba(0, 0, 0, 0);
       }
-      
+
       :host([toggleable]) .icon {
         width: 0px;
         transition: width 0.1s ease-in-out;

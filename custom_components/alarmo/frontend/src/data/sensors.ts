@@ -3,7 +3,54 @@ import { AlarmoSensor, EArmModes, Dictionary, HomeAssistant } from '../types';
 import { computeDomain, computeName, getDomain, sortAlphabetically } from '../helpers';
 import { ESensorTypes, ESensorIcons } from '../const';
 import { localize } from '../../localize/localize';
-import { mdiAlertCircle, mdiBattery, mdiBatteryCharging, mdiBatteryOutline, mdiBrightness5, mdiBrightness7, mdiCheck, mdiCheckboxMarkedCircle, mdiCheckCircle, mdiCrop, mdiCropPortrait, mdiDoorClosed, mdiDoorOpen, mdiFire, mdiGarage, mdiGarageOpen, mdiHome, mdiHomeOutline, mdiLock, mdiLockOpen, mdiMusic, mdiMusicNote, mdiMusicNoteOff, mdiPackage, mdiPackageUp, mdiPlay, mdiPower, mdiPowerPlug, mdiPowerPlugOff, mdiRadioboxBlank, mdiRun, mdiServer, mdiServerNetwork, mdiServerNetworkOff, mdiSmoke, mdiSnowflake, mdiSquare, mdiSquareOutline, mdiStop, mdiThermometer, mdiVibrate, mdiWalk, mdiWater, mdiWaterOff, mdiWindowClosed, mdiWindowOpen } from '@mdi/js';
+import {
+  mdiAlertCircle,
+  mdiBattery,
+  mdiBatteryCharging,
+  mdiBatteryOutline,
+  mdiBrightness5,
+  mdiBrightness7,
+  mdiCheck,
+  mdiCheckboxMarkedCircle,
+  mdiCheckCircle,
+  mdiCrop,
+  mdiCropPortrait,
+  mdiDoorClosed,
+  mdiDoorOpen,
+  mdiFire,
+  mdiGarage,
+  mdiGarageOpen,
+  mdiHome,
+  mdiHomeOutline,
+  mdiLock,
+  mdiLockOpen,
+  mdiMusic,
+  mdiMusicNote,
+  mdiMusicNoteOff,
+  mdiPackage,
+  mdiPackageUp,
+  mdiPlay,
+  mdiPower,
+  mdiPowerPlug,
+  mdiPowerPlugOff,
+  mdiRadioboxBlank,
+  mdiRun,
+  mdiServer,
+  mdiServerNetwork,
+  mdiServerNetworkOff,
+  mdiSmoke,
+  mdiSnowflake,
+  mdiSquare,
+  mdiSquareOutline,
+  mdiStop,
+  mdiThermometer,
+  mdiVibrate,
+  mdiWalk,
+  mdiWater,
+  mdiWaterOff,
+  mdiWindowClosed,
+  mdiWindowOpen,
+} from '@mdi/js';
 
 export const isValidSensor = (entity: HassEntity, showAllDeviceClasses: boolean) => {
   const domain = getDomain(entity.entity_id);
@@ -70,7 +117,7 @@ export const sensorClassToType = (stateObj: HassEntity): ESensorTypes | undefine
 };
 
 export const sensorConfigByType = (modeList: EArmModes[]): Dictionary<Partial<AlarmoSensor>> => {
-  const filterModes = (modes: EArmModes[]) => modes.filter(e => modeList.includes(e));
+  const filterModes = (modes: EArmModes[]) => modes.filter((e) => modeList.includes(e));
 
   return {
     [ESensorTypes.Door]: {
@@ -180,9 +227,9 @@ export const getConfigurableSensors = (
   showAllBinarySensors = false
 ) => {
   const list = Object.values(hass.states)
-    .filter(e => isValidSensor(e, showAllBinarySensors))
-    .filter(e => !includedSensors.includes(e.entity_id))
-    .map(e =>
+    .filter((e) => isValidSensor(e, showAllBinarySensors))
+    .filter((e) => !includedSensors.includes(e.entity_id))
+    .map((e) =>
       Object({
         id: e.entity_id,
         name: computeName(e),

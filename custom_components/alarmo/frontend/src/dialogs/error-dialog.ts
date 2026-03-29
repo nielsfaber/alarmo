@@ -21,24 +21,23 @@ export class ErrorDialog extends LitElement {
   render() {
     if (!this._params) return html``;
     return html`
-      <ha-dialog
-        open
-        @closed=${this.closeDialog}
-      >
+      <ha-dialog open @closed=${this.closeDialog}>
         <ha-dialog-header slot="header">
           <ha-icon-button
             slot="navigationIcon"
             data-dialog="close"
-            .label=${this.hass.localize("ui.common.close")}
-            .path=${mdiClose}
-          ></ha-icon-button>
+            .label=${this.hass.localize('ui.common.close')}
+            .path=${mdiClose}></ha-icon-button>
           <div slot="title">${this.hass.localize('state_badge.default.error')}</div>
         </ha-dialog-header>
-        <div class="wrapper">
-          ${this._params.error || ''}
-        </div>
+        <div class="wrapper">${this._params.error || ''}</div>
         <ha-dialog-footer slot="footer">
-          <ha-button appearance="plain" slot="primaryAction" style="float: left" @click=${this.closeDialog} dialogAction="close">
+          <ha-button
+            appearance="plain"
+            slot="primaryAction"
+            style="float: left"
+            @click=${this.closeDialog}
+            dialogAction="close">
             ${this.hass.localize('ui.common.ok')}
           </ha-button>
         </ha-dialog-footer>

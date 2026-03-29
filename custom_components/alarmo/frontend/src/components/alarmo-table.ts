@@ -69,14 +69,14 @@ export class AlarmoTable extends LitElement {
   render() {
     if (!this.columns || !this.data) return html``;
 
-    const filteredData = this.data.filter(e => this.filterTableData(e, this.filterConfig));
+    const filteredData = this.data.filter((e) => this.filterTableData(e, this.filterConfig));
     return html`
       ${this.renderFilterRow()}
       <div class="table">
         ${this.renderHeaderRow()}
         ${filteredData.length
-        ? filteredData.map(e => this.renderDataRow(e))
-        : html`
+          ? filteredData.map((e) => this.renderDataRow(e))
+          : html`
               <div class="table-row">
                 <div class="table-cell text grow">
                   <slot></slot>
@@ -91,18 +91,17 @@ export class AlarmoTable extends LitElement {
     if (!this.columns) return html``;
     return html`
       <div class="table-row header">
-        ${Object.values(this.columns).map(e =>
-      e.hide
-        ? ''
-        : html`
+        ${Object.values(this.columns).map((e) =>
+          e.hide
+            ? ''
+            : html`
                 <div
                   class="table-cell ${e.text ? 'text' : ''} ${e.grow ? 'grow' : ''} ${e.align ? e.align : ''}"
-                  style="${e.grow ? '' : `width: ${e.width}`}"
-                >
+                  style="${e.grow ? '' : `width: ${e.width}`}">
                   <span>${e.title || ''}</span>
                 </div>
               `
-    )}
+        )}
       </div>
     `;
   }
@@ -112,37 +111,35 @@ export class AlarmoTable extends LitElement {
     return html`
       <div
         class="table-row ${this.selectable ? 'selectable' : ''} ${data.warning ? 'warning' : ''}"
-        @click=${() => this.handleClick(String(data.id))}
-      >
+        @click=${() => this.handleClick(String(data.id))}>
         ${Object.entries(this.columns).map(([col, e]) =>
-      e.hide
-        ? ''
-        : html`
+          e.hide
+            ? ''
+            : html`
                 <div
                   class="table-cell ${e.text ? 'text' : ''} ${e.grow ? 'grow' : ''} ${e.align ? e.align : ''}"
-                  style="${e.grow ? '' : `width: ${e.width}`}"
-                >
+                  style="${e.grow ? '' : `width: ${e.width}`}">
                   ${e.renderer ? e.renderer(data) : data[col]}
                 </div>
               `
-    )}
+        )}
       </div>
     `;
   }
 
   filterTableData(data: TableData, filterConfig?: Record<string, { value: string[] }>) {
     if (!filterConfig) return true;
-    return Object.keys(filterConfig).every(key => {
+    return Object.keys(filterConfig).every((key) => {
       if (!Object.keys(data).includes(key)) return true;
       const filterValue = filterConfig![key].value;
       if (!filterValue || !filterValue.length) return true;
-      if (Array.isArray(data[key])) return data[key].some(e => filterValue.includes(e));
+      if (Array.isArray(data[key])) return data[key].some((e) => filterValue.includes(e));
       return filterValue.includes(data[key]);
     });
   }
 
   private _getFilteredItems() {
-    return this.data!.filter(e => !this.filterTableData(e, this.filterConfig)).length;
+    return this.data!.filter((e) => !this.filterTableData(e, this.filterConfig)).length;
   }
 
   handleClick(id: string) {
@@ -159,35 +156,32 @@ export class AlarmoTable extends LitElement {
         <ha-dropdown
           @wa-show=${this._showFilterMenu}
           @wa-after-hide=${this._applyFilterSelection}
-          placement="bottom-start"
-        >
+          placement="bottom-start">
           <ha-icon-button
             slot="trigger"
             .path=${mdiFilterVariant}
             ?disabled=${!this.data?.length}
-            label=${localize('components.table.filter.label', this.hass.language)}
-          ></ha-icon-button>
+            label=${localize('components.table.filter.label', this.hass.language)}></ha-icon-button>
           ${this.renderFilterMenu()}
         </ha-dropdown>
 
         ${this._getFilteredItems()
-        ? html`
+          ? html`
               <alarmo-chip
                 .hass=${this.hass}
                 removable
                 active
                 @icon-clicked=${this._clearFilters}
-                style="--chip-color: var(--primary-color); --background-opacity: 0.12; --chip-border-radius: 8px; --chip-height: 40px; --chip-font-size: 1em; --icon-color: var(--dark-primary-color)"
-              >
+                style="--chip-color: var(--primary-color); --background-opacity: 0.12; --chip-border-radius: 8px; --chip-height: 40px; --chip-font-size: 1em; --icon-color: var(--dark-primary-color)">
                 ${localize(
-          'components.table.filter.hidden_items',
-          this.hass.language,
-          'number',
-          this._getFilteredItems()
-        )}
+                  'components.table.filter.hidden_items',
+                  this.hass.language,
+                  'number',
+                  this._getFilteredItems()
+                )}
               </alarmo-chip>
             `
-        : ''}
+          : ''}
       </div>
     `;
   }
@@ -203,54 +197,45 @@ export class AlarmoTable extends LitElement {
     if (!this.filterConfig || !this.filterSelection) return html``;
 
     return html`
-      <span class="header">
-        ${localize('components.table.filter.label', this.hass.language)}
-      </span>
+      <span class="header">${localize('components.table.filter.label', this.hass.language)}</span>
       <ha-icon-button
         class="close"
         .path=${mdiClose}
         @click=${(ev: Event) => {
-        let target = ((ev.target as HTMLElement).parentElement as HTMLElement).parentElement as HTMLElement;
-        const triggerBtn = target.querySelector("ha-icon-button") as HTMLInputElement;
-        triggerBtn.click();
-      }}
-      ></ha-icon-button>
-      ${Object.keys(this.filterConfig).map(key => {
+          const target = ((ev.target as HTMLElement).parentElement as HTMLElement).parentElement as HTMLElement;
+          const triggerBtn = target.querySelector('ha-icon-button') as HTMLInputElement;
+          triggerBtn.click();
+        }}></ha-icon-button>
+      ${Object.keys(this.filterConfig).map((key) => {
         if (this.filterConfig![key].binary) {
           return html`
             <div class="dropdown-item checkbox">
               <ha-checkbox
                 @change=${(ev: Event) => this._updateFilterSelection(key, (ev.target as HTMLInputElement).checked)}
-                ?checked=${this.filterSelection![key].value.length}
-              ></ha-checkbox>
-              <span class="name">
-                ${this.filterConfig![key].name}
-              </span>
+                ?checked=${this.filterSelection![key].value.length}></ha-checkbox>
+              <span class="name">${this.filterConfig![key].name}</span>
             </div>
           `;
         }
 
         let items = this.filterConfig![key].items;
-        items = items.map(e => {
+        items = items.map((e) => {
           if (e.badge && typeof e.badge == 'function')
             return {
               ...e,
-              badge: e.badge(this.data?.filter(a => this.filterTableData(a, omit(this.filterSelection!, key)))),
+              badge: e.badge(this.data?.filter((a) => this.filterTableData(a, omit(this.filterSelection!, key)))),
             };
           else return e;
         });
         const value = this.filterSelection![key].value;
         return html`
           <div class="dropdown-item">
-            <span class="name">
-              ${this.filterConfig![key].name}
-            </span>
+            <span class="name">${this.filterConfig![key].name}</span>
             <alarmo-chip-set
               toggleable
               .items=${items}
               @value-changed=${(ev: CustomEvent) => this._updateFilterSelection(key, ev.detail)}
-              .value=${value}
-            ></alarmo-chip-set>
+              .value=${value}></alarmo-chip-set>
           </div>
         `;
       })}
@@ -268,7 +253,7 @@ export class AlarmoTable extends LitElement {
   }
 
   private _clearFilters() {
-    Object.keys(this.filterConfig!).forEach(key => {
+    Object.keys(this.filterConfig!).forEach((key) => {
       this.filterConfig = {
         ...this.filterConfig!,
         [key]: { ...this.filterConfig![key], value: [] },
@@ -277,7 +262,7 @@ export class AlarmoTable extends LitElement {
   }
 
   private _applyFilterSelection() {
-    Object.keys(this.filterConfig!).forEach(key => {
+    Object.keys(this.filterConfig!).forEach((key) => {
       this.filterConfig = {
         ...this.filterConfig!,
         [key]: { ...this.filterConfig![key], ...this.filterSelection![key] },
@@ -382,7 +367,8 @@ export class AlarmoTable extends LitElement {
       color: var(--error-color);
     }
 
-    ha-icon, ha-svg-icon {
+    ha-icon,
+    ha-svg-icon {
       color: var(--state-icon-color);
       padding: 8px;
     }
@@ -404,7 +390,8 @@ export class AlarmoTable extends LitElement {
     span.secondary.disabled {
       color: var(--disabled-text-color);
     }
-    ha-icon.disabled, ha-svg-icon.disabled {
+    ha-icon.disabled,
+    ha-svg-icon.disabled {
       color: var(--state-unavailable-color);
     }
 
