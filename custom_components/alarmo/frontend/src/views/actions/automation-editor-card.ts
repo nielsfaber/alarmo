@@ -286,13 +286,13 @@ export class AutomationEditorCard extends LitElement {
               ${localize('panels.actions.cards.new_action.fields.name.description', this.hass.language)}
             </span>
 
-            <ha-textfield
+            <ha-input
               label="${localize('panels.actions.cards.new_action.fields.name.heading', this.hass.language)}"
               .placeholder=${this._namePlaceholder()}
               .value=${this.config.name || ''}
               @input=${this._setName}
               ?invalid=${this.errors.name}
-            ></ha-textfield>
+            ></ha-input>
           </alarmo-settings-row>
 
           ${this.item?.automation_id

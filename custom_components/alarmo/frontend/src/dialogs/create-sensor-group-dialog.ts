@@ -96,12 +96,12 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
             <span slot="description">
               ${localize('panels.sensors.dialogs.create_group.fields.name.description', this.hass.language)}
             </span>
-            <ha-textfield
+            <ha-input
               label=${this.hass.localize('ui.common.name')}
               @input=${(ev: Event) =>
         (this.data = { ...this.data, name: String((ev.target as HTMLInputElement).value).trim() })}
               value="${this.data.name}"
-            ></ha-textfield>
+            ></ha-input>
           </alarmo-settings-row>
 
           <alarmo-settings-row large dialog>

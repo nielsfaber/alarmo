@@ -67,7 +67,7 @@ export const commonStyle = css`
     margin-bottom: -20px;
   }
 
-  ha-textfield {
+  ha-input {
     min-width: 220px;
   }
 

@@ -220,7 +220,7 @@ export class NotificationEditorCard extends LitElement {
             )}
                         </span>
 
-                        <ha-textfield
+                        <ha-input
                           label="${localize(
               'panels.actions.cards.new_notification.fields.title.heading',
               this.hass.language
@@ -228,7 +228,7 @@ export class NotificationEditorCard extends LitElement {
                           .value=${this.config.actions[0].data?.title || ''}
                           @input=${this._setTitle}
                           ?invalid=${this.errors.title}
-                        ></ha-textfield>
+                        ></ha-input>
                       </alarmo-settings-row>
                     `
             : ''}
@@ -432,13 +432,13 @@ export class NotificationEditorCard extends LitElement {
               ${localize('panels.actions.cards.new_notification.fields.name.description', this.hass.language)}
             </span>
 
-            <ha-textfield
+            <ha-input
               label="${localize('panels.actions.cards.new_notification.fields.name.heading', this.hass.language)}"
               .placeholder=${this._namePlaceholder()}
               .value=${this.config.name || ''}
               @input=${this._setName}
               ?invalid=${this.errors.name}
-            ></ha-textfield>
+            ></ha-input>
           </alarmo-settings-row>
 
           ${this.item?.automation_id

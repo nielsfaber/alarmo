@@ -54,7 +54,7 @@ export class AlarmoSelect extends LitElement {
 
   @property({ type: Boolean }) public invalid = false;
 
-  @query('ha-textfield', true)
+  @query('ha-input', true)
   private _menu?: any;
 
   protected render() {

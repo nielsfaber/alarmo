@@ -48,7 +48,8 @@ export class AlarmoDurationPicker extends LitElement {
         : nothing}
         </div>
         <div class="column">
-          <ha-textfield
+          <div class="row">
+          <ha-input
             id="minutes"
             inputmode="numeric"
             .value=${this.disabled ? this.placeholder : this._getMinutes()}
@@ -62,14 +63,14 @@ export class AlarmoDurationPicker extends LitElement {
             .max=${Math.floor(this.max / SECONDS_PER_MINUTE)}
             .disabled=${this.disabled}
             .validityTransform=${this._validateMinutesInput}
-                  suffix=":"
-                  class="hasSuffix"
           >
-          </ha-textfield>
+          </ha-input>
+          <div class="time-separator">:</div>
+          </div>
           <span class="label">${localize('components.time_picker.minutes', this.hass.language)}</span>
         </div>
         <div class="column">
-          <ha-textfield
+          <ha-input
             id="seconds"
             inputmode="numeric"
             .value=${this.disabled ? this.placeholder : this._getSeconds()}
@@ -84,7 +85,7 @@ export class AlarmoDurationPicker extends LitElement {
             .disabled=${this.disabled}
             .validityTransform=${this._validateSecondsInput}
           >
-          </ha-textfield>
+          </ha-input>
           <span class="label">${localize('components.time_picker.seconds', this.hass.language)}</span>
         </div>
         ${this.showArrows
@@ -223,19 +224,34 @@ export class AlarmoDurationPicker extends LitElement {
     :host([required]) div.wrapper {
       margin-left: 10px;
     }
-    ha-textfield {
+    ha-checkbox {
+      margin-top: 4px;
+    }
+    ha-input {
       width: 70px;
-      height: 48px;
+      height: 56px;
+      --ha-input-padding-top: 0px;
+      --ha-input-padding-bottom: 0px;
+      --ha-input-text-align: center;
+      --wa-form-control-value-font-size: 16px;
+    }
+    ha-input::part(wa-input) {
       text-align: center;
-      --mdc-shape-small: 0;
-      --text-field-appearance: none;
-      --text-field-padding: 0 4px;
-      --text-field-suffix-padding-left: 2px;
-      --text-field-suffix-padding-right: 0;
-      --text-field-text-align: center;
-      --mdc-typography-subtitle1-font-size: 16px;
-      --mdc-text-field-outlined-idle-border-color: var(--card-background-color);
-      --mdc-text-field-outlined-hover-border-color: var(--card-background-color);
+    }
+    .time-separator {
+      background-color: var(--ha-color-form-background);
+      color: var(--ha-color-text-secondary);
+      border-bottom: 1px solid var(--ha-color-border-neutral-loud);
+      box-sizing: border-box;
+      height: 56px;
+      width: 12px;
+      margin-inline-start: calc(var(--ha-space-1) * -1);
+      margin-inline-end: calc(var(--ha-space-1) * -1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 600;
     }
     div.column {
       display: flex;
@@ -244,7 +260,9 @@ export class AlarmoDurationPicker extends LitElement {
     div.column > * {
       display: flex;
     }
-    ha-icon {
+    div.row {
+      display: flex;
+      flex-direction: row;
     }
     wa-button {
       width: 30px;

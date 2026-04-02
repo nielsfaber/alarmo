@@ -40,11 +40,11 @@ export class EditMasterDialog extends LitElement {
           <div slot="title">${localize('panels.general.dialogs.edit_master.title', this.hass.language)}</div>
         </ha-dialog-header>
         <div class="wrapper">
-          <ha-textfield
+          <ha-input
             label=${this.hass.localize('ui.common.name')}
             @input=${(ev: Event) => (this.name = (ev.target as HTMLInputElement).value)}
             value="${this.name}"
-          ></ha-textfield>
+          ></ha-input>
           <span class="note">${localize('panels.general.dialogs.edit_area.name_warning', this.hass.language)}</span>
         </div>
         <ha-dialog-footer slot="footer">
@@ -83,7 +83,7 @@ export class EditMasterDialog extends LitElement {
       span.note {
         color: var(--secondary-text-color);
       }
-      ha-textfield {
+      ha-input {
         display: block;
       }
     `;

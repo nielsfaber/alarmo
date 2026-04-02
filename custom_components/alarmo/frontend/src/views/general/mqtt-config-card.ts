@@ -62,13 +62,13 @@ export class MqttConfigCard extends SubscribeMixin(LitElement) {
           <span slot="description">
             ${localize('panels.general.cards.mqtt.fields.state_topic.description', this.hass.language)}
           </span>
-          <ha-textfield
+          <ha-input
             label="${localize('panels.general.cards.mqtt.fields.state_topic.heading', this.hass.language)}"
             value=${this.selection.state_topic}
             @change=${(ev: Event) => {
         this.selection = { ...this.selection!, state_topic: (ev.target as HTMLInputElement).value };
       }}
-          ></ha-textfield>
+          ></ha-input>
         </alarmo-settings-row>
 
         <alarmo-collapsible-section
@@ -89,7 +89,7 @@ export class MqttConfigCard extends SubscribeMixin(LitElement) {
             prettyPrint(e)
           )}
                   </span>
-                  <ha-textfield
+                  <ha-input
                     label=${prettyPrint(e)}
                     placeholder=${e}
                     value=${this.selection!.state_payload[e] || ''}
@@ -98,7 +98,7 @@ export class MqttConfigCard extends SubscribeMixin(LitElement) {
                 state_payload: { [e]: (ev.target as HTMLInputElement).value },
               });
             }}
-                  ></ha-textfield>
+                  ></ha-input>
                 </alarmo-settings-row>
               `
         )}
@@ -111,13 +111,13 @@ export class MqttConfigCard extends SubscribeMixin(LitElement) {
           <span slot="description">
             ${localize('panels.general.cards.mqtt.fields.event_topic.description', this.hass.language)}
           </span>
-          <ha-textfield
+          <ha-input
             label="${localize('panels.general.cards.mqtt.fields.event_topic.heading', this.hass.language)}"
             value=${this.selection.event_topic}
             @change=${(ev: Event) => {
         this.selection = { ...this.selection!, event_topic: (ev.target as HTMLInputElement).value };
       }}
-          ></ha-textfield>
+          ></ha-input>
         </alarmo-settings-row>
 
         <alarmo-settings-row .narrow=${this.narrow}>
@@ -127,13 +127,13 @@ export class MqttConfigCard extends SubscribeMixin(LitElement) {
           <span slot="description">
             ${localize('panels.general.cards.mqtt.fields.command_topic.description', this.hass.language)}
           </span>
-          <ha-textfield
+          <ha-input
             label="${localize('panels.general.cards.mqtt.fields.command_topic.heading', this.hass.language)}"
             value=${this.selection.command_topic}
             @change=${(ev: Event) => {
         this.selection = { ...this.selection!, command_topic: (ev.target as HTMLInputElement).value };
       }}
-          ></ha-textfield>
+          ></ha-input>
         </alarmo-settings-row>
 
         <alarmo-collapsible-section
@@ -156,7 +156,7 @@ export class MqttConfigCard extends SubscribeMixin(LitElement) {
             prettyPrint(e)
           )}
                   </span>
-                  <ha-textfield
+                  <ha-input
                     label=${prettyPrint(e)}
                     placeholder=${e}
                     value=${this.selection!.command_payload[e] || ''}
@@ -165,7 +165,7 @@ export class MqttConfigCard extends SubscribeMixin(LitElement) {
                 command_payload: { [e]: (ev.target as HTMLInputElement).value },
               });
             }}
-                  ></ha-textfield>
+                  ></ha-input>
                 </alarmo-settings-row>
               `
         )}
