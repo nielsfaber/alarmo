@@ -1,6 +1,7 @@
 """Test alarm master functionality with multiple areas."""
 
 from typing import Any
+from unittest.mock import AsyncMock
 
 import pytest
 
@@ -11,7 +12,8 @@ from tests.helpers import (
     setup_alarmo_entry,
     patch_alarmo_integration_dependencies,
 )
-from tests.factories import AreaFactory, SensorFactory
+from tests.factories import AreaFactory, UserFactory, SensorFactory
+from custom_components.alarmo import const
 
 
 @pytest.mark.asyncio
@@ -304,4 +306,184 @@ async def test_alarm_master_priority_states(
             blocking=True,
         )
         await hass.async_block_till_done()
+        assert_alarm_state(hass, "alarm_control_panel.master", "disarmed")
+
+
+@pytest.mark.asyncio
+async def test_alarm_master_disarm_denied_for_area_limited_user(
+    hass: Any, enable_custom_integrations: Any
+) -> None:
+    """Master disarm should fail if user lacks permission for all areas."""
+    area1 = AreaFactory.create_area(
+        area_id="area_1",
+        name="Test Area 1 Limited",
+        modes=["armed_away"],
+        armed_away_enabled=True,
+        armed_away_exit_time=0,
+    )
+    area2 = AreaFactory.create_area(
+        area_id="area_2",
+        name="Test Area 2 Limited",
+        modes=["armed_away"],
+        armed_away_enabled=True,
+        armed_away_exit_time=0,
+    )
+
+    sensor1 = SensorFactory.create_door_sensor(
+        entity_id="binary_sensor.area_1_door", area="area_1"
+    )
+    sensor2 = SensorFactory.create_door_sensor(
+        entity_id="binary_sensor.area_2_door", area="area_2"
+    )
+
+    users = {
+        "admin_user": UserFactory.create_user(
+            user_id="admin_user",
+            name="Admin User",
+            code="1234",
+            can_arm=True,
+            can_disarm=True,
+        ),
+        "limited_user": UserFactory.create_user(
+            user_id="limited_user",
+            name="Limited User",
+            code="3456",
+            can_arm=True,
+            can_disarm=True,
+            area_limit="area_1",
+        ),
+    }
+
+    storage, entry = setup_alarmo_entry(
+        hass,
+        areas=[area1, area2],
+        sensors=[sensor1, sensor2],
+        entry_id="test_master_disarm_limited",
+        users=users,
+        master_enabled=True,
+    )
+
+    with patch_alarmo_integration_dependencies(storage):
+        await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+        hass.states.async_set("binary_sensor.area_1_door", "off")
+        hass.states.async_set("binary_sensor.area_2_door", "off")
+        await hass.async_block_till_done()
+
+        # Arm via master with admin user
+        await hass.services.async_call(
+            "alarm_control_panel",
+            "alarm_arm_away",
+            {"entity_id": "alarm_control_panel.master", "code": "1234"},
+            blocking=True,
+        )
+        await advance_time(hass, 1)
+
+        assert_alarm_state(
+            hass, "alarm_control_panel.test_area_1_limited", "armed_away"
+        )
+        assert_alarm_state(
+            hass, "alarm_control_panel.test_area_2_limited", "armed_away"
+        )
+        assert_alarm_state(hass, "alarm_control_panel.master", "armed_away")
+
+        # Attempt to disarm master with area-limited user
+        await hass.services.async_call(
+            "alarm_control_panel",
+            "alarm_disarm",
+            {"entity_id": "alarm_control_panel.master", "code": "3456"},
+            blocking=True,
+        )
+        await hass.async_block_till_done()
+
+        # Should remain armed since user cannot operate all areas
+        assert_alarm_state(
+            hass, "alarm_control_panel.test_area_1_limited", "armed_away"
+        )
+        assert_alarm_state(
+            hass, "alarm_control_panel.test_area_2_limited", "armed_away"
+        )
+        assert_alarm_state(hass, "alarm_control_panel.master", "armed_away")
+
+
+@pytest.mark.asyncio
+async def test_alarm_master_disarm_auth_resolved_once(
+    hass: Any, enable_custom_integrations: Any
+) -> None:
+    """Master disarm resolves the user only once and reuses it for all areas."""
+    area1 = AreaFactory.create_area(
+        area_id="area_1",
+        name="Test Area 1 Auth",
+        modes=["armed_away"],
+        armed_away_enabled=True,
+        armed_away_exit_time=0,
+    )
+    area2 = AreaFactory.create_area(
+        area_id="area_2",
+        name="Test Area 2 Auth",
+        modes=["armed_away"],
+        armed_away_enabled=True,
+        armed_away_exit_time=0,
+    )
+
+    sensor1 = SensorFactory.create_door_sensor(
+        entity_id="binary_sensor.area_1_door", area="area_1"
+    )
+    sensor2 = SensorFactory.create_door_sensor(
+        entity_id="binary_sensor.area_2_door", area="area_2"
+    )
+
+    users = {
+        "admin_user": UserFactory.create_user(
+            user_id="admin_user",
+            name="Admin User",
+            code="1234",
+            can_arm=True,
+            can_disarm=True,
+        )
+    }
+
+    storage, entry = setup_alarmo_entry(
+        hass,
+        areas=[area1, area2],
+        sensors=[sensor1, sensor2],
+        entry_id="test_master_disarm_auth_once",
+        users=users,
+        master_enabled=True,
+    )
+
+    with patch_alarmo_integration_dependencies(storage):
+        await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+        hass.states.async_set("binary_sensor.area_1_door", "off")
+        hass.states.async_set("binary_sensor.area_2_door", "off")
+        await hass.async_block_till_done()
+
+        # Arm via master
+        await hass.services.async_call(
+            "alarm_control_panel",
+            "alarm_arm_away",
+            {"entity_id": "alarm_control_panel.master", "code": "1234"},
+            blocking=True,
+        )
+        await advance_time(hass, 1)
+
+        coordinator = hass.data[const.DOMAIN]["coordinator"]
+        original_auth = coordinator.async_authenticate_user
+        coordinator.async_authenticate_user = AsyncMock(wraps=original_auth)
+
+        # Disarm via master
+        await hass.services.async_call(
+            "alarm_control_panel",
+            "alarm_disarm",
+            {"entity_id": "alarm_control_panel.master", "code": "1234"},
+            blocking=True,
+        )
+        await hass.async_block_till_done()
+
+        assert coordinator.async_authenticate_user.call_count == 1
+        assert_alarm_state(hass, "alarm_control_panel.test_area_1_auth", "disarmed")
+        assert_alarm_state(hass, "alarm_control_panel.test_area_2_auth", "disarmed")
         assert_alarm_state(hass, "alarm_control_panel.master", "disarmed")
