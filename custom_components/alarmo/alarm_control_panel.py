@@ -320,7 +320,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             "last_triggered": self.last_triggered,
         }
 
-    def _validate_code(self, code, to_state):  # noqa PLR0911
+    async def _validate_code(self, code, to_state):  # noqa PLR0911
         """Validate given code."""
         if (
             to_state == AlarmControlPanelState.DISARMED
@@ -344,7 +344,9 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
         elif not code or len(code) < 1:
             return (False, const.EVENT_NO_CODE_PROVIDED)
 
-        res = self.hass.data[const.DOMAIN]["coordinator"].async_authenticate_user(code)
+        res = await self.hass.data[const.DOMAIN]["coordinator"].async_authenticate_user(
+            code
+        )
         if not res:
             # wrong code was entered
             return (False, const.EVENT_INVALID_CODE_PROVIDED)
@@ -380,15 +382,13 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             self._changed_by = res[ATTR_NAME]
             return (True, res)
 
-    @callback
-    def async_service_disarm_handler(self, code, context_id=None):
+    async def async_service_disarm_handler(self, code, context_id=None):
         """Handle external disarm request from alarmo.disarm service."""
         _LOGGER.debug("Service alarmo.disarm was called")
 
-        self.alarm_disarm(code=code, context_id=context_id)
+        await self.async_alarm_disarm(code=code, context_id=context_id)
 
-    @callback
-    def alarm_disarm(self, code, **kwargs):
+    async def async_alarm_disarm(self, code, **kwargs):
         """Send disarm command."""
         _LOGGER.debug("alarm_disarm")
         skip_code = kwargs.get("skip_code", False)
@@ -417,7 +417,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
                 },
             )
             return
-        (res, info) = self._validate_code(code, AlarmControlPanelState.DISARMED)
+        (res, info) = await self._validate_code(code, AlarmControlPanelState.DISARMED)
         if not res and not skip_code:
             dispatcher_send(
                 self.hass,
@@ -457,14 +457,20 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             return True
 
     @callback
-    def async_service_arm_handler(self, code, mode, skip_delay, force, context_id=None):
+    def alarm_disarm(self, code=None, **kwargs):
+        """Send disarm command (sync wrapper)."""
+        self.hass.async_create_task(self.async_alarm_disarm(code=code, **kwargs))
+
+    async def async_service_arm_handler(
+        self, code, mode, skip_delay, force, context_id=None
+    ):
         """Handle external arm request from alarmo.arm service."""
         _LOGGER.debug("Service alarmo.arm was called")
 
         if mode in const.ARM_MODE_TO_STATE:
             mode = const.ARM_MODE_TO_STATE[mode]
 
-        self.async_handle_arm_request(
+        await self.async_handle_arm_request(
             mode,
             code=code,
             skip_delay=skip_delay,
@@ -472,8 +478,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             context_id=context_id,
         )
 
-    @callback
-    def async_handle_arm_request(self, arm_mode, **kwargs):
+    async def async_handle_arm_request(self, arm_mode, **kwargs):
         """Check if conditions are met for starting arm procedure."""
         code = kwargs.get(const.CONF_CODE, "")
         skip_code = kwargs.get("skip_code", False)
@@ -526,7 +531,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             return False
 
         if not skip_code:
-            (res, info) = self._validate_code(code, arm_mode)
+            (res, info) = await self._validate_code(code, arm_mode)
             if not res:
                 dispatcher_send(
                     self.hass,
@@ -600,7 +605,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
     ):
         """Send arm away command."""
         _LOGGER.debug("alarm_arm_away")
-        self.async_handle_arm_request(
+        await self.async_handle_arm_request(
             AlarmControlPanelState.ARMED_AWAY,
             code=code,
             skip_code=skip_code,
@@ -613,7 +618,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
     ):
         """Send arm home command."""
         _LOGGER.debug("alarm_arm_home")
-        self.async_handle_arm_request(
+        await self.async_handle_arm_request(
             AlarmControlPanelState.ARMED_HOME,
             code=code,
             skip_code=skip_code,
@@ -626,7 +631,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
     ):
         """Send arm night command."""
         _LOGGER.debug("alarm_arm_night")
-        self.async_handle_arm_request(
+        await self.async_handle_arm_request(
             AlarmControlPanelState.ARMED_NIGHT,
             code=code,
             skip_code=skip_code,
@@ -639,7 +644,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
     ):
         """Send arm custom_bypass command."""
         _LOGGER.debug("alarm_arm_custom_bypass")
-        self.async_handle_arm_request(
+        await self.async_handle_arm_request(
             AlarmControlPanelState.ARMED_CUSTOM_BYPASS,
             code=code,
             skip_code=skip_code,
@@ -652,7 +657,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
     ):
         """Send arm vacation command."""
         _LOGGER.debug("alarm_arm_vacation")
-        self.async_handle_arm_request(
+        await self.async_handle_arm_request(
             AlarmControlPanelState.ARMED_VACATION,
             code=code,
             skip_code=skip_code,
@@ -1403,18 +1408,16 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
                 self.hass, "alarmo_state_updated", None, old_state, new_state
             )
 
-    @callback
-    def alarm_disarm(self, code=None, **kwargs):
+    async def async_alarm_disarm(self, code=None, **kwargs):
         """Send disarm command."""
         skip_code = kwargs.get("skip_code", False)
         context_id = kwargs.get("context_id", None)
 
-        """Send disarm command."""
-        res = super().alarm_disarm(code=code, skip_code=skip_code)
+        res = await super().async_alarm_disarm(code=code, skip_code=skip_code)
         if res:
             for item in self.hass.data[const.DOMAIN]["areas"].values():
                 if item.state != AlarmControlPanelState.DISARMED:
-                    item.alarm_disarm(code=code, skip_code=skip_code)
+                    await item.async_alarm_disarm(code=code, skip_code=skip_code)
 
             dispatcher_send(
                 self.hass,
@@ -1423,6 +1426,7 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
                 self.area_id,
                 {const.ATTR_CONTEXT_ID: context_id},
             )
+        return res
 
     def async_arm(self, arm_mode, **kwargs):
         """Arm the alarm or switch between arm modes."""
