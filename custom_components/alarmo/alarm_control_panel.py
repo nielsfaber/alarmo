@@ -320,67 +320,123 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             "last_triggered": self.last_triggered,
         }
 
-    async def _validate_code(self, code, to_state):  # noqa PLR0911
-        """Validate given code."""
+    def _is_code_required(self, to_state):
+        """Check if code validation is required based on config."""
         if (
             to_state == AlarmControlPanelState.DISARMED
             and not self._config[const.ATTR_CODE_DISARM_REQUIRED]
         ):
-            self._changed_by = None
-            return (True, None)
-        elif (
+            _LOGGER.debug(
+                "Code is not required for disarming, bypassing code validation."
+            )
+            return False
+
+        if (
             to_state != AlarmControlPanelState.DISARMED
             and self._state == AlarmControlPanelState.DISARMED
             and not self._config[ATTR_CODE_ARM_REQUIRED]
         ):
-            self._changed_by = None
-            return (True, None)
-        elif (
+            _LOGGER.debug("Code is not required for arming, bypassing code validation.")
+            return False
+
+        if (
             AlarmControlPanelState.DISARMED not in {to_state, self._state}
             and not self._config[const.ATTR_CODE_MODE_CHANGE_REQUIRED]
         ):
-            self._changed_by = None
-            return (True, None)
-        elif not code or len(code) < 1:
-            return (False, const.EVENT_NO_CODE_PROVIDED)
-
-        res = await self.hass.data[const.DOMAIN]["coordinator"].async_authenticate_user(
-            code
-        )
-        if not res:
-            # wrong code was entered
-            return (False, const.EVENT_INVALID_CODE_PROVIDED)
-        elif res[const.ATTR_AREA_LIMIT] and not all(
-            area in res[const.ATTR_AREA_LIMIT]
-            for area in (
-                [self.area_id]
-                if self.area_id
-                else list(self.hass.data[const.DOMAIN]["areas"].keys())
+            _LOGGER.debug(
+                "Code is not required for mode change, bypassing code validation."
             )
-        ):
+            return False
+
+        return True
+
+    def _is_user_allowed_for_area(self, user):
+        """Check if user has permissions for the area of this entity."""
+        if not user:
+            return False
+
+        allowed_areas = user.get(const.ATTR_AREA_LIMIT)
+
+        if not allowed_areas:
+            return True  # global access
+
+        target_areas = (
+            [self.area_id]
+            if self.area_id
+            else list(self.hass.data[const.DOMAIN]["areas"].keys())
+        )
+
+        if not all(area in allowed_areas for area in target_areas):
             # user is not allowed to operate this area
             _LOGGER.debug(
                 "User %s has no permission to arm/disarm this area.",
-                res[ATTR_NAME],
+                user[ATTR_NAME],
             )
-            return (False, const.EVENT_INVALID_CODE_PROVIDED)
-        elif to_state == AlarmControlPanelState.DISARMED and not res["can_disarm"]:
-            # user is not allowed to disarm the alarm
-            _LOGGER.debug(
-                "User %s has no permission to disarm the alarm.",
-                res[ATTR_NAME],
-            )
-            return (False, const.EVENT_INVALID_CODE_PROVIDED)
-        elif to_state in const.ARM_MODES and not res["can_arm"]:
-            # user is not allowed to arm the alarm
-            _LOGGER.debug(
-                "User %s has no permission to arm the alarm.",
-                res[ATTR_NAME],
-            )
-            return (False, const.EVENT_INVALID_CODE_PROVIDED)
+            return False
         else:
-            self._changed_by = res[ATTR_NAME]
-            return (True, res)
+            return True
+
+    def _is_user_allowed_for_action(self, user, to_state):
+        """Check if user has permissions for the specific action (arm/disarm)."""
+        if to_state == AlarmControlPanelState.DISARMED:
+            if not user.get("can_disarm", False):
+                # user is not allowed to disarm the alarm
+                _LOGGER.debug(
+                    "User %s has no permission to disarm the alarm.",
+                    user.get(ATTR_NAME, "unknown user"),
+                )
+                return False
+            else:
+                return True
+
+        if to_state in const.ARM_MODES:
+            if not user.get("can_arm", False):
+                # user is not allowed to arm the alarm
+                _LOGGER.debug(
+                    "User %s has no permission to arm the alarm.",
+                    user.get(ATTR_NAME, "unknown user"),
+                )
+                return False
+            else:
+                return True
+
+        return False
+
+    async def _resolve_user(self, code):
+        """Resolve user based on provided code."""
+        if not code or len(code) < 1:
+            _LOGGER.debug("No code provided, cannot resolve user.")
+            return None
+        # delegate user resolution to coordinator through job executor
+        return await self.hass.data[const.DOMAIN][
+            "coordinator"
+        ].async_authenticate_user(code)
+
+    async def _authorize_state_transition(self, code, to_state):
+        """Main authorization pipeline."""
+        # check bypass rules
+        if not self._is_code_required(to_state):
+            self._changed_by = None
+            return True, None
+
+        if not code or len(code) < 1:
+            return False, const.EVENT_NO_CODE_PROVIDED
+        # resolve user
+        user = await self._resolve_user(code)
+        if not user:
+            return False, const.EVENT_INVALID_CODE_PROVIDED
+
+        # area permission check
+        if not self._is_user_allowed_for_area(user):
+            return False, const.EVENT_INVALID_CODE_PROVIDED
+
+        # action permission check
+        if not self._is_user_allowed_for_action(user, to_state):
+            return False, const.EVENT_INVALID_CODE_PROVIDED
+
+        # success
+        self._changed_by = user[ATTR_NAME]
+        return True, None
 
     async def async_service_disarm_handler(self, code, context_id=None):
         """Handle external disarm request from alarmo.disarm service."""
@@ -417,7 +473,13 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
                 },
             )
             return
-        (res, info) = await self._validate_code(code, AlarmControlPanelState.DISARMED)
+        if not skip_code:
+            (res, info) = await self._authorize_state_transition(
+                code, AlarmControlPanelState.DISARMED
+            )
+        else:
+            res, info = (True, None)
+
         if not res and not skip_code:
             dispatcher_send(
                 self.hass,
@@ -531,7 +593,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             return False
 
         if not skip_code:
-            (res, info) = await self._validate_code(code, arm_mode)
+            (res, info) = await self._authorize_state_transition(code, arm_mode)
             if not res:
                 dispatcher_send(
                     self.hass,
@@ -1413,11 +1475,36 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
         skip_code = kwargs.get("skip_code", False)
         context_id = kwargs.get("context_id", None)
 
-        res = await super().async_alarm_disarm(code=code, skip_code=skip_code)
-        if res:
+        # when skip_code is False, validate the code before disarming
+        if not skip_code:
+            (res, info) = await self._authorize_state_transition(
+                code, AlarmControlPanelState.DISARMED
+            )
+            if not res:
+                dispatcher_send(
+                    self.hass,
+                    "alarmo_event",
+                    info,
+                    self.area_id,
+                    {
+                        const.ATTR_CONTEXT_ID: context_id,
+                        "command": const.COMMAND_DISARM,
+                    },
+                )
+                _LOGGER.warning("Wrong code provided.")
+                return False
+        if skip_code or res:
+            # code has been validated or skip_code is True, proceed with disarm
+            if not await super().async_alarm_disarm(
+                code=code, skip_code=True, context_id=context_id
+            ):
+                _LOGGER.error("Failed to disarm master alarm.")
+                return False
             for item in self.hass.data[const.DOMAIN]["areas"].values():
                 if item.state != AlarmControlPanelState.DISARMED:
-                    await item.async_alarm_disarm(code=code, skip_code=skip_code)
+                    await item.async_alarm_disarm(
+                        code=code, skip_code=True, context_id=context_id
+                    )
 
             dispatcher_send(
                 self.hass,
@@ -1426,7 +1513,8 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
                 self.area_id,
                 {const.ATTR_CONTEXT_ID: context_id},
             )
-        return res
+            return True
+        return False
 
     def async_arm(self, arm_mode, **kwargs):
         """Arm the alarm or switch between arm modes."""
