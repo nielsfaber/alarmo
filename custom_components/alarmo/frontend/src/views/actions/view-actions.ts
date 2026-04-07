@@ -115,6 +115,9 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
           width: '40%',
           grow: true,
           text: true,
+          sortable: true,
+          sortDefault: 'asc',
+          sort: (item: AlarmoAutomation) => item.name || '',
         },
         event: {
           title: localize('panels.actions.cards.new_action.fields.event.heading', this.hass.language),
@@ -158,6 +161,8 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
               @change=${(ev: Event) => this.toggleEnable(ev, item.automation_id!)}
             ></ha-switch>
           `,
+          sortable: true,
+          sort: (item: AlarmoAutomation) => (item.enabled ? 1 : 0),
         },
       };
 

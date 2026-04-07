@@ -83,6 +83,8 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
         width: '40%',
         grow: true,
         text: true,
+        sortable: true,
+        sort: (item: AlarmoUser) => item.name || '',
       },
       area_limit: {
         title: localize('panels.codes.cards.new_user.fields.area_limit.heading', this.hass.language),
@@ -100,6 +102,8 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
         title: localize('common.enabled', this.hass.language),
         width: '68px',
         align: 'center',
+        sortable: true,
+        sort: (item: AlarmoUser) => (item.enabled ? 1 : 0),
       },
     };
 
