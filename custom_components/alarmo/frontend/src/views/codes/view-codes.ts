@@ -169,6 +169,8 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
         width: '40%',
         grow: true,
         text: true,
+        sortable: true,
+        sort: (item: any) => item.raw_name || '',
       },
       code_format: {
         title: localize('panels.codes.cards.codes.fields.code_format.heading', this.hass.language),
@@ -180,12 +182,16 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
         title: localize('common.enabled', this.hass.language),
         width: '68px',
         align: 'center',
+        sortable: true,
+        sort: (item: any) => (item.raw_enabled ? 1 : 0),
       },
     };
 
     const data = users.map(item => {
       const output: TableData = {
         id: item.user_id!,
+        raw_name: item.name,
+        raw_enabled: item.enabled,
         icon: html`
           <ha-icon icon="mdi:account-outline" class="${item.enabled ? '' : 'disabled'}"></ha-icon>
         `,

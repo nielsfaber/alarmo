@@ -76,6 +76,8 @@ export class AddSensorsCard extends SubscribeMixin(LitElement) {
         width: '40%',
         grow: true,
         text: true,
+        sortable: true,
+        sort: (item: SensorItem) => item.name || '',
         renderer: (item: SensorItem) => html`
           ${prettyPrint(item.name)}
           <span class="secondary">${item.id}</span>

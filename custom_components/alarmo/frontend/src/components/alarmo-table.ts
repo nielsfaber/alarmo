@@ -1,4 +1,4 @@
-import { mdiFilterVariant, mdiClose } from '@mdi/js';
+import { mdiFilterVariant, mdiClose, mdiArrowDown, mdiArrowUp } from '@mdi/js';
 import { LitElement, html, TemplateResult, css, PropertyValues } from 'lit';
 import { property, customElement, state, query } from 'lit/decorators.js';
 
@@ -16,6 +16,9 @@ export interface TableColumn {
   grow?: boolean;
   align?: 'center' | 'right';
   renderer?: (data: any) => string | TemplateResult;
+  sortable?: boolean;
+  sortDefault?: 'asc' | 'desc';
+  sort?: (data: any) => string | number;
 }
 
 export type TableData = Record<string, any> | { id: string | number; warning?: boolean };
@@ -53,6 +56,9 @@ export class AlarmoTable extends LitElement {
   @state()
   filterSelection?: Record<string, { value: string[] }>;
 
+  @state()
+  private sortConfig?: { key: string; direction: 'asc' | 'desc' };
+
   @property({ type: Boolean })
   selectable?: boolean;
 
@@ -63,13 +69,21 @@ export class AlarmoTable extends LitElement {
     if (changedProps.get('filters') && !this.filterConfig) {
       this.filterConfig = changedProps.get('filters') as TableFilterConfig;
     }
+    if (changedProps.get('columns') && this.columns && !this.sortConfig) {
+      const defaultSort = Object.entries(this.columns).find(([, col]) => col.sortDefault);
+      if (defaultSort) {
+        const [key, col] = defaultSort;
+        this.sortConfig = { key, direction: col.sortDefault || 'asc' };
+      }
+    }
     return true;
   }
 
   render() {
     if (!this.columns || !this.data) return html``;
 
-    const filteredData = this.data.filter(e => this.filterTableData(e, this.filterConfig));
+    let filteredData = this.data.filter(e => this.filterTableData(e, this.filterConfig));
+    filteredData = this.sortTableData(filteredData);
     return html`
       ${this.renderFilterRow()}
       <div class="table">
@@ -91,15 +105,37 @@ export class AlarmoTable extends LitElement {
     if (!this.columns) return html``;
     return html`
       <div class="table-row header">
-        ${Object.values(this.columns).map(e =>
+        ${Object.entries(this.columns).map(([key, e]) =>
       e.hide
         ? ''
         : html`
                 <div
                   class="table-cell ${e.text ? 'text' : ''} ${e.grow ? 'grow' : ''} ${e.align ? e.align : ''}"
-                  style="${e.grow ? '' : `width: ${e.width}`}"
-                >
-                  <span>${e.title || ''}</span>
+                  style="${e.grow ? '' : `width: ${e.width}`}">
+                  <div class="header-content">
+                    <span>${e.title || ''}</span>
+                    ${e.sortable
+                      ? html`
+                          <span
+                            class="sort-btn ${this.sortConfig?.key === key ? 'active' : 'inactive'}"
+                            role="button"
+                            tabindex="0"
+                            @click=${(ev: Event) => this.toggleSort(ev, key)}
+                            @keydown=${(ev: KeyboardEvent) => {
+                              if (ev.key === 'Enter' || ev.key === ' ') {
+                                ev.preventDefault();
+                                this.toggleSort(ev, key);
+                              }
+                            }}
+                          >
+                            <ha-svg-icon
+                              class="sort-icon ${this.sortConfig?.key === key ? 'active' : 'inactive'}"
+                              .path=${this.getSortIcon(key)}
+                            ></ha-svg-icon>
+                          </span>
+                        `
+                      : ''}
+                  </div>
                 </div>
               `
     )}
@@ -139,6 +175,46 @@ export class AlarmoTable extends LitElement {
       if (Array.isArray(data[key])) return data[key].some(e => filterValue.includes(e));
       return filterValue.includes(data[key]);
     });
+  }
+
+  private sortTableData(data: TableData[]) {
+    if (!this.sortConfig || !this.columns) return data;
+    const column = this.columns[this.sortConfig.key];
+    if (!column || !column.sortable) return data;
+    const getValue = column.sort || ((row: TableData) => (row as any)[this.sortConfig!.key]);
+    const dir = this.sortConfig.direction === 'asc' ? 1 : -1;
+
+    return [...data].sort((a, b) => {
+      const av = getValue(a);
+      const bv = getValue(b);
+      if (av == null && bv == null) return 0;
+      if (av == null) return -1 * dir;
+      if (bv == null) return 1 * dir;
+      if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * dir;
+      const as = String(av).toLowerCase();
+      const bs = String(bv).toLowerCase();
+      if (as === bs) return 0;
+      return (as < bs ? -1 : 1) * dir;
+    });
+  }
+
+  private toggleSort(ev: Event, key: string) {
+    ev.stopPropagation();
+    if (!this.sortConfig || this.sortConfig.key !== key) {
+      this.sortConfig = { key, direction: 'asc' };
+      return;
+    }
+    this.sortConfig = {
+      key,
+      direction: this.sortConfig.direction === 'asc' ? 'desc' : 'asc',
+    };
+  }
+
+  private getSortIcon(key: string) {
+    if (!this.sortConfig || this.sortConfig.key !== key) return mdiArrowDown;
+    return this.sortConfig.direction === 'asc'
+      ? mdiArrowDown
+      : mdiArrowUp;
   }
 
   private _getFilteredItems() {
@@ -352,6 +428,42 @@ export class AlarmoTable extends LitElement {
       overflow: hidden;
       text-overflow: ellipsis;
       min-width: 0;
+    }
+    div.table .header div.table-cell .header-content {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    div.table .header span.sort-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    div.table .header span.sort-btn.inactive {
+      opacity: 0.5;
+    }
+    div.table .header span.sort-btn.active {
+      opacity: 1;
+    }
+    div.table .header span.sort-btn:hover {
+      background-color: rgba(var(--rgb-primary-text-color), 0.12);
+    }
+    div.table .header span.sort-btn:active {
+      background-color: rgba(var(--rgb-primary-text-color), 0.2);
+    }
+    div.table .header ha-svg-icon.sort-icon {
+      --mdc-icon-size: 16px;
+      color: var(--secondary-text-color);
+      padding: 0;
+      width: 16px;
+      height: 16px;
+    }
+    div.table .header ha-svg-icon.sort-icon.active {
+      color: var(--primary-color);
     }
     div.table-row.selectable {
       cursor: pointer;
