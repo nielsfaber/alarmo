@@ -196,20 +196,11 @@ class AutomationHandler:
                     service_data[ATTR_ENTITY_ID] = action[ATTR_ENTITY_ID]
 
                 if self._config[automation_id][CONF_TYPE] == const.ATTR_NOTIFICATION:
-                    # replace wildcards within service_data struct
-                    for key, val in service_data.items():
-                        if type(val) is str:
-                            service_data[key] = await self.replace_wildcards_in_string(
-                                val, alarm_entity
-                            )
-                        elif type(val) is dict:
-                            for subkey, subval in service_data[key].items():
-                                if type(subval) is str:
-                                    service_data[key][
-                                        subkey
-                                    ] = await self.replace_wildcards_in_string(
-                                        subval, alarm_entity
-                                    )
+                    # recursively process all service_data (supports deep nesting)
+                    service_data = await self._process_service_data(
+                        service_data,
+                        alarm_entity,
+                    )
 
                 domain, service = action[ATTR_SERVICE].split(".")
 
@@ -228,6 +219,43 @@ class AutomationHandler:
                     automation_id,
                     e,
                 )
+
+    async def _process_service_data(
+        self, obj, alarm_entity, depth: int = 0, max_depth: int = 10
+    ):
+        """Recursively process service_data replacing wildcards and templates safely."""
+        if depth > max_depth:
+            return obj
+
+        # Handle strings
+        if isinstance(obj, str):
+            return await self.replace_wildcards_in_string(obj, alarm_entity)
+
+        # Handle dictionaries
+        if isinstance(obj, dict):
+            processed = {}
+            for k, v in obj.items():
+                processed[k] = await self._process_service_data(
+                    v,
+                    alarm_entity,
+                    depth + 1,
+                    max_depth,
+                )
+            return processed
+
+        # Handle lists
+        if isinstance(obj, list):
+            return [
+                await self._process_service_data(
+                    item,
+                    alarm_entity,
+                    depth + 1,
+                    max_depth,
+                )
+                for item in obj
+            ]
+        # Other types (int, float, bool, None, etc.)
+        return obj
 
     def get_automations_by_area(self, area_id: str):
         """Get automations for specified area."""
@@ -297,6 +325,7 @@ class AutomationHandler:
         # process HA templates
         if is_template_string(input):
             input = Template(input, self.hass).async_render()
+            _LOGGER.debug("Processed HA template, result:(%s) %s", type(input), input)
 
         return input
 
