@@ -25,6 +25,9 @@
         "label": "Filtrer par items",
         "item": "Filtrer par {name}",
         "hidden_items": "{number} {number, plural,\n  one { item est caché}\n  other { items sont cachés}\n} "
+      },
+      "search": {
+        "label": "Rechercher"
       }
     }
   },

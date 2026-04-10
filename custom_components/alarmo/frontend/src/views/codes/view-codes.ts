@@ -171,6 +171,7 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
         text: true,
         sortable: true,
         sort: (item: any) => item.raw_name || '',
+        search: (item: any) => item.raw_name || '',
       },
       code_format: {
         title: localize('panels.codes.cards.codes.fields.code_format.heading', this.hass.language),
@@ -232,6 +233,7 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
         </div>
 
         <alarmo-table
+          .hass=${this.hass}
           ?selectable=${true}
           .columns=${columns}
           .data=${data}

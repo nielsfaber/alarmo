@@ -131,6 +131,7 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
           sortable: true,
           sortDefault: 'asc',
           sort: (item: AlarmoAutomation) => item.name || '',
+          search: (item: AlarmoAutomation) => item.name || '',
         },
         enabled: {
           title: localize('common.enabled', this.hass.language),

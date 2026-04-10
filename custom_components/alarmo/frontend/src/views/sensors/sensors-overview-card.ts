@@ -119,6 +119,7 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
         text: true,
         sortable: true,
         sort: (data: AlarmoSensor & { name: string }) => data.name || '',
+        search: (data: AlarmoSensor & { name: string }) => `${data.name || ''} ${data.entity_id || ''}`,
         renderer: (data: AlarmoSensor & { name: string }) => html`
           <span class="${!data.enabled ? 'disabled' : ''}" id="${formatId(data.entity_id, 'name')}">
             ${data.name}

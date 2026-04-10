@@ -19,6 +19,7 @@ export interface TableColumn {
   sortable?: boolean;
   sortDefault?: 'asc' | 'desc';
   sort?: (data: any) => string | number;
+  search?: (data: any) => string | number;
 }
 
 export type TableData = Record<string, any> | { id: string | number; warning?: boolean };
@@ -59,6 +60,9 @@ export class AlarmoTable extends LitElement {
   @state()
   private sortConfig?: { key: string; direction: 'asc' | 'desc' };
 
+  @state()
+  private searchQuery: string = '';
+
   @property({ type: Boolean })
   selectable?: boolean;
 
@@ -83,6 +87,7 @@ export class AlarmoTable extends LitElement {
     if (!this.columns || !this.data) return html``;
 
     let filteredData = this.data.filter(e => this.filterTableData(e, this.filterConfig));
+    filteredData = filteredData.filter(e => this.matchesSearch(e));
     filteredData = this.sortTableData(filteredData);
     return html`
       ${this.renderFilterRow()}
@@ -177,6 +182,33 @@ export class AlarmoTable extends LitElement {
     });
   }
 
+  private matchesSearch(data: TableData) {
+    if (!this.columns) return true;
+    if (!this.hasSearchableColumns()) return true;
+    if (!this.searchQuery || !this.searchQuery.trim()) return true;
+
+    const tokens = this.searchQuery
+      .toLowerCase()
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+    if (!tokens.length) return true;
+
+    const searchable: string[] = [];
+    Object.entries(this.columns).forEach(([, col]) => {
+      if (col.hide || !col.search) return;
+      const value = col.search(data);
+      if (value === undefined || value === null) return;
+      if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+        searchable.push(String(value).toLowerCase());
+      }
+    });
+
+    if (!searchable.length) return false;
+    const haystack = searchable.join(' ');
+    return tokens.some(token => haystack.includes(token));
+  }
+
   private sortTableData(data: TableData[]) {
     if (!this.sortConfig || !this.columns) return data;
     const column = this.columns[this.sortConfig.key];
@@ -228,40 +260,61 @@ export class AlarmoTable extends LitElement {
   }
 
   renderFilterRow() {
-    if (!this.filterConfig) return html``;
+    const hasFilters = !!this.filterConfig && Object.keys(this.filterConfig).length > 0;
+    const hasSearchableColumns = this.hasSearchableColumns();
+    if (!hasFilters && !hasSearchableColumns) return html``;
 
     return html`
       <div class="table-filter">
-        <ha-dropdown
-          @wa-show=${this._showFilterMenu}
-          @wa-after-hide=${this._applyFilterSelection}
-          placement="bottom-start"
-        >
-          <ha-icon-button
-            slot="trigger"
-            .path=${mdiFilterVariant}
-            ?disabled=${!this.data?.length}
-            label=${localize('components.table.filter.label', this.hass.language)}
-          ></ha-icon-button>
-          ${this.renderFilterMenu()}
-        </ha-dropdown>
-
-        ${this._getFilteredItems()
+        ${hasFilters
         ? html`
-              <alarmo-chip
-                .hass=${this.hass}
-                removable
-                active
-                @icon-clicked=${this._clearFilters}
-                style="--chip-color: var(--primary-color); --background-opacity: 0.12; --chip-border-radius: 8px; --chip-height: 40px; --chip-font-size: 1em; --icon-color: var(--dark-primary-color)"
-              >
-                ${localize(
-          'components.table.filter.hidden_items',
-          this.hass.language,
-          'number',
-          this._getFilteredItems()
-        )}
-              </alarmo-chip>
+              <div class="filter-left">
+                <ha-dropdown
+                  @wa-show=${this._showFilterMenu}
+                  @wa-after-hide=${this._applyFilterSelection}
+                  placement="bottom-start"
+                >
+                  <ha-icon-button
+                    slot="trigger"
+                    .path=${mdiFilterVariant}
+                    ?disabled=${!this.data?.length}
+                    label=${localize('components.table.filter.label', this.hass.language)}
+                  ></ha-icon-button>
+                  ${this.renderFilterMenu()}
+                </ha-dropdown>
+
+                ${this._getFilteredItems()
+              ? html`
+                      <alarmo-chip
+                        .hass=${this.hass}
+                        removable
+                        active
+                        @icon-clicked=${this._clearFilters}
+                        style="--chip-color: var(--primary-color); --background-opacity: 0.12; --chip-border-radius: 8px; --chip-height: 40px; --chip-font-size: 1em; --icon-color: var(--dark-primary-color)"
+                      >
+                        ${localize(
+                'components.table.filter.hidden_items',
+                this.hass.language,
+                'number',
+                this._getFilteredItems()
+              )}
+                      </alarmo-chip>
+                    `
+              : ''}
+              </div>
+            `
+        : ''}
+        ${hasSearchableColumns
+        ? html`
+              <div class="filter-right">
+                <ha-input
+                  .value=${this.searchQuery}
+                  size="small"
+                  label=${localize('components.table.search.label', this.hass.language)}
+                  placeholder=""
+                  @input=${(ev: Event) => (this.searchQuery = (ev.target as HTMLInputElement).value)}
+                ></ha-input>
+              </div>
             `
         : ''}
       </div>
@@ -269,6 +322,7 @@ export class AlarmoTable extends LitElement {
   }
 
   private _showFilterMenu() {
+    if (!this.filterConfig) return;
     this.filterSelection = Object.entries(this.filterConfig!).reduce(
       (acc, [k, v]) => ({ ...acc, [k]: pick(v, ['value']) }),
       {}
@@ -344,6 +398,7 @@ export class AlarmoTable extends LitElement {
   }
 
   private _clearFilters() {
+    if (!this.filterConfig) return;
     Object.keys(this.filterConfig!).forEach(key => {
       this.filterConfig = {
         ...this.filterConfig!,
@@ -353,12 +408,17 @@ export class AlarmoTable extends LitElement {
   }
 
   private _applyFilterSelection() {
+    if (!this.filterConfig || !this.filterSelection) return;
     Object.keys(this.filterConfig!).forEach(key => {
       this.filterConfig = {
         ...this.filterConfig!,
         [key]: { ...this.filterConfig![key], ...this.filterSelection![key] },
       };
     });
+  }
+
+  private hasSearchableColumns() {
+    return !!this.columns && Object.values(this.columns).some(col => !!col.search);
   }
 
   static styles = css`
@@ -531,6 +591,23 @@ export class AlarmoTable extends LitElement {
       position: relative;
       flex-direction: row;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    div.table-filter .filter-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    div.table-filter .filter-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+    }
+    div.table-filter .filter-right ha-input {
+      min-width: 200px;
+      max-width: 360px;
+      width: 260px;
     }
     ha-dropdown .header {
       display: flex;
