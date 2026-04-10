@@ -25,6 +25,9 @@
         "label": "過濾",
         "item": "通過{name}過濾",
         "hidden_items": "{number} {number, plural,\n  one {項目}\n  other {項目}\n} 已隱藏"
+      },
+      "search": {
+        "label": "搜尋"
       }
     }
   },

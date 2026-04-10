@@ -25,6 +25,9 @@
         "label": "Filtrele",
         "item": "{name}'e göre filtrele",
         "hidden_items": "{number} {number, plural,\n  one {bir madde}\n  other {iki madde}\n} gizli"
+      },
+      "search": {
+        "label": "Ara"
       }
     }
   },

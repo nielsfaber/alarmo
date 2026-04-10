@@ -25,6 +25,9 @@
         "label": "Filter",
         "item": "Filter volgens {name}",
         "hidden_items": "{number} {number, plural,\n  one {item is}\n  other {items is}\n} versteek"
+      },
+      "search": {
+        "label": "Soek"
       }
     }
   },

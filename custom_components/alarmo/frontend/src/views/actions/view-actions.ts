@@ -118,6 +118,7 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
           sortable: true,
           sortDefault: 'asc',
           sort: (item: AlarmoAutomation) => item.name || '',
+          search: (item: AlarmoAutomation) => item.name || '',
         },
         event: {
           title: localize('panels.actions.cards.new_action.fields.event.heading', this.hass.language),

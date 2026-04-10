@@ -25,6 +25,9 @@
         "label": "Filtrovat",
         "item": "Filtrovat podle {name}",
         "hidden_items": "{number} {number, plural,\n  one {položka je}\n  other {položky jsou}\n} skryté"
+      },
+      "search": {
+        "label": "Hledat"
       }
     }
   },

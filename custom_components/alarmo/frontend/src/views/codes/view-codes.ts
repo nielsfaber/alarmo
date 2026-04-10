@@ -84,7 +84,8 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
         grow: true,
         text: true,
         sortable: true,
-        sort: (item: AlarmoUser) => item.name || '',
+        sort: (item: TableData & { raw_name?: string }) => item.raw_name || '',
+        search: (item: TableData & { raw_name?: string }) => item.raw_name || '',
       },
       area_limit: {
         title: localize('panels.codes.cards.new_user.fields.area_limit.heading', this.hass.language),
@@ -103,13 +104,15 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
         width: '68px',
         align: 'center',
         sortable: true,
-        sort: (item: AlarmoUser) => (item.enabled ? 1 : 0),
+        sort: (item: TableData & { raw_enabled?: boolean }) => (item.raw_enabled ? 1 : 0),
       },
     };
 
     const data = users.map(item => {
       const output: TableData = {
         id: item.user_id!,
+        raw_name: item.name,
+        raw_enabled: item.enabled,
         icon: html`<ha-icon icon="mdi:account-outline" class="${item.enabled ? '' : 'disabled'}"></ha-icon>`,
         name: html`<span class="${item.enabled ? '' : 'disabled'}">${prettyPrint(item.name)}</span>`,
         area_limit: html`
@@ -155,6 +158,7 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
 
         <div class="list-page-table">
           <alarmo-table
+            .hass=${this.hass}
             ?selectable=${true}
             .columns=${columns}
             .data=${data}

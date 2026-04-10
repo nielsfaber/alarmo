@@ -25,6 +25,9 @@
         "label": "Lọc",
         "item": "Lọc theo {name}",
         "hidden_items": "{number} {number, plural,\n  one {mục}\n  other {mục}\n} bị ẩn"
+      },
+      "search": {
+        "label": "Tìm kiếm"
       }
     }
   },
