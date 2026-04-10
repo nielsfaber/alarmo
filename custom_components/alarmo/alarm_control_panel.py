@@ -320,8 +320,13 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             "last_triggered": self.last_triggered,
         }
 
-    def _is_code_required(self, to_state):
-        """Check if code validation is required based on config."""
+    async def _validate_code(self, code, to_state):  # noqa PLR0911
+        """Validate code and user permissions for a requested state change.
+
+        Returns a (success, error_event) tuple. When success is True,
+        error_event is None.
+        """
+        # check bypass rules
         if (
             to_state == AlarmControlPanelState.DISARMED
             and not self._config[const.ATTR_CODE_DISARM_REQUIRED]
@@ -329,7 +334,8 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             _LOGGER.debug(
                 "Code is not required for disarming, bypassing code validation."
             )
-            return False
+            self._changed_by = None
+            return True, None
 
         if (
             to_state != AlarmControlPanelState.DISARMED
@@ -337,7 +343,8 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             and not self._config[ATTR_CODE_ARM_REQUIRED]
         ):
             _LOGGER.debug("Code is not required for arming, bypassing code validation.")
-            return False
+            self._changed_by = None
+            return True, None
 
         if (
             AlarmControlPanelState.DISARMED not in {to_state, self._state}
@@ -346,38 +353,36 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             _LOGGER.debug(
                 "Code is not required for mode change, bypassing code validation."
             )
-            return False
+            self._changed_by = None
+            return True, None
 
-        return True
-
-    def _is_user_allowed_for_area(self, user):
-        """Check if user has permissions for the area of this entity."""
+        if not code or len(code) < 1:
+            _LOGGER.debug("No code provided, but code is required. Rejecting command.")
+            return False, const.EVENT_NO_CODE_PROVIDED
+        # resolve user
+        user = await self.hass.data[const.DOMAIN][
+            "coordinator"
+        ].async_authenticate_user(code)
         if not user:
-            return False
+            return False, const.EVENT_INVALID_CODE_PROVIDED
 
+        # area permission check
         allowed_areas = user.get(const.ATTR_AREA_LIMIT)
-
-        if not allowed_areas:
-            return True  # global access
-
-        target_areas = (
-            [self.area_id]
-            if self.area_id
-            else list(self.hass.data[const.DOMAIN]["areas"].keys())
-        )
-
-        if not all(area in allowed_areas for area in target_areas):
-            # user is not allowed to operate this area
-            _LOGGER.debug(
-                "User %s has no permission to arm/disarm this area.",
-                user[ATTR_NAME],
+        if allowed_areas:
+            target_areas = (
+                [self.area_id]
+                if self.area_id
+                else list(self.hass.data[const.DOMAIN]["areas"].keys())
             )
-            return False
-        else:
-            return True
+            if not all(area in allowed_areas for area in target_areas):
+                # user is not allowed to operate this area
+                _LOGGER.debug(
+                    "User %s has no permission to arm/disarm this area.",
+                    user[ATTR_NAME],
+                )
+                return False, const.EVENT_INVALID_CODE_PROVIDED
 
-    def _is_user_allowed_for_action(self, user, to_state):
-        """Check if user has permissions for the specific action (arm/disarm)."""
+        # action permission check
         if to_state == AlarmControlPanelState.DISARMED:
             if not user.get("can_disarm", False):
                 # user is not allowed to disarm the alarm
@@ -385,53 +390,16 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
                     "User %s has no permission to disarm the alarm.",
                     user.get(ATTR_NAME, "unknown user"),
                 )
-                return False
-            else:
-                return True
-
-        if to_state in const.ARM_MODES:
+                return False, const.EVENT_INVALID_CODE_PROVIDED
+        elif to_state in const.ARM_MODES:
             if not user.get("can_arm", False):
                 # user is not allowed to arm the alarm
                 _LOGGER.debug(
                     "User %s has no permission to arm the alarm.",
                     user.get(ATTR_NAME, "unknown user"),
                 )
-                return False
-            else:
-                return True
-
-        return False
-
-    async def _resolve_user(self, code):
-        """Resolve user based on provided code."""
-        if not code or len(code) < 1:
-            _LOGGER.debug("No code provided, cannot resolve user.")
-            return None
-        # delegate user resolution to coordinator through job executor
-        return await self.hass.data[const.DOMAIN][
-            "coordinator"
-        ].async_authenticate_user(code)
-
-    async def _authorize_state_transition(self, code, to_state):
-        """Main authorization pipeline."""
-        # check bypass rules
-        if not self._is_code_required(to_state):
-            self._changed_by = None
-            return True, None
-
-        if not code or len(code) < 1:
-            return False, const.EVENT_NO_CODE_PROVIDED
-        # resolve user
-        user = await self._resolve_user(code)
-        if not user:
-            return False, const.EVENT_INVALID_CODE_PROVIDED
-
-        # area permission check
-        if not self._is_user_allowed_for_area(user):
-            return False, const.EVENT_INVALID_CODE_PROVIDED
-
-        # action permission check
-        if not self._is_user_allowed_for_action(user, to_state):
+                return False, const.EVENT_INVALID_CODE_PROVIDED
+        else:
             return False, const.EVENT_INVALID_CODE_PROVIDED
 
         # success
@@ -474,7 +442,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             )
             return
         if not skip_code:
-            (res, info) = await self._authorize_state_transition(
+            (res, info) = await self._validate_code(
                 code, AlarmControlPanelState.DISARMED
             )
         else:
@@ -593,7 +561,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             return False
 
         if not skip_code:
-            (res, info) = await self._authorize_state_transition(code, arm_mode)
+            (res, info) = await self._validate_code(code, arm_mode)
             if not res:
                 dispatcher_send(
                     self.hass,
@@ -1477,7 +1445,7 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
 
         # when skip_code is False, validate the code before disarming
         if not skip_code:
-            (res, info) = await self._authorize_state_transition(
+            (res, info) = await self._validate_code(
                 code, AlarmControlPanelState.DISARMED
             )
             if not res:
