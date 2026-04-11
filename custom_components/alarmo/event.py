@@ -18,6 +18,10 @@ class EventHandler:
 
     def __del__(self):
         """Class destructor."""
+        self.async_unload()
+
+    def async_unload(self):
+        """Unload dispatcher subscription."""
         self._subscription()
 
     @callback

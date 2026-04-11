@@ -108,6 +108,12 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     @callback
     def async_add_alarm_entity(config: dict):
         """Add each entity as Alarm Control Panel."""
+        if not hass.config_entries.async_get_entry(config_entry.entry_id):
+            _LOGGER.debug(
+                "Skipping area registration for unloaded config entry %s",
+                config_entry.entry_id,
+            )
+            return
         unique_id = _build_unique_id(hass, config["area_id"])
         entity_registry = er.async_get(hass)
         existing_entity_id = entity_registry.async_get_entity_id(
@@ -146,6 +152,12 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     @callback
     def async_add_alarm_master(config: dict):
         """Add each entity as Alarm Control Panel."""
+        if not hass.config_entries.async_get_entry(config_entry.entry_id):
+            _LOGGER.debug(
+                "Skipping master registration for unloaded config entry %s",
+                config_entry.entry_id,
+            )
+            return
         unique_id = _build_unique_id(hass)
         entity_registry = er.async_get(hass)
         existing_entity_id = entity_registry.async_get_entity_id(
@@ -1310,8 +1322,10 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
                 return
             self.async_update_state()
 
-        async_dispatcher_connect(
-            self.hass, "alarmo_state_updated", async_alarm_state_changed
+        self.async_on_remove(
+            async_dispatcher_connect(
+                self.hass, "alarmo_state_updated", async_alarm_state_changed
+            )
         )
 
         @callback
@@ -1352,7 +1366,9 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
             if event == const.EVENT_READY_TO_ARM_MODES_CHANGED:
                 self.update_ready_to_arm_modes()
 
-        async_dispatcher_connect(self.hass, "alarmo_event", async_handle_event)
+        self.async_on_remove(
+            async_dispatcher_connect(self.hass, "alarmo_event", async_handle_event)
+        )
 
         state = await self.async_get_last_state()
         if state and state.state:

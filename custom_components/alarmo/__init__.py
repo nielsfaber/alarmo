@@ -520,10 +520,12 @@ class AlarmoCoordinator(DataUpdateCoordinator):
         if self.hass.data[const.DOMAIN]["master"]:
             await self.async_remove_entity("master")
 
-        del self.hass.data[const.DOMAIN]["sensor_handler"]
-        del self.hass.data[const.DOMAIN]["automation_handler"]
-        del self.hass.data[const.DOMAIN]["mqtt_handler"]
-        del self.hass.data[const.DOMAIN]["event_handler"]
+        for key in ["sensor_handler", "automation_handler", "mqtt_handler", "event_handler"]:
+            handler = self.hass.data[const.DOMAIN].get(key)
+            if handler and hasattr(handler, "async_unload"):
+                handler.async_unload()
+            if key in self.hass.data[const.DOMAIN]:
+                del self.hass.data[const.DOMAIN][key]
 
         # remove subscriptions for coordinator
         while len(self._subscriptions):
