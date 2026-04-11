@@ -1148,6 +1148,12 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
         """Set arm modes which are ready for arming (no blocking sensors)."""
         if value == self._ready_to_arm_modes:
             return
+        if not self.hass or not getattr(self.hass, "loop", None):
+            _LOGGER.debug(
+                "Skipping ready_to_arm_modes update for %s because entity is detached",
+                self.entity_id,
+            )
+            return
         _LOGGER.debug(
             "ready_to_arm_modes for %s updated to %s",
             self.name,
@@ -1518,6 +1524,12 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
                 filter(lambda x: x in item._ready_to_arm_modes, modes_list)
             )
         if modes_list == self._ready_to_arm_modes:
+            return
+        if not self.hass or not getattr(self.hass, "loop", None):
+            _LOGGER.debug(
+                "Skipping ready_to_arm_modes update for %s because entity is detached",
+                self.entity_id,
+            )
             return
         self._ready_to_arm_modes = modes_list
         _LOGGER.debug(
