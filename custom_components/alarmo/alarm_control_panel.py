@@ -19,6 +19,7 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
 )
 from homeassistant.helpers import entity_platform
+from homeassistant.helpers import entity_registry as er
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.event import (
     async_call_later,
@@ -48,6 +49,49 @@ _LOGGER = logging.getLogger(__name__)
 PLATFORM_UNSUBS = "platform_unsubs"
 
 
+def _build_unique_id(hass: HomeAssistant, area_id: str | None = None) -> str:
+    """Build a stable unique ID for Alarmo entities."""
+    coordinator_id = hass.data[const.DOMAIN]["coordinator"].id
+    suffix = area_id if area_id else "master"
+    return f"{coordinator_id}_{suffix}"
+
+
+def _get_available_entity_id(
+    hass: HomeAssistant, suggested_entity_id: str, exclude_entity_id: str | None = None
+) -> str:
+    """Return an entity_id that does not collide with existing entities."""
+    used_ids = set(hass.states.async_entity_ids(PLATFORM))
+    entity_registry = er.async_get(hass)
+    used_ids.update(
+        entity_id
+        for entity_id in entity_registry.entities
+        if entity_id.startswith(f"{PLATFORM}.")
+    )
+
+    areas = hass.data.get(const.DOMAIN, {}).get("areas", {})
+    for alarm_entity in areas.values():
+        existing_id = getattr(alarm_entity, "entity_id", None)
+        if existing_id:
+            used_ids.add(existing_id)
+
+    master = hass.data.get(const.DOMAIN, {}).get("master")
+    if master and getattr(master, "entity_id", None):
+        used_ids.add(master.entity_id)
+
+    if exclude_entity_id:
+        used_ids.discard(exclude_entity_id)
+
+    if suggested_entity_id not in used_ids:
+        return suggested_entity_id
+
+    index = 2
+    while True:
+        candidate = f"{suggested_entity_id}_{index}"
+        if candidate not in used_ids:
+            return candidate
+        index += 1
+
+
 async def async_setup(hass, config):
     """Track states and offer events for alarm_control_panel."""
     return True
@@ -64,7 +108,21 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     @callback
     def async_add_alarm_entity(config: dict):
         """Add each entity as Alarm Control Panel."""
-        entity_id = f"{PLATFORM}.{slugify(config['name'])}"
+        if not hass.config_entries.async_get_entry(config_entry.entry_id):
+            _LOGGER.debug(
+                "Skipping area registration for unloaded config entry %s",
+                config_entry.entry_id,
+            )
+            return
+        unique_id = _build_unique_id(hass, config["area_id"])
+        entity_registry = er.async_get(hass)
+        existing_entity_id = entity_registry.async_get_entity_id(
+            PLATFORM, const.DOMAIN, unique_id
+        )
+        suggested_entity_id = f"{PLATFORM}.{slugify(config['name'])}"
+        entity_id = existing_entity_id or _get_available_entity_id(
+            hass, suggested_entity_id
+        )
 
         # Guard against duplicate registration (reloads/upgrade timing)
         if config["area_id"] in hass.data[const.DOMAIN]["areas"]:
@@ -80,6 +138,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
         alarm_entity = AlarmoAreaEntity(
             hass=hass,
             entity_id=entity_id,
+            unique_id=unique_id,
             name=config["name"],
             area_id=config["area_id"],
         )
@@ -93,7 +152,21 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     @callback
     def async_add_alarm_master(config: dict):
         """Add each entity as Alarm Control Panel."""
-        entity_id = f"{PLATFORM}.{slugify(config['name'])}"
+        if not hass.config_entries.async_get_entry(config_entry.entry_id):
+            _LOGGER.debug(
+                "Skipping master registration for unloaded config entry %s",
+                config_entry.entry_id,
+            )
+            return
+        unique_id = _build_unique_id(hass)
+        entity_registry = er.async_get(hass)
+        existing_entity_id = entity_registry.async_get_entity_id(
+            PLATFORM, const.DOMAIN, unique_id
+        )
+        suggested_entity_id = f"{PLATFORM}.{slugify(config['name'])}"
+        entity_id = existing_entity_id or _get_available_entity_id(
+            hass, suggested_entity_id
+        )
 
         # Guard against duplicate master registration
         if hass.data[const.DOMAIN]["master"] is not None:
@@ -107,6 +180,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
         alarm_entity = AlarmoMasterEntity(
             hass=hass,
             entity_id=entity_id,
+            unique_id=unique_id,
             name=config["name"],
         )
         hass.data[const.DOMAIN]["master"] = alarm_entity
@@ -158,9 +232,12 @@ async def async_unload_entry(hass, config_entry):
 class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
     """Defines a base alarm_control_panel entity."""
 
-    def __init__(self, hass: HomeAssistant, name: str, entity_id: str) -> None:
+    def __init__(
+        self, hass: HomeAssistant, name: str, entity_id: str, unique_id: str
+    ) -> None:
         """Initialize the alarm_control_panel entity."""
         self.entity_id = entity_id
+        self._attr_unique_id = unique_id
         self._name = name
         self._state = None
         self.hass = hass
@@ -193,7 +270,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
     @property
     def unique_id(self):
         """Return a unique ID to use for this entity."""
-        return f"{self.entity_id}"
+        return self._attr_unique_id
 
     @property
     def name(self):
@@ -702,10 +779,15 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
     """Defines a base alarm_control_panel entity."""
 
     def __init__(
-        self, hass: HomeAssistant, name: str, entity_id: str, area_id: str
+        self,
+        hass: HomeAssistant,
+        name: str,
+        entity_id: str,
+        unique_id: str,
+        area_id: str,
     ) -> None:
         """Initialize the alarm_control_panel entity."""
-        super().__init__(hass, name, entity_id)
+        super().__init__(hass, name, entity_id, unique_id)
 
         self.area_id = area_id
         self._timer = None
@@ -1148,6 +1230,12 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
         """Set arm modes which are ready for arming (no blocking sensors)."""
         if value == self._ready_to_arm_modes:
             return
+        if not self.hass or not getattr(self.hass, "loop", None):
+            _LOGGER.debug(
+                "Skipping ready_to_arm_modes update for %s because entity is detached",
+                self.entity_id,
+            )
+            return
         _LOGGER.debug(
             "ready_to_arm_modes for %s updated to %s",
             self.name,
@@ -1166,9 +1254,11 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
 class AlarmoMasterEntity(AlarmoBaseEntity):
     """Defines a base alarm_control_panel entity."""
 
-    def __init__(self, hass: HomeAssistant, name: str, entity_id: str) -> None:
+    def __init__(
+        self, hass: HomeAssistant, name: str, entity_id: str, unique_id: str
+    ) -> None:
         """Initialize the alarm_control_panel entity."""
-        super().__init__(hass, name, entity_id)
+        super().__init__(hass, name, entity_id, unique_id)
         self.area_id = None
         self._target_state = None
 
@@ -1232,8 +1322,10 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
                 return
             self.async_update_state()
 
-        async_dispatcher_connect(
-            self.hass, "alarmo_state_updated", async_alarm_state_changed
+        self.async_on_remove(
+            async_dispatcher_connect(
+                self.hass, "alarmo_state_updated", async_alarm_state_changed
+            )
         )
 
         @callback
@@ -1274,7 +1366,9 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
             if event == const.EVENT_READY_TO_ARM_MODES_CHANGED:
                 self.update_ready_to_arm_modes()
 
-        async_dispatcher_connect(self.hass, "alarmo_event", async_handle_event)
+        self.async_on_remove(
+            async_dispatcher_connect(self.hass, "alarmo_event", async_handle_event)
+        )
 
         state = await self.async_get_last_state()
         if state and state.state:
@@ -1518,6 +1612,12 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
                 filter(lambda x: x in item._ready_to_arm_modes, modes_list)
             )
         if modes_list == self._ready_to_arm_modes:
+            return
+        if not self.hass or not getattr(self.hass, "loop", None):
+            _LOGGER.debug(
+                "Skipping ready_to_arm_modes update for %s because entity is detached",
+                self.entity_id,
+            )
             return
         self._ready_to_arm_modes = modes_list
         _LOGGER.debug(
