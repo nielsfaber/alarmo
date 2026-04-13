@@ -520,7 +520,12 @@ class AlarmoCoordinator(DataUpdateCoordinator):
         if self.hass.data[const.DOMAIN]["master"]:
             await self.async_remove_entity("master")
 
-        for key in ["sensor_handler", "automation_handler", "mqtt_handler", "event_handler"]:
+        for key in [
+            "sensor_handler",
+            "automation_handler",
+            "mqtt_handler",
+            "event_handler",
+        ]:
             handler = self.hass.data[const.DOMAIN].get(key)
             if handler and hasattr(handler, "async_unload"):
                 handler.async_unload()
