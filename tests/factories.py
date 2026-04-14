@@ -1,6 +1,7 @@
 """Factories for creating test objects with defaults."""
 
 import copy
+import time
 import base64
 from typing import Any, ClassVar
 
@@ -456,6 +457,33 @@ class MockStorage:
     def async_get_users(self) -> dict[str, Any]:
         """Get all users."""
         return self.users
+
+    def async_get_user(self, user_id: str) -> dict[str, Any] | None:
+        """Get a user by ID."""
+        return self.users.get(user_id)
+
+    def async_create_user(self, data: dict[str, Any]) -> dict[str, Any]:
+        """Create a new user."""
+        user_id = str(int(time.time()))
+        user = {"user_id": user_id, **data}
+        self.users[user_id] = user
+        return user
+
+    def async_delete_user(self, user_id: str) -> bool:
+        """Delete a user by ID."""
+        if user_id in self.users:
+            del self.users[user_id]
+            return True
+        return False
+
+    def async_update_user(
+        self, user_id: str, changes: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Update an existing user."""
+        if user_id not in self.users:
+            raise KeyError(f"User {user_id} not found in mock storage")
+        self.users[user_id].update(changes)
+        return self.users[user_id]
 
     def async_get_config(self) -> dict[str, Any]:
         """Get the config."""

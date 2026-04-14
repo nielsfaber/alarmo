@@ -3,7 +3,6 @@
 import re
 import base64
 import logging
-import concurrent.futures
 
 import bcrypt
 from homeassistant.core import (
@@ -49,8 +48,6 @@ from .automations import AutomationHandler
 
 _LOGGER = logging.getLogger(__name__)
 
-# Max number of threads to start when checking user codes.
-MAX_WORKERS = 4
 # Number of rounds of hashing when computing user hashes.
 BCRYPT_NUM_ROUNDS = 10
 
@@ -272,12 +269,14 @@ class AlarmoCoordinator(DataUpdateCoordinator):
 
         async_dispatcher_send(self.hass, "alarmo_sensors_updated")
 
-    def _validate_user_code(self, user_id: str, data: dict):
-        user_with_code = self.async_authenticate_user(data[ATTR_CODE])
+    async def _validate_user_code(self, user_id: str, data: dict):
+        user_with_code = await self.async_authenticate_user(data[ATTR_CODE])
         if user_id:
             if const.ATTR_OLD_CODE not in data:
                 return "No code provided"
-            if not self.async_authenticate_user(data[const.ATTR_OLD_CODE], user_id):
+            if not await self.async_authenticate_user(
+                data[const.ATTR_OLD_CODE], user_id
+            ):
                 return "Wrong code provided"
             if user_with_code and user_with_code[const.ATTR_USER_ID] != user_id:
                 return "User with same code already exists"
@@ -296,7 +295,9 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                 return "User with same name already exists"
         return
 
-    def async_update_user_config(self, user_id: str | None = None, data: dict = {}):
+    async def async_update_user_config(
+        self, user_id: str | None = None, data: dict = {}
+    ):
         """Update user configuration."""
         if const.ATTR_REMOVE in data:
             self.store.async_delete_user(user_id)
@@ -308,7 +309,7 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                 _LOGGER.error(err)
                 return err
         if ATTR_CODE in data:
-            err = self._validate_user_code(user_id, data)
+            err = await self._validate_user_code(user_id, data)
             if err:
                 _LOGGER.error(err)
                 return err
@@ -318,12 +319,17 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                 "number" if data[ATTR_CODE].isdigit() else "text"
             )
             data[const.ATTR_CODE_LENGTH] = len(data[ATTR_CODE])
-            hashed = bcrypt.hashpw(
-                data[ATTR_CODE].encode("utf-8"),
-                bcrypt.gensalt(rounds=BCRYPT_NUM_ROUNDS),
+
+            def _hash_code(code):
+                hashed = bcrypt.hashpw(
+                    code.encode("utf-8"),
+                    bcrypt.gensalt(rounds=BCRYPT_NUM_ROUNDS),
+                )
+                return base64.b64encode(hashed).decode()
+
+            data[ATTR_CODE] = await self.hass.async_add_executor_job(
+                _hash_code, data[ATTR_CODE]
             )
-            hashed = base64.b64encode(hashed)
-            data[ATTR_CODE] = hashed.decode()
 
         if not user_id:
             self.store.async_create_user(data)
@@ -334,32 +340,42 @@ class AlarmoCoordinator(DataUpdateCoordinator):
             self.store.async_update_user(user_id, data)
             return
 
-    def async_authenticate_user(self, code: str, user_id: str | None = None):
-        """Authenticate a user by code."""
+    async def async_authenticate_user(self, code, user_id=None):
+        """Run user authentication in the executor.
 
-        def check_user_code(user, code):
-            """Returns the supplied user object if the code matches, None otherwise."""
-            if not user[const.ATTR_ENABLED]:
-                return
-            elif not user[ATTR_CODE] and not code:
-                return user
-            elif user[ATTR_CODE]:
-                hash = base64.b64decode(user[ATTR_CODE])
-                if bcrypt.checkpw(code.encode("utf-8"), hash):
+        This wrapper ensures that the blocking bcrypt-based authentication
+        is executed outside of the event loop, making it safe to call
+        from async context.
+        """
+
+        def _authenticate_user_sync():
+            """Perform user authentication using blocking bcrypt operations."""
+
+            def check_user_code(user, code):
+                """Returns None or the supplied user object if the code matches."""
+                if not user[const.ATTR_ENABLED]:
+                    return None
+                elif not user[ATTR_CODE] and not code:
                     return user
+                elif user[ATTR_CODE]:
+                    try:
+                        hash = base64.b64decode(user[ATTR_CODE])
+                    except Exception:
+                        return None
+                    if bcrypt.checkpw((code or "").encode("utf-8"), hash):
+                        return user
 
-        if user_id:
-            return check_user_code(self.store.async_get_user(user_id), code)
+            if user_id:
+                return check_user_code(self.store.async_get_user(user_id), code)
 
-        users = self.store.async_get_users()
-        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-            futures = [
-                executor.submit(check_user_code, user, code) for user in users.values()
-            ]
-            for future in concurrent.futures.as_completed(futures):
-                if future.result():
-                    executor.shutdown(wait=False, cancel_futures=True)
-                    return future.result()
+            users = self.store.async_get_users()
+            for user in users.values():
+                result = check_user_code(user, code)
+                if result:
+                    return result
+            return None
+
+        return await self.hass.async_add_executor_job(_authenticate_user_sync)
 
     def async_update_automation_config(
         self,
@@ -421,21 +437,21 @@ class AlarmoCoordinator(DataUpdateCoordinator):
 
             if action == const.EVENT_ACTION_FORCE_ARM:
                 _LOGGER.info("Received request for force arming")
-                alarm_entity.async_handle_arm_request(
+                await alarm_entity.async_handle_arm_request(
                     arm_mode, skip_code=True, bypass_open_sensors=True
                 )
             elif action == const.EVENT_ACTION_RETRY_ARM:
                 _LOGGER.info("Received request for retry arming")
-                alarm_entity.async_handle_arm_request(arm_mode, skip_code=True)
+                await alarm_entity.async_handle_arm_request(arm_mode, skip_code=True)
             elif action == const.EVENT_ACTION_DISARM:
                 _LOGGER.info("Received request for disarming")
-                alarm_entity.alarm_disarm(None, skip_code=True)
+                await alarm_entity.async_alarm_disarm(None, skip_code=True)
             else:
                 _LOGGER.info(
                     "Received request for arming with mode %s",
                     arm_mode,
                 )
-                alarm_entity.async_handle_arm_request(arm_mode, skip_code=True)
+                await alarm_entity.async_handle_arm_request(arm_mode, skip_code=True)
 
         self._subscriptions.append(
             self.hass.bus.async_listen(const.PUSH_EVENT, async_handle_push_event)

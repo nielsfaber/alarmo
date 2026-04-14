@@ -435,3 +435,211 @@ async def test_text_code_format(hass: Any, enable_custom_integrations: Any) -> N
         state = hass.states.get(ALARM_ENTITY)
         assert state.state == "armed_away"
         assert state.attributes.get("changed_by") == "Text Code User"
+
+
+@pytest.mark.asyncio
+async def test_disarm_without_code_when_not_required(
+    hass: Any, enable_custom_integrations: Any
+) -> None:
+    """Test disarm without code when not required."""
+    users = {
+        "admin_user": UserFactory.create_user(
+            user_id="admin_user",
+            name="Admin User",
+            code="1234",
+            can_arm=True,
+            can_disarm=True,
+        ),
+    }
+    areas = [
+        AreaFactory.create_area(
+            area_id="area_1",
+            name="Test Area 1",
+            code_disarm_required=False,
+            code_arm_required=True,
+        )
+    ]
+    sensors = [
+        SensorFactory.create_door_sensor(
+            entity_id=DOOR_SENSOR,
+            name="Door Sensor",
+            area="area_1",
+            modes=["armed_away", "armed_home"],
+            auto_bypass=False,
+            allow_open=False,
+            arm_on_close=False,
+            always_on=False,
+            trigger_unavailable=False,
+            use_exit_delay=True,
+            use_entry_delay=True,
+        )
+    ]
+    storage, entry = setup_alarmo_entry(
+        hass,
+        areas=areas,
+        sensors=sensors,
+        entry_id="test_disarm_without_code_when_not_required",
+        users=users,
+    )
+    with patch_alarmo_integration_dependencies(storage):
+        await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+        hass.states.async_set(DOOR_SENSOR, "off")
+        await hass.async_block_till_done()
+        await hass.services.async_call(
+            "alarmo",
+            "arm",
+            {"entity_id": ALARM_ENTITY, "code": "1234", "mode": "away"},
+            blocking=True,
+        )
+        await hass.async_block_till_done()
+        area = AreaFactory.create_area(area_id="area_1")
+        exit_time = area["modes"]["armed_away"]["exit_time"]
+        await advance_time(hass, exit_time + 1)
+        state = hass.states.get(ALARM_ENTITY)
+        assert state.state == "armed_away"
+        await hass.services.async_call(
+            "alarmo",
+            "disarm",
+            {"entity_id": ALARM_ENTITY},
+            blocking=True,
+        )
+        await hass.async_block_till_done()
+        state = hass.states.get(ALARM_ENTITY)
+        assert state.state == "disarmed"
+        assert state.attributes.get("changed_by") is None
+
+
+@pytest.mark.asyncio
+async def test_arm_without_code_when_not_required(
+    hass: Any, enable_custom_integrations: Any
+) -> None:
+    """Test arm without code when not required."""
+    users = {
+        "admin_user": UserFactory.create_user(
+            user_id="admin_user",
+            name="Admin User",
+            code="1234",
+            can_arm=True,
+            can_disarm=True,
+        ),
+    }
+    areas = [
+        AreaFactory.create_area(
+            area_id="area_1",
+            name="Test Area 1",
+            code_arm_required=False,
+        )
+    ]
+    sensors = [
+        SensorFactory.create_door_sensor(
+            entity_id=DOOR_SENSOR,
+            name="Door Sensor",
+            area="area_1",
+            modes=["armed_away", "armed_home"],
+            auto_bypass=False,
+            allow_open=False,
+            arm_on_close=False,
+            always_on=False,
+            trigger_unavailable=False,
+            use_exit_delay=True,
+            use_entry_delay=True,
+        )
+    ]
+    storage, entry = setup_alarmo_entry(
+        hass,
+        areas=areas,
+        sensors=sensors,
+        entry_id="test_arm_without_code_when_not_required",
+        users=users,
+    )
+    with patch_alarmo_integration_dependencies(storage):
+        await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+        hass.states.async_set(DOOR_SENSOR, "off")
+        await hass.async_block_till_done()
+        await hass.services.async_call(
+            "alarmo",
+            "arm",
+            {"entity_id": ALARM_ENTITY, "mode": "away"},
+            blocking=True,
+        )
+        await hass.async_block_till_done()
+        area = AreaFactory.create_area(area_id="area_1")
+        exit_time = area["modes"]["armed_away"]["exit_time"]
+        await advance_time(hass, exit_time + 1)
+        state = hass.states.get(ALARM_ENTITY)
+        assert state.state == "armed_away"
+        assert state.attributes.get("changed_by") is None
+
+
+@pytest.mark.asyncio
+async def test_mode_change_without_code_when_not_required(
+    hass: Any, enable_custom_integrations: Any
+) -> None:
+    """Test mode change without code when not required."""
+    users = {
+        "admin_user": UserFactory.create_user(
+            user_id="admin_user",
+            name="Admin User",
+            code="1234",
+            can_arm=True,
+            can_disarm=True,
+        ),
+    }
+    areas = [
+        AreaFactory.create_area(
+            area_id="area_1",
+            name="Test Area 1",
+            code_mode_change_required=False,
+        )
+    ]
+    sensors = [
+        SensorFactory.create_door_sensor(
+            entity_id=DOOR_SENSOR,
+            name="Door Sensor",
+            area="area_1",
+            modes=["armed_away", "armed_home"],
+            auto_bypass=False,
+            allow_open=False,
+            arm_on_close=False,
+            always_on=False,
+            trigger_unavailable=False,
+            use_exit_delay=True,
+            use_entry_delay=True,
+        )
+    ]
+    storage, entry = setup_alarmo_entry(
+        hass,
+        areas=areas,
+        sensors=sensors,
+        entry_id="test_mode_change_without_code_when_not_required",
+        users=users,
+    )
+    with patch_alarmo_integration_dependencies(storage):
+        await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+        hass.states.async_set(DOOR_SENSOR, "off")
+        await hass.async_block_till_done()
+        await hass.services.async_call(
+            "alarmo",
+            "arm",
+            {"entity_id": ALARM_ENTITY, "code": "1234", "mode": "away"},
+            blocking=True,
+        )
+        await hass.async_block_till_done()
+        area = AreaFactory.create_area(area_id="area_1")
+        exit_time = area["modes"]["armed_away"]["exit_time"]
+        await advance_time(hass, exit_time + 1)
+        state = hass.states.get(ALARM_ENTITY)
+        assert state.state == "armed_away"
+        await hass.services.async_call(
+            "alarmo",
+            "arm",
+            {"entity_id": ALARM_ENTITY, "mode": "home"},
+            blocking=True,
+        )
+        await hass.async_block_till_done()
+        state = hass.states.get(ALARM_ENTITY)
+        assert state.state == "armed_home"
+        assert state.attributes.get("changed_by") is None
