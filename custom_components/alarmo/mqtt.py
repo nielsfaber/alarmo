@@ -173,10 +173,6 @@ class MqttHandler:
 
     def __del__(self):
         """Prepare for removal."""
-        self.async_unload()
-
-    def async_unload(self):
-        """Unload subscriptions and subscribed topics."""
         while len(self._subscribed_topics):
             self._subscribed_topics.pop()()
         while len(self._subscriptions):
