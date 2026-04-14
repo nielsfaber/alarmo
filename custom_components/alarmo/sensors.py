@@ -195,23 +195,11 @@ class SensorHandler:
 
     def __del__(self):
         """Prepare for removal."""
-        self.async_unload()
-
-    def async_unload(self):
-        """Unload listeners and timers for the sensor handler."""
         if self._state_listener:
             self._state_listener()
             self._state_listener = None
         while len(self._subscriptions):
             self._subscriptions.pop()()
-        while len(self._arm_timers):
-            _key, unsub = self._arm_timers.popitem()
-            if unsub:
-                unsub()
-        while len(self._delay_on_timers):
-            _key, unsub = self._delay_on_timers.popitem()
-            if unsub:
-                unsub()
 
     def async_watch_sensor_states(
         self,

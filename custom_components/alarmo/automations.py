@@ -174,10 +174,6 @@ class AutomationHandler:
 
     def __del__(self):
         """Prepare for removal."""
-        self.async_unload()
-
-    def async_unload(self):
-        """Unload dispatcher subscriptions."""
         while len(self._subscriptions):
             self._subscriptions.pop()()
 
