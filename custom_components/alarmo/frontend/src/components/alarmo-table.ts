@@ -206,7 +206,7 @@ export class AlarmoTable extends LitElement {
 
     if (!searchable.length) return false;
     const haystack = searchable.join(' ');
-    return tokens.some(token => haystack.includes(token));
+    return tokens.every(token => haystack.includes(token));
   }
 
   private sortTableData(data: TableData[]) {
