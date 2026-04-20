@@ -1,9 +1,13 @@
 """fire events in HA for use with automations."""
 
+import logging
+
 from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
 from . import const
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class EventHandler:
@@ -71,6 +75,12 @@ class EventHandler:
             self.hass.bus.async_fire("alarmo_command_success", data)
 
         elif event == const.EVENT_READY_TO_ARM_MODES_CHANGED:
+            if alarm_entity is None:
+                _LOGGER.debug(
+                    "Ignoring ready_to_arm_modes_changed for area %s: alarm entity is None (likely removed or master not configured)",
+                    area_id,
+                )
+                return
             supported_modes = dict(
                 filter(
                     lambda el: el[1] & alarm_entity.supported_features,
