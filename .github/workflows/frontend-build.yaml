@@ -1,0 +1,33 @@
+name: Frontend Build Check
+
+on:
+  pull_request:
+    paths:
+      - 'custom_components/alarmo/frontend/**'
+  push:
+    paths:
+      - 'custom_components/alarmo/frontend/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        working-directory: custom_components/alarmo/frontend
+        run: npm install
+
+      - name: Run linter check
+        working-directory: custom_components/alarmo/frontend
+        run: npm run lint:check
+
+      - name: Build frontend
+        working-directory: custom_components/alarmo/frontend
+        run: npm run build
