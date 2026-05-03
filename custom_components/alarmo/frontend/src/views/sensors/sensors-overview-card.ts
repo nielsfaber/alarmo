@@ -117,6 +117,9 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
         width: '60%',
         grow: true,
         text: true,
+        sortable: true,
+        sort: (data: AlarmoSensor & { name: string }) => data.name || '',
+        search: (data: AlarmoSensor & { name: string }) => `${data.name || ''} ${data.entity_id || ''}`,
         renderer: (data: AlarmoSensor & { name: string }) => html`
           <span class="${!data.enabled ? 'disabled' : ''}" id="${formatId(data.entity_id, 'name')}">
             ${data.name}
@@ -158,6 +161,8 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
         title: localize('common.enabled', this.hass.language),
         width: '68px',
         align: 'center',
+        sortable: true,
+        sort: (data: AlarmoSensor) => (data.enabled ? 1 : 0),
         renderer: (data: AlarmoSensor) => html`
           <ha-switch
             @click=${(ev: Event) => {

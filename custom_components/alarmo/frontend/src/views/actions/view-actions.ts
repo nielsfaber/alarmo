@@ -128,10 +128,14 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
           width: '40%',
           grow: true,
           text: true,
+          sortable: true,
+          sortDefault: 'asc',
+          sort: (item: AlarmoAutomation) => item.name || '',
+          search: (item: AlarmoAutomation) => item.name || '',
         },
         enabled: {
           title: localize('common.enabled', this.hass.language),
-          width: '68px',
+          width: '15%',
           align: 'center',
           renderer: (item: AlarmoAutomation) => html`
             <ha-switch
@@ -142,6 +146,8 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
             }}
             ></ha-switch>
           `,
+          sortable: true,
+          sort: (item: AlarmoAutomation) => (item.enabled ? 1 : 0),
         },
       };
 
