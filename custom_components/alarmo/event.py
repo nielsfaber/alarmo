@@ -33,11 +33,10 @@ class EventHandler:
             alarm_entity = self.hass.data[const.DOMAIN]["master"]
 
         if alarm_entity is None:
-            _LOGGER.debug(
-                "Ignoring %s for area %s: alarm entity is None "
-                "(likely removed or master not configured)",
-                event,
+            _LOGGER.warning(
+                "Cannot resolve alarm_entity for area_id: %s (event: %s)",
                 area_id,
+                event,
             )
             return
 
