@@ -128,7 +128,7 @@ function _e(e,a){return(a,t,i)=>{const n=a=>a.renderRoot?.querySelector(e)??null
     margin-bottom: -20px;
   }
 
-  ha-textfield {
+  ha-input {
     min-width: 220px;
   }
 
@@ -191,7 +191,8 @@ function _e(e,a){return(a,t,i)=>{const n=a=>a.renderRoot?.querySelector(e)??null
           </ha-checkbox>`}
         </div>
         <div class="column">
-          <ha-textfield
+          <div class="row">
+          <ha-input
             id="minutes"
             inputmode="numeric"
             .value=${this.disabled?this.placeholder:this._getMinutes()}
@@ -205,14 +206,14 @@ function _e(e,a){return(a,t,i)=>{const n=a=>a.renderRoot?.querySelector(e)??null
             .max=${Math.floor(this.max/ps)}
             .disabled=${this.disabled}
             .validityTransform=${this._validateMinutesInput}
-                  suffix=":"
-                  class="hasSuffix"
           >
-          </ha-textfield>
+          </ha-input>
+          <div class="time-separator">:</div>
+          </div>
           <span class="label">${_n("components.time_picker.minutes",this.hass.language)}</span>
         </div>
         <div class="column">
-          <ha-textfield
+          <ha-input
             id="seconds"
             inputmode="numeric"
             .value=${this.disabled?this.placeholder:this._getSeconds()}
@@ -227,7 +228,7 @@ function _e(e,a){return(a,t,i)=>{const n=a=>a.renderRoot?.querySelector(e)??null
             .disabled=${this.disabled}
             .validityTransform=${this._validateSecondsInput}
           >
-          </ha-textfield>
+          </ha-input>
           <span class="label">${_n("components.time_picker.seconds",this.hass.language)}</span>
         </div>
         ${this.showArrows?K`
@@ -265,19 +266,34 @@ function _e(e,a){return(a,t,i)=>{const n=a=>a.renderRoot?.querySelector(e)??null
     :host([required]) div.wrapper {
       margin-left: 10px;
     }
-    ha-textfield {
+    ha-checkbox {
+      margin-top: 4px;
+    }
+    ha-input {
       width: 70px;
-      height: 48px;
+      height: 56px;
+      --ha-input-padding-top: 0px;
+      --ha-input-padding-bottom: 0px;
+      --ha-input-text-align: center;
+      --wa-form-control-value-font-size: 16px;
+    }
+    ha-input::part(wa-input) {
       text-align: center;
-      --mdc-shape-small: 0;
-      --text-field-appearance: none;
-      --text-field-padding: 0 4px;
-      --text-field-suffix-padding-left: 2px;
-      --text-field-suffix-padding-right: 0;
-      --text-field-text-align: center;
-      --mdc-typography-subtitle1-font-size: 16px;
-      --mdc-text-field-outlined-idle-border-color: var(--card-background-color);
-      --mdc-text-field-outlined-hover-border-color: var(--card-background-color);
+    }
+    .time-separator {
+      background-color: var(--ha-color-form-background);
+      color: var(--ha-color-text-secondary);
+      border-bottom: 1px solid var(--ha-color-border-neutral-loud);
+      box-sizing: border-box;
+      height: 56px;
+      width: 12px;
+      margin-inline-start: calc(var(--ha-space-1) * -1);
+      margin-inline-end: calc(var(--ha-space-1) * -1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 600;
     }
     div.column {
       display: flex;
@@ -286,7 +302,9 @@ function _e(e,a){return(a,t,i)=>{const n=a=>a.renderRoot?.querySelector(e)??null
     div.column > * {
       display: flex;
     }
-    ha-icon {
+    div.row {
+      display: flex;
+      flex-direction: row;
     }
     wa-button {
       width: 30px;
@@ -378,7 +396,7 @@ function _e(e,a){return(a,t,i)=>{const n=a=>a.renderRoot?.querySelector(e)??null
     :host([icons]) ha-select {
       --ha-space-10: var(--ha-space-15);
     }
-  `,i([ue()],_s.prototype,"hass",void 0),i([ue()],_s.prototype,"label",void 0),i([ue()],_s.prototype,"items",void 0),i([ue({type:String,reflect:!0})],_s.prototype,"value",void 0),i([ue({type:Boolean,reflect:!0})],_s.prototype,"disabled",void 0),i([ue()],_s.prototype,"helper",void 0),i([ue({type:Boolean})],_s.prototype,"showSearch",void 0),i([ue({type:Boolean})],_s.prototype,"clearable",void 0),i([ue({type:Boolean})],_s.prototype,"invalid",void 0),i([_e("ha-textfield")],_s.prototype,"_menu",void 0),_s=i([me("alarmo-select")],_s);let bs=class extends ce{static get styles(){return c`
+  `,i([ue()],_s.prototype,"hass",void 0),i([ue()],_s.prototype,"label",void 0),i([ue()],_s.prototype,"items",void 0),i([ue({type:String,reflect:!0})],_s.prototype,"value",void 0),i([ue({type:Boolean,reflect:!0})],_s.prototype,"disabled",void 0),i([ue()],_s.prototype,"helper",void 0),i([ue({type:Boolean})],_s.prototype,"showSearch",void 0),i([ue({type:Boolean})],_s.prototype,"clearable",void 0),i([ue({type:Boolean})],_s.prototype,"invalid",void 0),i([_e("ha-input")],_s.prototype,"_menu",void 0),_s=i([me("alarmo-select")],_s);let bs=class extends ce{static get styles(){return c`
       :host {
         display: block;
       }
@@ -764,11 +782,11 @@ function _e(e,a){return(a,t,i)=>{const n=a=>a.renderRoot?.querySelector(e)??null
           <span slot="description">
             ${_n("panels.general.cards.mqtt.fields.state_topic.description",this.hass.language)}
           </span>
-          <ha-textfield
+          <ha-input
             label="${_n("panels.general.cards.mqtt.fields.state_topic.heading",this.hass.language)}"
             value=${this.selection.state_topic}
             @change=${e=>{this.selection=Object.assign(Object.assign({},this.selection),{state_topic:e.target.value})}}
-          ></ha-textfield>
+          ></ha-input>
         </alarmo-settings-row>
 
         <alarmo-collapsible-section
@@ -781,12 +799,12 @@ function _e(e,a){return(a,t,i)=>{const n=a=>a.renderRoot?.querySelector(e)??null
                   <span slot="description">
                     ${_n("panels.general.cards.mqtt.fields.state_payload.item",this.hass.language,"{state}",Fn(e))}
                   </span>
-                  <ha-textfield
+                  <ha-input
                     label=${Fn(e)}
                     placeholder=${e}
                     value=${this.selection.state_payload[e]||""}
                     @change=${a=>{this.selection=ns(this.selection,{state_payload:{[e]:a.target.value}})}}
-                  ></ha-textfield>
+                  ></ha-input>
                 </alarmo-settings-row>
               `)}
         </alarmo-collapsible-section>
@@ -798,11 +816,11 @@ function _e(e,a){return(a,t,i)=>{const n=a=>a.renderRoot?.querySelector(e)??null
           <span slot="description">
             ${_n("panels.general.cards.mqtt.fields.event_topic.description",this.hass.language)}
           </span>
-          <ha-textfield
+          <ha-input
             label="${_n("panels.general.cards.mqtt.fields.event_topic.heading",this.hass.language)}"
             value=${this.selection.event_topic}
             @change=${e=>{this.selection=Object.assign(Object.assign({},this.selection),{event_topic:e.target.value})}}
-          ></ha-textfield>
+          ></ha-input>
         </alarmo-settings-row>
 
         <alarmo-settings-row .narrow=${this.narrow}>
@@ -812,11 +830,11 @@ function _e(e,a){return(a,t,i)=>{const n=a=>a.renderRoot?.querySelector(e)??null
           <span slot="description">
             ${_n("panels.general.cards.mqtt.fields.command_topic.description",this.hass.language)}
           </span>
-          <ha-textfield
+          <ha-input
             label="${_n("panels.general.cards.mqtt.fields.command_topic.heading",this.hass.language)}"
             value=${this.selection.command_topic}
             @change=${e=>{this.selection=Object.assign(Object.assign({},this.selection),{command_topic:e.target.value})}}
-          ></ha-textfield>
+          ></ha-input>
         </alarmo-settings-row>
 
         <alarmo-collapsible-section
@@ -829,12 +847,12 @@ function _e(e,a){return(a,t,i)=>{const n=a=>a.renderRoot?.querySelector(e)??null
                   <span slot="description">
                     ${_n("panels.general.cards.mqtt.fields.command_payload.item",this.hass.language,"{command}",Fn(e))}
                   </span>
-                  <ha-textfield
+                  <ha-input
                     label=${Fn(e)}
                     placeholder=${e}
                     value=${this.selection.command_payload[e]||""}
                     @change=${a=>{this.selection=ns(this.selection,{command_payload:{[e]:a.target.value}})}}
-                  ></ha-textfield>
+                  ></ha-input>
                 </alarmo-settings-row>
               `)}
         </alarmo-collapsible-section>
@@ -1370,10 +1388,10 @@ const $s=2;class Ts{constructor(e){}get _$AU(){return this._$AM._$AU}_$AT(e,a,t)
         </div>
         <ha-dialog-footer slot="footer">
           <ha-button appearance="plain" slot="primaryAction" @click=${this.cancelClick} dialogAction="close">
-            ${this.hass.localize("ui.dialogs.generic.cancel")}
+            ${this.hass.localize("ui.common.cancel")}
           </ha-button>
           <ha-button appearance="plain" slot="secondaryAction" style="float: left" @click=${this.confirmClick} dialogAction="close">
-            ${this.hass.localize("ui.dialogs.generic.ok")}
+            ${this.hass.localize("ui.common.ok")}
           </ha-button>
         </ha-dialog-footer>
       </ha-dialog>
@@ -1399,11 +1417,11 @@ const $s=2;class Ts{constructor(e){}get _$AU(){return this._$AM._$AU}_$AT(e,a,t)
           </div>
         </ha-dialog-header>
         <div class="wrapper">
-          <ha-textfield
+          <ha-input
             label=${this.hass.localize("ui.common.name")}
             @input=${e=>this.name=e.target.value}
             value="${this.name}"
-          ></ha-textfield>
+          ></ha-input>
           ${this.area_id?K`
                 <span class="note">
                   ${_n("panels.general.dialogs.edit_area.name_warning",this.hass.language)}
@@ -1445,7 +1463,7 @@ const $s=2;class Ts{constructor(e){}get _$AU(){return this._$AM._$AU}_$AT(e,a,t)
       span.note {
         color: var(--secondary-text-color);
       }
-      ha-textfield {
+      ha-input {
         display: block;
       }
       alarmo-select {
@@ -1483,11 +1501,11 @@ const $s=2;class Ts{constructor(e){}get _$AU(){return this._$AM._$AU}_$AT(e,a,t)
           <div slot="title">${_n("panels.general.dialogs.edit_master.title",this.hass.language)}</div>
         </ha-dialog-header>
         <div class="wrapper">
-          <ha-textfield
+          <ha-input
             label=${this.hass.localize("ui.common.name")}
             @input=${e=>this.name=e.target.value}
             value="${this.name}"
-          ></ha-textfield>
+          ></ha-input>
           <span class="note">${_n("panels.general.dialogs.edit_area.name_warning",this.hass.language)}</span>
         </div>
         <ha-dialog-footer slot="footer">
@@ -1506,7 +1524,7 @@ const $s=2;class Ts{constructor(e){}get _$AU(){return this._$AM._$AU}_$AT(e,a,t)
       span.note {
         color: var(--secondary-text-color);
       }
-      ha-textfield {
+      ha-input {
         display: block;
       }
     `}};i([ue({attribute:!1})],Ps.prototype,"hass",void 0),i([ve()],Ps.prototype,"_params",void 0),i([ue()],Ps.prototype,"name",void 0),Ps=i([me("edit-master-dialog")],Ps);var Bs=Object.freeze({__proto__:null,get EditMasterDialog(){return Ps}});let Vs=class extends(Me(ce)){constructor(){super(...arguments),this.areas={},this.automations={}}hassSubscribe(){return this._fetchData(),[this.hass.connection.subscribeMessage(()=>this._fetchData(),{type:"alarmo_config_updated"})]}async _fetchData(){this.hass&&(this.config=await ye(this.hass),this.areas=await Ce(this.hass),this.automations=await ze(this.hass),this.data=Wn(this.config,["trigger_time","disarm_after_trigger","ignore_blocking_sensors_after_trigger","mqtt","master"]))}firstUpdated(){(async()=>{await be()})()}render(){var e,a,t,i,n,s,r,o,d;return this.hass&&this.config&&this.data?"mqtt_configuration"==this.path.subpage?K`
@@ -1657,11 +1675,11 @@ const $s=2;class Ts{constructor(e){}get _$AU(){return this._$AM._$AU}_$AT(e,a,t)
             <span slot="description">
               ${_n("panels.sensors.dialogs.create_group.fields.name.description",this.hass.language)}
             </span>
-            <ha-textfield
+            <ha-input
               label=${this.hass.localize("ui.common.name")}
               @input=${e=>this.data=Object.assign(Object.assign({},this.data),{name:String(e.target.value).trim()})}
               value="${this.data.name}"
-            ></ha-textfield>
+            ></ha-input>
           </alarmo-settings-row>
 
           <alarmo-settings-row large dialog>
@@ -2283,12 +2301,12 @@ const $s=2;class Ts{constructor(e){}get _$AU(){return this._$AM._$AU}_$AT(e,a,t)
             ${_n("panels.codes.cards.new_user.fields.name.description",this.hass.language)}
           </span>
 
-          <ha-textfield
+          <ha-input
             label="${_n("panels.codes.cards.new_user.fields.name.heading",this.hass.language)}"
             placeholder=""
             value=${this.data.name}
             @input=${e=>this.data=Object.assign(Object.assign({},this.data),{name:e.target.value})}
-          ></ha-textfield>
+          ></ha-input>
         </alarmo-settings-row>
 
         ${this.item?K`
@@ -2300,13 +2318,13 @@ const $s=2;class Ts{constructor(e){}get _$AU(){return this._$AM._$AU}_$AT(e,a,t)
                   ${_n("panels.codes.cards.edit_user.fields.old_code.description",this.hass.language)}
                 </span>
 
-                <ha-textfield
+                <ha-input
                   label="${_n("panels.codes.cards.edit_user.fields.old_code.heading",this.hass.language)}"
                   placeholder=""
                   type="password"
                   value=${this.data.old_code||""}
                   @input=${e=>this.data=Object.assign(Object.assign({},this.data),{old_code:String(e.target.value).trim()})}
-                ></ha-textfield>
+                ></ha-input>
               </alarmo-settings-row>
             `:""}
         ${this.item&&!(null===(e=this.data.old_code)||void 0===e?void 0:e.length)?"":K`
@@ -2318,13 +2336,13 @@ const $s=2;class Ts{constructor(e){}get _$AU(){return this._$AM._$AU}_$AT(e,a,t)
                   ${_n("panels.codes.cards.new_user.fields.code.description",this.hass.language)}
                 </span>
 
-                <ha-textfield
+                <ha-input
                   label="${_n("panels.codes.cards.new_user.fields.code.heading",this.hass.language)}"
                   placeholder=""
                   type="password"
                   value=${this.data.code}
                   @input=${e=>this.data=Object.assign(Object.assign({},this.data),{code:String(e.target.value).trim()})}
-                ></ha-textfield>
+                ></ha-input>
               </alarmo-settings-row>
 
               <alarmo-settings-row .narrow=${this.narrow}>
@@ -2335,13 +2353,13 @@ const $s=2;class Ts{constructor(e){}get _$AU(){return this._$AM._$AU}_$AT(e,a,t)
                   ${_n("panels.codes.cards.new_user.fields.confirm_code.description",this.hass.language)}
                 </span>
 
-                <ha-textfield
+                <ha-input
                   label="${_n("panels.codes.cards.new_user.fields.confirm_code.heading",this.hass.language)}"
                   placeholder=""
                   type="password"
                   value=${this.repeatCode||""}
                   @input=${e=>this.repeatCode=String(e.target.value).trim()}
-                ></ha-textfield>
+                ></ha-input>
               </alarmo-settings-row>
             `}
 
@@ -2677,12 +2695,12 @@ const $s=2;class Ts{constructor(e){}get _$AU(){return this._$AM._$AU}_$AT(e,a,t)
                           ${_n("panels.actions.cards.new_notification.fields.title.description",this.hass.language)}
                         </span>
 
-                        <ha-textfield
+                        <ha-input
                           label="${_n("panels.actions.cards.new_notification.fields.title.heading",this.hass.language)}"
                           .value=${(null===(t=this.config.actions[0].data)||void 0===t?void 0:t.title)||""}
                           @input=${this._setTitle}
                           ?invalid=${this.errors.title}
-                        ></ha-textfield>
+                        ></ha-input>
                       </alarmo-settings-row>
                     `}
                 ${this.config.actions[0].service&&"tts"==os(this.config.actions[0].service)?K`
@@ -2843,13 +2861,13 @@ const $s=2;class Ts{constructor(e){}get _$AU(){return this._$AM._$AU}_$AT(e,a,t)
               ${_n("panels.actions.cards.new_notification.fields.name.description",this.hass.language)}
             </span>
 
-            <ha-textfield
+            <ha-input
               label="${_n("panels.actions.cards.new_notification.fields.name.heading",this.hass.language)}"
               .placeholder=${this._namePlaceholder()}
               .value=${this.config.name||""}
               @input=${this._setName}
               ?invalid=${this.errors.name}
-            ></ha-textfield>
+            ></ha-input>
           </alarmo-settings-row>
 
           ${(null===(r=this.item)||void 0===r?void 0:r.automation_id)?K`
@@ -3093,13 +3111,13 @@ const $s=2;class Ts{constructor(e){}get _$AU(){return this._$AM._$AU}_$AT(e,a,t)
               ${_n("panels.actions.cards.new_action.fields.name.description",this.hass.language)}
             </span>
 
-            <ha-textfield
+            <ha-input
               label="${_n("panels.actions.cards.new_action.fields.name.heading",this.hass.language)}"
               .placeholder=${this._namePlaceholder()}
               .value=${this.config.name||""}
               @input=${this._setName}
               ?invalid=${this.errors.name}
-            ></ha-textfield>
+            ></ha-input>
           </alarmo-settings-row>
 
           ${(null===(e=this.item)||void 0===e?void 0:e.automation_id)?K`
@@ -3277,7 +3295,7 @@ const $s=2;class Ts{constructor(e){}get _$AU(){return this._$AM._$AU}_$AT(e,a,t)
             ${_n("title",this.hass.language)}
           </div>
           <div class="version">
-            v${"1.10.16"}
+            v${"1.10.17"}
           </div>
         </div>
 
