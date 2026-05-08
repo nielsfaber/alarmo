@@ -1,9 +1,13 @@
 """fire events in HA for use with automations."""
 
+import logging
+
 from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
 from . import const
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class EventHandler:
@@ -27,6 +31,14 @@ class EventHandler:
             alarm_entity = self.hass.data[const.DOMAIN]["areas"][area_id]
         else:
             alarm_entity = self.hass.data[const.DOMAIN]["master"]
+
+        if alarm_entity is None:
+            _LOGGER.warning(
+                "Cannot resolve alarm_entity for area_id: %s (event: %s)",
+                area_id,
+                event,
+            )
+            return
 
         if event in [
             const.EVENT_FAILED_TO_ARM,
