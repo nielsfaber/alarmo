@@ -1573,9 +1573,13 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
     def update_ready_to_arm_modes(self):
         """Set arm modes which are ready for arming (no blocking sensors)."""
         modes_list = const.ARM_MODES
+        modes_list = list(filter(lambda x: x != self._state, modes_list))
         for item in self.hass.data[const.DOMAIN]["areas"].values():
             modes_list = list(
-                filter(lambda x: x in item._ready_to_arm_modes, modes_list)
+                filter(
+                    lambda x: x in item._ready_to_arm_modes or x == item.state,
+                    modes_list,
+                )
             )
         if modes_list == self._ready_to_arm_modes:
             return
