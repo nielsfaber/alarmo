@@ -41,10 +41,10 @@ export class ConfirmDeleteDialog extends LitElement {
         </div>
         <ha-dialog-footer slot="footer">
           <ha-button appearance="plain" slot="primaryAction" @click=${this.cancelClick} dialogAction="close">
-            ${this.hass.localize('ui.dialogs.generic.cancel')}
+            ${this.hass.localize('ui.common.cancel')}
           </ha-button>
           <ha-button appearance="plain" slot="secondaryAction" style="float: left" @click=${this.confirmClick} dialogAction="close">
-            ${this.hass.localize('ui.dialogs.generic.ok')}
+            ${this.hass.localize('ui.common.ok')}
           </ha-button>
         </ha-dialog-footer>
       </ha-dialog>
