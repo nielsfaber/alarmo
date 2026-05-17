@@ -63,16 +63,7 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
         <mqtt-config-card .hass=${this.hass} .narrow=${this.narrow}></mqtt-config-card>
       `;
     }
-    if (this.path.params.edit_area) {
-      return html`
-        <area-editor-card
-          .hass=${this.hass}
-          .narrow=${this.narrow}
-          item=${this.path.params.edit_area}
-        ></area-editor-card>
-      `;
-    } else {
-      return html`
+    return html`
         <ha-card header="${localize('panels.general.title', this.hass.language)}">
           <div class="card-content">
             ${localize('panels.general.cards.general.description', this.hass.language)}
@@ -172,7 +163,6 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
         </ha-card>
         <alarm-mode-card .hass=${this.hass} .narrow=${this.narrow}></alarm-mode-card>
       `;
-    }
   }
 
   setupMasterClick(ev: Event) {
