@@ -141,27 +141,31 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
         );
 
       return html`
-        <ha-card header="${localize('panels.actions.title', this.hass.language)}">
-          <div class="card-content">${localize('panels.actions.cards.actions.description', this.hass.language)}</div>
-
-          <alarmo-table
-            .hass=${this.hass}
-            ?selectable=${true}
-            .columns=${columns}
-            .data=${automationData}
-            .filters=${this.getTableFilterOptions()}
-            @row-click=${(ev: CustomEvent) =>
-          navigate(this, exportPath('actions', { params: { edit_action: ev.detail.id } }), true)}
-          >
-            ${localize('panels.actions.cards.actions.table.no_items', this.hass.language)}
-          </alarmo-table>
-
-          <div class="card-actions">
-            <ha-button appearance="plain" @click=${this.addActionClick}>
-              ${localize('panels.actions.cards.actions.actions.new_action', this.hass.language)}
-            </ha-button>
+        <section class="list-page">
+          <div class="list-page-header">
+            <h1 class="list-page-title">${localize('panels.actions.title', this.hass.language)}</h1>
+            <p class="list-page-description">${localize('panels.actions.cards.actions.description', this.hass.language)}</p>
+            <div class="list-page-actions">
+              <ha-button appearance="plain" @click=${this.addActionClick}>
+                ${localize('panels.actions.cards.actions.actions.new_action', this.hass.language)}
+              </ha-button>
+            </div>
           </div>
-        </ha-card>
+
+          <div class="list-page-table">
+            <alarmo-table
+              .hass=${this.hass}
+              ?selectable=${true}
+              .columns=${columns}
+              .data=${automationData}
+              .filters=${this.getTableFilterOptions()}
+              @row-click=${(ev: CustomEvent) =>
+                navigate(this, exportPath('actions', { params: { edit_action: ev.detail.id } }), true)}
+            >
+              ${localize('panels.actions.cards.actions.table.no_items', this.hass.language)}
+            </alarmo-table>
+          </div>
+        </section>
       `;
     }
   }

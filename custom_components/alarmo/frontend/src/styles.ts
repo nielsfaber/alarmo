@@ -96,6 +96,48 @@ export const commonStyle = css`
   ha-card > ha-card {
     margin: 10px;
   }
+
+  .list-page {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 8px 5px 5px;
+  }
+
+  .list-page-header {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px 0;
+  }
+
+  .list-page-title {
+    font-size: 1.5rem;
+    line-height: 2rem;
+    font-weight: 400;
+    letter-spacing: -0.012em;
+    color: var(--primary-text-color);
+    margin: 0;
+  }
+
+  .list-page-description {
+    color: var(--secondary-text-color);
+    margin: 0;
+  }
+
+  .list-page-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .list-page-table {
+    border: 1px solid var(--divider-color);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--card-background-color);
+  }
 `;
 
 export const dialogStyle = css`

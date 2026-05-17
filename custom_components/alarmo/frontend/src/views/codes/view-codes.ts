@@ -73,9 +73,7 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
     users.sort(sortAlphabetically);
 
     const columns: Dictionary<TableColumn> = {
-      icon: {
-        width: '40px',
-      },
+      icon: { width: '40px' },
       name: {
         title: this.hass.localize('ui.common.name'),
         width: '40%',
@@ -98,24 +96,15 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
     const data = users.map(item => {
       const output: TableData = {
         id: item.user_id!,
-        icon: html`
-          <ha-icon icon="mdi:account-outline" class="${item.enabled ? '' : 'disabled'}"></ha-icon>
-        `,
-        name: html`
-          <span class="${item.enabled ? '' : 'disabled'}">
-            ${prettyPrint(item.name)}
-          </span>
-        `,
+        icon: html`<ha-icon icon="mdi:account-outline" class="${item.enabled ? '' : 'disabled'}"></ha-icon>`,
+        name: html`<span class="${item.enabled ? '' : 'disabled'}">${prettyPrint(item.name)}</span>`,
         code_format: html`
           <span class="${item.enabled ? '' : 'disabled'}">
           ${item.code_format == 'number'
-            ? prettyPrint(
-              localize('panels.codes.cards.codes.fields.code_format.code_format_number', this.hass!.language)
-            )
+            ? prettyPrint(localize('panels.codes.cards.codes.fields.code_format.code_format_number', this.hass!.language))
             : item.code_format == 'text'
               ? prettyPrint(localize('panels.codes.cards.codes.fields.code_format.code_format_text', this.hass!.language))
-              : this.hass!.localize('state.default.unknown')
-          }
+              : this.hass!.localize('state.default.unknown')}
           </span>
         `,
         enabled: html`
@@ -130,37 +119,35 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
     });
 
     return html`
-      <ha-card header="${localize('panels.codes.cards.user_management.title', this.hass.language)}">
-        <div class="card-content">
-          ${localize('panels.codes.cards.user_management.description', this.hass.language)}
-        </div>
-        <div style="padding: 0px 0px 16px 16px; margin-top: -8px">
-          <ha-button
-            appearance="filled"
-            @click=${this.openCodeConfigDialog}
-          >
-            <ha-icon slot="start" icon="mdi:cog-outline"></ha-icon>
-            ${localize('panels.codes.cards.user_management.actions.configure_codes', this.hass.language)}
-          </ha-button>
+      <section class="list-page">
+        <div class="list-page-header">
+          <h1 class="list-page-title">${localize('panels.codes.cards.user_management.title', this.hass.language)}</h1>
+          <p class="list-page-description">${localize('panels.codes.cards.user_management.description', this.hass.language)}</p>
+          <div class="list-page-actions">
+            <ha-button appearance="filled" @click=${this.openCodeConfigDialog}>
+              <ha-icon slot="start" icon="mdi:cog-outline"></ha-icon>
+              ${localize('panels.codes.cards.user_management.actions.configure_codes', this.hass.language)}
+            </ha-button>
+            <ha-button appearance="plain" @click=${this.addUserClick}>
+              ${localize('panels.codes.cards.user_management.actions.new_user', this.hass.language)}
+            </ha-button>
+          </div>
         </div>
 
-        <alarmo-table
-          ?selectable=${true}
-          .columns=${columns}
-          .data=${data}
-          @row-click=${(ev: CustomEvent) => {
-        const id = String(ev.detail.id);
-        navigate(this, exportPath('codes', { params: { edit_user: id } }), true);
-      }}
-        >
-          ${localize('panels.codes.cards.user_management.no_items', this.hass.language)}
-        </alarmo-table>
-        <div class="card-actions">
-          <ha-button appearance="plain" @click=${this.addUserClick}>
-            ${localize('panels.codes.cards.user_management.actions.new_user', this.hass.language)}
-          </ha-button>
+        <div class="list-page-table">
+          <alarmo-table
+            ?selectable=${true}
+            .columns=${columns}
+            .data=${data}
+            @row-click=${(ev: CustomEvent) => {
+              const id = String(ev.detail.id);
+              navigate(this, exportPath('codes', { params: { edit_user: id } }), true);
+            }}
+          >
+            ${localize('panels.codes.cards.user_management.no_items', this.hass.language)}
+          </alarmo-table>
         </div>
-      </ha-card>
+      </section>
     `;
   }
 
@@ -179,7 +166,7 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
   toggleEnabled(ev: Event, id: string) {
     const enabled = (ev.target as HTMLInputElement).checked;
     saveUser(this.hass!, { user_id: id, enabled: enabled })
-      .catch(e => handleError(e, this.shadowRoot!.querySelector('ha-card') as HTMLElement))
+      .catch(e => handleError(e, ev))
       .then();
   }
 

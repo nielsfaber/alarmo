@@ -140,29 +140,33 @@ export class AlarmViewNotifications extends SubscribeMixin(LitElement) {
         );
 
       return html`
-        <ha-card header="${localize('panels.actions.cards.notifications.title', this.hass.language)}">
-          <div class="card-content">
-            ${localize('panels.actions.cards.notifications.description', this.hass.language)}
+        <section class="list-page">
+          <div class="list-page-header">
+            <h1 class="list-page-title">${localize('panels.actions.cards.notifications.title', this.hass.language)}</h1>
+            <p class="list-page-description">
+              ${localize('panels.actions.cards.notifications.description', this.hass.language)}
+            </p>
+            <div class="list-page-actions">
+              <ha-button appearance="plain" @click=${this.addNotificationClick}>
+                ${localize('panels.actions.cards.notifications.actions.new_notification', this.hass.language)}
+              </ha-button>
+            </div>
           </div>
 
-          <alarmo-table
-            .hass=${this.hass}
-            ?selectable=${true}
-            .columns=${columns}
-            .data=${notificationData}
-            .filters=${this.getTableFilterOptions()}
-            @row-click=${(ev: CustomEvent) =>
-              navigate(this, exportPath('notifications', { params: { edit_notification: ev.detail.id } }), true)}
-          >
-            ${localize('panels.actions.cards.notifications.table.no_items', this.hass.language)}
-          </alarmo-table>
-
-          <div class="card-actions">
-            <ha-button appearance="plain" @click=${this.addNotificationClick}>
-              ${localize('panels.actions.cards.notifications.actions.new_notification', this.hass.language)}
-            </ha-button>
+          <div class="list-page-table">
+            <alarmo-table
+              .hass=${this.hass}
+              ?selectable=${true}
+              .columns=${columns}
+              .data=${notificationData}
+              .filters=${this.getTableFilterOptions()}
+              @row-click=${(ev: CustomEvent) =>
+                navigate(this, exportPath('notifications', { params: { edit_notification: ev.detail.id } }), true)}
+            >
+              ${localize('panels.actions.cards.notifications.table.no_items', this.hass.language)}
+            </alarmo-table>
           </div>
-        </ha-card>
+        </section>
       `;
     }
   }

@@ -70,27 +70,30 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
     if (!this.hass || !this.areas || !this.sensors) return html``;
 
     return html`
-      <ha-card header="${localize('panels.sensors.title', this.hass.language)}">
-        <div class="card-content">
-          ${localize('panels.sensors.cards.sensors.description', this.hass.language)}
+      <section class="list-page">
+        <div class="list-page-header">
+          <h1 class="list-page-title">${localize('panels.sensors.title', this.hass.language)}</h1>
+          <p class="list-page-description">${localize('panels.sensors.cards.sensors.description', this.hass.language)}</p>
+          <div class="list-page-actions">
+            <ha-button appearance="plain" @click=${this.addSensorClick}>
+              ${localize('panels.sensors.cards.add_sensors.actions.add_to_alarm', this.hass.language)}
+            </ha-button>
+          </div>
         </div>
 
-        <alarmo-table
-          .hass=${this.hass}
-          ?selectable=${true}
-          .columns=${this.tableColumns()}
-          .data=${this.getTableData()}
-          .filters=${this.getTableFilterOptions()}
-          @row-click=${(ev: CustomEvent) => navigate(this, exportPath('sensors', { params: { edit: ev.detail.id } }), true)}
-        >
-          ${localize('panels.sensors.cards.sensors.table.no_items', this.hass.language)}
-        </alarmo-table>
-        <div class="card-actions">
-          <ha-button appearance="plain" @click=${this.addSensorClick}>
-            ${localize('panels.sensors.cards.add_sensors.actions.add_to_alarm', this.hass.language)}
-          </ha-button>
+        <div class="list-page-table">
+          <alarmo-table
+            .hass=${this.hass}
+            ?selectable=${true}
+            .columns=${this.tableColumns()}
+            .data=${this.getTableData()}
+            .filters=${this.getTableFilterOptions()}
+            @row-click=${(ev: CustomEvent) => navigate(this, exportPath('sensors', { params: { edit: ev.detail.id } }), true)}
+          >
+            ${localize('panels.sensors.cards.sensors.table.no_items', this.hass.language)}
+          </alarmo-table>
         </div>
-      </ha-card>
+      </section>
     `;
   }
 
