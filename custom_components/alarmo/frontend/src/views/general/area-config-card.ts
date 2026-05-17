@@ -1,7 +1,7 @@
 import { LitElement, html } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import { mdiPencil } from '@mdi/js';
+import { mdiPencil, mdiPlus } from '@mdi/js';
 
 import { prettyPrint, sortAlphabetically } from '../../helpers';
 import { AlarmoConfig, Dictionary, AlarmoArea, AlarmoSensor, AlarmoAutomation, HomeAssistant } from '../../types';
@@ -107,20 +107,23 @@ export class AreaConfigCard extends SubscribeMixin(LitElement) {
     });
 
     return html`
-      <ha-card header="${localize('panels.general.cards.areas.title', this.hass.language)}">
-        <div class="card-content">
-          ${localize('panels.general.cards.areas.description', this.hass.language)}
+      <section class="list-page">
+        <div class="list-page-header">
+          <h1 class="list-page-title">${localize('panels.general.cards.areas.title', this.hass.language)}</h1>
+          <p class="list-page-description">${localize('panels.general.cards.areas.description', this.hass.language)}</p>
         </div>
 
-        <alarmo-table .columns=${columns} .data=${data}>
-          ${localize('panels.general.cards.areas.no_items', this.hass.language)}
-        </alarmo-table>
-        <div class="card-actions">
-          <ha-button appearance="plain" @click=${this.addClick}>
-            ${localize('panels.general.cards.areas.actions.add', this.hass.language)}
-          </ha-button>
+        <div class="list-page-table">
+          <alarmo-table .columns=${columns} .data=${data}>
+            ${localize('panels.general.cards.areas.no_items', this.hass.language)}
+          </alarmo-table>
         </div>
-      </ha-card>
+
+        <ha-button slot="fab" class="list-page-fab" size="large" variant="brand" appearance="accent" @click=${this.addClick}>
+          <ha-svg-icon slot="start" .path=${mdiPlus}></ha-svg-icon>
+          ${localize('panels.general.cards.areas.actions.add', this.hass.language)}
+        </ha-button>
+      </section>
     `;
   }
 
