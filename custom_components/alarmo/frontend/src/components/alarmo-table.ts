@@ -578,9 +578,9 @@ export class AlarmoTable extends LitElement {
       overflow: hidden;
       text-overflow: ellipsis;
       min-width: 0;
-      color: var(--secondary-text-color);
+      color: var(--primary-text-color);
       font-size: 0.875rem;
-      font-weight: 600;
+      font-weight: 700;
     }
     div.table .header div.table-cell.sortable {
       display: flex;
