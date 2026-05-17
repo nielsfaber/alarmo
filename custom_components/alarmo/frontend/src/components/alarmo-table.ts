@@ -145,6 +145,11 @@ export class AlarmoTable extends LitElement {
     return this.data!.filter(e => !this.filterTableData(e, this.filterConfig)).length;
   }
 
+  private _getActiveFilterCount() {
+    if (!this.filterConfig) return 0;
+    return Object.values(this.filterConfig).filter(filter => filter.value.length).length;
+  }
+
   handleClick(id: string) {
     if (!this.selectable) return;
     const myEvent = new CustomEvent('row-click', { detail: { id: id } });
@@ -161,12 +166,25 @@ export class AlarmoTable extends LitElement {
           @wa-after-hide=${this._applyFilterSelection}
           placement="bottom-start"
         >
-          <ha-icon-button
+          <div
             slot="trigger"
-            .path=${mdiFilterVariant}
-            ?disabled=${!this.data?.length}
-            label=${localize('components.table.filter.label', this.hass.language)}
-          ></ha-icon-button>
+            class="filter-trigger ${!this.data?.length ? 'disabled' : ''}"
+            aria-label=${localize('components.table.filter.label', this.hass.language)}
+          >
+            <div class="relative">
+              <ha-assist-chip
+                has-icon
+                class="type-assist-chip"
+                ?disabled=${!this.data?.length}
+                .label=${localize('components.table.filter.label', this.hass.language)}
+              >
+                <ha-svg-icon slot="icon" .path=${mdiFilterVariant}></ha-svg-icon>
+              </ha-assist-chip>
+              ${this._getActiveFilterCount()
+                ? html`<div class="badge">${this._getActiveFilterCount()}</div>`
+                : ''}
+            </div>
+          </div>
           ${this.renderFilterMenu()}
         </ha-dropdown>
 
@@ -209,11 +227,9 @@ export class AlarmoTable extends LitElement {
       <ha-icon-button
         class="close"
         .path=${mdiClose}
-        @click=${(ev: Event) => {
-        let target = ((ev.target as HTMLElement).parentElement as HTMLElement).parentElement as HTMLElement;
-        const triggerBtn = target.querySelector("ha-icon-button") as HTMLInputElement;
-        triggerBtn.click();
-      }}
+        @click=${() => {
+          this._menu!.open = false;
+        }}
       ></ha-icon-button>
       ${Object.keys(this.filterConfig).map(key => {
         if (this.filterConfig![key].binary) {
@@ -265,6 +281,10 @@ export class AlarmoTable extends LitElement {
       }
     }
     this.filterSelection = { ...this.filterSelection!, [key]: { value: value } };
+    this.filterConfig = {
+      ...this.filterConfig!,
+      [key]: { ...this.filterConfig![key], value: value },
+    };
   }
 
   private _clearFilters() {
@@ -438,6 +458,41 @@ export class AlarmoTable extends LitElement {
       align-items: center;
       gap: 8px;
       background: var(--table-row-background-color, var(--card-background-color));
+    }
+    .filter-trigger {
+      display: flex;
+      cursor: pointer;
+    }
+    .filter-trigger.disabled {
+      pointer-events: none;
+      cursor: default;
+      opacity: 0.38;
+    }
+    .filter-trigger .relative {
+      position: relative;
+    }
+    .type-assist-chip {
+      --ha-assist-chip-container-height: 40px;
+    }
+    .type-assist-chip ha-svg-icon {
+      color: var(--primary-text-color);
+    }
+    .badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      min-width: 16px;
+      height: 16px;
+      padding: 0 4px;
+      box-sizing: border-box;
+      border-radius: 999px;
+      background: var(--primary-color);
+      color: var(--text-primary-color);
+      font-size: 0.6875rem;
+      line-height: 16px;
+      text-align: center;
+      font-weight: 500;
+      pointer-events: none;
     }
     ha-dropdown .header {
       display: flex;
