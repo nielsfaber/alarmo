@@ -22,9 +22,15 @@
     },
     "table": {
       "filter": {
-        "label": "Öğeleri filtrele",
+        "label": "Filtrele",
         "item": "{name}'e göre filtrele",
         "hidden_items": "{number} {number, plural,\n  one {bir madde}\n  other {iki madde}\n} gizli"
+      },
+      "search": {
+        "label": "Ara"
+      },
+      "sort": {
+        "label": "{name} göre sırala"
       }
     }
   },
@@ -351,7 +357,8 @@
           "description": "Her kullanıcının alarmı kurmak/devre dışı bırakmak için kendi kodu vardır.",
           "no_items": "Henüz kullanıcı yok",
           "actions": {
-            "new_user": "Yeni kullanıcı"
+            "new_user": "Yeni kullanıcı",
+            "configure_codes": "Kod yapılandırması"
           }
         },
         "new_user": {

@@ -3,9 +3,11 @@ import { property, customElement } from 'lit/decorators.js';
 import { loadHaForm } from './load-ha-elements';
 
 import './views/general/view-general.ts';
+import './views/areas/view-areas.ts';
 import './views/sensors/view-sensors.ts';
 import './views/codes/view-codes.ts';
 import './views/actions/view-actions.ts';
+import './views/actions/view-notifications.ts';
 
 import { commonStyle } from './styles';
 import { VERSION } from './const';
@@ -17,9 +19,11 @@ import { navigate } from './helpers';
 
 enum EMenuItems {
   General = 'general',
+  Areas = 'areas',
   Sensors = 'sensors',
   Codes = 'codes',
-  Actions = 'actions'
+  Actions = 'actions',
+  Notifications = 'notifications'
 }
 
 @customElement('alarm-panel')
@@ -66,44 +70,74 @@ export class MyAlarmPanel extends LitElement {
         >
           ${Object.values(EMenuItems).map(e => html`
             <ha-tab-group-tab slot="nav" panel="${e}" .active=${path.page === e}>
-              ${localize(`panels.${e}.title`, this.hass.language)}
+              ${e === EMenuItems.Notifications
+                ? localize('panels.actions.cards.notifications.title', this.hass.language)
+                : e === EMenuItems.Areas
+                  ? localize('panels.general.cards.areas.title', this.hass.language)
+                : localize(`panels.${e}.title`, this.hass.language)}
             </ha-tab-group-tab>
           `)}
         </ha-tab-group>
       </div>
-      <div class="view">
-        ${this.getView(path)}
-      </div>
+      ${this.getView(path)}
     `;
   }
 
   getView(path: Path) {
     const page = path.page;
+    const hasSubpage = Boolean(path.subpage);
+    const hasParams = Object.keys(path.params).length > 0;
+    const layout: 'modal' | 'full-width' =
+      ['areas', 'sensors', 'codes', 'actions', 'notifications'].includes(page) && !hasSubpage && !hasParams
+        ? 'full-width'
+        : 'modal';
 
     switch (page) {
       case 'general':
         return html`
-          <alarm-view-general .hass=${this.hass} .narrow=${this.narrow} .path=${path}></alarm-view-general>
+          <div class="view ${layout}">
+            <alarm-view-general .hass=${this.hass} .narrow=${this.narrow} .path=${path}></alarm-view-general>
+          </div>
+        `;
+      case 'areas':
+        return html`
+          <div class="view ${layout}">
+            <alarm-view-areas .hass=${this.hass} .narrow=${this.narrow} .path=${path}></alarm-view-areas>
+          </div>
         `;
       case 'sensors':
         return html`
-          <alarm-view-sensors .hass=${this.hass} .narrow=${this.narrow} .path=${path}></alarm-view-sensors>
+          <div class="view ${layout}">
+            <alarm-view-sensors .hass=${this.hass} .narrow=${this.narrow} .path=${path}></alarm-view-sensors>
+          </div>
         `;
       case 'codes':
         return html`
-          <alarm-view-codes .hass=${this.hass} .narrow=${this.narrow} .path=${path}></alarm-view-codes>
+          <div class="view ${layout}">
+            <alarm-view-codes .hass=${this.hass} .narrow=${this.narrow} .path=${path}></alarm-view-codes>
+          </div>
         `;
       case 'actions':
         return html`
-          <alarm-view-actions .hass=${this.hass} .narrow=${this.narrow} .path=${path}></alarm-view-actions>
+          <div class="view ${layout}">
+            <alarm-view-actions .hass=${this.hass} .narrow=${this.narrow} .path=${path}></alarm-view-actions>
+          </div>
+        `;
+      case 'notifications':
+        return html`
+          <div class="view ${layout}">
+            <alarm-view-notifications .hass=${this.hass} .narrow=${this.narrow} .path=${path}></alarm-view-notifications>
+          </div>
         `;
       default:
         return html`
-          <ha-card header="Page not found">
-            <div class="card-content">
-              The page you are trying to reach cannot be found. Please select a page from the menu above to continue.
-            </div>
-          </ha-card>
+          <div class="view modal">
+            <ha-card header="Page not found">
+              <div class="card-content">
+                The page you are trying to reach cannot be found. Please select a page from the menu above to continue.
+              </div>
+            </ha-card>
+          </div>
         `;
     }
   }
@@ -155,9 +189,20 @@ export class MyAlarmPanel extends LitElement {
         display: flex;
         justify-content: center;
       }
-      .view > * {
+      .view.modal > * {
         width: 600px;
         max-width: 600px;
+      }
+      .view.full-width > * {
+        width: 100%;
+        max-width: 100%;
+        padding: 0 16px;
+        box-sizing: border-box;
+      }
+      @media (min-width: 1200px) {
+        .view.full-width > * {
+          padding: 0 24px;
+        }
       }
       .view > *:last-child {
         margin-bottom: 20px;

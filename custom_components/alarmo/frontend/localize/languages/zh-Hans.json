@@ -24,9 +24,15 @@
     },
     "table": {
       "filter": {
-        "label": "过滤项目",
+        "label": "过滤",
         "item": "通过{name}过滤",
         "hidden_items": "{number} {number, plural,\n  one {项目}\n  other {项目}\n} 已隐藏"
+      },
+      "search": {
+        "label": "搜索"
+      },
+      "sort": {
+        "label": "按{name}排序"
       }
     }
   },
@@ -353,7 +359,8 @@
           "description": "每个用户都有自己的密码来启用/解除警报。",
           "no_items": "无用户",
           "actions": {
-            "new_user": "新用户"
+            "new_user": "新用户",
+            "configure_codes": "代码配置"
           }
         },
         "new_user": {

@@ -36,7 +36,11 @@ export class AlarmViewSensors extends LitElement {
 
   render() {
     if (!this.hass) return html``;
-    if (this.path.params.edit) {
+    if (this.path.subpage == 'new_sensor') {
+      return html`
+        <add-sensors-card .hass=${this.hass} .narrow=${this.narrow}></add-sensors-card>
+      `;
+    } else if (this.path.params.edit) {
       return html`
         <sensor-editor-card
           .hass=${this.hass}
@@ -55,7 +59,6 @@ export class AlarmViewSensors extends LitElement {
           .selectedArea=${selectedArea}
           .selectedMode=${selectedMode}
         ></sensors-overview-card>
-        <add-sensors-card .hass=${this.hass} .narrow=${this.narrow}></add-sensors-card>
       `;
     }
   }

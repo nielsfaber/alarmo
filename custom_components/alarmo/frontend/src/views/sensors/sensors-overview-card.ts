@@ -14,7 +14,7 @@ import { getModesList, modesByArea } from '../../common/modes';
 import { exportPath } from '../../common/navigation';
 
 import '../../components/alarmo-table';
-import { mdiHelpCircleOutline } from '@mdi/js';
+import { mdiHelpCircleOutline, mdiPlus } from '@mdi/js';
 
 const noArea = 'no_area';
 
@@ -70,22 +70,30 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
     if (!this.hass || !this.areas || !this.sensors) return html``;
 
     return html`
-      <ha-card header="${localize('panels.sensors.title', this.hass.language)}">
-        <div class="card-content">
-          ${localize('panels.sensors.cards.sensors.description', this.hass.language)}
+      <section class="list-page">
+        <div class="list-page-header">
+          <h1 class="list-page-title">${localize('panels.sensors.title', this.hass.language)}</h1>
+          <p class="list-page-description">${localize('panels.sensors.cards.sensors.description', this.hass.language)}</p>
         </div>
 
-        <alarmo-table
-          .hass=${this.hass}
-          ?selectable=${true}
-          .columns=${this.tableColumns()}
-          .data=${this.getTableData()}
-          .filters=${this.getTableFilterOptions()}
-          @row-click=${(ev: CustomEvent) => navigate(this, exportPath('sensors', { params: { edit: ev.detail.id } }), true)}
-        >
-          ${localize('panels.sensors.cards.sensors.table.no_items', this.hass.language)}
-        </alarmo-table>
-      </ha-card>
+        <div class="list-page-table">
+          <alarmo-table
+            .hass=${this.hass}
+            ?selectable=${true}
+            .columns=${this.tableColumns()}
+            .data=${this.getTableData()}
+            .filters=${this.getTableFilterOptions()}
+            @row-click=${(ev: CustomEvent) => navigate(this, exportPath('sensors', { params: { edit: ev.detail.id } }), true)}
+          >
+            ${localize('panels.sensors.cards.sensors.table.no_items', this.hass.language)}
+          </alarmo-table>
+        </div>
+
+        <ha-button slot="fab" class="list-page-fab" size="large" variant="brand" appearance="accent" @click=${this.addSensorClick}>
+          <ha-svg-icon slot="start" .path=${mdiPlus}></ha-svg-icon>
+          ${localize('panels.sensors.cards.add_sensors.actions.add_to_alarm', this.hass.language)}
+        </ha-button>
+      </section>
     `;
   }
 
@@ -117,6 +125,9 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
         width: '60%',
         grow: true,
         text: true,
+        sortable: true,
+        sort: (data: AlarmoSensor & { name: string }) => data.name || '',
+        search: (data: AlarmoSensor & { name: string }) => `${data.name || ''} ${data.entity_id || ''}`,
         renderer: (data: AlarmoSensor & { name: string }) => html`
           <span class="${!data.enabled ? 'disabled' : ''}" id="${formatId(data.entity_id, 'name')}">
             ${data.name}
@@ -134,11 +145,33 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
           }
         `,
       },
+      area: {
+        title: localize('panels.sensors.cards.editor.fields.area.heading', this.hass.language),
+        width: '20%',
+        hide: this.narrow,
+        text: true,
+        sortable: true,
+        sort: (data: AlarmoSensor) =>
+          data.area == noArea
+            ? this.hass.localize('state_attributes.climate.preset_mode.none')
+            : this.areas[data.area!]?.name || data.area || '',
+        search: (data: AlarmoSensor) =>
+          data.area == noArea
+            ? this.hass.localize('state_attributes.climate.preset_mode.none')
+            : this.areas[data.area!]?.name || data.area || '',
+        renderer: (data: AlarmoSensor) =>
+          data.area == noArea
+            ? this.hass.localize('state_attributes.climate.preset_mode.none')
+            : this.areas[data.area!]?.name || data.area || '',
+      },
       modes: {
         title: localize('panels.sensors.cards.sensors.table.arm_modes', this.hass.language),
         width: '25%',
         hide: this.narrow,
         text: true,
+        sortable: true,
+        sort: (data: AlarmoSensor) => this.getModesLabel(data),
+        search: (data: AlarmoSensor) => this.getModesLabel(data),
         renderer: (data: AlarmoSensor) => html`
           <span class="${!data.enabled ? 'disabled' : ''}" id="${formatId(data.entity_id, 'modes')}">
             ${data.always_on
@@ -158,6 +191,8 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
         title: localize('common.enabled', this.hass.language),
         width: '68px',
         align: 'center',
+        sortable: true,
+        sort: (data: AlarmoSensor) => (data.enabled ? 1 : 0),
         renderer: (data: AlarmoSensor) => html`
           <ha-switch
             @click=${(ev: Event) => ev.stopPropagation()}
@@ -181,6 +216,8 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
         modes: config.always_on ? modesList : config.modes.filter(e => modesList.includes(e)),
         warning: !config.area,
         area: config.area || noArea,
+        type: config.type,
+        enabled_value: config.enabled ? 'enabled' : 'disabled',
       };
       //if (!config.area) res = { ...res, warning: localize('panels.sensors.cards.sensors.no_area', this.hass.language) };
       return res;
@@ -202,6 +239,18 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
       name: '',
     };
     saveSensor(this.hass, data);
+  }
+
+  private getModesLabel(data: AlarmoSensor) {
+    return data.always_on
+      ? localize('panels.sensors.cards.sensors.table.always_on', this.hass!.language)
+      : data.modes.length
+        ? data.modes.map(e => localize(`common.modes_short.${e}`, this.hass!.language)).join(', ')
+        : this.hass.localize('state_attributes.climate.preset_mode.none');
+  }
+
+  private addSensorClick() {
+    navigate(this, exportPath('sensors', 'new_sensor'), true);
   }
 
   private getTableFilterOptions() {
@@ -233,6 +282,12 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
       })
     );
 
+    const typeFilterOptions = Object.values(ESensorTypes).map(type => ({
+      value: type,
+      name: localize(`panels.sensors.cards.editor.fields.device_type.choose.${type}.name`, this.hass.language),
+      badge: (list: AlarmoSensor[]) => list.filter(item => item.type == type).length,
+    }));
+
     const filterConfig: TableFilterConfig = {
       area: {
         name: localize(
@@ -253,6 +308,32 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
         ),
         items: modeFilterOptions,
         value: this.selectedMode ? [this.selectedMode] : [],
+      },
+      type: {
+        name: localize(
+          'components.table.filter.item',
+          this.hass.language,
+          'name',
+          localize('panels.sensors.cards.add_sensors.table.type', this.hass.language)
+        ),
+        items: typeFilterOptions,
+        value: [],
+      },
+      enabled_value: {
+        name: localize('components.table.filter.item', this.hass.language, 'name', localize('common.enabled', this.hass.language)),
+        items: [
+          {
+            value: 'enabled',
+            name: localize('common.enabled', this.hass.language),
+            badge: (list: (AlarmoSensor & { enabled_value?: string })[]) => list.filter(item => item.enabled_value == 'enabled').length,
+          },
+          {
+            value: 'disabled',
+            name: localize('common.disabled', this.hass.language),
+            badge: (list: (AlarmoSensor & { enabled_value?: string })[]) => list.filter(item => item.enabled_value == 'disabled').length,
+          },
+        ],
+        value: [],
       },
     };
     return filterConfig;

@@ -22,9 +22,15 @@
     },
     "table": {
       "filter": {
-        "label": "Filtrovať položky",
+        "label": "Filtrovať",
         "item": "Filter podľa {name}",
         "hidden_items": "{number} {number, plural,\n  jeden {item is}\n  other {items are}\n} skriť"
+      },
+      "search": {
+        "label": "Hľadať"
+      },
+      "sort": {
+        "label": "Zoradiť podľa {name}"
       }
     }
   },
@@ -351,7 +357,8 @@
           "description": "Každý užívateľ má svoj vlastný kód na zapnutie/vypnutie alarmu.",
           "no_items": "Zatiaľ nie sú žiadni používatelia",
           "actions": {
-            "new_user": "Nový užívateľ"
+            "new_user": "Nový užívateľ",
+            "configure_codes": "Konfigurácia kódu"
           }
         },
         "new_user": {

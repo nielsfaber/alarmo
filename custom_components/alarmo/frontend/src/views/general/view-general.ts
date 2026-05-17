@@ -13,7 +13,6 @@ import { exportPath, Path } from '../../common/navigation';
 
 import './alarm-mode-card';
 import './mqtt-config-card.ts';
-import './area-config-card.ts';
 import '../../components/alarmo-settings-row';
 import '../../dialogs/edit-master-dialog.ts';
 import '../../dialogs/confirm-delete-dialog.ts';
@@ -43,7 +42,13 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
     this.config = await fetchConfig(this.hass);
     this.areas = await fetchAreas(this.hass);
     this.automations = await fetchAutomations(this.hass);
-    this.data = pick(this.config, ['trigger_time', 'disarm_after_trigger', 'ignore_blocking_sensors_after_trigger', 'mqtt', 'master']);
+    this.data = pick(this.config, [
+      'trigger_time',
+      'disarm_after_trigger',
+      'ignore_blocking_sensors_after_trigger',
+      'mqtt',
+      'master'
+    ]);
   }
 
   firstUpdated() {
@@ -58,16 +63,7 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
         <mqtt-config-card .hass=${this.hass} .narrow=${this.narrow}></mqtt-config-card>
       `;
     }
-    if (this.path.params.edit_area) {
-      return html`
-        <area-editor-card
-          .hass=${this.hass}
-          .narrow=${this.narrow}
-          item=${this.path.params.edit_area}
-        ></area-editor-card>
-      `;
-    } else {
-      return html`
+    return html`
         <ha-card header="${localize('panels.general.title', this.hass.language)}">
           <div class="card-content">
             ${localize('panels.general.cards.general.description', this.hass.language)}
@@ -165,12 +161,8 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
               `
           : ''}
         </ha-card>
-
         <alarm-mode-card .hass=${this.hass} .narrow=${this.narrow}></alarm-mode-card>
-
-        <area-config-card .hass=${this.hass} .narrow=${this.narrow}></area-config-card>
       `;
-    }
   }
 
   setupMasterClick(ev: Event) {

@@ -22,9 +22,15 @@
     },
     "table": {
       "filter": {
-        "label": "Filter items",
+        "label": "Filter",
         "item": "Filter volgens {name}",
         "hidden_items": "{number} {number, plural,\n  one {item is}\n  other {items is}\n} versteek"
+      },
+      "search": {
+        "label": "Soek"
+      },
+      "sort": {
+        "label": "Sorteer volgens {name}"
       }
     }
   },
@@ -351,7 +357,8 @@
           "description": "Elke gebruik het hulle eie kode om die alarm aan en af te skakel.",
           "no_items": "Daar is nog geen gebruikers nie",
           "actions": {
-            "new_user": "Nuwe gebruiker"
+            "new_user": "Nuwe gebruiker",
+            "configure_codes": "Kodekonfigurasie"
           }
         },
         "new_user": {

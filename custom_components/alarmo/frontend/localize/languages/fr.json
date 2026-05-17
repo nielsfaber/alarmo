@@ -22,9 +22,15 @@
     },
     "table": {
       "filter": {
-        "label": "Filtrer par items",
+        "label": "Filtrer",
         "item": "Filtrer par {name}",
         "hidden_items": "{number} {number, plural,\n  one { item est caché}\n  other { items sont cachés}\n} "
+      },
+      "search": {
+        "label": "Rechercher"
+      },
+      "sort": {
+        "label": "Trier par {name}"
       }
     }
   },
@@ -351,7 +357,8 @@
           "description": "Chaque utilisateur a son propre code pour activer / désactiver l'alarme.",
           "no_items": "Il n'y a aucun utilisateur de défini",
           "actions": {
-            "new_user": "Nouvel utilisateur"
+            "new_user": "Nouvel utilisateur",
+            "configure_codes": "Configuration du code"
           }
         },
         "new_user": {

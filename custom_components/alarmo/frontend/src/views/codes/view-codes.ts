@@ -1,20 +1,22 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, css, CSSResultGroup } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 
-import { prettyPrint, handleError, sortAlphabetically, pick, navigate } from '../../helpers';
-import { AlarmoConfig, Dictionary, AlarmoUser, HomeAssistant } from '../../types';
+import { prettyPrint, handleError, sortAlphabetically, navigate } from '../../helpers';
+import { Dictionary, AlarmoArea, AlarmoUser, HomeAssistant } from '../../types';
+import { fireEvent } from '../../fire_event';
 
 import './user-editor-card.ts';
-import '../../components/alarmo-settings-row';
+import './code-config-modal.ts';
 import '../../components/alarmo-table.ts';
 
 import { commonStyle } from '../../styles';
 import { localize } from '../../../localize/localize';
 import { SubscribeMixin } from '../../subscribe-mixin';
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
-import { fetchConfig, fetchUsers, saveConfig, saveUser } from '../../data/websockets';
-import { TableData, TableColumn } from '../../components/alarmo-table';
+import { fetchAreas, fetchUsers, saveUser } from '../../data/websockets';
+import { TableData, TableColumn, TableFilterConfig } from '../../components/alarmo-table';
 import { exportPath, Path } from '../../common/navigation';
+import { mdiPlus } from '@mdi/js';
 
 @customElement('alarm-view-codes')
 export class AlarmViewCodes extends SubscribeMixin(LitElement) {
@@ -28,10 +30,10 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
   path!: Path;
 
   @property()
-  data?: Partial<AlarmoConfig>;
+  users: Dictionary<AlarmoUser> = {};
 
   @property()
-  users: Dictionary<AlarmoUser> = {};
+  areas: Dictionary<AlarmoArea> = {};
 
   public hassSubscribe(): Promise<UnsubscribeFunc>[] {
     this._fetchData();
@@ -42,15 +44,12 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
     if (!this.hass) {
       return;
     }
-    const config = await fetchConfig(this.hass);
-    this.data = pick(config, ['code_arm_required', 'code_disarm_required', 'code_mode_change_required', 'code_format']);
-
-    const users = await fetchUsers(this.hass);
-    this.users = users;
+    this.users = await fetchUsers(this.hass);
+    this.areas = await fetchAreas(this.hass);
   }
 
   render() {
-    if (!this.hass || !this.data) return html``;
+    if (!this.hass) return html``;
 
     if (this.path.subpage == 'new_user') {
       return html`
@@ -65,90 +64,7 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
         ></user-editor-card>
       `;
     } else {
-      const codesInUse = this.data.code_arm_required || this.data.code_disarm_required || this.data.code_mode_change_required;
-
       return html`
-        <ha-card header="${localize('panels.codes.title', this.hass.language)}">
-          <div class="card-content">${localize('panels.codes.cards.codes.description', this.hass.language)}</div>
-
-          <alarmo-settings-row .narrow=${this.narrow}>
-            <span slot="heading">
-              ${localize('panels.codes.cards.codes.fields.code_arm_required.heading', this.hass.language)}
-            </span>
-            <span slot="description">
-              ${localize('panels.codes.cards.codes.fields.code_arm_required.description', this.hass.language)}
-            </span>
-            <ha-switch
-              ?checked=${this.data.code_arm_required}
-              @change=${(ev: Event) => {
-          this.saveData({ code_arm_required: (ev.target as HTMLInputElement).checked });
-        }}
-            ></ha-switch>
-          </alarmo-settings-row>
-
-          <alarmo-settings-row .narrow=${this.narrow}>
-            <span slot="heading">
-              ${localize('panels.codes.cards.codes.fields.code_disarm_required.heading', this.hass.language)}
-            </span>
-            <span slot="description">
-              ${localize('panels.codes.cards.codes.fields.code_disarm_required.description', this.hass.language)}
-            </span>
-            <ha-switch
-              ?checked=${this.data.code_disarm_required}
-              @change=${(ev: Event) => {
-          this.saveData({ code_disarm_required: (ev.target as HTMLInputElement).checked });
-        }}
-            ></ha-switch>
-          </alarmo-settings-row>
-
-          <alarmo-settings-row .narrow=${this.narrow}>
-            <span slot="heading">
-              ${localize('panels.codes.cards.codes.fields.code_mode_change_required.heading', this.hass.language)}
-            </span>
-            <span slot="description">
-              ${localize('panels.codes.cards.codes.fields.code_mode_change_required.description', this.hass.language)}
-            </span>
-            <ha-switch
-              ?checked=${this.data.code_mode_change_required}
-              @change=${(ev: Event) => {
-          this.saveData({ code_mode_change_required: (ev.target as HTMLInputElement).checked });
-        }}
-            ></ha-switch>
-          </alarmo-settings-row>
-
-          <alarmo-settings-row .narrow=${this.narrow}>
-            <span slot="heading">
-              ${localize('panels.codes.cards.codes.fields.code_format.heading', this.hass.language)}
-            </span>
-            <span slot="description">
-              ${localize('panels.codes.cards.codes.fields.code_format.description', this.hass.language)}
-            </span>
-            <ha-button
-              appearance="${this.data.code_format == 'number' ? 'filled' : 'plain'}"
-              variant="${this.data.code_format == 'number' ? 'brand' : 'neutral'}"
-          : ''}"
-              @click=${() => {
-          this.saveData({ code_format: 'number' });
-        }}
-              ?disabled=${!codesInUse}
-            >
-              ${localize('panels.codes.cards.codes.fields.code_format.code_format_number', this.hass.language)}
-            </ha-button>
-            <ha-button
-              appearance="${this.data.code_format == 'text' ? 'filled' : 'plain'}"
-              variant="${this.data.code_format == 'text' ? 'brand' : 'neutral'}"
-          : ''
-        }"
-              @click=${() => {
-          this.saveData({ code_format: 'text' });
-        }}
-              ?disabled=${!codesInUse}
-            >
-              ${localize('panels.codes.cards.codes.fields.code_format.code_format_text', this.hass.language)}
-            </ha-button>
-          </alarmo-settings-row>
-        </ha-card>
-
         ${this.usersPanel()}
       `;
     }
@@ -161,49 +77,73 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
     users.sort(sortAlphabetically);
 
     const columns: Dictionary<TableColumn> = {
-      icon: {
-        width: '40px',
-      },
+      icon: { width: '40px' },
       name: {
         title: this.hass.localize('ui.common.name'),
         width: '40%',
         grow: true,
         text: true,
+        sortable: true,
+        sort: (item: TableData & { raw_name?: string }) => item.raw_name || '',
+        search: (item: TableData & { raw_name?: string }) => item.raw_name || '',
+      },
+      area_limit: {
+        title: localize('panels.codes.cards.new_user.fields.area_limit.heading', this.hass.language),
+        width: '30%',
+        hide: this.narrow,
+        text: true,
+        sortable: true,
+        sort: (item: TableData & { raw_area_limit?: string }) => item.raw_area_limit || '',
+        search: (item: TableData & { raw_area_limit?: string }) => item.raw_area_limit || '',
       },
       code_format: {
         title: localize('panels.codes.cards.codes.fields.code_format.heading', this.hass.language),
         width: '40%',
         hide: this.narrow,
         text: true,
+        sortable: true,
+        sort: (item: TableData & { raw_code_format?: string }) => item.raw_code_format || '',
+        search: (item: TableData & { raw_code_format?: string }) => item.raw_code_format || '',
       },
       enabled: {
         title: localize('common.enabled', this.hass.language),
         width: '68px',
         align: 'center',
+        sortable: true,
+        sort: (item: TableData & { raw_enabled?: boolean }) => (item.raw_enabled ? 1 : 0),
       },
     };
 
     const data = users.map(item => {
+      const areaLimitLabel = (item.area_limit?.length ? item.area_limit : Object.keys(this.areas))
+        .map(area => this.areas[area]?.name)
+        .filter(Boolean)
+        .join(', ');
+      const codeFormatLabel =
+        item.code_format == 'number'
+          ? prettyPrint(localize('panels.codes.cards.codes.fields.code_format.code_format_number', this.hass!.language))
+          : item.code_format == 'text'
+            ? prettyPrint(localize('panels.codes.cards.codes.fields.code_format.code_format_text', this.hass!.language))
+            : this.hass!.localize('state.default.unknown');
       const output: TableData = {
         id: item.user_id!,
-        icon: html`
-          <ha-icon icon="mdi:account-outline" class="${item.enabled ? '' : 'disabled'}"></ha-icon>
-        `,
-        name: html`
+        raw_name: item.name,
+        raw_enabled: item.enabled,
+        raw_area_limit: areaLimitLabel,
+        raw_code_format: codeFormatLabel,
+        area_limit_ids: item.area_limit?.length ? item.area_limit : Object.keys(this.areas),
+        code_format_value: item.code_format,
+        enabled_value: item.enabled ? 'enabled' : 'disabled',
+        icon: html`<ha-icon icon="mdi:account-outline" class="${item.enabled ? '' : 'disabled'}"></ha-icon>`,
+        name: html`<span class="${item.enabled ? '' : 'disabled'}">${prettyPrint(item.name)}</span>`,
+        area_limit: html`
           <span class="${item.enabled ? '' : 'disabled'}">
-            ${prettyPrint(item.name)}
+            ${areaLimitLabel}
           </span>
         `,
         code_format: html`
           <span class="${item.enabled ? '' : 'disabled'}">
-          ${item.code_format == 'number'
-            ? prettyPrint(
-              localize('panels.codes.cards.codes.fields.code_format.code_format_number', this.hass!.language)
-            )
-            : item.code_format == 'text'
-              ? prettyPrint(localize('panels.codes.cards.codes.fields.code_format.code_format_text', this.hass!.language))
-              : this.hass!.localize('state.default.unknown')
-          }
+          ${codeFormatLabel}
           </span>
         `,
         enabled: html`
@@ -218,28 +158,39 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
     });
 
     return html`
-      <ha-card header="${localize('panels.codes.cards.user_management.title', this.hass.language)}">
-        <div class="card-content">
-          ${localize('panels.codes.cards.user_management.description', this.hass.language)}
+      <section class="list-page">
+        <div class="list-page-header">
+          <div class="header-row">
+            <h1 class="list-page-title">${localize('panels.codes.cards.user_management.title', this.hass.language)}</h1>
+            <ha-button appearance="plain" @click=${this.openCodeConfigDialog}>
+              <ha-icon slot="start" icon="mdi:cog-outline"></ha-icon>
+              ${localize('panels.codes.cards.user_management.actions.configure_codes', this.hass.language)}
+            </ha-button>
+          </div>
+          <p class="list-page-description">${localize('panels.codes.cards.user_management.description', this.hass.language)}</p>
         </div>
 
-        <alarmo-table
-          ?selectable=${true}
-          .columns=${columns}
-          .data=${data}
-          @row-click=${(ev: CustomEvent) => {
-        const id = String(ev.detail.id);
-        navigate(this, exportPath('codes', { params: { edit_user: id } }), true);
-      }}
-        >
-          ${localize('panels.codes.cards.user_management.no_items', this.hass.language)}
-        </alarmo-table>
-        <div class="card-actions">
-          <ha-button appearance="plain" @click=${this.addUserClick}>
-            ${localize('panels.codes.cards.user_management.actions.new_user', this.hass.language)}
-          </ha-button>
+        <div class="list-page-table">
+          <alarmo-table
+            .hass=${this.hass}
+            ?selectable=${true}
+            .columns=${columns}
+            .data=${data}
+            .filters=${this.getTableFilterOptions()}
+            @row-click=${(ev: CustomEvent) => {
+              const id = String(ev.detail.id);
+              navigate(this, exportPath('codes', { params: { edit_user: id } }), true);
+            }}
+          >
+            ${localize('panels.codes.cards.user_management.no_items', this.hass.language)}
+          </alarmo-table>
         </div>
-      </ha-card>
+
+        <ha-button slot="fab" class="list-page-fab" size="large" variant="brand" appearance="accent" @click=${this.addUserClick}>
+          <ha-svg-icon slot="start" .path=${mdiPlus}></ha-svg-icon>
+          ${localize('panels.codes.cards.user_management.actions.new_user', this.hass.language)}
+        </ha-button>
+      </section>
     `;
   }
 
@@ -247,25 +198,65 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
     navigate(this, exportPath('codes', 'new_user'), true);
   }
 
-  saveData(changes: Partial<AlarmoConfig>) {
-    if (!this.hass) return;
+  private openCodeConfigDialog(ev: Event) {
+    fireEvent(ev.currentTarget as HTMLElement, 'show-dialog', {
+      dialogTag: 'code-config-modal',
+      dialogImport: () => import('./code-config-modal'),
+      dialogParams: {},
+    });
+  }
 
-    this.data = {
-      ...this.data,
-      ...changes,
+  private getTableFilterOptions(): TableFilterConfig {
+    return {
+      area_limit_ids: {
+        name: localize('components.table.filter.item', this.hass!.language, 'name', localize('panels.codes.cards.new_user.fields.area_limit.heading', this.hass!.language)),
+        items: Object.values(this.areas).map(area => ({
+          value: area.area_id,
+          name: area.name,
+          badge: (list: (TableData & { area_limit_ids?: string[] })[]) => list.filter(item => item.area_limit_ids?.includes(area.area_id)).length,
+        })),
+        value: [],
+      },
+      code_format_value: {
+        name: localize('components.table.filter.item', this.hass!.language, 'name', localize('panels.codes.cards.codes.fields.code_format.heading', this.hass!.language)),
+        items: ['number', 'text'].map(format => ({
+          value: format,
+          name: format == 'number'
+            ? prettyPrint(localize('panels.codes.cards.codes.fields.code_format.code_format_number', this.hass!.language))
+            : prettyPrint(localize('panels.codes.cards.codes.fields.code_format.code_format_text', this.hass!.language)),
+          badge: (list: (TableData & { code_format_value?: string })[]) => list.filter(item => item.code_format_value == format).length,
+        })),
+        value: [],
+      },
+      enabled_value: {
+        name: localize('components.table.filter.item', this.hass!.language, 'name', localize('common.enabled', this.hass!.language)),
+        items: [
+          { value: 'enabled', name: localize('common.enabled', this.hass!.language), badge: (list: (TableData & { enabled_value?: string })[]) => list.filter(item => item.enabled_value == 'enabled').length },
+          { value: 'disabled', name: localize('common.disabled', this.hass!.language), badge: (list: (TableData & { enabled_value?: string })[]) => list.filter(item => item.enabled_value == 'disabled').length },
+        ],
+        value: [],
+      },
     };
-
-    saveConfig(this.hass, this.data)
-      .catch(e => handleError(e, this.shadowRoot!.querySelector('ha-card') as HTMLElement))
-      .then();
   }
 
   toggleEnabled(ev: Event, id: string) {
     const enabled = (ev.target as HTMLInputElement).checked;
     saveUser(this.hass!, { user_id: id, enabled: enabled })
-      .catch(e => handleError(e, this.shadowRoot!.querySelector('ha-card') as HTMLElement))
+      .catch(e => handleError(e, ev))
       .then();
   }
 
-  static styles = commonStyle;
+  static get styles(): CSSResultGroup {
+    return [
+      commonStyle,
+      css`
+        .header-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+        }
+      `,
+    ];
+  }
 }

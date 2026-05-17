@@ -1,7 +1,7 @@
 import { LitElement, html } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import { mdiPencil } from '@mdi/js';
+import { mdiPencil, mdiPlus } from '@mdi/js';
 
 import { prettyPrint, sortAlphabetically } from '../../helpers';
 import { AlarmoConfig, Dictionary, AlarmoArea, AlarmoSensor, AlarmoAutomation, HomeAssistant } from '../../types';
@@ -15,9 +15,10 @@ import { localize } from '../../../localize/localize';
 import { SubscribeMixin } from '../../subscribe-mixin';
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
 import { fetchAreas, fetchSensors, fetchAutomations } from '../../data/websockets';
-import { TableData, TableColumn } from '../../components/alarmo-table';
+import { TableData, TableColumn, TableFilterConfig } from '../../components/alarmo-table';
 import { exportPath } from '../../common/navigation';
 import { fireEvent } from '../../fire_event';
+import { getModesList, modesByArea } from '../../common/modes';
 
 @customElement('area-config-card')
 export class AreaConfigCard extends SubscribeMixin(LitElement) {
@@ -57,6 +58,18 @@ export class AreaConfigCard extends SubscribeMixin(LitElement) {
         width: '40%',
         grow: true,
         text: true,
+        sortable: true,
+        search: (item: TableData & { raw_name?: string }) => item.raw_name || '',
+        sort: (item: TableData & { raw_name?: string }) => item.raw_name || '',
+      },
+      modes: {
+        title: localize('panels.sensors.cards.sensors.table.arm_modes', this.hass.language),
+        width: '25%',
+        hide: this.narrow,
+        text: true,
+        sortable: true,
+        search: (item: TableData & { raw_modes?: string }) => item.raw_modes || '',
+        sort: (item: TableData & { raw_modes?: string }) => item.raw_modes || '',
       },
       remarks: {
         title: localize('panels.general.cards.areas.table.remarks', this.hass.language),
@@ -88,10 +101,14 @@ export class AreaConfigCard extends SubscribeMixin(LitElement) {
       )}</a>`;
       const output: TableData = {
         id: item.area_id,
+        raw_name: item.name,
+        raw_mode_ids: modesByArea(item),
         actions: html`
           <ha-icon-button @click=${(ev: Event) => this.editClick(ev, item.area_id)} .path=${mdiPencil}></ha-icon-button>
         `,
         name: prettyPrint(item.name),
+        raw_modes: modesByArea(item).map(mode => localize(`common.modes_short.${mode}`, this.hass!.language)).join(', '),
+        modes: modesByArea(item).map(mode => localize(`common.modes_short.${mode}`, this.hass!.language)).join(', '),
         remarks: (unsafeHTML(
           localize(
             'panels.general.cards.areas.table.summary',
@@ -107,20 +124,23 @@ export class AreaConfigCard extends SubscribeMixin(LitElement) {
     });
 
     return html`
-      <ha-card header="${localize('panels.general.cards.areas.title', this.hass.language)}">
-        <div class="card-content">
-          ${localize('panels.general.cards.areas.description', this.hass.language)}
+      <section class="list-page">
+        <div class="list-page-header">
+          <h1 class="list-page-title">${localize('panels.general.cards.areas.title', this.hass.language)}</h1>
+          <p class="list-page-description">${localize('panels.general.cards.areas.description', this.hass.language)}</p>
         </div>
 
-        <alarmo-table .columns=${columns} .data=${data}>
-          ${localize('panels.general.cards.areas.no_items', this.hass.language)}
-        </alarmo-table>
-        <div class="card-actions">
-          <ha-button appearance="plain" @click=${this.addClick}>
-            ${localize('panels.general.cards.areas.actions.add', this.hass.language)}
-          </ha-button>
+        <div class="list-page-table">
+          <alarmo-table .hass=${this.hass} .columns=${columns} .data=${data} .filters=${this.getTableFilterOptions()}>
+            ${localize('panels.general.cards.areas.no_items', this.hass.language)}
+          </alarmo-table>
         </div>
-      </ha-card>
+
+        <ha-button slot="fab" class="list-page-fab" size="large" variant="brand" appearance="accent" @click=${this.addClick}>
+          <ha-svg-icon slot="start" .path=${mdiPlus}></ha-svg-icon>
+          ${localize('panels.general.cards.areas.actions.add', this.hass.language)}
+        </ha-button>
+      </section>
     `;
   }
 
@@ -140,6 +160,27 @@ export class AreaConfigCard extends SubscribeMixin(LitElement) {
       dialogImport: () => import('../../dialogs/create-area-dialog'),
       dialogParams: { area_id: area_id },
     });
+  }
+
+  private getTableFilterOptions(): TableFilterConfig {
+    const modeFilterOptions = getModesList(this.areas).map(mode => ({
+      value: mode,
+      name: localize(`common.modes_short.${mode}`, this.hass!.language),
+      badge: (list: (TableData & { raw_mode_ids?: string[] })[]) => list.filter(item => item.raw_mode_ids?.includes(mode)).length,
+    }));
+
+    return {
+      raw_mode_ids: {
+        name: localize(
+          'components.table.filter.item',
+          this.hass!.language,
+          'name',
+          localize('panels.sensors.cards.sensors.table.arm_modes', this.hass!.language)
+        ),
+        items: modeFilterOptions,
+        value: [],
+      },
+    };
   }
 
   static styles = commonStyle;

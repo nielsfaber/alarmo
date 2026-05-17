@@ -22,9 +22,15 @@
     },
     "table": {
       "filter": {
-        "label": "Filtruj elementy",
+        "label": "Filtruj",
         "item": "Filtruj po {name}",
         "hidden_items": "{number} {number, plural,\n  one { element jest}\n  other { elementy są}\n} ukryte"
+      },
+      "search": {
+        "label": "Szukaj"
+      },
+      "sort": {
+        "label": "Sortuj według {name}"
       }
     }
   },
@@ -347,7 +353,8 @@
           "description": "Każdy użytkownik ma własny kod do uzbrojenia/rozbrojenia alarmu.",
           "no_items": "Nie ma jeszcze użytkowników",
           "actions": {
-            "new_user": "Nowy użytkownik"
+            "new_user": "Nowy użytkownik",
+            "configure_codes": "Konfiguracja kodu"
           }
         },
         "new_user": {

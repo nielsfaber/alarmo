@@ -22,9 +22,15 @@
     },
     "table": {
       "filter": {
-        "label": "Filtrovat položky",
+        "label": "Filtrovat",
         "item": "Filtrovat podle {name}",
         "hidden_items": "{number} {number, plural,\n  one {položka je}\n  other {položky jsou}\n} skryté"
+      },
+      "search": {
+        "label": "Hledat"
+      },
+      "sort": {
+        "label": "Seřadit podle {name}"
       }
     }
   },
@@ -351,7 +357,8 @@
           "description": "Každý uživatel má svůj vlastní kód pro zajištění/deaktivaci alarmu.",
           "no_items": "Neexistují žádní uživatelé",
           "actions": {
-            "new_user": "Nový uživatel"
+            "new_user": "Nový uživatel",
+            "configure_codes": "Konfigurace kódu"
           }
         },
         "new_user": {

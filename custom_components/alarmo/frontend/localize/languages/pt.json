@@ -22,9 +22,15 @@
     },
     "table": {
       "filter": {
-        "label": "Filtrar itens",
+        "label": "Filtrar",
         "item": "Filtrar por {name}",
         "hidden_items": "{number} {number, plural,\n  one {item está}\n  other {itens estão}\n} oculto"
+      },
+      "search": {
+        "label": "Pesquisar"
+      },
+      "sort": {
+        "label": "Ordenar por {name}"
       }
     }
   },
@@ -351,7 +357,8 @@
           "description": "Cada usuário tem seu próprio código para armar/desarmar o alarme.",
           "no_items": "Não há usuários ainda",
           "actions": {
-            "new_user": "Novo usuário"
+            "new_user": "Novo usuário",
+            "configure_codes": "Configuração do código"
           }
         },
         "new_user": {

@@ -1,4 +1,4 @@
-import { mdiFilterVariant, mdiClose } from '@mdi/js';
+import { mdiFilterVariant, mdiClose, mdiArrowDown, mdiArrowUp, mdiMenuDown } from '@mdi/js';
 import { LitElement, html, TemplateResult, css, PropertyValues } from 'lit';
 import { property, customElement, state, query } from 'lit/decorators.js';
 
@@ -16,6 +16,10 @@ export interface TableColumn {
   grow?: boolean;
   align?: 'center' | 'right';
   renderer?: (data: any) => string | TemplateResult;
+  sortable?: boolean;
+  sortDefault?: 'asc' | 'desc';
+  sort?: (data: any) => string | number;
+  search?: (data: any) => string | number;
 }
 
 export type TableData = Record<string, any> | { id: string | number; warning?: boolean };
@@ -43,8 +47,21 @@ export class AlarmoTable extends LitElement {
   data?: TableData[];
 
   set filters(data: TableFilterConfig) {
-    if (this.filterConfig) return;
-    this.filterConfig = data;
+    if (!this.filterConfig) {
+      this.filterConfig = data;
+      return;
+    }
+
+    this.filterConfig = Object.entries(data).reduce(
+      (filters, [key, filter]) => ({
+        ...filters,
+        [key]: {
+          ...filter,
+          value: this.filterConfig?.[key]?.value || filter.value,
+        },
+      }),
+      {} as TableFilterConfig
+    );
   }
 
   @state()
@@ -52,6 +69,12 @@ export class AlarmoTable extends LitElement {
 
   @state()
   filterSelection?: Record<string, { value: string[] }>;
+
+  @state()
+  private sortConfig?: { key: string; direction: 'asc' | 'desc' };
+
+  @state()
+  private searchQuery: string = '';
 
   @property({ type: Boolean })
   selectable?: boolean;
@@ -63,13 +86,22 @@ export class AlarmoTable extends LitElement {
     if (changedProps.get('filters') && !this.filterConfig) {
       this.filterConfig = changedProps.get('filters') as TableFilterConfig;
     }
+    if (changedProps.get('columns') && this.columns && !this.sortConfig) {
+      const defaultSort = Object.entries(this.columns).find(([, col]) => col.sortDefault);
+      if (defaultSort) {
+        const [key, col] = defaultSort;
+        this.sortConfig = { key, direction: col.sortDefault || 'asc' };
+      }
+    }
     return true;
   }
 
   render() {
     if (!this.columns || !this.data) return html``;
 
-    const filteredData = this.data.filter(e => this.filterTableData(e, this.filterConfig));
+    let filteredData = this.data.filter(e => this.filterTableData(e, this.filterConfig));
+    filteredData = filteredData.filter(e => this.matchesSearch(e));
+    filteredData = this.sortTableData(filteredData);
     return html`
       ${this.renderFilterRow()}
       <div class="table">
@@ -91,14 +123,30 @@ export class AlarmoTable extends LitElement {
     if (!this.columns) return html``;
     return html`
       <div class="table-row header">
-        ${Object.values(this.columns).map(e =>
+        ${Object.entries(this.columns).map(([key, e]) =>
       e.hide
         ? ''
         : html`
                 <div
-                  class="table-cell ${e.text ? 'text' : ''} ${e.grow ? 'grow' : ''} ${e.align ? e.align : ''}"
+                  class="table-cell ${e.text ? 'text' : ''} ${e.grow ? 'grow' : ''} ${e.align ? e.align : ''} ${e.sortable ? 'sortable' : ''} ${this.sortConfig?.key === key ? 'sorted' : 'not-sorted'}"
                   style="${e.grow ? '' : `width: ${e.width}`}"
+                  role=${e.sortable ? 'button' : ''}
+                  tabindex=${e.sortable ? '0' : '-1'}
+                  @click=${e.sortable ? (ev: Event) => this.toggleSort(ev, key) : undefined}
+                  @keydown=${e.sortable
+                    ? (ev: KeyboardEvent) => {
+                        if (ev.key === 'Enter' || ev.key === ' ') {
+                          ev.preventDefault();
+                          this.toggleSort(ev, key);
+                        }
+                      }
+                    : undefined}
                 >
+                  ${e.sortable
+                    ? html`
+                        <ha-svg-icon class="sort-icon" .path=${this.getSortIcon(key)}></ha-svg-icon>
+                      `
+                    : ''}
                   <span>${e.title || ''}</span>
                 </div>
               `
@@ -145,6 +193,95 @@ export class AlarmoTable extends LitElement {
     return this.data!.filter(e => !this.filterTableData(e, this.filterConfig)).length;
   }
 
+  private matchesSearch(data: TableData) {
+    if (!this.columns) return true;
+    if (!this.hasSearchableColumns()) return true;
+    if (!this.searchQuery || !this.searchQuery.trim()) return true;
+
+    const tokens = this.searchQuery
+      .toLowerCase()
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+    if (!tokens.length) return true;
+
+    const searchable: string[] = [];
+    Object.entries(this.columns).forEach(([, col]) => {
+      if (col.hide || !col.search) return;
+      const value = col.search(data);
+      if (value === undefined || value === null) return;
+      if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+        searchable.push(String(value).toLowerCase());
+      }
+    });
+
+    if (!searchable.length) return false;
+    const haystack = searchable.join(' ');
+    return tokens.every(token => haystack.includes(token));
+  }
+
+  private sortTableData(data: TableData[]) {
+    if (!this.sortConfig || !this.columns) return data;
+    const column = this.columns[this.sortConfig.key];
+    if (!column || !column.sortable) return data;
+    const getValue = column.sort || ((row: TableData) => (row as any)[this.sortConfig!.key]);
+    const dir = this.sortConfig.direction === 'asc' ? 1 : -1;
+
+    return [...data].sort((a, b) => {
+      const av = getValue(a);
+      const bv = getValue(b);
+      if (av == null && bv == null) return 0;
+      if (av == null) return -1 * dir;
+      if (bv == null) return 1 * dir;
+      if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * dir;
+      const as = String(av).toLowerCase();
+      const bs = String(bv).toLowerCase();
+      if (as === bs) return 0;
+      return (as < bs ? -1 : 1) * dir;
+    });
+  }
+
+  private toggleSort(ev: Event, key: string) {
+    ev.stopPropagation();
+    if (!this.sortConfig || this.sortConfig.key !== key) {
+      this.sortConfig = { key, direction: 'asc' };
+      return;
+    }
+    if (this.sortConfig.direction === 'asc') {
+      this.sortConfig = { key, direction: 'desc' };
+      return;
+    }
+    this.sortConfig = undefined;
+  }
+
+  private getSortIcon(key: string) {
+    if (!this.sortConfig || this.sortConfig.key !== key) return mdiArrowDown;
+    return this.sortConfig.direction === 'asc' ? mdiArrowDown : mdiArrowUp;
+  }
+
+  private getSortableColumns() {
+    if (!this.columns) return [];
+    return Object.entries(this.columns).filter(([, column]) => column.sortable && !column.hide);
+  }
+
+  private getCurrentSortColumn() {
+    const sortableColumns = this.getSortableColumns();
+    if (!sortableColumns.length) return undefined;
+    return sortableColumns.find(([key]) => key === this.sortConfig?.key) || sortableColumns[0];
+  }
+
+  private selectSortColumn(key: string) {
+    this.sortConfig = {
+      key,
+      direction: this.sortConfig?.key === key ? this.sortConfig.direction : 'asc',
+    };
+  }
+
+  private _getActiveFilterCount() {
+    if (!this.filterConfig) return 0;
+    return Object.values(this.filterConfig).filter(filter => filter.value.length).length;
+  }
+
   handleClick(id: string) {
     if (!this.selectable) return;
     const myEvent = new CustomEvent('row-click', { detail: { id: id } });
@@ -152,40 +289,108 @@ export class AlarmoTable extends LitElement {
   }
 
   renderFilterRow() {
-    if (!this.filterConfig) return html``;
+    const hasFilters = !!this.filterConfig && Object.keys(this.filterConfig).length > 0;
+    const hasSearchableColumns = this.hasSearchableColumns();
+    if (!hasFilters && !hasSearchableColumns) return html``;
 
     return html`
       <div class="table-filter">
-        <ha-dropdown
-          @wa-show=${this._showFilterMenu}
-          @wa-after-hide=${this._applyFilterSelection}
-          placement="bottom-start"
-        >
-          <ha-icon-button
-            slot="trigger"
-            .path=${mdiFilterVariant}
-            ?disabled=${!this.data?.length}
-            label=${localize('components.table.filter.label', this.hass.language)}
-          ></ha-icon-button>
-          ${this.renderFilterMenu()}
-        </ha-dropdown>
-
-        ${this._getFilteredItems()
+        ${hasFilters || this._getFilteredItems()
         ? html`
-              <alarmo-chip
-                .hass=${this.hass}
-                removable
-                active
-                @icon-clicked=${this._clearFilters}
-                style="--chip-color: var(--primary-color); --background-opacity: 0.12; --chip-border-radius: 8px; --chip-height: 40px; --chip-font-size: 1em; --icon-color: var(--dark-primary-color)"
-              >
-                ${localize(
-          'components.table.filter.hidden_items',
-          this.hass.language,
-          'number',
-          this._getFilteredItems()
-        )}
-              </alarmo-chip>
+              <div class="filter-actions">
+                ${hasFilters
+                  ? html`
+                      <ha-dropdown
+                        @wa-show=${this._showFilterMenu}
+                        @wa-after-hide=${this._applyFilterSelection}
+                        placement="bottom-start"
+                      >
+                        <div
+                          slot="trigger"
+                          class="filter-trigger ${!this.data?.length ? 'disabled' : ''}"
+                          aria-label=${localize('components.table.filter.label', this.hass.language)}
+                        >
+                          <div class="relative">
+                            <ha-assist-chip
+                              has-icon
+                              class="type-assist-chip"
+                              ?disabled=${!this.data?.length}
+                              .label=${localize('components.table.filter.label', this.hass.language)}
+                            >
+                              <ha-svg-icon slot="icon" .path=${mdiFilterVariant}></ha-svg-icon>
+                            </ha-assist-chip>
+                            ${this._getActiveFilterCount()
+                              ? html`<div class="badge">${this._getActiveFilterCount()}</div>`
+                              : ''}
+                          </div>
+                        </div>
+                        ${this.renderFilterMenu()}
+                      </ha-dropdown>
+                    `
+                  : ''}
+
+                ${this._getFilteredItems()
+                  ? html`
+                      <alarmo-chip
+                        .hass=${this.hass}
+                        removable
+                        active
+                        @icon-clicked=${this._clearFilters}
+                        style="--chip-color: var(--primary-color); --background-opacity: 0.12; --chip-border-radius: 8px; --chip-height: 40px; --chip-font-size: 1em; --icon-color: var(--dark-primary-color)"
+                      >
+                        ${localize(
+                          'components.table.filter.hidden_items',
+                          this.hass.language,
+                          'number',
+                          this._getFilteredItems()
+                        )}
+                      </alarmo-chip>
+                    `
+                  : ''}
+              </div>
+            `
+        : ''}
+        ${hasSearchableColumns
+        ? html`
+              <ha-input-search
+                class="filter-search"
+                appearance="outlined"
+                .value=${this.searchQuery}
+                .placeholder=${localize('components.table.search.label', this.hass.language)}
+                style="--start-slot-width: calc(18px + var(--ha-space-1)); --input-padding-inline-start: var(--ha-space-1);"
+                @input=${(ev: Event) => (this.searchQuery = (ev.target as HTMLInputElement).value)}
+              ></ha-input-search>
+            `
+        : ''}
+        ${this.getSortableColumns().length
+        ? html`
+              <ha-dropdown placement="bottom-end">
+                <ha-assist-chip
+                  slot="trigger"
+                  class="sort-trigger"
+                  trailing-icon
+                  .label=${localize(
+                    'components.table.sort.label',
+                    this.hass.language,
+                    'name',
+                    this.getCurrentSortColumn()?.[1].title || ''
+                  )}
+                >
+                  <ha-svg-icon slot="trailing-icon" .path=${mdiMenuDown}></ha-svg-icon>
+                </ha-assist-chip>
+                <div class="sort-menu">
+                  ${this.getSortableColumns().map(
+                    ([key, column]) => html`
+                      <button
+                        class="sort-option ${this.sortConfig?.key === key ? 'active' : ''}"
+                        @click=${() => this.selectSortColumn(key)}
+                      >
+                        ${column.title || ''}
+                      </button>
+                    `
+                  )}
+                </div>
+              </ha-dropdown>
             `
         : ''}
       </div>
@@ -193,6 +398,7 @@ export class AlarmoTable extends LitElement {
   }
 
   private _showFilterMenu() {
+    if (!this.filterConfig) return;
     this.filterSelection = Object.entries(this.filterConfig!).reduce(
       (acc, [k, v]) => ({ ...acc, [k]: pick(v, ['value']) }),
       {}
@@ -209,11 +415,9 @@ export class AlarmoTable extends LitElement {
       <ha-icon-button
         class="close"
         .path=${mdiClose}
-        @click=${(ev: Event) => {
-        let target = ((ev.target as HTMLElement).parentElement as HTMLElement).parentElement as HTMLElement;
-        const triggerBtn = target.querySelector("ha-icon-button") as HTMLInputElement;
-        triggerBtn.click();
-      }}
+        @click=${() => {
+          this._menu!.open = false;
+        }}
       ></ha-icon-button>
       ${Object.keys(this.filterConfig).map(key => {
         if (this.filterConfig![key].binary) {
@@ -265,9 +469,14 @@ export class AlarmoTable extends LitElement {
       }
     }
     this.filterSelection = { ...this.filterSelection!, [key]: { value: value } };
+    this.filterConfig = {
+      ...this.filterConfig!,
+      [key]: { ...this.filterConfig![key], value: value },
+    };
   }
 
   private _clearFilters() {
+    if (!this.filterConfig) return;
     Object.keys(this.filterConfig!).forEach(key => {
       this.filterConfig = {
         ...this.filterConfig!,
@@ -277,6 +486,7 @@ export class AlarmoTable extends LitElement {
   }
 
   private _applyFilterSelection() {
+    if (!this.filterConfig || !this.filterSelection) return;
     Object.keys(this.filterConfig!).forEach(key => {
       this.filterConfig = {
         ...this.filterConfig!,
@@ -285,26 +495,35 @@ export class AlarmoTable extends LitElement {
     });
   }
 
+  private hasSearchableColumns() {
+    return !!this.columns && Object.values(this.columns).some(col => !!col.search);
+  }
+
   static styles = css`
     :host {
       width: 100%;
+      display: block;
     }
     div.table {
       display: inline-flex;
       flex-direction: column;
       box-sizing: border-box;
       width: 100%;
+      overflow-x: auto;
     }
     div.table .header {
-      font-weight: bold;
+      font-weight: 600;
+      min-height: 48px;
+      background: var(--data-table-background-color, var(--card-background-color));
     }
     div.table-row {
       display: flex;
       width: 100%;
-      height: 52px;
+      min-height: 52px;
       border-top: 1px solid var(--divider-color);
       flex-direction: row;
       position: relative;
+      background: var(--data-table-background-color, var(--card-background-color));
     }
     div.table-cell {
       align-self: center;
@@ -312,9 +531,12 @@ export class AlarmoTable extends LitElement {
       text-overflow: ellipsis;
       flex-shrink: 0;
       box-sizing: border-box;
+      min-height: 52px;
+      display: flex;
+      align-items: center;
     }
     div.table-cell.text {
-      padding: 4px 16px;
+      padding: 8px 16px;
     }
     div.table-cell.grow {
       flex-grow: 1;
@@ -356,6 +578,47 @@ export class AlarmoTable extends LitElement {
       overflow: hidden;
       text-overflow: ellipsis;
       min-width: 0;
+      color: var(--primary-text-color);
+      font-size: 0.875rem;
+      font-weight: 700;
+    }
+    div.table .header div.table-cell.sortable {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      cursor: pointer;
+      user-select: none;
+      overflow: hidden;
+      position: relative;
+    }
+    div.table .header div.table-cell.sortable:focus-visible {
+      outline: 2px solid var(--primary-color);
+      outline-offset: -2px;
+    }
+    div.table .header ha-svg-icon.sort-icon {
+      --mdc-icon-size: 16px;
+      color: var(--secondary-text-color);
+      padding: 0;
+      width: 16px;
+      height: 16px;
+      position: absolute;
+      top: 50%;
+      left: -20px;
+      transform: translateY(-50%);
+      transition: left 0.2s ease;
+    }
+    div.table .header div.table-cell.sortable span {
+      position: relative;
+      left: 0;
+      transition: left 0.2s ease;
+    }
+    div.table .header div.table-cell.sorted span,
+    div.table .header div.table-cell.not-sorted:hover span {
+      left: 24px;
+    }
+    div.table .header div.table-cell.sorted ha-svg-icon.sort-icon,
+    div.table .header div.table-cell.not-sorted:hover ha-svg-icon.sort-icon {
+      left: 12px;
     }
     div.table-row.selectable {
       cursor: pointer;
@@ -372,15 +635,15 @@ export class AlarmoTable extends LitElement {
       border-radius: 4px;
     }
     div.table-row.selectable:hover::before {
-      background-color: rgba(var(--rgb-primary-text-color), 0.5);
+      background-color: rgba(var(--rgb-primary-color), 0.12);
     }
     div.table-row.warning::before {
       background-color: var(--error-color);
-      opacity: 0.06;
+      opacity: 0.05;
     }
     div.table-row.warning:hover::before {
       background-color: var(--error-color);
-      opacity: 0.12;
+      opacity: 0.1;
     }
     div.table-row.warning span {
       color: var(--error-color);
@@ -388,13 +651,15 @@ export class AlarmoTable extends LitElement {
 
     ha-icon, ha-svg-icon {
       color: var(--state-icon-color);
-      padding: 8px;
+      padding: 6px 8px;
     }
 
     .secondary {
       color: var(--secondary-text-color);
       display: flex;
-      padding-top: 4px;
+      padding-top: 2px;
+      font-size: 0.75rem;
+      line-height: 1.2;
     }
 
     a,
@@ -418,11 +683,88 @@ export class AlarmoTable extends LitElement {
       min-height: 52px;
       border-top: 1px solid var(--divider-color);
       box-sizing: border-box;
-      padding: 2px 8px;
+      padding: 12px 16px;
       flex: 1;
       position: relative;
       flex-direction: row;
       align-items: center;
+      gap: 8px;
+      background: var(--primary-background-color, var(--data-table-background-color, var(--card-background-color)));
+    }
+    div.table-filter .filter-search {
+      flex: 1 1 auto;
+      min-width: 220px;
+      --mdc-text-field-fill-color: var(--sidebar-background-color);
+    }
+    div.table-filter .filter-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+    .filter-trigger {
+      display: flex;
+      cursor: pointer;
+    }
+    .filter-trigger.disabled {
+      pointer-events: none;
+      cursor: default;
+      opacity: 0.38;
+    }
+    .filter-trigger .relative {
+      position: relative;
+    }
+    .type-assist-chip {
+      --ha-assist-chip-container-height: 40px;
+    }
+    .sort-trigger {
+      --ha-assist-chip-container-height: 40px;
+      flex: 0 0 auto;
+    }
+    .type-assist-chip ha-svg-icon {
+      color: var(--primary-text-color);
+    }
+    .badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      min-width: 16px;
+      height: 16px;
+      padding: 0 4px;
+      box-sizing: border-box;
+      border-radius: 999px;
+      background: var(--primary-color);
+      color: var(--text-primary-color);
+      font-size: 0.6875rem;
+      line-height: 16px;
+      text-align: center;
+      font-weight: 500;
+      pointer-events: none;
+    }
+    .sort-menu {
+      display: flex;
+      flex-direction: column;
+      min-width: 220px;
+      padding: 4px;
+      box-sizing: border-box;
+    }
+    .sort-option {
+      min-height: 40px;
+      border: 0;
+      border-radius: 8px;
+      padding: 0 16px;
+      background: transparent;
+      color: var(--primary-text-color);
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+    .sort-option.active {
+      color: var(--primary-color);
+      background: rgba(var(--rgb-primary-color), 0.12);
+    }
+    .sort-option:hover {
+      background: rgba(var(--rgb-primary-text-color), 0.08);
     }
     ha-dropdown .header {
       display: flex;

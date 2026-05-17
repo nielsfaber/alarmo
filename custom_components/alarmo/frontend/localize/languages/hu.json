@@ -22,9 +22,15 @@
     },
     "table": {
       "filter": {
-        "label": "Elemek szűrése",
+        "label": "Szűrés",
         "item": "Szűrés: {name}",
         "hidden_items": "{number} {number, plural,\n  one {item is}\n  other {items are}\n} rejtve"
+      },
+      "search": {
+        "label": "Keresés"
+      },
+      "sort": {
+        "label": "Rendezés: {name}"
       }
     }
   },
@@ -351,7 +357,8 @@
           "description": "Minden felhasználó saját kóddal rendelkezik a riasztó élesítéséhez és hatástalanításához.",
           "no_items": "Még nincs létrehozott felhasználó",
           "actions": {
-            "new_user": "Új felhasználó"
+            "new_user": "Új felhasználó",
+            "configure_codes": "Kódbeállítások"
           }
         },
         "new_user": {

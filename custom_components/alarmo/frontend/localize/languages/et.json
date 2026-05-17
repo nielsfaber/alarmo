@@ -22,9 +22,15 @@
     },
     "table": {
       "filter": {
-        "label": "Filter items",
+        "label": "Filtreeri",
         "item": "Filter by {name}",
         "hidden_items": "{number} {number, plural,\n  one {item is}\n  other {items are}\n} hidden"
+      },
+      "search": {
+        "label": "Otsi"
+      },
+      "sort": {
+        "label": "Sorteeri {name} järgi"
       }
     }
   },
@@ -351,7 +357,8 @@
           "description": "Igal kasutajal on oma juhtkood.",
           "no_items": "Kasutajaid pole määratud",
           "actions": {
-            "new_user": "Uus kasutaja"
+            "new_user": "Uus kasutaja",
+            "configure_codes": "Koodi seadistamine"
           }
         },
         "new_user": {

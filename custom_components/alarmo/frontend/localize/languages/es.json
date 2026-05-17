@@ -22,9 +22,15 @@
     },
     "table": {
       "filter": {
-        "label": "Filtrar entidades",
+        "label": "Filtrar",
         "item": "Filtrar por {name}",
         "hidden_items": "{number} {number, plural,\n  one {entidas está}\n  other {entidades están}\n} oculta"
+      },
+      "search": {
+        "label": "Buscar"
+      },
+      "sort": {
+        "label": "Ordenar por {name}"
       }
     }
   },
@@ -351,7 +357,8 @@
           "description": "Cada usuario tiene su propio código para armar / desarmar la alarma.",
           "no_items": "Aún no hay usuarios",
           "actions": {
-            "new_user": "Nuevo usuario"
+            "new_user": "Nuevo usuario",
+            "configure_codes": "Configuración del código"
           }
         },
         "new_user": {

@@ -22,9 +22,15 @@
     },
     "table": {
       "filter": {
-        "label": "Lọc mục",
+        "label": "Lọc",
         "item": "Lọc theo {name}",
         "hidden_items": "{number} {number, plural,\n  one {mục}\n  other {mục}\n} bị ẩn"
+      },
+      "search": {
+        "label": "Tìm kiếm"
+      },
+      "sort": {
+        "label": "Sắp xếp theo {name}"
       }
     }
   },
@@ -351,7 +357,8 @@
           "description": "Mỗi người dùng sẽ có một mã riêng để bật/tắt hệ thống báo động.",
           "no_items": "Chưa có người dùng nào",
           "actions": {
-            "new_user": "Người dùng mới"
+            "new_user": "Người dùng mới",
+            "configure_codes": "Cấu hình mã"
           }
         },
         "new_user": {
