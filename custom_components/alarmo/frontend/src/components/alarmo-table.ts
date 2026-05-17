@@ -344,6 +344,10 @@ export class AlarmoTable extends LitElement {
     div.table-cell > ha-icon-button {
       color: var(--secondary-text-color);
     }
+    div.table-cell > ha-checkbox {
+      display: flex;
+      align-items: center;
+    }
     div.table-cell > * {
       transition: color 0.2s ease-in-out;
     }

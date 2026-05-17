@@ -225,7 +225,7 @@ export class AlarmoDurationPicker extends LitElement {
       margin-left: 10px;
     }
     ha-checkbox {
-      margin-top: 4px;
+      margin-top: 18px;
     }
     ha-input {
       width: 70px;
@@ -238,20 +238,29 @@ export class AlarmoDurationPicker extends LitElement {
     ha-input::part(wa-input) {
       text-align: center;
     }
+    ha-input#minutes::part(wa-base) {
+      border-top-right-radius: 0px;
+    }
+    ha-input#seconds::part(wa-base) {
+      border-top-left-radius: 0px;
+    }
     .time-separator {
       background-color: var(--ha-color-form-background);
       color: var(--ha-color-text-secondary);
       border-bottom: 1px solid var(--ha-color-border-neutral-loud);
       box-sizing: border-box;
       height: 56px;
-      width: 12px;
-      margin-inline-start: calc(var(--ha-space-1) * -1);
-      margin-inline-end: calc(var(--ha-space-1) * -1);
+      width: 9px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 16px;
       font-weight: 600;
+      transition: background 0.15s ease-in-out;
+    }
+    :host([disabled]) .time-separator {
+      background-color: var(--ha-color-form-background-disabled);
+      opacity: 0.5;
     }
     div.column {
       display: flex;
