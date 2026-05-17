@@ -13,7 +13,6 @@ import { exportPath, Path } from '../../common/navigation';
 
 import './alarm-mode-card';
 import './mqtt-config-card.ts';
-import './area-config-card.ts';
 import '../../components/alarmo-settings-row';
 import '../../dialogs/edit-master-dialog.ts';
 import '../../dialogs/confirm-delete-dialog.ts';
@@ -172,8 +171,6 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
           : ''}
         </ha-card>
         <alarm-mode-card .hass=${this.hass} .narrow=${this.narrow}></alarm-mode-card>
-
-        <area-config-card .hass=${this.hass} .narrow=${this.narrow}></area-config-card>
       `;
     }
   }

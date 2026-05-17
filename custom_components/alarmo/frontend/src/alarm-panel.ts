@@ -3,6 +3,7 @@ import { property, customElement } from 'lit/decorators.js';
 import { loadHaForm } from './load-ha-elements';
 
 import './views/general/view-general.ts';
+import './views/areas/view-areas.ts';
 import './views/sensors/view-sensors.ts';
 import './views/codes/view-codes.ts';
 import './views/actions/view-actions.ts';
@@ -18,6 +19,7 @@ import { navigate } from './helpers';
 
 enum EMenuItems {
   General = 'general',
+  Areas = 'areas',
   Sensors = 'sensors',
   Codes = 'codes',
   Actions = 'actions',
@@ -70,6 +72,8 @@ export class MyAlarmPanel extends LitElement {
             <ha-tab-group-tab slot="nav" panel="${e}" .active=${path.page === e}>
               ${e === EMenuItems.Notifications
                 ? localize('panels.actions.cards.notifications.title', this.hass.language)
+                : e === EMenuItems.Areas
+                  ? localize('panels.general.cards.areas.title', this.hass.language)
                 : localize(`panels.${e}.title`, this.hass.language)}
             </ha-tab-group-tab>
           `)}
@@ -88,6 +92,10 @@ export class MyAlarmPanel extends LitElement {
       case 'general':
         return html`
           <alarm-view-general .hass=${this.hass} .narrow=${this.narrow} .path=${path}></alarm-view-general>
+        `;
+      case 'areas':
+        return html`
+          <alarm-view-areas .hass=${this.hass} .narrow=${this.narrow} .path=${path}></alarm-view-areas>
         `;
       case 'sensors':
         return html`
