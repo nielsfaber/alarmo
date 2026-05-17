@@ -125,6 +125,9 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
           width: '18%',
           hide: this.narrow,
           text: true,
+          sortable: true,
+          sort: (item: AlarmoAutomation) => computeEventDisplay(item.triggers[0].event!, this.hass!)?.name || '',
+          search: (item: AlarmoAutomation) => computeEventDisplay(item.triggers[0].event!, this.hass!)?.name || '',
           renderer: (item: AlarmoAutomation) => computeEventDisplay(item.triggers[0].event!, this.hass!)?.name || '',
         },
         area: {
@@ -132,6 +135,9 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
           width: '18%',
           hide: this.narrow,
           text: true,
+          sortable: true,
+          sort: (item: AlarmoAutomation & { area: string }) => this.getAreaLabel(item.area),
+          search: (item: AlarmoAutomation & { area: string }) => this.getAreaLabel(item.area),
           renderer: (item: AlarmoAutomation & { area: string }) =>
             item.area == noArea
               ? this.config.master.enabled
@@ -144,6 +150,9 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
           width: '22%',
           hide: this.narrow,
           text: true,
+          sortable: true,
+          sort: (item: AlarmoAutomation) => this.getModesLabel(item),
+          search: (item: AlarmoAutomation) => this.getModesLabel(item),
           renderer: (item: AlarmoAutomation) => {
             const modes = item.triggers[0].modes?.length
               ? item.triggers[0].modes
@@ -214,6 +223,21 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
     let area = automation.triggers[0].area;
     return isDefined(area) && areaOptions.includes(area) ? area : undefined;
   };
+
+  private getAreaLabel(area: string) {
+    return area == noArea
+      ? this.config!.master.enabled
+        ? this.config!.master.name
+        : this.hass!.localize('state_attributes.climate.preset_mode.none')
+      : computeAreaDisplay(area, this.areas, this.config!).name;
+  }
+
+  private getModesLabel(item: AlarmoAutomation) {
+    const modes = item.triggers[0].modes?.length
+      ? item.triggers[0].modes
+      : getArmModeOptions(item.triggers[0].area, this.areas);
+    return modes.map(e => localize(`common.modes_short.${e}`, this.hass!.language)).join(', ');
+  }
 
   private toggleEnable(ev: Event, item_id: string) {
     saveAutomation(this.hass!, { automation_id: item_id, enabled: (ev.target as HTMLInputElement).checked })

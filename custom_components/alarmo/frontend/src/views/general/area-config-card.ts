@@ -58,12 +58,18 @@ export class AreaConfigCard extends SubscribeMixin(LitElement) {
         width: '40%',
         grow: true,
         text: true,
+        sortable: true,
+        search: (item: TableData & { raw_name?: string }) => item.raw_name || '',
+        sort: (item: TableData & { raw_name?: string }) => item.raw_name || '',
       },
       modes: {
         title: localize('panels.sensors.cards.sensors.table.arm_modes', this.hass.language),
         width: '25%',
         hide: this.narrow,
         text: true,
+        sortable: true,
+        search: (item: TableData & { raw_modes?: string }) => item.raw_modes || '',
+        sort: (item: TableData & { raw_modes?: string }) => item.raw_modes || '',
       },
       remarks: {
         title: localize('panels.general.cards.areas.table.remarks', this.hass.language),
@@ -95,10 +101,12 @@ export class AreaConfigCard extends SubscribeMixin(LitElement) {
       )}</a>`;
       const output: TableData = {
         id: item.area_id,
+        raw_name: item.name,
         actions: html`
           <ha-icon-button @click=${(ev: Event) => this.editClick(ev, item.area_id)} .path=${mdiPencil}></ha-icon-button>
         `,
         name: prettyPrint(item.name),
+        raw_modes: modesByArea(item).map(mode => localize(`common.modes_short.${mode}`, this.hass!.language)).join(', '),
         modes: modesByArea(item).map(mode => localize(`common.modes_short.${mode}`, this.hass!.language)).join(', '),
         remarks: (unsafeHTML(
           localize(
@@ -122,7 +130,7 @@ export class AreaConfigCard extends SubscribeMixin(LitElement) {
         </div>
 
         <div class="list-page-table">
-          <alarmo-table .columns=${columns} .data=${data}>
+          <alarmo-table .hass=${this.hass} .columns=${columns} .data=${data}>
             ${localize('panels.general.cards.areas.no_items', this.hass.language)}
           </alarmo-table>
         </div>

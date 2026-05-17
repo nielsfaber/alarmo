@@ -150,6 +150,15 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
         width: '20%',
         hide: this.narrow,
         text: true,
+        sortable: true,
+        sort: (data: AlarmoSensor) =>
+          data.area == noArea
+            ? this.hass.localize('state_attributes.climate.preset_mode.none')
+            : this.areas[data.area!]?.name || data.area || '',
+        search: (data: AlarmoSensor) =>
+          data.area == noArea
+            ? this.hass.localize('state_attributes.climate.preset_mode.none')
+            : this.areas[data.area!]?.name || data.area || '',
         renderer: (data: AlarmoSensor) =>
           data.area == noArea
             ? this.hass.localize('state_attributes.climate.preset_mode.none')
@@ -160,6 +169,9 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
         width: '25%',
         hide: this.narrow,
         text: true,
+        sortable: true,
+        sort: (data: AlarmoSensor) => this.getModesLabel(data),
+        search: (data: AlarmoSensor) => this.getModesLabel(data),
         renderer: (data: AlarmoSensor) => html`
           <span class="${!data.enabled ? 'disabled' : ''}" id="${formatId(data.entity_id, 'modes')}">
             ${data.always_on
@@ -225,6 +237,14 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
       name: '',
     };
     saveSensor(this.hass, data);
+  }
+
+  private getModesLabel(data: AlarmoSensor) {
+    return data.always_on
+      ? localize('panels.sensors.cards.sensors.table.always_on', this.hass!.language)
+      : data.modes.length
+        ? data.modes.map(e => localize(`common.modes_short.${e}`, this.hass!.language)).join(', ')
+        : this.hass.localize('state_attributes.climate.preset_mode.none');
   }
 
   private addSensorClick() {

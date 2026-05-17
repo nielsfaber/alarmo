@@ -92,12 +92,18 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
         width: '30%',
         hide: this.narrow,
         text: true,
+        sortable: true,
+        sort: (item: TableData & { raw_area_limit?: string }) => item.raw_area_limit || '',
+        search: (item: TableData & { raw_area_limit?: string }) => item.raw_area_limit || '',
       },
       code_format: {
         title: localize('panels.codes.cards.codes.fields.code_format.heading', this.hass.language),
         width: '40%',
         hide: this.narrow,
         text: true,
+        sortable: true,
+        sort: (item: TableData & { raw_code_format?: string }) => item.raw_code_format || '',
+        search: (item: TableData & { raw_code_format?: string }) => item.raw_code_format || '',
       },
       enabled: {
         title: localize('common.enabled', this.hass.language),
@@ -109,27 +115,32 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
     };
 
     const data = users.map(item => {
+      const areaLimitLabel = (item.area_limit?.length ? item.area_limit : Object.keys(this.areas))
+        .map(area => this.areas[area]?.name)
+        .filter(Boolean)
+        .join(', ');
+      const codeFormatLabel =
+        item.code_format == 'number'
+          ? prettyPrint(localize('panels.codes.cards.codes.fields.code_format.code_format_number', this.hass!.language))
+          : item.code_format == 'text'
+            ? prettyPrint(localize('panels.codes.cards.codes.fields.code_format.code_format_text', this.hass!.language))
+            : this.hass!.localize('state.default.unknown');
       const output: TableData = {
         id: item.user_id!,
         raw_name: item.name,
         raw_enabled: item.enabled,
+        raw_area_limit: areaLimitLabel,
+        raw_code_format: codeFormatLabel,
         icon: html`<ha-icon icon="mdi:account-outline" class="${item.enabled ? '' : 'disabled'}"></ha-icon>`,
         name: html`<span class="${item.enabled ? '' : 'disabled'}">${prettyPrint(item.name)}</span>`,
         area_limit: html`
           <span class="${item.enabled ? '' : 'disabled'}">
-            ${(item.area_limit?.length ? item.area_limit : Object.keys(this.areas))
-              .map(area => this.areas[area]?.name)
-              .filter(Boolean)
-              .join(', ')}
+            ${areaLimitLabel}
           </span>
         `,
         code_format: html`
           <span class="${item.enabled ? '' : 'disabled'}">
-          ${item.code_format == 'number'
-            ? prettyPrint(localize('panels.codes.cards.codes.fields.code_format.code_format_number', this.hass!.language))
-            : item.code_format == 'text'
-              ? prettyPrint(localize('panels.codes.cards.codes.fields.code_format.code_format_text', this.hass!.language))
-              : this.hass!.localize('state.default.unknown')}
+          ${codeFormatLabel}
           </span>
         `,
         enabled: html`

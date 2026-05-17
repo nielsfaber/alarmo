@@ -91,6 +91,12 @@ export class AddSensorsCard extends SubscribeMixin(LitElement) {
         width: '40%',
         hide: this.narrow,
         text: true,
+        sortable: true,
+        sort: (item: SensorItem & { type?: string }) => item.type || '',
+        search: (item: SensorItem & { type?: string }) =>
+          item.type
+            ? localize(`panels.sensors.cards.editor.fields.device_type.choose.${item.type}.name`, this.hass!.language)
+            : this.hass!.localize('state.default.unknown'),
         renderer: (item: SensorItem) =>
           item.type
             ? localize(`panels.sensors.cards.editor.fields.device_type.choose.${item.type}.name`, this.hass.language)

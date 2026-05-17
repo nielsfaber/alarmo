@@ -120,12 +120,19 @@ export class AlarmViewNotifications extends SubscribeMixin(LitElement) {
           width: '40%',
           grow: true,
           text: true,
+          sortable: true,
+          sortDefault: 'asc',
+          sort: (item: AlarmoAutomation) => item.name || '',
+          search: (item: AlarmoAutomation) => item.name || '',
         },
         event: {
           title: localize('panels.actions.cards.new_notification.fields.event.heading', this.hass.language),
           width: '16%',
           hide: this.narrow,
           text: true,
+          sortable: true,
+          sort: (item: AlarmoAutomation) => computeEventDisplay(item.triggers[0].event!, this.hass!)?.name || '',
+          search: (item: AlarmoAutomation) => computeEventDisplay(item.triggers[0].event!, this.hass!)?.name || '',
           renderer: (item: AlarmoAutomation) => computeEventDisplay(item.triggers[0].event!, this.hass!)?.name || '',
         },
         area: {
@@ -133,6 +140,9 @@ export class AlarmViewNotifications extends SubscribeMixin(LitElement) {
           width: '16%',
           hide: this.narrow,
           text: true,
+          sortable: true,
+          sort: (item: AlarmoAutomation & { area: string }) => this.getAreaLabel(item.area),
+          search: (item: AlarmoAutomation & { area: string }) => this.getAreaLabel(item.area),
           renderer: (item: AlarmoAutomation & { area: string }) =>
             item.area == noArea
               ? this.config.master.enabled
@@ -145,6 +155,9 @@ export class AlarmViewNotifications extends SubscribeMixin(LitElement) {
           width: '20%',
           hide: this.narrow,
           text: true,
+          sortable: true,
+          sort: (item: AlarmoAutomation) => this.getModesLabel(item),
+          search: (item: AlarmoAutomation) => this.getModesLabel(item),
           renderer: (item: AlarmoAutomation) => {
             const modes = item.triggers[0].modes?.length
               ? item.triggers[0].modes
@@ -157,6 +170,9 @@ export class AlarmViewNotifications extends SubscribeMixin(LitElement) {
           width: '20%',
           hide: this.narrow,
           text: true,
+          sortable: true,
+          sort: (item: AlarmoAutomation) => computeServiceDisplay(this.hass!, item.actions[0]).pop()?.name || '',
+          search: (item: AlarmoAutomation) => computeServiceDisplay(this.hass!, item.actions[0]).pop()?.name || '',
           renderer: (item: AlarmoAutomation) => computeServiceDisplay(this.hass!, item.actions[0]).pop()?.name || '',
         },
         enabled: {
@@ -170,6 +186,8 @@ export class AlarmViewNotifications extends SubscribeMixin(LitElement) {
               @change=${(ev: Event) => this.toggleEnable(ev, item.automation_id!)}
             ></ha-switch>
           `,
+          sortable: true,
+          sort: (item: AlarmoAutomation) => (item.enabled ? 1 : 0),
         },
       };
 
@@ -222,6 +240,21 @@ export class AlarmViewNotifications extends SubscribeMixin(LitElement) {
     const area = automation.triggers[0].area;
     return isDefined(area) && areaOptions.includes(area) ? area : undefined;
   };
+
+  private getAreaLabel(area: string) {
+    return area == noArea
+      ? this.config!.master.enabled
+        ? this.config!.master.name
+        : this.hass!.localize('state_attributes.climate.preset_mode.none')
+      : computeAreaDisplay(area, this.areas, this.config!).name;
+  }
+
+  private getModesLabel(item: AlarmoAutomation) {
+    const modes = item.triggers[0].modes?.length
+      ? item.triggers[0].modes
+      : getArmModeOptions(item.triggers[0].area, this.areas);
+    return modes.map(e => localize(`common.modes_short.${e}`, this.hass!.language)).join(', ');
+  }
 
   private toggleEnable(ev: Event, item_id: string) {
     saveAutomation(this.hass!, { automation_id: item_id, enabled: (ev.target as HTMLInputElement).checked })
