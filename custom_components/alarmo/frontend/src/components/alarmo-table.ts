@@ -47,8 +47,21 @@ export class AlarmoTable extends LitElement {
   data?: TableData[];
 
   set filters(data: TableFilterConfig) {
-    if (this.filterConfig) return;
-    this.filterConfig = data;
+    if (!this.filterConfig) {
+      this.filterConfig = data;
+      return;
+    }
+
+    this.filterConfig = Object.entries(data).reduce(
+      (filters, [key, filter]) => ({
+        ...filters,
+        [key]: {
+          ...filter,
+          value: this.filterConfig?.[key]?.value || filter.value,
+        },
+      }),
+      {} as TableFilterConfig
+    );
   }
 
   @state()
