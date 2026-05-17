@@ -14,7 +14,7 @@ import { getModesList, modesByArea } from '../../common/modes';
 import { exportPath } from '../../common/navigation';
 
 import '../../components/alarmo-table';
-import { mdiHelpCircleOutline } from '@mdi/js';
+import { mdiHelpCircleOutline, mdiPlus } from '@mdi/js';
 
 const noArea = 'no_area';
 
@@ -74,11 +74,6 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
         <div class="list-page-header">
           <h1 class="list-page-title">${localize('panels.sensors.title', this.hass.language)}</h1>
           <p class="list-page-description">${localize('panels.sensors.cards.sensors.description', this.hass.language)}</p>
-          <div class="list-page-actions">
-            <ha-button appearance="plain" @click=${this.addSensorClick}>
-              ${localize('panels.sensors.cards.add_sensors.actions.add_to_alarm', this.hass.language)}
-            </ha-button>
-          </div>
         </div>
 
         <div class="list-page-table">
@@ -93,6 +88,11 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
             ${localize('panels.sensors.cards.sensors.table.no_items', this.hass.language)}
           </alarmo-table>
         </div>
+
+        <ha-button slot="fab" class="list-page-fab" size="large" variant="brand" appearance="accent" @click=${this.addSensorClick}>
+          <ha-svg-icon slot="start" .path=${mdiPlus}></ha-svg-icon>
+          ${localize('panels.sensors.cards.add_sensors.actions.add_to_alarm', this.hass.language)}
+        </ha-button>
       </section>
     `;
   }

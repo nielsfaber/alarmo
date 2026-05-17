@@ -102,6 +102,7 @@ export const commonStyle = css`
     flex-direction: column;
     gap: 8px;
     margin: 8px 5px 5px;
+    padding-bottom: 88px;
   }
 
   .list-page-header {
@@ -130,6 +131,13 @@ export const commonStyle = css`
     align-items: center;
     gap: 8px;
     flex-wrap: wrap;
+  }
+
+  .list-page-fab {
+    position: fixed;
+    right: max(24px, calc(env(safe-area-inset-right) + 16px));
+    bottom: max(24px, calc(env(safe-area-inset-bottom) + 16px));
+    z-index: 2;
   }
 
   .list-page-table {

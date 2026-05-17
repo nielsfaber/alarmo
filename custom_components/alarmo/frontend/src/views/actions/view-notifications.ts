@@ -17,6 +17,7 @@ import './notification-editor-card.ts';
 import { EAutomationTypes } from '../../const';
 import { getAreaOptions } from '../../data/actions';
 import { exportPath, Path } from '../../common/navigation';
+import { mdiPlus } from '@mdi/js';
 
 const noArea = 'no_area';
 
@@ -146,11 +147,6 @@ export class AlarmViewNotifications extends SubscribeMixin(LitElement) {
             <p class="list-page-description">
               ${localize('panels.actions.cards.notifications.description', this.hass.language)}
             </p>
-            <div class="list-page-actions">
-              <ha-button appearance="plain" @click=${this.addNotificationClick}>
-                ${localize('panels.actions.cards.notifications.actions.new_notification', this.hass.language)}
-              </ha-button>
-            </div>
           </div>
 
           <div class="list-page-table">
@@ -166,6 +162,11 @@ export class AlarmViewNotifications extends SubscribeMixin(LitElement) {
               ${localize('panels.actions.cards.notifications.table.no_items', this.hass.language)}
             </alarmo-table>
           </div>
+
+          <ha-button slot="fab" class="list-page-fab" size="large" variant="brand" appearance="accent" @click=${this.addNotificationClick}>
+            <ha-svg-icon slot="start" .path=${mdiPlus}></ha-svg-icon>
+            ${localize('panels.actions.cards.notifications.actions.new_notification', this.hass.language)}
+          </ha-button>
         </section>
       `;
     }

@@ -18,6 +18,7 @@ import '../../components/alarmo-settings-row';
 import { EAutomationTypes } from '../../const';
 import { getAreaOptions, computeAreaDisplay } from '../../data/actions';
 import { exportPath, Path } from '../../common/navigation';
+import { mdiPlus } from '@mdi/js';
 
 const noArea = 'no_area';
 
@@ -145,11 +146,6 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
           <div class="list-page-header">
             <h1 class="list-page-title">${localize('panels.actions.title', this.hass.language)}</h1>
             <p class="list-page-description">${localize('panels.actions.cards.actions.description', this.hass.language)}</p>
-            <div class="list-page-actions">
-              <ha-button appearance="plain" @click=${this.addActionClick}>
-                ${localize('panels.actions.cards.actions.actions.new_action', this.hass.language)}
-              </ha-button>
-            </div>
           </div>
 
           <div class="list-page-table">
@@ -165,6 +161,11 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
               ${localize('panels.actions.cards.actions.table.no_items', this.hass.language)}
             </alarmo-table>
           </div>
+
+          <ha-button slot="fab" class="list-page-fab" size="large" variant="brand" appearance="accent" @click=${this.addActionClick}>
+            <ha-svg-icon slot="start" .path=${mdiPlus}></ha-svg-icon>
+            ${localize('panels.actions.cards.actions.actions.new_action', this.hass.language)}
+          </ha-button>
         </section>
       `;
     }

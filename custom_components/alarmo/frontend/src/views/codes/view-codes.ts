@@ -16,6 +16,7 @@ import { UnsubscribeFunc } from 'home-assistant-js-websocket';
 import { fetchUsers, saveUser } from '../../data/websockets';
 import { TableData, TableColumn } from '../../components/alarmo-table';
 import { exportPath, Path } from '../../common/navigation';
+import { mdiPlus } from '@mdi/js';
 
 @customElement('alarm-view-codes')
 export class AlarmViewCodes extends SubscribeMixin(LitElement) {
@@ -129,11 +130,6 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
             </ha-button>
           </div>
           <p class="list-page-description">${localize('panels.codes.cards.user_management.description', this.hass.language)}</p>
-          <div class="list-page-actions">
-            <ha-button appearance="plain" @click=${this.addUserClick}>
-              ${localize('panels.codes.cards.user_management.actions.new_user', this.hass.language)}
-            </ha-button>
-          </div>
         </div>
 
         <div class="list-page-table">
@@ -149,6 +145,11 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
             ${localize('panels.codes.cards.user_management.no_items', this.hass.language)}
           </alarmo-table>
         </div>
+
+        <ha-button slot="fab" class="list-page-fab" size="large" variant="brand" appearance="accent" @click=${this.addUserClick}>
+          <ha-svg-icon slot="start" .path=${mdiPlus}></ha-svg-icon>
+          ${localize('panels.codes.cards.user_management.actions.new_user', this.hass.language)}
+        </ha-button>
       </section>
     `;
   }
