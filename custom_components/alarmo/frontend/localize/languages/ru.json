@@ -22,7 +22,7 @@
     },
     "table": {
       "filter": {
-        "label": "Фильтр элементов",
+        "label": "Фильтр",
         "item": "Фильтровать по {name}",
         "hidden_items": "{number} {number, plural,\n  one {item is}\n  other {items are}\n} скрыты"
       }

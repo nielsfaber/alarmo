@@ -22,7 +22,7 @@
     },
     "table": {
       "filter": {
-        "label": "Filtrar entidades",
+        "label": "Filtrar",
         "item": "Filtrar por {name}",
         "hidden_items": "{number} {number, plural,\n  one {entidas está}\n  other {entidades están}\n} oculta"
       }

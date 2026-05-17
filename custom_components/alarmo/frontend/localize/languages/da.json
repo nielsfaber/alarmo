@@ -22,7 +22,7 @@
     },
     "table": {
       "filter": {
-        "label": "Filtrer genstande",
+        "label": "Filtrer",
         "item": "Filtrer efter {name}",
         "hidden_items": "{number} {number, plural,\n one {enhed er}\n  other {enheder er}\n} skjult"
       }

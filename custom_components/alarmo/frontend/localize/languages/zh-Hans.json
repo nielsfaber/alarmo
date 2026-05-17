@@ -24,7 +24,7 @@
     },
     "table": {
       "filter": {
-        "label": "过滤项目",
+        "label": "过滤",
         "item": "通过{name}过滤",
         "hidden_items": "{number} {number, plural,\n  one {项目}\n  other {项目}\n} 已隐藏"
       }

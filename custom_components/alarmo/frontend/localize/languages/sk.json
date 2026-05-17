@@ -22,7 +22,7 @@
     },
     "table": {
       "filter": {
-        "label": "Filtrovať položky",
+        "label": "Filtrovať",
         "item": "Filter podľa {name}",
         "hidden_items": "{number} {number, plural,\n  jeden {item is}\n  other {items are}\n} skriť"
       }

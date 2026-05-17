@@ -22,7 +22,7 @@
     },
     "table": {
       "filter": {
-        "label": "Filtrar itens",
+        "label": "Filtrar",
         "item": "Filtrar por {name}",
         "hidden_items": "{number} {number, plural,\n  one {item está}\n  other {itens estão}\n} oculto"
       }

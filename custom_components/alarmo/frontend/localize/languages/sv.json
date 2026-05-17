@@ -22,7 +22,7 @@
     },
     "table": {
       "filter": {
-        "label": "Filtrera sensorer",
+        "label": "Filtrera",
         "item": "Filtrera med {name}",
         "hidden_items": "{number} {number, plural,\n  en {item is}\n  other {items are}\n} dolda"
       }
