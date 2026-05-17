@@ -216,6 +216,8 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
         modes: config.always_on ? modesList : config.modes.filter(e => modesList.includes(e)),
         warning: !config.area,
         area: config.area || noArea,
+        type: config.type,
+        enabled_value: config.enabled ? 'enabled' : 'disabled',
       };
       //if (!config.area) res = { ...res, warning: localize('panels.sensors.cards.sensors.no_area', this.hass.language) };
       return res;
@@ -280,6 +282,12 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
       })
     );
 
+    const typeFilterOptions = Object.values(ESensorTypes).map(type => ({
+      value: type,
+      name: localize(`panels.sensors.cards.editor.fields.device_type.choose.${type}.name`, this.hass.language),
+      badge: (list: AlarmoSensor[]) => list.filter(item => item.type == type).length,
+    }));
+
     const filterConfig: TableFilterConfig = {
       area: {
         name: localize(
@@ -300,6 +308,32 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
         ),
         items: modeFilterOptions,
         value: this.selectedMode ? [this.selectedMode] : [],
+      },
+      type: {
+        name: localize(
+          'components.table.filter.item',
+          this.hass.language,
+          'name',
+          localize('panels.sensors.cards.add_sensors.table.type', this.hass.language)
+        ),
+        items: typeFilterOptions,
+        value: [],
+      },
+      enabled_value: {
+        name: localize('components.table.filter.item', this.hass.language, 'name', localize('common.enabled', this.hass.language)),
+        items: [
+          {
+            value: 'enabled',
+            name: localize('common.enabled', this.hass.language),
+            badge: (list: (AlarmoSensor & { enabled_value?: string })[]) => list.filter(item => item.enabled_value == 'enabled').length,
+          },
+          {
+            value: 'disabled',
+            name: localize('common.disabled', this.hass.language),
+            badge: (list: (AlarmoSensor & { enabled_value?: string })[]) => list.filter(item => item.enabled_value == 'disabled').length,
+          },
+        ],
+        value: [],
       },
     };
     return filterConfig;

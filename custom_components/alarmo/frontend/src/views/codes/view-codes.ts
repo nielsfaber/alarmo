@@ -14,7 +14,7 @@ import { localize } from '../../../localize/localize';
 import { SubscribeMixin } from '../../subscribe-mixin';
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
 import { fetchAreas, fetchUsers, saveUser } from '../../data/websockets';
-import { TableData, TableColumn } from '../../components/alarmo-table';
+import { TableData, TableColumn, TableFilterConfig } from '../../components/alarmo-table';
 import { exportPath, Path } from '../../common/navigation';
 import { mdiPlus } from '@mdi/js';
 
@@ -131,6 +131,9 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
         raw_enabled: item.enabled,
         raw_area_limit: areaLimitLabel,
         raw_code_format: codeFormatLabel,
+        area_limit_ids: item.area_limit?.length ? item.area_limit : Object.keys(this.areas),
+        code_format_value: item.code_format,
+        enabled_value: item.enabled ? 'enabled' : 'disabled',
         icon: html`<ha-icon icon="mdi:account-outline" class="${item.enabled ? '' : 'disabled'}"></ha-icon>`,
         name: html`<span class="${item.enabled ? '' : 'disabled'}">${prettyPrint(item.name)}</span>`,
         area_limit: html`
@@ -173,6 +176,7 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
             ?selectable=${true}
             .columns=${columns}
             .data=${data}
+            .filters=${this.getTableFilterOptions()}
             @row-click=${(ev: CustomEvent) => {
               const id = String(ev.detail.id);
               navigate(this, exportPath('codes', { params: { edit_user: id } }), true);
@@ -200,6 +204,39 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
       dialogImport: () => import('./code-config-modal'),
       dialogParams: {},
     });
+  }
+
+  private getTableFilterOptions(): TableFilterConfig {
+    return {
+      area_limit_ids: {
+        name: localize('components.table.filter.item', this.hass!.language, 'name', localize('panels.codes.cards.new_user.fields.area_limit.heading', this.hass!.language)),
+        items: Object.values(this.areas).map(area => ({
+          value: area.area_id,
+          name: area.name,
+          badge: (list: (TableData & { area_limit_ids?: string[] })[]) => list.filter(item => item.area_limit_ids?.includes(area.area_id)).length,
+        })),
+        value: [],
+      },
+      code_format_value: {
+        name: localize('components.table.filter.item', this.hass!.language, 'name', localize('panels.codes.cards.codes.fields.code_format.heading', this.hass!.language)),
+        items: ['number', 'text'].map(format => ({
+          value: format,
+          name: format == 'number'
+            ? prettyPrint(localize('panels.codes.cards.codes.fields.code_format.code_format_number', this.hass!.language))
+            : prettyPrint(localize('panels.codes.cards.codes.fields.code_format.code_format_text', this.hass!.language)),
+          badge: (list: (TableData & { code_format_value?: string })[]) => list.filter(item => item.code_format_value == format).length,
+        })),
+        value: [],
+      },
+      enabled_value: {
+        name: localize('components.table.filter.item', this.hass!.language, 'name', localize('common.enabled', this.hass!.language)),
+        items: [
+          { value: 'enabled', name: localize('common.enabled', this.hass!.language), badge: (list: (TableData & { enabled_value?: string })[]) => list.filter(item => item.enabled_value == 'enabled').length },
+          { value: 'disabled', name: localize('common.disabled', this.hass!.language), badge: (list: (TableData & { enabled_value?: string })[]) => list.filter(item => item.enabled_value == 'disabled').length },
+        ],
+        value: [],
+      },
+    };
   }
 
   toggleEnabled(ev: Event, id: string) {

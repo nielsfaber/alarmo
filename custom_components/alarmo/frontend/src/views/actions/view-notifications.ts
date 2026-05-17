@@ -199,6 +199,10 @@ export class AlarmViewNotifications extends SubscribeMixin(LitElement) {
             id: e.automation_id,
             warning: !this.config.master.enabled && !this.getAreaForAutomation(e),
             area: this.getAreaForAutomation(e) || noArea,
+            event: e.triggers[0].event,
+            modes: e.triggers[0].modes?.length ? e.triggers[0].modes : getArmModeOptions(e.triggers[0].area, this.areas),
+            target: computeServiceDisplay(this.hass!, e.actions[0]).pop()?.name || '',
+            enabled_value: e.enabled ? 'enabled' : 'disabled',
           })
         );
 
@@ -296,6 +300,39 @@ export class AlarmViewNotifications extends SubscribeMixin(LitElement) {
         ),
         items: areaFilterOptions,
         value: this.selectedArea ? [this.selectedArea] : [],
+      },
+      event: {
+        name: localize('components.table.filter.item', this.hass.language, 'name', localize('panels.actions.cards.new_notification.fields.event.heading', this.hass.language)),
+        items: [...new Set((this.automations || []).filter(e => e.type == EAutomationTypes.Notification).map(e => e.triggers[0].event!))].map(event => ({
+          value: event,
+          name: computeEventDisplay(event, this.hass!)?.name || event,
+          badge: (list: any[]) => list.filter(item => item.event == event).length,
+        })),
+        value: [],
+      },
+      modes: {
+        name: localize('components.table.filter.item', this.hass.language, 'name', localize('panels.actions.cards.new_notification.fields.mode.heading', this.hass.language)),
+        items: getArmModeOptions(undefined, this.areas).map(mode => ({
+          value: mode,
+          name: localize(`common.modes_short.${mode}`, this.hass!.language),
+          badge: (list: any[]) => list.filter(item => item.modes?.includes(mode)).length,
+        })),
+        value: [],
+      },
+      target: {
+        name: localize('components.table.filter.item', this.hass.language, 'name', localize('panels.actions.cards.new_notification.fields.target.heading', this.hass.language)),
+        items: [...new Set((this.automations || []).filter(e => e.type == EAutomationTypes.Notification).map(e => computeServiceDisplay(this.hass!, e.actions[0]).pop()?.name || ''))]
+          .filter(Boolean)
+          .map(target => ({ value: target, name: target, badge: (list: any[]) => list.filter(item => item.target == target).length })),
+        value: [],
+      },
+      enabled_value: {
+        name: localize('components.table.filter.item', this.hass.language, 'name', localize('common.enabled', this.hass.language)),
+        items: [
+          { value: 'enabled', name: localize('common.enabled', this.hass.language), badge: (list: any[]) => list.filter(item => item.enabled_value == 'enabled').length },
+          { value: 'disabled', name: localize('common.disabled', this.hass.language), badge: (list: any[]) => list.filter(item => item.enabled_value == 'disabled').length },
+        ],
+        value: [],
       },
     };
     return filterConfig;

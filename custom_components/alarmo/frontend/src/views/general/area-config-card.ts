@@ -15,10 +15,10 @@ import { localize } from '../../../localize/localize';
 import { SubscribeMixin } from '../../subscribe-mixin';
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
 import { fetchAreas, fetchSensors, fetchAutomations } from '../../data/websockets';
-import { TableData, TableColumn } from '../../components/alarmo-table';
+import { TableData, TableColumn, TableFilterConfig } from '../../components/alarmo-table';
 import { exportPath } from '../../common/navigation';
 import { fireEvent } from '../../fire_event';
-import { modesByArea } from '../../common/modes';
+import { getModesList, modesByArea } from '../../common/modes';
 
 @customElement('area-config-card')
 export class AreaConfigCard extends SubscribeMixin(LitElement) {
@@ -102,6 +102,7 @@ export class AreaConfigCard extends SubscribeMixin(LitElement) {
       const output: TableData = {
         id: item.area_id,
         raw_name: item.name,
+        raw_mode_ids: modesByArea(item),
         actions: html`
           <ha-icon-button @click=${(ev: Event) => this.editClick(ev, item.area_id)} .path=${mdiPencil}></ha-icon-button>
         `,
@@ -130,7 +131,7 @@ export class AreaConfigCard extends SubscribeMixin(LitElement) {
         </div>
 
         <div class="list-page-table">
-          <alarmo-table .hass=${this.hass} .columns=${columns} .data=${data}>
+          <alarmo-table .hass=${this.hass} .columns=${columns} .data=${data} .filters=${this.getTableFilterOptions()}>
             ${localize('panels.general.cards.areas.no_items', this.hass.language)}
           </alarmo-table>
         </div>
@@ -159,6 +160,27 @@ export class AreaConfigCard extends SubscribeMixin(LitElement) {
       dialogImport: () => import('../../dialogs/create-area-dialog'),
       dialogParams: { area_id: area_id },
     });
+  }
+
+  private getTableFilterOptions(): TableFilterConfig {
+    const modeFilterOptions = getModesList(this.areas).map(mode => ({
+      value: mode,
+      name: localize(`common.modes_short.${mode}`, this.hass!.language),
+      badge: (list: (TableData & { raw_mode_ids?: string[] })[]) => list.filter(item => item.raw_mode_ids?.includes(mode)).length,
+    }));
+
+    return {
+      raw_mode_ids: {
+        name: localize(
+          'components.table.filter.item',
+          this.hass!.language,
+          'name',
+          localize('panels.sensors.cards.sensors.table.arm_modes', this.hass!.language)
+        ),
+        items: modeFilterOptions,
+        value: [],
+      },
+    };
   }
 
   static styles = commonStyle;
