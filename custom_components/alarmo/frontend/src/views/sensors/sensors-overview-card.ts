@@ -85,6 +85,11 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
         >
           ${localize('panels.sensors.cards.sensors.table.no_items', this.hass.language)}
         </alarmo-table>
+        <div class="card-actions">
+          <ha-button appearance="plain" @click=${this.addSensorClick}>
+            ${localize('panels.sensors.cards.add_sensors.actions.add_to_alarm', this.hass.language)}
+          </ha-button>
+        </div>
       </ha-card>
     `;
   }
@@ -202,6 +207,10 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
       name: '',
     };
     saveSensor(this.hass, data);
+  }
+
+  private addSensorClick() {
+    navigate(this, exportPath('sensors', 'new_sensor'), true);
   }
 
   private getTableFilterOptions() {

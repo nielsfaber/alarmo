@@ -1,14 +1,16 @@
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { mdiClose } from '@mdi/js';
 import { localize } from '../../../localize/localize';
 import { TableColumn, TableData, TableFilterConfig } from '../../components/alarmo-table';
 import { defaultSensorConfig, getConfigurableSensors, sensorClassToType } from '../../data/sensors';
 import { fetchAreas, fetchSensors, saveSensor } from '../../data/websockets';
-import { handleError, prettyPrint } from '../../helpers';
+import { handleError, navigate, prettyPrint } from '../../helpers';
 import { commonStyle } from '../../styles';
 import { SubscribeMixin } from '../../subscribe-mixin';
 import { AlarmoArea, AlarmoSensor, Dictionary, EArmModes, HomeAssistant } from '../../types';
+import { exportPath } from '../../common/navigation';
 
 import '../../components/alarmo-table.ts';
 import { ESensorTypes } from '../../const';
@@ -105,7 +107,11 @@ export class AddSensorsCard extends SubscribeMixin(LitElement) {
     });
 
     return html`
-      <ha-card header="${localize('panels.sensors.cards.add_sensors.title', this.hass.language)}">
+      <ha-card>
+        <div class="card-header">
+          <div class="name">${localize('panels.sensors.cards.add_sensors.title', this.hass.language)}</div>
+          <ha-icon-button .path=${mdiClose} @click=${this.cancelClick}></ha-icon-button>
+        </div>
         <div class="card-content">
           ${localize('panels.sensors.cards.add_sensors.description', this.hass.language)}
         </div>
@@ -138,7 +144,7 @@ export class AddSensorsCard extends SubscribeMixin(LitElement) {
           : this.addSelection;
   }
 
-  addSelected(ev: Event) {
+  async addSelected(ev: Event) {
     if (!this.hass) return;
 
     const modeList: EArmModes[] = Object.values(this.areas)
@@ -160,13 +166,17 @@ export class AddSensorsCard extends SubscribeMixin(LitElement) {
       )
       .filter(e => e) as AlarmoSensor[];
 
-    data.forEach(el => {
-      saveSensor(this.hass!, el)
-        .catch(e => handleError(e, ev))
-        .then();
-    });
+    try {
+      await Promise.all(data.map(el => saveSensor(this.hass!, el)));
+      this.addSelection = [];
+      this.cancelClick();
+    } catch (e: any) {
+      handleError(e, ev);
+    }
+  }
 
-    this.addSelection = [];
+  private cancelClick() {
+    navigate(this, exportPath('sensors'), true);
   }
 
   private getTableFilterOptions() {
