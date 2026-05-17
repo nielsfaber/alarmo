@@ -142,6 +142,16 @@ export class SensorsOverviewCard extends SubscribeMixin(LitElement) {
           }
         `,
       },
+      area: {
+        title: localize('panels.sensors.cards.editor.fields.area.heading', this.hass.language),
+        width: '20%',
+        hide: this.narrow,
+        text: true,
+        renderer: (data: AlarmoSensor) =>
+          data.area == noArea
+            ? this.hass.localize('state_attributes.climate.preset_mode.none')
+            : this.areas[data.area!]?.name || data.area || '',
+      },
       modes: {
         title: localize('panels.sensors.cards.sensors.table.arm_modes', this.hass.language),
         width: '25%',

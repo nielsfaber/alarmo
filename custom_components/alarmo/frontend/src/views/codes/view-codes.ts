@@ -2,7 +2,7 @@ import { LitElement, html, css, CSSResultGroup } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 
 import { prettyPrint, handleError, sortAlphabetically, navigate } from '../../helpers';
-import { Dictionary, AlarmoUser, HomeAssistant } from '../../types';
+import { Dictionary, AlarmoArea, AlarmoUser, HomeAssistant } from '../../types';
 import { fireEvent } from '../../fire_event';
 
 import './user-editor-card.ts';
@@ -13,7 +13,7 @@ import { commonStyle } from '../../styles';
 import { localize } from '../../../localize/localize';
 import { SubscribeMixin } from '../../subscribe-mixin';
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
-import { fetchUsers, saveUser } from '../../data/websockets';
+import { fetchAreas, fetchUsers, saveUser } from '../../data/websockets';
 import { TableData, TableColumn } from '../../components/alarmo-table';
 import { exportPath, Path } from '../../common/navigation';
 import { mdiPlus } from '@mdi/js';
@@ -32,6 +32,9 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
   @property()
   users: Dictionary<AlarmoUser> = {};
 
+  @property()
+  areas: Dictionary<AlarmoArea> = {};
+
   public hassSubscribe(): Promise<UnsubscribeFunc>[] {
     this._fetchData();
     return [this.hass!.connection.subscribeMessage(() => this._fetchData(), { type: 'alarmo_config_updated' })];
@@ -41,8 +44,8 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
     if (!this.hass) {
       return;
     }
-    const users = await fetchUsers(this.hass);
-    this.users = users;
+    this.users = await fetchUsers(this.hass);
+    this.areas = await fetchAreas(this.hass);
   }
 
   render() {
@@ -81,6 +84,12 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
         grow: true,
         text: true,
       },
+      area_limit: {
+        title: localize('panels.codes.cards.new_user.fields.area_limit.heading', this.hass.language),
+        width: '30%',
+        hide: this.narrow,
+        text: true,
+      },
       code_format: {
         title: localize('panels.codes.cards.codes.fields.code_format.heading', this.hass.language),
         width: '40%',
@@ -99,6 +108,14 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
         id: item.user_id!,
         icon: html`<ha-icon icon="mdi:account-outline" class="${item.enabled ? '' : 'disabled'}"></ha-icon>`,
         name: html`<span class="${item.enabled ? '' : 'disabled'}">${prettyPrint(item.name)}</span>`,
+        area_limit: html`
+          <span class="${item.enabled ? '' : 'disabled'}">
+            ${(item.area_limit?.length ? item.area_limit : Object.keys(this.areas))
+              .map(area => this.areas[area]?.name)
+              .filter(Boolean)
+              .join(', ')}
+          </span>
+        `,
         code_format: html`
           <span class="${item.enabled ? '' : 'disabled'}">
           ${item.code_format == 'number'

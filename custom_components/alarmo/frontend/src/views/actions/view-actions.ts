@@ -16,7 +16,7 @@ import './automation-editor-card.ts';
 import '../../components/alarmo-settings-row';
 
 import { EAutomationTypes } from '../../const';
-import { getAreaOptions, computeAreaDisplay } from '../../data/actions';
+import { getAreaOptions, computeAreaDisplay, computeEventDisplay, getArmModeOptions } from '../../data/actions';
 import { exportPath, Path } from '../../common/navigation';
 import { mdiPlus } from '@mdi/js';
 
@@ -115,6 +115,37 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
           width: '40%',
           grow: true,
           text: true,
+        },
+        event: {
+          title: localize('panels.actions.cards.new_action.fields.event.heading', this.hass.language),
+          width: '18%',
+          hide: this.narrow,
+          text: true,
+          renderer: (item: AlarmoAutomation) => computeEventDisplay(item.triggers[0].event!, this.hass!)?.name || '',
+        },
+        area: {
+          title: localize('panels.actions.cards.new_action.fields.area.heading', this.hass.language),
+          width: '18%',
+          hide: this.narrow,
+          text: true,
+          renderer: (item: AlarmoAutomation & { area: string }) =>
+            item.area == noArea
+              ? this.config.master.enabled
+                ? this.config.master.name
+                : this.hass!.localize('state_attributes.climate.preset_mode.none')
+              : computeAreaDisplay(item.area, this.areas, this.config).name,
+        },
+        modes: {
+          title: localize('panels.actions.cards.new_action.fields.mode.heading', this.hass.language),
+          width: '22%',
+          hide: this.narrow,
+          text: true,
+          renderer: (item: AlarmoAutomation) => {
+            const modes = item.triggers[0].modes?.length
+              ? item.triggers[0].modes
+              : getArmModeOptions(item.triggers[0].area, this.areas);
+            return modes.map(e => localize(`common.modes_short.${e}`, this.hass!.language)).join(', ');
+          },
         },
         enabled: {
           title: localize('common.enabled', this.hass.language),

@@ -18,6 +18,7 @@ import { fetchAreas, fetchSensors, fetchAutomations } from '../../data/websocket
 import { TableData, TableColumn } from '../../components/alarmo-table';
 import { exportPath } from '../../common/navigation';
 import { fireEvent } from '../../fire_event';
+import { modesByArea } from '../../common/modes';
 
 @customElement('area-config-card')
 export class AreaConfigCard extends SubscribeMixin(LitElement) {
@@ -58,6 +59,12 @@ export class AreaConfigCard extends SubscribeMixin(LitElement) {
         grow: true,
         text: true,
       },
+      modes: {
+        title: localize('panels.sensors.cards.sensors.table.arm_modes', this.hass.language),
+        width: '25%',
+        hide: this.narrow,
+        text: true,
+      },
       remarks: {
         title: localize('panels.general.cards.areas.table.remarks', this.hass.language),
         width: '60%',
@@ -92,6 +99,7 @@ export class AreaConfigCard extends SubscribeMixin(LitElement) {
           <ha-icon-button @click=${(ev: Event) => this.editClick(ev, item.area_id)} .path=${mdiPencil}></ha-icon-button>
         `,
         name: prettyPrint(item.name),
+        modes: modesByArea(item).map(mode => localize(`common.modes_short.${mode}`, this.hass!.language)).join(', '),
         remarks: (unsafeHTML(
           localize(
             'panels.general.cards.areas.table.summary',
