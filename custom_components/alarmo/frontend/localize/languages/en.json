@@ -351,7 +351,8 @@
           "description": "Each user has its own code to arm/disarm the alarm.",
           "no_items": "There are no users yet",
           "actions": {
-            "new_user": "New user"
+            "new_user": "New user",
+            "configure_codes": "Code Configuration"
           }
         },
         "new_user": {

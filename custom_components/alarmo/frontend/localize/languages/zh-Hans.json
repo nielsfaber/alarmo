@@ -353,7 +353,8 @@
           "description": "每个用户都有自己的密码来启用/解除警报。",
           "no_items": "无用户",
           "actions": {
-            "new_user": "新用户"
+            "new_user": "新用户",
+            "configure_codes": "代码配置"
           }
         },
         "new_user": {

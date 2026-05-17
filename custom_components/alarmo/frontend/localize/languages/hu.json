@@ -351,7 +351,8 @@
           "description": "Minden felhasználó saját kóddal rendelkezik a riasztó élesítéséhez és hatástalanításához.",
           "no_items": "Még nincs létrehozott felhasználó",
           "actions": {
-            "new_user": "Új felhasználó"
+            "new_user": "Új felhasználó",
+            "configure_codes": "Kódbeállítások"
           }
         },
         "new_user": {

@@ -347,7 +347,8 @@
           "description": "Każdy użytkownik ma własny kod do uzbrojenia/rozbrojenia alarmu.",
           "no_items": "Nie ma jeszcze użytkowników",
           "actions": {
-            "new_user": "Nowy użytkownik"
+            "new_user": "Nowy użytkownik",
+            "configure_codes": "Konfiguracja kodu"
           }
         },
         "new_user": {

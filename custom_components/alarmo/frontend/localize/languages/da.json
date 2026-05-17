@@ -351,7 +351,8 @@
           "description": "Hver bruger har sin egen kode til at til/fra-koble alarmen.",
           "no_items": "Der er ingen brugere endnu",
           "actions": {
-            "new_user": "Ny bruger"
+            "new_user": "Ny bruger",
+            "configure_codes": "Kodekonfiguration"
           }
         },
         "new_user": {

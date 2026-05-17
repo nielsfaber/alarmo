@@ -1,18 +1,19 @@
 import { LitElement, html } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 
-import { prettyPrint, handleError, sortAlphabetically, pick, navigate } from '../../helpers';
-import { AlarmoConfig, Dictionary, AlarmoUser, HomeAssistant } from '../../types';
+import { prettyPrint, handleError, sortAlphabetically, navigate } from '../../helpers';
+import { Dictionary, AlarmoUser, HomeAssistant } from '../../types';
+import { fireEvent } from '../../fire_event';
 
 import './user-editor-card.ts';
-import '../../components/alarmo-settings-row';
+import './code-config-modal.ts';
 import '../../components/alarmo-table.ts';
 
 import { commonStyle } from '../../styles';
 import { localize } from '../../../localize/localize';
 import { SubscribeMixin } from '../../subscribe-mixin';
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
-import { fetchConfig, fetchUsers, saveConfig, saveUser } from '../../data/websockets';
+import { fetchUsers, saveUser } from '../../data/websockets';
 import { TableData, TableColumn } from '../../components/alarmo-table';
 import { exportPath, Path } from '../../common/navigation';
 
@@ -28,9 +29,6 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
   path!: Path;
 
   @property()
-  data?: Partial<AlarmoConfig>;
-
-  @property()
   users: Dictionary<AlarmoUser> = {};
 
   public hassSubscribe(): Promise<UnsubscribeFunc>[] {
@@ -42,15 +40,12 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
     if (!this.hass) {
       return;
     }
-    const config = await fetchConfig(this.hass);
-    this.data = pick(config, ['code_arm_required', 'code_disarm_required', 'code_mode_change_required', 'code_format']);
-
     const users = await fetchUsers(this.hass);
     this.users = users;
   }
 
   render() {
-    if (!this.hass || !this.data) return html``;
+    if (!this.hass) return html``;
 
     if (this.path.subpage == 'new_user') {
       return html`
@@ -65,90 +60,7 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
         ></user-editor-card>
       `;
     } else {
-      const codesInUse = this.data.code_arm_required || this.data.code_disarm_required || this.data.code_mode_change_required;
-
       return html`
-        <ha-card header="${localize('panels.codes.title', this.hass.language)}">
-          <div class="card-content">${localize('panels.codes.cards.codes.description', this.hass.language)}</div>
-
-          <alarmo-settings-row .narrow=${this.narrow}>
-            <span slot="heading">
-              ${localize('panels.codes.cards.codes.fields.code_arm_required.heading', this.hass.language)}
-            </span>
-            <span slot="description">
-              ${localize('panels.codes.cards.codes.fields.code_arm_required.description', this.hass.language)}
-            </span>
-            <ha-switch
-              ?checked=${this.data.code_arm_required}
-              @change=${(ev: Event) => {
-          this.saveData({ code_arm_required: (ev.target as HTMLInputElement).checked });
-        }}
-            ></ha-switch>
-          </alarmo-settings-row>
-
-          <alarmo-settings-row .narrow=${this.narrow}>
-            <span slot="heading">
-              ${localize('panels.codes.cards.codes.fields.code_disarm_required.heading', this.hass.language)}
-            </span>
-            <span slot="description">
-              ${localize('panels.codes.cards.codes.fields.code_disarm_required.description', this.hass.language)}
-            </span>
-            <ha-switch
-              ?checked=${this.data.code_disarm_required}
-              @change=${(ev: Event) => {
-          this.saveData({ code_disarm_required: (ev.target as HTMLInputElement).checked });
-        }}
-            ></ha-switch>
-          </alarmo-settings-row>
-
-          <alarmo-settings-row .narrow=${this.narrow}>
-            <span slot="heading">
-              ${localize('panels.codes.cards.codes.fields.code_mode_change_required.heading', this.hass.language)}
-            </span>
-            <span slot="description">
-              ${localize('panels.codes.cards.codes.fields.code_mode_change_required.description', this.hass.language)}
-            </span>
-            <ha-switch
-              ?checked=${this.data.code_mode_change_required}
-              @change=${(ev: Event) => {
-          this.saveData({ code_mode_change_required: (ev.target as HTMLInputElement).checked });
-        }}
-            ></ha-switch>
-          </alarmo-settings-row>
-
-          <alarmo-settings-row .narrow=${this.narrow}>
-            <span slot="heading">
-              ${localize('panels.codes.cards.codes.fields.code_format.heading', this.hass.language)}
-            </span>
-            <span slot="description">
-              ${localize('panels.codes.cards.codes.fields.code_format.description', this.hass.language)}
-            </span>
-            <ha-button
-              appearance="${this.data.code_format == 'number' ? 'filled' : 'plain'}"
-              variant="${this.data.code_format == 'number' ? 'brand' : 'neutral'}"
-          : ''}"
-              @click=${() => {
-          this.saveData({ code_format: 'number' });
-        }}
-              ?disabled=${!codesInUse}
-            >
-              ${localize('panels.codes.cards.codes.fields.code_format.code_format_number', this.hass.language)}
-            </ha-button>
-            <ha-button
-              appearance="${this.data.code_format == 'text' ? 'filled' : 'plain'}"
-              variant="${this.data.code_format == 'text' ? 'brand' : 'neutral'}"
-          : ''
-        }"
-              @click=${() => {
-          this.saveData({ code_format: 'text' });
-        }}
-              ?disabled=${!codesInUse}
-            >
-              ${localize('panels.codes.cards.codes.fields.code_format.code_format_text', this.hass.language)}
-            </ha-button>
-          </alarmo-settings-row>
-        </ha-card>
-
         ${this.usersPanel()}
       `;
     }
@@ -222,6 +134,15 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
         <div class="card-content">
           ${localize('panels.codes.cards.user_management.description', this.hass.language)}
         </div>
+        <div style="padding: 0px 0px 16px 16px; margin-top: -8px">
+          <ha-button
+            appearance="filled"
+            @click=${this.openCodeConfigDialog}
+          >
+            <ha-icon slot="start" icon="mdi:cog-outline"></ha-icon>
+            ${localize('panels.codes.cards.user_management.actions.configure_codes', this.hass.language)}
+          </ha-button>
+        </div>
 
         <alarmo-table
           ?selectable=${true}
@@ -247,17 +168,12 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
     navigate(this, exportPath('codes', 'new_user'), true);
   }
 
-  saveData(changes: Partial<AlarmoConfig>) {
-    if (!this.hass) return;
-
-    this.data = {
-      ...this.data,
-      ...changes,
-    };
-
-    saveConfig(this.hass, this.data)
-      .catch(e => handleError(e, this.shadowRoot!.querySelector('ha-card') as HTMLElement))
-      .then();
+  private openCodeConfigDialog(ev: Event) {
+    fireEvent(ev.currentTarget as HTMLElement, 'show-dialog', {
+      dialogTag: 'code-config-modal',
+      dialogImport: () => import('./code-config-modal'),
+      dialogParams: {},
+    });
   }
 
   toggleEnabled(ev: Event, id: string) {

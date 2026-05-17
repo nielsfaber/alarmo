@@ -351,7 +351,8 @@
           "description": "Každý užívateľ má svoj vlastný kód na zapnutie/vypnutie alarmu.",
           "no_items": "Zatiaľ nie sú žiadni používatelia",
           "actions": {
-            "new_user": "Nový užívateľ"
+            "new_user": "Nový užívateľ",
+            "configure_codes": "Konfigurácia kódu"
           }
         },
         "new_user": {

@@ -351,7 +351,8 @@
           "description": "Cada usuário tem seu próprio código para armar/desarmar o alarme.",
           "no_items": "Não há usuários ainda",
           "actions": {
-            "new_user": "Novo usuário"
+            "new_user": "Novo usuário",
+            "configure_codes": "Configuração do código"
           }
         },
         "new_user": {

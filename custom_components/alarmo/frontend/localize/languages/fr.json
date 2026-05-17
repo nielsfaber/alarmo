@@ -351,7 +351,8 @@
           "description": "Chaque utilisateur a son propre code pour activer / désactiver l'alarme.",
           "no_items": "Il n'y a aucun utilisateur de défini",
           "actions": {
-            "new_user": "Nouvel utilisateur"
+            "new_user": "Nouvel utilisateur",
+            "configure_codes": "Configuration du code"
           }
         },
         "new_user": {

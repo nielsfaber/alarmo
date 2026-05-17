@@ -351,7 +351,8 @@
           "description": "每個用戶都有自己的密碼來啟用/解除警報。",
           "no_items": "無用戶",
           "actions": {
-            "new_user": "新用戶"
+            "new_user": "新用戶",
+            "configure_codes": "代碼設定"
           }
         },
         "new_user": {

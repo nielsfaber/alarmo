@@ -351,7 +351,8 @@
           "description": "Jeder Benutzer hat seinen eigenen Code zum Scharf-/Unscharfschalten des Alarms.",
           "no_items": "Es sind noch keine Benutzer vorhanden",
           "actions": {
-            "new_user": "Neuer Benutzer"
+            "new_user": "Neuer Benutzer",
+            "configure_codes": "Code-Konfiguration"
           }
         },
         "new_user": {

@@ -43,7 +43,13 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
     this.config = await fetchConfig(this.hass);
     this.areas = await fetchAreas(this.hass);
     this.automations = await fetchAutomations(this.hass);
-    this.data = pick(this.config, ['trigger_time', 'disarm_after_trigger', 'ignore_blocking_sensors_after_trigger', 'mqtt', 'master']);
+    this.data = pick(this.config, [
+      'trigger_time',
+      'disarm_after_trigger',
+      'ignore_blocking_sensors_after_trigger',
+      'mqtt',
+      'master'
+    ]);
   }
 
   firstUpdated() {
@@ -165,7 +171,6 @@ export class AlarmViewGeneral extends SubscribeMixin(LitElement) {
               `
           : ''}
         </ha-card>
-
         <alarm-mode-card .hass=${this.hass} .narrow=${this.narrow}></alarm-mode-card>
 
         <area-config-card .hass=${this.hass} .narrow=${this.narrow}></area-config-card>

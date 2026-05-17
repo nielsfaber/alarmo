@@ -351,7 +351,8 @@
           "description": "Her kullanıcının alarmı kurmak/devre dışı bırakmak için kendi kodu vardır.",
           "no_items": "Henüz kullanıcı yok",
           "actions": {
-            "new_user": "Yeni kullanıcı"
+            "new_user": "Yeni kullanıcı",
+            "configure_codes": "Kod yapılandırması"
           }
         },
         "new_user": {

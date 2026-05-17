@@ -351,7 +351,8 @@
           "description": "Cada usuari té el seu propi codi per activar/desactivar l'alarma.",
           "no_items": "Encara no hi ha usuaris",
           "actions": {
-            "new_user": "Usuari nou"
+            "new_user": "Usuari nou",
+            "configure_codes": "Configuració del codi"
           }
         },
         "new_user": {

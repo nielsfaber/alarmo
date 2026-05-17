@@ -351,7 +351,8 @@
           "description": "Ogni utente ha il suo codice per attivare/disattivare l'allarme.",
           "no_items": "Non è stato ancora creato nessun utente.",
           "actions": {
-            "new_user": "Nuovo utente"
+            "new_user": "Nuovo utente",
+            "configure_codes": "Configurazione del codice"
           }
         },
         "new_user": {
