@@ -76,6 +76,9 @@ export class NotificationEditorCard extends LitElement {
   @property()
   errors: Dictionary<boolean> = {};
 
+  @property()
+  returnPage = 'notifications';
+
   async firstUpdated() {
     await loadHaYamlEditor();
 
@@ -870,7 +873,7 @@ export class NotificationEditorCard extends LitElement {
   }
 
   private _cancelClick() {
-    navigate(this, exportPath('actions'), true);
+    navigate(this, exportPath(this.returnPage), true);
   }
 
   static get styles(): CSSResultGroup {

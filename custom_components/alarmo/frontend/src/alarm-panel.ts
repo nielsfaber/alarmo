@@ -6,6 +6,7 @@ import './views/general/view-general.ts';
 import './views/sensors/view-sensors.ts';
 import './views/codes/view-codes.ts';
 import './views/actions/view-actions.ts';
+import './views/actions/view-notifications.ts';
 
 import { commonStyle } from './styles';
 import { VERSION } from './const';
@@ -19,7 +20,8 @@ enum EMenuItems {
   General = 'general',
   Sensors = 'sensors',
   Codes = 'codes',
-  Actions = 'actions'
+  Actions = 'actions',
+  Notifications = 'notifications'
 }
 
 @customElement('alarm-panel')
@@ -66,7 +68,9 @@ export class MyAlarmPanel extends LitElement {
         >
           ${Object.values(EMenuItems).map(e => html`
             <ha-tab-group-tab slot="nav" panel="${e}" .active=${path.page === e}>
-              ${localize(`panels.${e}.title`, this.hass.language)}
+              ${e === EMenuItems.Notifications
+                ? localize('panels.actions.cards.notifications.title', this.hass.language)
+                : localize(`panels.${e}.title`, this.hass.language)}
             </ha-tab-group-tab>
           `)}
         </ha-tab-group>
@@ -96,6 +100,10 @@ export class MyAlarmPanel extends LitElement {
       case 'actions':
         return html`
           <alarm-view-actions .hass=${this.hass} .narrow=${this.narrow} .path=${path}></alarm-view-actions>
+        `;
+      case 'notifications':
+        return html`
+          <alarm-view-notifications .hass=${this.hass} .narrow=${this.narrow} .path=${path}></alarm-view-notifications>
         `;
       default:
         return html`

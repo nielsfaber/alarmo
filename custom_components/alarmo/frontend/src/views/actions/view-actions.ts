@@ -2,17 +2,16 @@ import { LitElement, html } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 import { loadHaForm } from '../../load-ha-elements';
 
-import { AlarmEntity, AlarmoAutomation, Dictionary, AlarmoArea, AlarmoConfig, HomeAssistant } from '../../types';
+import { AlarmoAutomation, Dictionary, AlarmoArea, AlarmoConfig, HomeAssistant } from '../../types';
 import { SubscribeMixin } from '../../subscribe-mixin';
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
 
 import { commonStyle } from '../../styles';
 import { fetchAutomations, saveAutomation, fetchAreas, fetchConfig } from '../../data/websockets';
 import { TableColumn, TableFilterConfig } from '../../components/alarmo-table';
-import { handleError, Unique, isDefined, flatten, sortAlphabetically, navigate } from '../../helpers';
+import { handleError, isDefined, sortAlphabetically, navigate } from '../../helpers';
 import { localize } from '../../../localize/localize';
 
-import './notification-editor-card.ts';
 import './automation-editor-card.ts';
 import '../../components/alarmo-settings-row';
 
@@ -32,9 +31,6 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
 
   @property()
   path!: Path;
-
-  @property()
-  alarmEntity?: AlarmEntity;
 
   @property()
   automations?: AlarmoAutomation[];
@@ -73,27 +69,21 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
   render() {
     if (!this.hass || !this.automations || !this.config) return html``;
 
-    if (this.path.subpage == 'new_notification') {
+    if (this.path.subpage == 'new_action') {
       return html`
-        <notification-editor-card .hass=${this.hass} .narrow=${this.narrow}></notification-editor-card>
-      `;
-    } else if (this.path.params.edit_notification) {
-      const config = this.automations.find(
-        e => e.automation_id == this.path.params.edit_notification && e.type == EAutomationTypes.Notification
-      );
-      return html`
-        <notification-editor-card .hass=${this.hass} .narrow=${this.narrow} .item=${config}></notification-editor-card>
-      `;
-    } else if (this.path.subpage == 'new_action') {
-      return html`
-        <automation-editor-card .hass=${this.hass} .narrow=${this.narrow}></automation-editor-card>
+        <automation-editor-card .hass=${this.hass} .narrow=${this.narrow} returnPage="actions"></automation-editor-card>
       `;
     } else if (this.path.params.edit_action) {
       const config = this.automations.find(
         e => e.automation_id == this.path.params.edit_action && e.type == EAutomationTypes.Action
       );
       return html`
-        <automation-editor-card .hass=${this.hass} .narrow=${this.narrow} .item=${config}></automation-editor-card>
+        <automation-editor-card
+          .hass=${this.hass}
+          .narrow=${this.narrow}
+          .item=${config}
+          returnPage="actions"
+        ></automation-editor-card>
       `;
     } else {
       const warningTooltip = () => html`
@@ -111,11 +101,7 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
                   ${warningTooltip()}
                   <ha-icon icon="mdi:alert" style="color: var(--error-color)"></ha-icon>
                 `
-              : item.type == EAutomationTypes.Notification
-                ? html`
-                  <ha-icon icon="hass:message-text-outline"  class="${!item.enabled ? 'disabled' : ''}"></ha-icon>
-                `
-                : html`
+              : html`
                   <ha-icon icon="hass:flash"  class="${!item.enabled ? 'disabled' : ''}"></ha-icon>
                 `,
         },
@@ -143,17 +129,6 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
         },
       };
 
-      const notificationData = this.automations
-        .filter(e => e.type == EAutomationTypes.Notification)
-        .map(e =>
-          Object({
-            ...e,
-            id: e.automation_id,
-            warning: !this.config.master.enabled && !this.getAreaForAutomation(e),
-            area: this.getAreaForAutomation(e) || noArea,
-          })
-        );
-
       const automationData = this.automations
         .filter(e => e.type == EAutomationTypes.Action)
         .map(e =>
@@ -166,30 +141,6 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
         );
 
       return html`
-        <ha-card header="${localize('panels.actions.cards.notifications.title', this.hass.language)}">
-          <div class="card-content">
-            ${localize('panels.actions.cards.notifications.description', this.hass.language)}
-          </div>
-
-          <alarmo-table
-            .hass=${this.hass}
-            ?selectable=${true}
-            .columns=${columns}
-            .data=${notificationData}
-            .filters=${this.getTableFilterOptions()}
-            @row-click=${(ev: CustomEvent) =>
-          navigate(this, exportPath('actions', { params: { edit_notification: ev.detail.id } }), true)}
-          >
-            ${localize('panels.actions.cards.notifications.table.no_items', this.hass.language)}
-          </alarmo-table>
-
-          <div class="card-actions">
-            <ha-button appearance="plain" @click=${this.addNotificationClick}>
-              ${localize('panels.actions.cards.notifications.actions.new_notification', this.hass.language)}
-            </ha-button>
-          </div>
-        </ha-card>
-
         <ha-card header="${localize('panels.actions.title', this.hass.language)}">
           <div class="card-content">${localize('panels.actions.cards.actions.description', this.hass.language)}</div>
 
@@ -265,10 +216,6 @@ export class AlarmViewActions extends SubscribeMixin(LitElement) {
       },
     };
     return filterConfig;
-  }
-
-  addNotificationClick() {
-    navigate(this, exportPath('actions', 'new_notification'), true);
   }
 
   addActionClick() {

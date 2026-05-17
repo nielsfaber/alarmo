@@ -75,6 +75,9 @@ export class AutomationEditorCard extends LitElement {
   @property()
   errors: Dictionary<boolean> = {};
 
+  @property()
+  returnPage = 'actions';
+
   async firstUpdated() {
     await loadHaYamlEditor();
 
@@ -613,7 +616,7 @@ export class AutomationEditorCard extends LitElement {
   }
 
   private _cancelClick() {
-    navigate(this, exportPath('actions'), true);
+    navigate(this, exportPath(this.returnPage), true);
   }
 
   static get styles(): CSSResultGroup {
