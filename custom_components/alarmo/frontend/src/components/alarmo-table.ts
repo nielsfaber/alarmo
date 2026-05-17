@@ -288,23 +288,28 @@ export class AlarmoTable extends LitElement {
   static styles = css`
     :host {
       width: 100%;
+      display: block;
     }
     div.table {
       display: inline-flex;
       flex-direction: column;
       box-sizing: border-box;
       width: 100%;
+      overflow-x: auto;
     }
     div.table .header {
-      font-weight: bold;
+      font-weight: 600;
+      min-height: 48px;
+      background: var(--table-row-background-color, var(--card-background-color));
     }
     div.table-row {
       display: flex;
       width: 100%;
-      height: 52px;
+      min-height: 52px;
       border-top: 1px solid var(--divider-color);
       flex-direction: row;
       position: relative;
+      background: var(--table-row-background-color, var(--card-background-color));
     }
     div.table-cell {
       align-self: center;
@@ -312,9 +317,12 @@ export class AlarmoTable extends LitElement {
       text-overflow: ellipsis;
       flex-shrink: 0;
       box-sizing: border-box;
+      min-height: 52px;
+      display: flex;
+      align-items: center;
     }
     div.table-cell.text {
-      padding: 4px 16px;
+      padding: 8px 16px;
     }
     div.table-cell.grow {
       flex-grow: 1;
@@ -356,6 +364,9 @@ export class AlarmoTable extends LitElement {
       overflow: hidden;
       text-overflow: ellipsis;
       min-width: 0;
+      color: var(--secondary-text-color);
+      font-size: 0.875rem;
+      font-weight: 600;
     }
     div.table-row.selectable {
       cursor: pointer;
@@ -372,15 +383,15 @@ export class AlarmoTable extends LitElement {
       border-radius: 4px;
     }
     div.table-row.selectable:hover::before {
-      background-color: rgba(var(--rgb-primary-text-color), 0.5);
+      background-color: rgba(var(--rgb-primary-color), 0.12);
     }
     div.table-row.warning::before {
       background-color: var(--error-color);
-      opacity: 0.06;
+      opacity: 0.05;
     }
     div.table-row.warning:hover::before {
       background-color: var(--error-color);
-      opacity: 0.12;
+      opacity: 0.1;
     }
     div.table-row.warning span {
       color: var(--error-color);
@@ -388,13 +399,15 @@ export class AlarmoTable extends LitElement {
 
     ha-icon, ha-svg-icon {
       color: var(--state-icon-color);
-      padding: 8px;
+      padding: 6px 8px;
     }
 
     .secondary {
       color: var(--secondary-text-color);
       display: flex;
-      padding-top: 4px;
+      padding-top: 2px;
+      font-size: 0.75rem;
+      line-height: 1.2;
     }
 
     a,
@@ -423,6 +436,8 @@ export class AlarmoTable extends LitElement {
       position: relative;
       flex-direction: row;
       align-items: center;
+      gap: 8px;
+      background: var(--table-row-background-color, var(--card-background-color));
     }
     ha-dropdown .header {
       display: flex;
