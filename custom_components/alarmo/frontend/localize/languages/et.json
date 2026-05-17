@@ -28,6 +28,9 @@
       },
       "search": {
         "label": "Otsi"
+      },
+      "sort": {
+        "label": "Sorteeri {name} järgi"
       }
     }
   },

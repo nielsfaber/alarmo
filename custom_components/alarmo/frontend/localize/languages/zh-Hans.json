@@ -30,6 +30,9 @@
       },
       "search": {
         "label": "搜索"
+      },
+      "sort": {
+        "label": "按{name}排序"
       }
     }
   },

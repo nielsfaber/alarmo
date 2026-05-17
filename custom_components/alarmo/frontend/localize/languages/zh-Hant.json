@@ -28,6 +28,9 @@
       },
       "search": {
         "label": "搜尋"
+      },
+      "sort": {
+        "label": "按{name}排序"
       }
     }
   },

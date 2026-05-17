@@ -28,6 +28,9 @@
       },
       "search": {
         "label": "Tìm kiếm"
+      },
+      "sort": {
+        "label": "Sắp xếp theo {name}"
       }
     }
   },

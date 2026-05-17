@@ -28,6 +28,9 @@
       },
       "search": {
         "label": "Søg"
+      },
+      "sort": {
+        "label": "Sorter efter {name}"
       }
     }
   },

@@ -28,6 +28,9 @@
       },
       "search": {
         "label": "Soek"
+      },
+      "sort": {
+        "label": "Sorteer volgens {name}"
       }
     }
   },

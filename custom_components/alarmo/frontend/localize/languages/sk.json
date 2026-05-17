@@ -28,6 +28,9 @@
       },
       "search": {
         "label": "Hľadať"
+      },
+      "sort": {
+        "label": "Zoradiť podľa {name}"
       }
     }
   },

@@ -1,4 +1,4 @@
-import { mdiFilterVariant, mdiClose, mdiArrowDown, mdiArrowUp } from '@mdi/js';
+import { mdiFilterVariant, mdiClose, mdiArrowDown, mdiArrowUp, mdiMenuDown } from '@mdi/js';
 import { LitElement, html, TemplateResult, css, PropertyValues } from 'lit';
 import { property, customElement, state, query } from 'lit/decorators.js';
 
@@ -115,33 +115,26 @@ export class AlarmoTable extends LitElement {
         ? ''
         : html`
                 <div
-                  class="table-cell ${e.text ? 'text' : ''} ${e.grow ? 'grow' : ''} ${e.align ? e.align : ''}"
+                  class="table-cell ${e.text ? 'text' : ''} ${e.grow ? 'grow' : ''} ${e.align ? e.align : ''} ${e.sortable ? 'sortable' : ''} ${this.sortConfig?.key === key ? 'sorted' : 'not-sorted'}"
                   style="${e.grow ? '' : `width: ${e.width}`}"
+                  role=${e.sortable ? 'button' : ''}
+                  tabindex=${e.sortable ? '0' : '-1'}
+                  @click=${e.sortable ? (ev: Event) => this.toggleSort(ev, key) : undefined}
+                  @keydown=${e.sortable
+                    ? (ev: KeyboardEvent) => {
+                        if (ev.key === 'Enter' || ev.key === ' ') {
+                          ev.preventDefault();
+                          this.toggleSort(ev, key);
+                        }
+                      }
+                    : undefined}
                 >
-                  <div class="header-content">
-                    <span>${e.title || ''}</span>
-                    ${e.sortable
-                      ? html`
-                          <span
-                            class="sort-btn ${this.sortConfig?.key === key ? 'active' : 'inactive'}"
-                            role="button"
-                            tabindex="0"
-                            @click=${(ev: Event) => this.toggleSort(ev, key)}
-                            @keydown=${(ev: KeyboardEvent) => {
-                              if (ev.key === 'Enter' || ev.key === ' ') {
-                                ev.preventDefault();
-                                this.toggleSort(ev, key);
-                              }
-                            }}
-                          >
-                            <ha-svg-icon
-                              class="sort-icon ${this.sortConfig?.key === key ? 'active' : 'inactive'}"
-                              .path=${this.getSortIcon(key)}
-                            ></ha-svg-icon>
-                          </span>
-                        `
-                      : ''}
-                  </div>
+                  ${e.sortable
+                    ? html`
+                        <ha-svg-icon class="sort-icon" .path=${this.getSortIcon(key)}></ha-svg-icon>
+                      `
+                    : ''}
+                  <span>${e.title || ''}</span>
                 </div>
               `
     )}
@@ -253,6 +246,24 @@ export class AlarmoTable extends LitElement {
     return this.sortConfig.direction === 'asc' ? mdiArrowDown : mdiArrowUp;
   }
 
+  private getSortableColumns() {
+    if (!this.columns) return [];
+    return Object.entries(this.columns).filter(([, column]) => column.sortable && !column.hide);
+  }
+
+  private getCurrentSortColumn() {
+    const sortableColumns = this.getSortableColumns();
+    if (!sortableColumns.length) return undefined;
+    return sortableColumns.find(([key]) => key === this.sortConfig?.key) || sortableColumns[0];
+  }
+
+  private selectSortColumn(key: string) {
+    this.sortConfig = {
+      key,
+      direction: this.sortConfig?.key === key ? this.sortConfig.direction : 'asc',
+    };
+  }
+
   private _getActiveFilterCount() {
     if (!this.filterConfig) return 0;
     return Object.values(this.filterConfig).filter(filter => filter.value.length).length;
@@ -271,66 +282,102 @@ export class AlarmoTable extends LitElement {
 
     return html`
       <div class="table-filter">
-        ${hasFilters
+        ${hasFilters || this._getFilteredItems()
         ? html`
-              <ha-dropdown
-                @wa-show=${this._showFilterMenu}
-                @wa-after-hide=${this._applyFilterSelection}
-                placement="bottom-start"
-              >
-                <div
-                  slot="trigger"
-                  class="filter-trigger ${!this.data?.length ? 'disabled' : ''}"
-                  aria-label=${localize('components.table.filter.label', this.hass.language)}
-                >
-                  <div class="relative">
-                    <ha-assist-chip
-                      has-icon
-                      class="type-assist-chip"
-                      ?disabled=${!this.data?.length}
-                      .label=${localize('components.table.filter.label', this.hass.language)}
-                    >
-                      <ha-svg-icon slot="icon" .path=${mdiFilterVariant}></ha-svg-icon>
-                    </ha-assist-chip>
-                    ${this._getActiveFilterCount()
-                      ? html`<div class="badge">${this._getActiveFilterCount()}</div>`
-                      : ''}
-                  </div>
-                </div>
-                ${this.renderFilterMenu()}
-              </ha-dropdown>
-            `
-        : ''}
+              <div class="filter-actions">
+                ${hasFilters
+                  ? html`
+                      <ha-dropdown
+                        @wa-show=${this._showFilterMenu}
+                        @wa-after-hide=${this._applyFilterSelection}
+                        placement="bottom-start"
+                      >
+                        <div
+                          slot="trigger"
+                          class="filter-trigger ${!this.data?.length ? 'disabled' : ''}"
+                          aria-label=${localize('components.table.filter.label', this.hass.language)}
+                        >
+                          <div class="relative">
+                            <ha-assist-chip
+                              has-icon
+                              class="type-assist-chip"
+                              ?disabled=${!this.data?.length}
+                              .label=${localize('components.table.filter.label', this.hass.language)}
+                            >
+                              <ha-svg-icon slot="icon" .path=${mdiFilterVariant}></ha-svg-icon>
+                            </ha-assist-chip>
+                            ${this._getActiveFilterCount()
+                              ? html`<div class="badge">${this._getActiveFilterCount()}</div>`
+                              : ''}
+                          </div>
+                        </div>
+                        ${this.renderFilterMenu()}
+                      </ha-dropdown>
+                    `
+                  : ''}
 
-        ${this._getFilteredItems()
-        ? html`
-              <alarmo-chip
-                .hass=${this.hass}
-                removable
-                active
-                @icon-clicked=${this._clearFilters}
-                style="--chip-color: var(--primary-color); --background-opacity: 0.12; --chip-border-radius: 8px; --chip-height: 40px; --chip-font-size: 1em; --icon-color: var(--dark-primary-color)"
-              >
-                ${localize(
-          'components.table.filter.hidden_items',
-          this.hass.language,
-          'number',
-          this._getFilteredItems()
-        )}
-              </alarmo-chip>
+                ${this._getFilteredItems()
+                  ? html`
+                      <alarmo-chip
+                        .hass=${this.hass}
+                        removable
+                        active
+                        @icon-clicked=${this._clearFilters}
+                        style="--chip-color: var(--primary-color); --background-opacity: 0.12; --chip-border-radius: 8px; --chip-height: 40px; --chip-font-size: 1em; --icon-color: var(--dark-primary-color)"
+                      >
+                        ${localize(
+                          'components.table.filter.hidden_items',
+                          this.hass.language,
+                          'number',
+                          this._getFilteredItems()
+                        )}
+                      </alarmo-chip>
+                    `
+                  : ''}
+              </div>
             `
         : ''}
         ${hasSearchableColumns
         ? html`
-              <div class="filter-right">
-                <ha-input
-                  .value=${this.searchQuery}
-                  size="small"
-                  label=${localize('components.table.search.label', this.hass.language)}
-                  placeholder=""
-                  @input=${(ev: Event) => (this.searchQuery = (ev.target as HTMLInputElement).value)}
-                ></ha-input>
-              </div>
+              <ha-input-search
+                class="filter-search"
+                appearance="outlined"
+                .value=${this.searchQuery}
+                .placeholder=${localize('components.table.search.label', this.hass.language)}
+                style="--start-slot-width: calc(18px + var(--ha-space-1)); --input-padding-inline-start: var(--ha-space-1);"
+                @input=${(ev: Event) => (this.searchQuery = (ev.target as HTMLInputElement).value)}
+              ></ha-input-search>
+            `
+        : ''}
+        ${this.getSortableColumns().length
+        ? html`
+              <ha-dropdown placement="bottom-end">
+                <ha-assist-chip
+                  slot="trigger"
+                  class="sort-trigger"
+                  trailing-icon
+                  .label=${localize(
+                    'components.table.sort.label',
+                    this.hass.language,
+                    'name',
+                    this.getCurrentSortColumn()?.[1].title || ''
+                  )}
+                >
+                  <ha-svg-icon slot="trailing-icon" .path=${mdiMenuDown}></ha-svg-icon>
+                </ha-assist-chip>
+                <div class="sort-menu">
+                  ${this.getSortableColumns().map(
+                    ([key, column]) => html`
+                      <button
+                        class="sort-option ${this.sortConfig?.key === key ? 'active' : ''}"
+                        @click=${() => this.selectSortColumn(key)}
+                      >
+                        ${column.title || ''}
+                      </button>
+                    `
+                  )}
+                </div>
+              </ha-dropdown>
             `
         : ''}
       </div>
@@ -454,7 +501,7 @@ export class AlarmoTable extends LitElement {
     div.table .header {
       font-weight: 600;
       min-height: 48px;
-      background: var(--table-row-background-color, var(--card-background-color));
+      background: var(--data-table-background-color, var(--card-background-color));
     }
     div.table-row {
       display: flex;
@@ -463,7 +510,7 @@ export class AlarmoTable extends LitElement {
       border-top: 1px solid var(--divider-color);
       flex-direction: row;
       position: relative;
-      background: var(--table-row-background-color, var(--card-background-color));
+      background: var(--data-table-background-color, var(--card-background-color));
     }
     div.table-cell {
       align-self: center;
@@ -522,31 +569,18 @@ export class AlarmoTable extends LitElement {
       font-size: 0.875rem;
       font-weight: 600;
     }
-    div.table .header div.table-cell .header-content {
-      display: inline-flex;
+    div.table .header div.table-cell.sortable {
+      display: flex;
       align-items: center;
-      gap: 4px;
-    }
-    div.table .header span.sort-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 18px;
-      height: 18px;
-      border-radius: 4px;
+      justify-content: flex-start;
       cursor: pointer;
+      user-select: none;
+      overflow: hidden;
+      position: relative;
     }
-    div.table .header span.sort-btn.inactive {
-      opacity: 0.5;
-    }
-    div.table .header span.sort-btn.active {
-      opacity: 1;
-    }
-    div.table .header span.sort-btn:hover {
-      background-color: rgba(var(--rgb-primary-text-color), 0.12);
-    }
-    div.table .header span.sort-btn:active {
-      background-color: rgba(var(--rgb-primary-text-color), 0.2);
+    div.table .header div.table-cell.sortable:focus-visible {
+      outline: 2px solid var(--primary-color);
+      outline-offset: -2px;
     }
     div.table .header ha-svg-icon.sort-icon {
       --mdc-icon-size: 16px;
@@ -554,9 +588,24 @@ export class AlarmoTable extends LitElement {
       padding: 0;
       width: 16px;
       height: 16px;
+      position: absolute;
+      top: 50%;
+      left: -20px;
+      transform: translateY(-50%);
+      transition: left 0.2s ease;
     }
-    div.table .header ha-svg-icon.sort-icon.active {
-      color: var(--primary-color);
+    div.table .header div.table-cell.sortable span {
+      position: relative;
+      left: 0;
+      transition: left 0.2s ease;
+    }
+    div.table .header div.table-cell.sorted span,
+    div.table .header div.table-cell.not-sorted:hover span {
+      left: 24px;
+    }
+    div.table .header div.table-cell.sorted ha-svg-icon.sort-icon,
+    div.table .header div.table-cell.not-sorted:hover ha-svg-icon.sort-icon {
+      left: 12px;
     }
     div.table-row.selectable {
       cursor: pointer;
@@ -621,23 +670,24 @@ export class AlarmoTable extends LitElement {
       min-height: 52px;
       border-top: 1px solid var(--divider-color);
       box-sizing: border-box;
-      padding: 2px 8px;
+      padding: 12px 16px;
       flex: 1;
       position: relative;
       flex-direction: row;
       align-items: center;
       gap: 8px;
-      background: var(--table-row-background-color, var(--card-background-color));
+      background: var(--primary-background-color, var(--data-table-background-color, var(--card-background-color)));
     }
-    div.table-filter .filter-right {
-      margin-left: auto;
+    div.table-filter .filter-search {
+      flex: 1 1 auto;
+      min-width: 220px;
+      --mdc-text-field-fill-color: var(--sidebar-background-color);
+    }
+    div.table-filter .filter-actions {
       display: flex;
       align-items: center;
-    }
-    div.table-filter .filter-right ha-input {
-      min-width: 200px;
-      max-width: 360px;
-      width: 260px;
+      gap: 8px;
+      flex: 0 0 auto;
     }
     .filter-trigger {
       display: flex;
@@ -653,6 +703,10 @@ export class AlarmoTable extends LitElement {
     }
     .type-assist-chip {
       --ha-assist-chip-container-height: 40px;
+    }
+    .sort-trigger {
+      --ha-assist-chip-container-height: 40px;
+      flex: 0 0 auto;
     }
     .type-assist-chip ha-svg-icon {
       color: var(--primary-text-color);
@@ -673,6 +727,31 @@ export class AlarmoTable extends LitElement {
       text-align: center;
       font-weight: 500;
       pointer-events: none;
+    }
+    .sort-menu {
+      display: flex;
+      flex-direction: column;
+      min-width: 220px;
+      padding: 4px;
+      box-sizing: border-box;
+    }
+    .sort-option {
+      min-height: 40px;
+      border: 0;
+      border-radius: 8px;
+      padding: 0 16px;
+      background: transparent;
+      color: var(--primary-text-color);
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+    .sort-option.active {
+      color: var(--primary-color);
+      background: rgba(var(--rgb-primary-color), 0.12);
+    }
+    .sort-option:hover {
+      background: rgba(var(--rgb-primary-text-color), 0.08);
     }
     ha-dropdown .header {
       display: flex;

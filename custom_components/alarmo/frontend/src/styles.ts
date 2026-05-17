@@ -144,7 +144,7 @@ export const commonStyle = css`
     border: 1px solid var(--divider-color);
     border-radius: 12px;
     overflow: hidden;
-    background: var(--card-background-color);
+    background: var(--data-table-background-color, var(--card-background-color));
   }
 `;
 
