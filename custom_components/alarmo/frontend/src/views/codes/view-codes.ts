@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, css, CSSResultGroup } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 
 import { prettyPrint, handleError, sortAlphabetically, navigate } from '../../helpers';
@@ -121,13 +121,15 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
     return html`
       <section class="list-page">
         <div class="list-page-header">
-          <h1 class="list-page-title">${localize('panels.codes.cards.user_management.title', this.hass.language)}</h1>
-          <p class="list-page-description">${localize('panels.codes.cards.user_management.description', this.hass.language)}</p>
-          <div class="list-page-actions">
-            <ha-button appearance="filled" @click=${this.openCodeConfigDialog}>
+          <div class="header-row">
+            <h1 class="list-page-title">${localize('panels.codes.cards.user_management.title', this.hass.language)}</h1>
+            <ha-button appearance="plain" @click=${this.openCodeConfigDialog}>
               <ha-icon slot="start" icon="mdi:cog-outline"></ha-icon>
               ${localize('panels.codes.cards.user_management.actions.configure_codes', this.hass.language)}
             </ha-button>
+          </div>
+          <p class="list-page-description">${localize('panels.codes.cards.user_management.description', this.hass.language)}</p>
+          <div class="list-page-actions">
             <ha-button appearance="plain" @click=${this.addUserClick}>
               ${localize('panels.codes.cards.user_management.actions.new_user', this.hass.language)}
             </ha-button>
@@ -170,5 +172,17 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
       .then();
   }
 
-  static styles = commonStyle;
+  static get styles(): CSSResultGroup {
+    return [
+      commonStyle,
+      css`
+        .header-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+        }
+      `,
+    ];
+  }
 }
