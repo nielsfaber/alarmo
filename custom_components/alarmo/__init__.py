@@ -3,6 +3,7 @@
 import re
 import base64
 import logging
+import concurrent.futures
 
 import bcrypt
 from homeassistant.core import (
@@ -48,6 +49,8 @@ from .automations import AutomationHandler
 
 _LOGGER = logging.getLogger(__name__)
 
+# Max number of threads to start when checking user codes.
+MAX_WORKERS = 4
 # Number of rounds of hashing when computing user hashes.
 BCRYPT_NUM_ROUNDS = 10
 
@@ -369,11 +372,17 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                 return check_user_code(self.store.async_get_user(user_id), code)
 
             users = self.store.async_get_users()
-            for user in users.values():
-                result = check_user_code(user, code)
-                if result:
-                    return result
-            return None
+            with concurrent.futures.ThreadPoolExecutor(
+                max_workers=MAX_WORKERS
+            ) as executor:
+                futures = [
+                    executor.submit(check_user_code, user, code)
+                    for user in users.values()
+                ]
+                for future in concurrent.futures.as_completed(futures):
+                    if future.result():
+                        executor.shutdown(wait=False, cancel_futures=True)
+                        return future.result()
 
         return await self.hass.async_add_executor_job(_authenticate_user_sync)
 
