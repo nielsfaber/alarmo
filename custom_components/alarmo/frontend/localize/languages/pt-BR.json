@@ -62,11 +62,11 @@
           "title": "Modos",
           "description": "Este painel pode ser usado para configurar os modos de armamento do alarme.",
           "modes": {
-            "armed_away": "Armado ausente será usado quando todas as pessoas saírem de casa. Todas as portas e janelas que permitem acesso à casa serão monitorizadas, assim como os sensores de movimento dentro da casa.",
-            "armed_home": "Armado em casa (também conhecido como estadia armada) será usado ao ativar o alarme enquanto há pessoas em casa. Todas as portas e janelas que permitem acesso à casa serão monitorizadas, mas não os sensores de movimento dentro da casa.",
-            "armed_night": "Armado noturno será usado ao configurar o alarme antes de dormir. Todas as portas e janelas que permitem acesso à casa serão monitorizadas, além de sensores de movimento selecionados dentro da casa.",
+            "armed_away": "Armado ausente será usado quando todas as pessoas saírem de casa. Todas as portas e janelas que permitem acesso à casa serão monitoradas, assim como os sensores de movimento dentro da casa.",
+            "armed_home": "Armado em casa (também conhecido como estadia armada) será usado ao ativar o alarme enquanto há pessoas em casa. Todas as portas e janelas que permitem acesso à casa serão monitoradas, mas não os sensores de movimento dentro da casa.",
+            "armed_night": "Armado noturno será usado ao configurar o alarme antes de dormir. Todas as portas e janelas que permitem acesso à casa serão monitoradas, além de sensores de movimento selecionados dentro da casa.",
             "armed_vacation": "Armado férias pode ser usado como extensão do modo armado ausente em caso de ausência prolongada. Os tempos de atraso e as respostas ao disparo podem ser adaptados conforme desejado.",
-            "armed_custom_bypass": "Um modo extra para definir o seu próprio perímetro de segurança."
+            "armed_custom_bypass": "Um modo extra para definir seu próprio perímetro de segurança."
           },
           "number_sensors_active": "{number} {number, plural,\n  one {sensor}\n  other {sensores}\n} ativo",
           "fields": {
@@ -102,7 +102,7 @@
             },
             "command_topic": {
               "heading": "Tópico de comando",
-              "description": "Tópico que o Alarmo monitoriza para comandos de armar/desarmar."
+              "description": "Tópico que o Alarmo monitora para comandos de armar/desarmar."
             },
             "require_code": {
               "heading": "Exigir código",
@@ -146,14 +146,14 @@
         },
         "remove_area": {
           "title": "Remover área?",
-          "description": "Tem a certeza que pretende remover esta área? Esta área contém {sensors} sensores e {automations} automações, que também serão removidos."
+          "description": "Tem certeza que deseja remover esta área? Esta área contém {sensors} sensores e {automations} automações, que também serão removidos."
         },
         "edit_master": {
           "title": "Configuração mestre"
         },
         "disable_master": {
           "title": "Desativar mestre?",
-          "description": "Tem a certeza que pretende remover o alarme mestre? Esta área contém {automations} automações, que serão removidas com esta ação."
+          "description": "Tem certeza que deseja remover o alarme mestre? Esta área contém {automations} automações, que serão removidas com esta ação."
         }
       }
     },
@@ -161,7 +161,7 @@
       "title": "Sensores",
       "cards": {
         "sensors": {
-          "description": "Sensores configurados atualmente. Clique num item para fazer alterações.",
+          "description": "Sensores configurados atualmente. Clique em um item para fazer alterações.",
           "table": {
             "no_items": "Não há sensores para exibir aqui.",
             "no_area_warning": "O sensor não está atribuído a nenhuma área.",
@@ -171,7 +171,7 @@
         },
         "add_sensors": {
           "title": "Adicionar sensores",
-          "description": "Adicione mais sensores. Certifique-se de que os seus sensores tenham um nome adequado para que possa identificá-los.",
+          "description": "Adicione mais sensores. Certifique-se de que seus sensores tenham um nome adequado para que você possa identificá-los.",
           "no_items": "Não há entidades do HA disponíveis para configurar no alarme. Certifique-se de incluir entidades do tipo binary_sensor.",
           "table": {
             "type": "Tipo detectado"
@@ -219,7 +219,7 @@
                 },
                 "environmental": {
                   "name": "Ambiental",
-                  "description": "Sensor de fumo/gás, detector de fuga, etc. (não relacionado à proteção contra invasão)."
+                  "description": "Sensor de fumaça/gás, detector de vazamento, etc. (não relacionado à proteção contra invasão)."
                 },
                 "other": {
                   "name": "Genérico"
@@ -283,8 +283,8 @@
       },
       "dialogs": {
         "manage_groups": {
-          "title": "Gerir grupos de sensores",
-          "description": "Num grupo de sensores, múltiplos sensores devem ser ativados dentro de um período de tempo antes que o alarme seja disparado.",
+          "title": "Gerenciar grupos de sensores",
+          "description": "Em um grupo de sensores, múltiplos sensores devem ser ativados dentro de um período de tempo antes que o alarme seja disparado.",
           "no_items": "Nenhum grupo ainda",
           "actions": {
             "new_group": "Novo grupo"
@@ -347,24 +347,24 @@
           }
         },
         "user_management": {
-          "title": "Gestão de utilizadores",
-          "description": "Cada utilizador tem o seu próprio código para armar/desarmar o alarme.",
-          "no_items": "Não há utilizadores ainda",
+          "title": "Gerenciamento de usuários",
+          "description": "Cada usuário tem seu próprio código para armar/desarmar o alarme.",
+          "no_items": "Não há usuários ainda",
           "actions": {
-            "new_user": "Novo utilizador"
+            "new_user": "Novo usuário"
           }
         },
         "new_user": {
-          "title": "Criar novo utilizador",
-          "description": "Utilizadores podem ser criados para fornecer acesso à operação do alarme.",
+          "title": "Criar novo usuário",
+          "description": "Usuários podem ser criados para fornecer acesso à operação do alarme.",
           "fields": {
             "name": {
               "heading": "Nome",
-              "description": "Nome do utilizador."
+              "description": "Nome do usuário."
             },
             "code": {
               "heading": "Código",
-              "description": "Código para este utilizador."
+              "description": "Código para este usuário."
             },
             "confirm_code": {
               "heading": "Confirmar código",
@@ -384,7 +384,7 @@
             },
             "area_limit": {
               "heading": "Áreas restritas",
-              "description": "Limitar o utilizador a controlar apenas as áreas selecionadas."
+              "description": "Limitar o usuário a controlar apenas as áreas selecionadas."
             }
           },
           "errors": {
@@ -394,8 +394,8 @@
           }
         },
         "edit_user": {
-          "title": "Editar utilizador",
-          "description": "Alterar configurações do utilizador ''{name}''.",
+          "title": "Editar usuário",
+          "description": "Alterar configurações do usuário ''{name}''.",
           "fields": {
             "old_code": {
               "heading": "Código atual",
@@ -410,7 +410,7 @@
       "cards": {
         "notifications": {
           "title": "Notificações",
-          "description": "Neste painel pode gerir notificações a serem enviadas quando um determinado evento de alarme ocorrer.",
+          "description": "Neste painel você pode gerenciar notificações a serem enviadas quando um determinado evento de alarme ocorrer.",
           "table": {
             "no_items": "Não há notificações criadas ainda.",
             "no_area_warning": "A ação não está atribuída a nenhuma área."
@@ -480,7 +480,7 @@
             "message": {
               "heading": "Mensagem",
               "description": "Conteúdo da mensagem de notificação.",
-              "insert_wildcard": "Inserir marcador",
+              "insert_wildcard": "Inserir curinga",
               "placeholders": {
                 "armed": "O alarme está configurado para {{arm_mode}}",
                 "disarmed": "O alarme está DESLIGADO",
@@ -492,7 +492,7 @@
               }
             },
             "open_sensors_format": {
-              "heading": "Formato para o marcador open_sensors",
+              "heading": "Formato para o curinga open_sensors",
               "description": "Escolha quais informações do sensor são inseridas na mensagem.",
               "options": {
                 "default": "Nomes e estados",
@@ -500,7 +500,7 @@
               }
             },
             "arm_mode_format": {
-              "heading": "Tradução para o marcador arm_mode",
+              "heading": "Tradução para o curinga arm_mode",
               "description": "Escolha em qual idioma o modo de armamento é inserido na mensagem."
             },
             "target": {
@@ -525,7 +525,7 @@
               }
             },
             "delete": {
-              "heading": "Eliminar automação",
+              "heading": "Excluir automação",
               "description": "Remover permanentemente esta automação."
             }
           },
