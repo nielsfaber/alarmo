@@ -381,10 +381,10 @@ class AlarmoStorage:
                 for area in data["areas"]:
                     modes = {
                         mode: ModeEntry(
-                            enabled=config["enabled"],
-                            exit_time=config["exit_time"],
-                            entry_time=config["entry_time"],
-                            trigger_time=config["trigger_time"],
+                            enabled=config.get("enabled", False),
+                            exit_time=config.get("exit_time", None),
+                            entry_time=config.get("entry_time", None),
+                            trigger_time=config.get("trigger_time", None),
                         )
                         for (mode, config) in area["modes"].items()
                     }
