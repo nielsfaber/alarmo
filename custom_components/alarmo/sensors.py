@@ -377,15 +377,28 @@ class SensorHandler:
         new_state = parse_sensor_state(event.data["new_state"])
         sensor_config = self._config[entity]
         if old_state == STATE_UNKNOWN:
-            # sensor is unknown at startup,
-            #   state which comes after is considered as initial state
-            _LOGGER.debug(
-                "Initial state for %s is %s",
-                entity,
-                new_state,
-            )
-            self.update_ready_to_arm_status(sensor_config["area"])
-            return
+            if new_state not in (STATE_OPEN, STATE_UNAVAILABLE) or (
+                sensor_config[ATTR_ALLOW_OPEN] and new_state == STATE_OPEN
+            ):
+                # transition to a safe state, or to open while the sensor is
+                #   allowed to be open — treat as initial state
+                _LOGGER.debug(
+                    "Initial state for %s is %s",
+                    entity,
+                    new_state,
+                )
+                self.update_ready_to_arm_status(sensor_config["area"])
+                return
+            else:
+                # transition to a violation state — do not treat as initial,
+                #   proceed through normal trigger evaluation
+                _LOGGER.debug(
+                    "Sensor %s recovered from unknown to %s while alarm is %s, "
+                    "evaluating as live state change",
+                    entity,
+                    new_state,
+                    self.hass.data[const.DOMAIN]["areas"][sensor_config["area"]].state,
+                )
         if old_state == new_state:
             # not a state change - ignore
             return
