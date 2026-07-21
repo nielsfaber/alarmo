@@ -7,6 +7,7 @@ from typing import Any
 
 import pytest
 from homeassistant.const import ATTR_SERVICE, CONF_SERVICE_DATA
+from homeassistant.helpers.dispatcher import async_dispatcher_send
 from pytest_homeassistant_custom_component.common import async_mock_service
 
 from custom_components.alarmo import const
@@ -233,3 +234,138 @@ async def test_process_service_data_handles_lists_and_depth(
     assert shallow["message"] == "hello"
     assert shallow["nested"]["inner"] == "world"
     assert shallow["items"][0] == "one"
+
+
+@pytest.mark.asyncio
+async def test_notification_fires_once_per_event_with_master(
+    hass: Any, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Area dispatches skipped when master + global trigger exists."""
+    master_entity = SimpleNamespace(
+        entity_id="alarm_control_panel.master", _arm_mode="armed_away"
+    )
+    area_1_entity = SimpleNamespace(
+        entity_id="alarm_control_panel.area_1", _arm_mode="armed_away"
+    )
+
+    automations = {
+        "notify_1": {
+            "automation_id": "notify_1",
+            const.ATTR_TYPE: const.ATTR_NOTIFICATION,
+            "name": "Global Notification",
+            const.ATTR_TRIGGERS: [
+                {
+                    const.ATTR_AREA: None,
+                    const.ATTR_EVENT: "armed",
+                    const.ATTR_MODES: ["armed_away"],
+                }
+            ],
+            const.ATTR_ACTIONS: [],
+            const.ATTR_ENABLED: True,
+        }
+    }
+
+    store = _DummyStore(automations=automations)
+    hass.data[const.DOMAIN] = {
+        "coordinator": _DummyCoordinator(store),
+        "areas": {"area_1": area_1_entity},
+        "master": master_entity,
+    }
+
+    handler = AutomationHandler(hass)
+
+    calls: list[tuple[str, Any]] = []
+
+    async def _mock_execute(auto_id: str, entity: Any) -> None:
+        calls.append((auto_id, entity))
+
+    monkeypatch.setattr(handler, "async_execute_automation", _mock_execute)
+
+    async_dispatcher_send(
+        hass, "alarmo_state_updated", "area_1", "disarmed", "armed_away"
+    )
+    await hass.async_block_till_done()
+    assert len(calls) == 0, f"Expected 0 for area dispatch, got {len(calls)}"
+
+    async_dispatcher_send(
+        hass, "alarmo_state_updated", None, "disarmed", "armed_away"
+    )
+    await hass.async_block_till_done()
+    assert len(calls) == 1, f"Expected 1 for master dispatch, got {len(calls)}"
+    assert calls[0][0] == "notify_1"
+    assert calls[0][1] is master_entity
+
+
+@pytest.mark.asyncio
+async def test_notification_fires_per_area_without_master(
+    hass: Any, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Without a master entity, area-level dispatches execute normally per area."""
+    area_1_entity = SimpleNamespace(
+        entity_id="alarm_control_panel.area_1", _arm_mode="armed_away"
+    )
+    area_2_entity = SimpleNamespace(
+        entity_id="alarm_control_panel.area_2", _arm_mode="armed_away"
+    )
+
+    automations = {
+        "notify_1": {
+            "automation_id": "notify_1",
+            const.ATTR_TYPE: const.ATTR_NOTIFICATION,
+            "name": "Area 1 Notification",
+            const.ATTR_TRIGGERS: [
+                {
+                    const.ATTR_AREA: "area_1",
+                    const.ATTR_EVENT: "armed",
+                    const.ATTR_MODES: ["armed_away"],
+                }
+            ],
+            const.ATTR_ACTIONS: [],
+            const.ATTR_ENABLED: True,
+        },
+        "notify_2": {
+            "automation_id": "notify_2",
+            const.ATTR_TYPE: const.ATTR_NOTIFICATION,
+            "name": "Area 2 Notification",
+            const.ATTR_TRIGGERS: [
+                {
+                    const.ATTR_AREA: "area_2",
+                    const.ATTR_EVENT: "armed",
+                    const.ATTR_MODES: ["armed_away"],
+                }
+            ],
+            const.ATTR_ACTIONS: [],
+            const.ATTR_ENABLED: True,
+        },
+    }
+
+    store = _DummyStore(automations=automations)
+    hass.data[const.DOMAIN] = {
+        "coordinator": _DummyCoordinator(store),
+        "areas": {"area_1": area_1_entity, "area_2": area_2_entity},
+        "master": None,
+    }
+
+    handler = AutomationHandler(hass)
+
+    calls: list[str] = []
+
+    async def _mock_execute(auto_id: str, entity: Any) -> None:
+        calls.append(auto_id)
+
+    monkeypatch.setattr(handler, "async_execute_automation", _mock_execute)
+
+    async_dispatcher_send(
+        hass, "alarmo_state_updated", "area_1", "disarmed", "armed_away"
+    )
+    await hass.async_block_till_done()
+    assert "notify_1" in calls
+    assert "notify_2" not in calls
+
+    calls.clear()
+
+    async_dispatcher_send(
+        hass, "alarmo_state_updated", "area_2", "disarmed", "armed_away"
+    )
+    await hass.async_block_till_done()
+    assert "notify_2" in calls
