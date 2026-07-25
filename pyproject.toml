@@ -34,6 +34,7 @@ line-ending = "auto"
 ignore = [
     "D105",    #missing-docstring-in-init
     "PLR2004", #Magic Values
+    "PLR0917", #too-many-positional-arguments
     "D203",    #no-blank-line-before-class
     "D212",    #multi-line-summary-first-line
 ]
