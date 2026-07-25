@@ -430,6 +430,11 @@ class AlarmoCoordinator(DataUpdateCoordinator):
                 )
                 return
 
+            if action == const.EVENT_ACTION_DISARM:
+                _LOGGER.info("Received request for disarming")
+                await alarm_entity.async_alarm_disarm(None, skip_code=True)
+                return
+
             arm_mode = (
                 alarm_entity._revert_state
                 if alarm_entity._revert_state in const.ARM_MODES
@@ -452,9 +457,6 @@ class AlarmoCoordinator(DataUpdateCoordinator):
             elif action == const.EVENT_ACTION_RETRY_ARM:
                 _LOGGER.info("Received request for retry arming")
                 await alarm_entity.async_handle_arm_request(arm_mode, skip_code=True)
-            elif action == const.EVENT_ACTION_DISARM:
-                _LOGGER.info("Received request for disarming")
-                await alarm_entity.async_alarm_disarm(None, skip_code=True)
             else:
                 _LOGGER.info(
                     "Received request for arming with mode %s",

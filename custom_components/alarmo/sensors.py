@@ -740,6 +740,13 @@ class SensorHandler:
                 # Skip unknown sensors - they'll be handled when they become known
                 continue
 
+            if sensor_config[ATTR_ALLOW_OPEN] and sensor_state == STATE_OPEN:
+                _LOGGER.debug(
+                    "Sensor %s is open with allow_open, skipping startup eval",
+                    entity_id,
+                )
+                continue
+
             # Check if sensor state is allowed in current alarm state
             res = sensor_state_allowed(sensor_state, sensor_config, alarm_entity.state)
 
