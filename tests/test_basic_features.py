@@ -490,3 +490,102 @@ async def test_sensor_trigger_unavailable(hass: Any, enable_custom_integrations:
         await advance_time(hass, 1)  # Time for state to propagate
         assert_alarm_state(hass, ALARM_ENTITY, "triggered")
         await cleanup_timers(hass)
+
+
+@pytest.mark.asyncio
+async def test_push_disarm_after_environmental_trigger(
+    hass: Any, enable_custom_integrations: Any
+):
+    """Test ALARMO_DISARM push event works after environmental sensor trigger.
+
+    When an always_on sensor triggers the alarm while disarmed, arm_mode is
+    None. The push handler must handle DISARM before validating arm_mode.
+    """
+    sensor = get_generic_sensor()
+    area = AreaFactory.create_area(
+        area_id="area_1", modes=["armed_away"], armed_away_enabled=True
+    )
+    sensor_config = SensorFactory.create_door_sensor(
+        entity_id=sensor, always_on=True, use_exit_delay=False, use_entry_delay=False
+    )
+    storage, entry = setup_alarmo_entry(
+        hass,
+        areas=[area],
+        sensors=[sensor_config],
+        entry_id="test_push_disarm_env_trigger",
+    )
+    with patch_alarmo_integration_dependencies(storage):
+        await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+        hass.states.async_set(ALARM_ENTITY, "disarmed")
+        hass.states.async_set(sensor, "off")
+        await hass.async_block_till_done()
+
+        # Trigger with always_on sensor while disarmed
+        hass.states.async_set(sensor, "on")
+        await hass.async_block_till_done()
+        await advance_time(hass, 1)
+        assert_alarm_state(hass, ALARM_ENTITY, "triggered")
+
+        # Send ALARMO_DISARM push event
+        hass.bus.async_fire(
+            "mobile_app_notification_action",
+            {"action": "ALARMO_DISARM"},
+        )
+        await hass.async_block_till_done()
+        await advance_time(hass, 1)
+        assert_alarm_state(hass, ALARM_ENTITY, "disarmed")
+
+        await cleanup_timers(hass)
+
+
+@pytest.mark.asyncio
+async def test_push_arm_away_after_disarm_via_push(
+    hass: Any, enable_custom_integrations: Any
+):
+    """Test ALARMO_ARM_AWAY push event works after disarm via push."""
+    sensor = get_generic_sensor()
+    armed_away_exit_time = 0
+    area = AreaFactory.create_area(
+        area_id="area_1",
+        modes=["armed_away"],
+        armed_away_exit_time=armed_away_exit_time,
+        armed_away_enabled=True,
+    )
+    sensor_config = SensorFactory.create_door_sensor(
+        entity_id=sensor, use_exit_delay=False, use_entry_delay=False
+    )
+    storage, entry = setup_alarmo_entry(
+        hass,
+        areas=[area],
+        sensors=[sensor_config],
+        entry_id="test_push_arm_after_disarm",
+    )
+    with patch_alarmo_integration_dependencies(storage):
+        await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+        hass.states.async_set(ALARM_ENTITY, "disarmed")
+        hass.states.async_set(sensor, "off")
+        await hass.async_block_till_done()
+
+        # Arm via service call
+        await hass.services.async_call(
+            "alarmo",
+            "arm",
+            {"entity_id": ALARM_ENTITY, "code": "1234"},
+            blocking=True,
+        )
+        await hass.async_block_till_done()
+        await advance_time(hass, armed_away_exit_time + 1)
+        assert_alarm_state(hass, ALARM_ENTITY, "armed_away")
+
+        # Send ALARMO_ARM_AWAY push event
+        hass.bus.async_fire(
+            "mobile_app_notification_action",
+            {"action": "ALARMO_ARM_AWAY"},
+        )
+        await hass.async_block_till_done()
+        await advance_time(hass, 1)
+        assert_alarm_state(hass, ALARM_ENTITY, "armed_away")
+
+        await cleanup_timers(hass)
