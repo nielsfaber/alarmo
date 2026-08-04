@@ -323,9 +323,10 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
     async def _validate_code(self, code, to_state):  # noqa PLR0911
         """Validate code and user permissions for a requested state change.
 
-        Returns a (success, info) tuple. 
+        Returns a (success, info) tuple.
         When validation is successful, success is True, otherwise False.
-        When success is True, info is the user data (or None if no user/code was needed).
+        When success is True, info is the user data
+            (or None if no user/code was needed).
         When success is False, info is the error event.
         """
         # check bypass rules

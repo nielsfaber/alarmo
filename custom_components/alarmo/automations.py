@@ -44,6 +44,8 @@ def validate_area(trigger, area_id, hass):
         return False
     elif trigger[const.ATTR_AREA]:
         return trigger[const.ATTR_AREA] == area_id
+    elif area_id and hass.data[const.DOMAIN].get("master"):
+        return False
     elif len(hass.data[const.DOMAIN]["areas"]) == 1:
         return True
     else:
