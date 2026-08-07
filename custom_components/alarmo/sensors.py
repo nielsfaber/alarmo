@@ -130,7 +130,11 @@ class SensorHandler:
 
     def __init__(self, hass: HomeAssistant):
         """Initialize the sensor handler."""
-        self._config = None
+        # The sensor config is only loaded once HA has finished starting (see
+        # _setup_sensor_listeners below). Until then this must be an empty dict
+        # rather than None: restoring a persisted alarm state can call into
+        # active_sensors_for_alarm_state() before that point.
+        self._config = {}
         self.hass = hass
         self._state_listener = None
         self._subscriptions = []
@@ -144,9 +148,10 @@ class SensorHandler:
         @callback
         def async_update_sensor_config():
             """Sensor config updated, reload the configuration."""
-            self._config = self.hass.data[const.DOMAIN][
-                "coordinator"
-            ].store.async_get_sensors()
+            self._config = (
+                self.hass.data[const.DOMAIN]["coordinator"].store.async_get_sensors()
+                or {}
+            )
             self._groups = self.hass.data[const.DOMAIN][
                 "coordinator"
             ].store.async_get_sensor_groups()
