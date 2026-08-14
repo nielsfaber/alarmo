@@ -353,7 +353,7 @@ Clicking the 'setup groups' button while editing a sensor brings you to an overv
 ### Codes and users
 
 By default, the alarm has no code and can be locked and unlocked by anyone who has access to HA.
-It is recommended to set a code for _disarming_ the alarm as minumum security level.
+It is recommended to set a code for _disarming_ the alarm as minimum security level.
 
 To do so, go to the _codes_ tab, and enable the setting 'use disarm code'.
 
