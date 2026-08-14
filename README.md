@@ -833,6 +833,9 @@ It is also possible to arm/disarm the alarm as a step in a routine (e.g. the *'G
 * In case you have a pin set up, the Google Assistant will ask you to speak the pin. In some devices, like the Nest Hub, it is also possible to enter the pin via the keypad on the screen.
 * The Google Translate [text-to-speech service](https://www.home-assistant.io/integrations/google_translate/) can be very useful to provide additional feedback (e.g. when arming fails) for the members of your home. You can set up a notification action via Alarmo.
 
+### Ring Keypad V2
+A blueprint for Alarmo used with the Ring Keypad V2 can be found [here](https://github.com/Ryckie/Ring-Keypad-V2-Advanced-Blueprint).
+
 ## Making Contributions
 Want to contribute? See the [Development](./DEVELOPMENT.md) documentation for setup instructions.
 
