@@ -612,13 +612,16 @@ Example of the notification editor:
 The alarmo notifications editor contains some wildcards which can be used to provide adaptive info to your push message.
 By adding the wildcard in a message (including the brackets) it will be automatically be replaced by the applicable text.
 
-| Wildcard               | Description                                                    | Example Text       | Suitable events                       |
-| ---------------------- | -------------------------------------------------------------- | ------------------ | ------------------------------------- |
-| `{{open_sensors}}`     | List of sensors (with their states) which are currently active | *Backdoor is open* | Failed to arm<br> Triggered<br> Entry |
-| `{{bypassed_sensors}}` | List of sensors which are bypassed                             | *Bedroom window*   | Armed                                 |
-| `{{arm_mode}}`         | Current arming mode.                                           | *Armed Away*       | Leave<br> Armed                       |
-| `{{changed_by}}`       | User who's code has been entered.                              | *Niels*            | Armed<br> Disarmed                    |
-| `{{delay}}`            | Delay in seconds until armed or the alarm is triggered         | *30*               | Arming<br> Pending                    |
+| Wildcard                    | Description                                                        | Example Text                              | Suitable events                       |
+| --------------------------- | ------------------------------------------------------------------ | ----------------------------------------- | ------------------------------------- |
+| `{{open_sensors}}`          | List of sensors (with their states) which are currently active     | *Backdoor is open*                        | Failed to arm<br> Triggered<br> Entry |
+| `{{open_sensors_with_area}}`| List of sensors (with their states and Home Assistant area) active | *Left window is open in bathroom* | Failed to arm<br> Triggered<br> Entry |
+| `{{bypassed_sensors}}`      | List of sensors which are bypassed                                 | *Bedroom window*                          | Armed                                 |
+| `{{arm_mode}}`              | Current arming mode.                                               | *Armed Away*                              | Leave<br> Armed                       |
+| `{{changed_by}}`            | User who's code has been entered.                                  | *Niels*                                   | Armed<br> Disarmed                    |
+| `{{delay}}`                 | Delay in seconds until armed or the alarm is triggered             | *30*                                      | Arming<br> Pending                    |
+
+The `{{open_sensors}}`, `{{open_sensors_with_area}}` and `{{arm_mode}}` wildcards accept an optional `|lang=<code>` modifier to insert the text in the language of your choice (e.g. `{{open_sensors_with_area|lang=de}}`).
 
 ##### Actionable notifications
 This function adds buttons to a push message, that can be clicked to interact with Alarmo.
