@@ -75,3 +75,20 @@ disable_user:
       required: true
       selector:
         text:
+clear_bypassed_sensors:
+  fields:
+    entity_id:
+      example: "alarm_control_panel.alarmo"
+      required: true
+      selector:
+        entity:
+          integration: alarmo
+          domain: alarm_control_panel
+    sensors:
+      example:
+        - "binary_sensor.front_door"
+        - "binary_sensor.garage_door"
+      required: false
+      selector:
+        entity:
+          multiple: true
