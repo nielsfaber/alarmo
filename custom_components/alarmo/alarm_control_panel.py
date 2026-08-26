@@ -138,6 +138,11 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
         const.SERVICE_SKIP_DELAY_SCHEMA,
         "async_service_skip_delay_handler",
     )
+    platform.async_register_entity_service(
+        const.SERVICE_CLEAR_BYPASSED_SENSORS,
+        const.SERVICE_CLEAR_BYPASSED_SENSORS_SCHEMA,
+        "async_service_clear_bypassed_sensors",
+    )
 
 
 async def async_unload_entry(hass, config_entry):
@@ -414,6 +419,34 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
         _LOGGER.debug("Service alarmo.disarm was called")
 
         await self.async_alarm_disarm(code=code, context_id=context_id)
+
+    async def async_service_clear_bypassed_sensors(self, sensors):
+        """Clear bypassed sensors."""
+        _LOGGER.debug(
+            "Service alarmo.clear_bypassed_sensors was called with sensors: %s",
+            sensors,
+        )
+
+        if sensors:
+            if not self._bypassed_sensors:
+                return
+
+            remaining = [
+                sensor
+                for sensor in self._bypassed_sensors
+                if sensor not in sensors
+            ]
+
+            # Nothing changed
+            if remaining == self._bypassed_sensors:
+                return
+
+            self.bypassed_sensors = remaining
+        else:
+            # No sensors specified -> clear all
+            self.bypassed_sensors = None
+
+        self.schedule_update_ha_state()
 
     async def async_alarm_disarm(self, code, **kwargs):
         """Send disarm command."""
