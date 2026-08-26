@@ -69,6 +69,20 @@
           "description": "Name of the user to disable."
         }
       }
+    },
+    "clear_bypassed_sensors": {
+      "name": "Clear Bypassed Sensors",
+      "description": "Remove selected sensors from Alarmo's bypass list.",
+      "fields": {
+        "entity_id": {
+          "name": "Alarm",
+          "description": "Alarmo alarm entity."
+        },
+        "sensors": {
+          "name": "Sensors",
+          "description": "Sensors to remove from the bypass list. Leave empty to clear all bypassed sensors."
+        }
+      }
     }
   },
   "selector": {
