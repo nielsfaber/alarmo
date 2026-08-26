@@ -4,6 +4,6 @@
     "disarm": "mdi:shield-off",
     "enable_user": "mdi:account-lock-open",
     "disable_user": "mdi:account-lock-closed",
-    "clear_bypassed_sensors": "mdi:shield-refresh
+    "clear_bypassed_sensors": "mdi:shield-refresh"
   }
 }
