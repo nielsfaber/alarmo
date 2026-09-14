@@ -10,6 +10,7 @@ from homeassistant.core import (
 from homeassistant.util import slugify
 from homeassistant.components import mqtt
 from homeassistant.helpers.json import JSONEncoder
+from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.components.mqtt import (
     DOMAIN as ATTR_MQTT,
 )
@@ -23,9 +24,13 @@ from . import const
 from .helpers import (
     friendly_name_for_entity_id,
 )
+from .sensors import parse_sensor_state
 
 _LOGGER = logging.getLogger(__name__)
 CONF_EVENT_TOPIC = "event_topic"
+COMMAND_GET_SENSOR_STATES = "get_sensor_states"
+EVENT_SENSOR_STATE_CHANGED = "SENSOR_STATE_CHANGED"
+EVENT_SENSOR_STATES = "SENSOR_STATES"
 
 
 class MqttHandler:
@@ -37,6 +42,7 @@ class MqttHandler:
         self._config = None
         self._subscribed_topics = []
         self._subscriptions = []
+        self._sensor_state_subscription = None
 
         @callback
         def async_update_config(_args=None):
@@ -51,6 +57,7 @@ class MqttHandler:
                 return
 
             self._config = new_config
+            self._async_watch_sensor_states()
 
             if (
                 not old_config
@@ -66,6 +73,12 @@ class MqttHandler:
             async_dispatcher_connect(hass, "alarmo_config_updated", async_update_config)
         )
         async_update_config()
+
+        self._subscriptions.append(
+            async_dispatcher_connect(
+                hass, "alarmo_sensors_updated", self._async_watch_sensor_states
+            )
+        )
 
         @callback
         def async_alarm_state_changed(area_id: str, old_state: str, new_state: str):
@@ -110,17 +123,9 @@ class MqttHandler:
             if not self._config[ATTR_MQTT][const.ATTR_ENABLED]:
                 return
 
-            topic = self._config[ATTR_MQTT][CONF_EVENT_TOPIC]
-
-            if not topic:  # do not publish if no topic is provided
+            topic = self._event_topic(area_id)
+            if not topic:
                 return
-
-            if area_id and len(self.hass.data[const.DOMAIN]["areas"]) > 1:
-                # handle the sending of a state update for a specific area
-                area = self.hass.data[const.DOMAIN]["areas"][area_id]
-                topic = topic.rsplit("/", 1)
-                topic.insert(1, slugify(area.name))
-                topic = "/".join(topic)
 
             if event == const.EVENT_ARM:
                 payload = {
@@ -173,10 +178,133 @@ class MqttHandler:
 
     def __del__(self):
         """Prepare for removal."""
+        if self._sensor_state_subscription:
+            self._sensor_state_subscription()
+            self._sensor_state_subscription = None
         while len(self._subscribed_topics):
             self._subscribed_topics.pop()()
         while len(self._subscriptions):
             self._subscriptions.pop()()
+
+    def _event_topic(self, area_id: str | None = None) -> str | None:
+        """Return the event topic for the master or an area."""
+        topic = self._config[ATTR_MQTT][CONF_EVENT_TOPIC]
+        if not topic:
+            return None
+
+        areas = self.hass.data[const.DOMAIN]["areas"]
+        if area_id and len(areas) > 1:
+            area = areas.get(area_id)
+            if not area:
+                return None
+            topic_parts = topic.rsplit("/", 1)
+            topic_parts.insert(1, slugify(area.name))
+            topic = "/".join(topic_parts)
+        return topic
+
+    def _configured_sensors(self, area_id: str | None = None) -> dict:
+        """Return enabled configured sensors, optionally limited to an area."""
+        sensors = self.hass.data[const.DOMAIN]["coordinator"].store.async_get_sensors()
+        return {
+            entity_id: config
+            for entity_id, config in sensors.items()
+            if config[const.ATTR_ENABLED]
+            and (area_id is None or config[const.ATTR_AREA] == area_id)
+        }
+
+    @callback
+    def _async_watch_sensor_states(self):
+        """Watch all enabled sensors configured in Alarmo."""
+        if self._sensor_state_subscription:
+            self._sensor_state_subscription()
+            self._sensor_state_subscription = None
+
+        if not self._config[ATTR_MQTT][const.ATTR_ENABLED]:
+            return
+
+        sensors = self._configured_sensors()
+        if sensors:
+            self._sensor_state_subscription = async_track_state_change_event(
+                self.hass, list(sensors), self._async_sensor_state_changed
+            )
+
+    @callback
+    def _async_sensor_state_changed(self, event):
+        """Publish a normalized state change for a configured sensor."""
+        if not self._config[ATTR_MQTT][const.ATTR_ENABLED]:
+            return
+
+        entity_id = event.data["entity_id"]
+        sensors = self._configured_sensors()
+        if entity_id not in sensors:
+            return
+
+        previous_state = parse_sensor_state(event.data["old_state"])
+        state = parse_sensor_state(event.data["new_state"])
+        if previous_state == state:
+            return
+
+        topic = self._event_topic(sensors[entity_id][const.ATTR_AREA])
+        if not topic:
+            return
+
+        payload = {
+            "event": EVENT_SENSOR_STATE_CHANGED,
+            "sensor": {
+                "entity_id": entity_id,
+                "name": friendly_name_for_entity_id(entity_id, self.hass),
+                "previous_state": previous_state,
+                "state": state,
+            },
+        }
+        self.hass.async_create_task(
+            mqtt.async_publish(self.hass, topic, json.dumps(payload, cls=JSONEncoder))
+        )
+
+    def _area_id_from_slug(self, area: str) -> str | None:
+        """Resolve an MQTT area slug to its Alarmo area ID."""
+        for area_id, entity in self.hass.data[const.DOMAIN]["areas"].items():
+            if slugify(entity.name) == area:
+                return area_id
+        return None
+
+    async def _async_publish_sensor_states(
+        self, area: str | None, request_id=None
+    ) -> None:
+        """Publish a snapshot of configured sensor states."""
+        areas = self.hass.data[const.DOMAIN]["areas"]
+        area_id = None
+        if area:
+            area_id = self._area_id_from_slug(area)
+            if area_id is None:
+                _LOGGER.warning("Area %s does not exist", area)
+                return
+        elif len(areas) == 1:
+            area_id = next(iter(areas))
+        elif not self._config[const.ATTR_MASTER][const.ATTR_ENABLED]:
+            _LOGGER.warning("No area specified")
+            return
+
+        topic = self._event_topic(area_id)
+        if not topic:
+            return
+
+        sensors = self._configured_sensors(area_id)
+        payload = {
+            "event": EVENT_SENSOR_STATES,
+            "sensors": [
+                {
+                    "entity_id": entity_id,
+                    "name": friendly_name_for_entity_id(entity_id, self.hass),
+                    "state": parse_sensor_state(self.hass.states.get(entity_id)),
+                }
+                for entity_id in sorted(sensors)
+            ],
+        }
+        if request_id is not None:
+            payload["request_id"] = request_id
+
+        await mqtt.async_publish(self.hass, topic, json.dumps(payload, cls=JSONEncoder))
 
     async def _async_subscribe_topics(self):
         """Install a listener for the command topic."""
@@ -203,6 +331,7 @@ class MqttHandler:
     @callback
     async def async_message_received(self, msg):  # noqa: PLR0915, PLR0912
         """Handle new MQTT messages."""
+        payload = {}
         command = None
         code = None
         area = None
@@ -249,6 +378,10 @@ class MqttHandler:
             command = command.lower()
         else:
             _LOGGER.warning("Received unexpected command")
+            return
+
+        if command == COMMAND_GET_SENSOR_STATES:
+            await self._async_publish_sensor_states(area, payload.get("request_id"))
             return
 
         payload_config = self._config[ATTR_MQTT][const.ATTR_COMMAND_PAYLOAD]

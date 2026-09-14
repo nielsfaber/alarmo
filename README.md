@@ -527,6 +527,8 @@ The following table shows the events which are published on the event topic, tog
 | `COMMAND_NOT_ALLOWED`   | The conditions for which the command is allowed are not met (see [commands](#commands)).                           | - `state`: current [state](#states) of the alarm entity.<br>- `command`: the command that was provided by the user.                                                                                                                                                                                                       |
 | `NO_CODE_PROVIDED`      | The command was rejected because no code was provided, while the operation requires a code.                        |                                                                                                                                                                                                                                                                                                                           |
 | `INVALID_CODE_PROVIDED` | The command was rejected because a wrong code was provided, or the provided code is not allowed for the operation. |                                                                                                                                                                                                                                                                                                                           |
+| `SENSOR_STATE_CHANGED`  | An enabled sensor configured in Alarmo changed state.                                                              | - `sensor`: sensor entity details containing `entity_id`, `name`, `previous_state`, and `state`. States are normalized to `open`, `closed`, `unavailable`, or `unknown`.                                                                                                                                                    |
+| `SENSOR_STATES`         | Response to a `GET_SENSOR_STATES` command containing the current sensor states.                                    | - `sensors`: list of enabled configured sensors containing `entity_id`, `name`, and normalized `state`.<br>- `request_id`: optional value copied from the request.                                                                                                                                                         |
 
 Example payload on the event topic (*Consider the scenario where the alarm is armed in state `armed_away` and the front door is opened):*
 ```yaml
@@ -566,6 +568,21 @@ The supported commands can be found in [commands](#commands).
 If the provided payload does not have the correct format, lacks a code when it is required or contains a wrong code, the command shall be ignored. 
 In other cases, you should see a change in the state topic.
 
+The current state of all enabled sensors configured in Alarmo can be requested
+without a code. Alarmo publishes the response as a `SENSOR_STATES` event:
+
+```json
+{
+  "command": "GET_SENSOR_STATES",
+  "request_id": "front-keypad"
+}
+```
+
+The optional `request_id` is copied to the response so a client can correlate it
+with the request. After the snapshot, `SENSOR_STATE_CHANGED` events keep the client
+updated. Sensor states are normalized to `open`, `closed`, `unavailable`, or
+`unknown`.
+
 **Notes**:
 * The pin or password value should always be sent as a text/string value. A numeric value is not supported. This is due to the fact that a pincode could contain leading zeros (e.g. 0012), which would be lost if sent as a number.
 * Alarmo provides the option to accept MQTT commands without requiring a code. By disabling the "*Require code*" setting in the MQTT configuration, the internal code check is skipped. This setting should be used with care as it may compromise the security of the alarm.
@@ -586,6 +603,12 @@ For targeting an arm/disarm command to a specific area, the JSON payload can be 
   "area": "<area_name>"
 }
 ```
+
+The same `area` property limits `GET_SENSOR_STATES` to that area's sensors and
+publishes the response on its derived event topic. Without `area`, a request to an
+enabled Alarm Master returns sensors from all areas on the master event topic.
+Live `SENSOR_STATE_CHANGED` events are published on the event topic derived for the
+sensor's area.
 
 **Notes**: 
 * The MQTT configuration allows defining the topics for the Master Alarm only. The input topics (state/event topics) for the areas are automatically derived by inserting the area name. Example: setting state topic to `my/custom/topic` gives `my/custom/<area_name>/topic` as state topic for an area. 
@@ -869,5 +892,3 @@ disarmed => "evaluate leave delay configuration": received command;
 "^sensors?" => armed: sensors OK;
 "^sensors?" => disarmed: sensors NOK;
 -->
-
-
