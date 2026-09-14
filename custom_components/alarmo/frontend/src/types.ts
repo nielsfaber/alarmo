@@ -111,7 +111,7 @@ export type AlarmoSensor = {
   auto_bypass_modes: EArmModes[];
   area?: string;
   enabled: boolean;
-  group?: string | null;
+  groups?: string[];
   new_entity_id?: string;
   entry_delay: number | null;
   delay_on: number | null;
