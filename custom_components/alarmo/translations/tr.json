@@ -81,5 +81,8 @@
         "custom": "Özel"
       }
     }
+  },
+  "open_sensor_area": {
+    "in_area": "{area} içinde"
   }
 }

@@ -496,7 +496,9 @@
               "description": "Vælg hvilken sensorinformation der skal indsættes i meddelelsen",
               "options": {
                 "default": "Navne og tilstande",
-                "short": "Kun navne"
+                "short": "Kun navne",
+                "with_area": "Navne og tilstande med område",
+                "short_with_area": "Kun navne med område"
               }
             },
             "arm_mode_format": {

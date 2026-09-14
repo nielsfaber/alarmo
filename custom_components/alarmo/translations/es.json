@@ -81,5 +81,8 @@
         "custom": "Armado Bypass Personalizado"
       }
     }
+  },
+  "open_sensor_area": {
+    "in_area": "en {area}"
   }
 }

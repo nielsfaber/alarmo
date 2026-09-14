@@ -496,7 +496,9 @@
               "description": "Kies watter sensor-inligting in die boodskap gevoeg moet word",
               "options": {
                 "default": "Name en statusse",
-                "short": "Slegs name"
+                "short": "Slegs name",
+                "with_area": "Name en status met area",
+                "short_with_area": "Slegs name met area"
               }
             },
             "arm_mode_format": {

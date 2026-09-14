@@ -7,11 +7,21 @@ from typing import Any
 
 import pytest
 from homeassistant.const import ATTR_SERVICE, CONF_SERVICE_DATA
+from homeassistant.helpers import area_registry as ar
+from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.dispatcher import async_dispatcher_send
-from pytest_homeassistant_custom_component.common import async_mock_service
+from pytest_homeassistant_custom_component.common import (
+    MockConfigEntry,
+    async_mock_service,
+)
 
 from custom_components.alarmo import const
-from custom_components.alarmo.sensors import STATE_OPEN
+from custom_components.alarmo.sensors import (
+    STATE_OPEN,
+    STATE_CLOSED,
+    STATE_UNKNOWN,
+)
 from custom_components.alarmo.automations import (
     AutomationHandler,
     validate_area,
@@ -142,6 +152,397 @@ async def test_replace_wildcards_in_string_replaces_values(
     assert "By: Alice" in result
     assert "Delay: 15" in result
     assert "Math: 2" in result
+
+
+@pytest.mark.asyncio
+async def test_replace_wildcards_opens_sensors_with_area(
+    hass: Any,
+) -> None:
+    """Ensure {{open_sensors_with_area}} includes the Home Assistant area of sensors."""
+    store = _DummyStore(automations={})
+    hass.data[const.DOMAIN] = {
+        "coordinator": _DummyCoordinator(store),
+        "areas": {"area_1": object()},
+        "master": None,
+    }
+
+    handler = AutomationHandler(hass)
+
+    area_registry = ar.async_get(hass)
+    area = area_registry.async_create("Bathroom")
+
+    device_registry = dr.async_get(hass)
+    entry = MockConfigEntry(domain="test", data={})
+    entry.add_to_hass(hass)
+    device = device_registry.async_get_or_create(
+        config_entry_id=entry.entry_id,
+        connections=set(),
+        identifiers={("test", "unique_device_1")},
+    )
+    device_registry.async_update_device(device.id, area_id=area.id)
+
+    entity_registry = er.async_get(hass)
+    entity_registry.async_get_or_create(
+        "binary_sensor",
+        "test",
+        "window_1",
+        device_id=device.id,
+        suggested_object_id="window_1",
+    )
+
+    hass.states.async_set(
+        "binary_sensor.window_1", "on", {"friendly_name": "Left Window"}
+    )
+    await hass.async_block_till_done()
+
+    alarm_entity = SimpleNamespace(
+        open_sensors={
+            "binary_sensor.window_1": STATE_OPEN,
+        },
+        bypassed_sensors=[],
+        arm_mode="armed_away",
+        changed_by="Alice",
+        delay=15,
+    )
+
+    result = await handler.replace_wildcards_in_string(
+        "Open: {{open_sensors_with_area}}; "
+        "Short: {{open_sensors_with_area|format=short}}",
+        alarm_entity,
+    )
+
+    assert "Left Window is open in Bathroom" in result
+    assert "Left Window (Bathroom)" in result
+
+    result_english = await handler.replace_wildcards_in_string(
+        "Open: {{open_sensors_with_area|lang=en}}", alarm_entity
+    )
+    assert "Left Window is open in Bathroom" in result_english
+
+
+@pytest.mark.asyncio
+async def test_replace_wildcards_opens_sensors_with_area_mixed_device_class(
+    hass: Any,
+) -> None:
+    """Ensure the standard and with-area wildcards share the device-class phrase."""
+    store = _DummyStore(automations={})
+    hass.data[const.DOMAIN] = {
+        "coordinator": _DummyCoordinator(store),
+        "areas": {"area_1": object()},
+        "master": None,
+    }
+
+    handler = AutomationHandler(hass)
+
+    area_registry = ar.async_get(hass)
+    area = area_registry.async_create("Living room")
+
+    device_registry = dr.async_get(hass)
+    entry = MockConfigEntry(domain="test", data={})
+    entry.add_to_hass(hass)
+    device = device_registry.async_get_or_create(
+        config_entry_id=entry.entry_id,
+        connections=set(),
+        identifiers={("test", "unique_device_motion")},
+    )
+    device_registry.async_update_device(device.id, area_id=area.id)
+
+    entity_registry = er.async_get(hass)
+    entity_registry.async_get_or_create(
+        "binary_sensor",
+        "test",
+        "motion_1",
+        device_id=device.id,
+        suggested_object_id="motion_1",
+    )
+
+    hass.states.async_set(
+        "binary_sensor.motion_1",
+        "on",
+        {"friendly_name": "Motion Sensor", "device_class": "motion"},
+    )
+    await hass.async_block_till_done()
+
+    alarm_entity = SimpleNamespace(
+        open_sensors={
+            "binary_sensor.motion_1": STATE_OPEN,
+        },
+        bypassed_sensors=[],
+        arm_mode="armed_away",
+        changed_by="Alice",
+        delay=15,
+    )
+
+    result = await handler.replace_wildcards_in_string(
+        "Plain: {{open_sensors}}; "
+        "Area: {{open_sensors_with_area}}; "
+        "Short: {{open_sensors|format=short}}; "
+        "Short area: {{open_sensors_with_area|format=short}}",
+        alarm_entity,
+    )
+
+    assert result == (
+        "Plain: Motion Sensor is detecting motion; "
+        "Area: Motion Sensor is detecting motion in Living room; "
+        "Short: Motion Sensor; "
+        "Short area: Motion Sensor (Living room)"
+    )
+
+
+@pytest.mark.asyncio
+async def test_replace_wildcards_opens_sensors_modifier_order(
+    hass: Any,
+) -> None:
+    """Ensure the wildcard modifiers are accepted in any order."""
+    store = _DummyStore(automations={})
+    hass.data[const.DOMAIN] = {
+        "coordinator": _DummyCoordinator(store),
+        "areas": {"area_1": object()},
+        "master": None,
+    }
+
+    handler = AutomationHandler(hass)
+
+    area_registry = ar.async_get(hass)
+    area = area_registry.async_create("Bathroom")
+
+    device_registry = dr.async_get(hass)
+    entry = MockConfigEntry(domain="test", data={})
+    entry.add_to_hass(hass)
+    device = device_registry.async_get_or_create(
+        config_entry_id=entry.entry_id,
+        connections=set(),
+        identifiers={("test", "unique_device_2")},
+    )
+    device_registry.async_update_device(device.id, area_id=area.id)
+
+    entity_registry = er.async_get(hass)
+    entity_registry.async_get_or_create(
+        "binary_sensor",
+        "test",
+        "window_2",
+        device_id=device.id,
+        suggested_object_id="window_2",
+    )
+
+    hass.states.async_set(
+        "binary_sensor.window_2", "on", {"friendly_name": "Left Window"}
+    )
+    await hass.async_block_till_done()
+
+    alarm_entity = SimpleNamespace(
+        open_sensors={
+            "binary_sensor.window_2": STATE_OPEN,
+        },
+        bypassed_sensors=[],
+        arm_mode="armed_away",
+        changed_by="Alice",
+        delay=15,
+    )
+
+    result = await handler.replace_wildcards_in_string(
+        "{{open_sensors_with_area|format=short|lang=en}} "
+        "{{open_sensors|lang=en|format=short}}",
+        alarm_entity,
+    )
+
+    assert result == "Left Window (Bathroom) Left Window"
+
+
+@pytest.mark.asyncio
+async def test_replace_wildcards_opens_sensors_with_area_states(
+    hass: Any,
+) -> None:
+    """Ensure non-open states render with the area clause."""
+    store = _DummyStore(automations={})
+    hass.data[const.DOMAIN] = {
+        "coordinator": _DummyCoordinator(store),
+        "areas": {"area_1": object()},
+        "master": None,
+    }
+
+    handler = AutomationHandler(hass)
+
+    area_registry = ar.async_get(hass)
+    area = area_registry.async_create("Bathroom")
+
+    device_registry = dr.async_get(hass)
+    entry = MockConfigEntry(domain="test", data={})
+    entry.add_to_hass(hass)
+    device = device_registry.async_get_or_create(
+        config_entry_id=entry.entry_id,
+        connections=set(),
+        identifiers={("test", "unique_device_3")},
+    )
+    device_registry.async_update_device(device.id, area_id=area.id)
+
+    entity_registry = er.async_get(hass)
+    entity_registry.async_get_or_create(
+        "binary_sensor",
+        "test",
+        "window_3",
+        device_id=device.id,
+        suggested_object_id="window_3",
+    )
+    entity_registry.async_get_or_create(
+        "binary_sensor",
+        "test",
+        "sensor_3",
+        device_id=device.id,
+        suggested_object_id="sensor_3",
+    )
+
+    hass.states.async_set(
+        "binary_sensor.window_3", "off", {"friendly_name": "Bedroom Window"}
+    )
+    hass.states.async_set(
+        "binary_sensor.sensor_3", "unknown", {"friendly_name": "Glitch Sensor"}
+    )
+    await hass.async_block_till_done()
+
+    alarm_entity = SimpleNamespace(
+        open_sensors={
+            "binary_sensor.window_3": STATE_CLOSED,
+            "binary_sensor.sensor_3": STATE_UNKNOWN,
+        },
+        bypassed_sensors=[],
+        arm_mode="armed_away",
+        changed_by="Alice",
+        delay=15,
+    )
+
+    result = await handler.replace_wildcards_in_string(
+        "Open: {{open_sensors_with_area}}",
+        alarm_entity,
+    )
+
+    assert result == (
+        "Open: Bedroom Window is closed in Bathroom, "
+        "Glitch Sensor is unknown in Bathroom"
+    )
+
+
+@pytest.mark.asyncio
+async def test_replace_wildcards_opens_sensors_with_area_device_without_area(
+    hass: Any,
+) -> None:
+    """Ensure a sensor assigned to a device with no area falls back gracefully."""
+    store = _DummyStore(automations={})
+    hass.data[const.DOMAIN] = {
+        "coordinator": _DummyCoordinator(store),
+        "areas": {"area_1": object()},
+        "master": None,
+    }
+
+    handler = AutomationHandler(hass)
+
+    device_registry = dr.async_get(hass)
+    entry = MockConfigEntry(domain="test", data={})
+    entry.add_to_hass(hass)
+    device = device_registry.async_get_or_create(
+        config_entry_id=entry.entry_id,
+        connections=set(),
+        identifiers={("test", "unique_device_4")},
+    )
+
+    entity_registry = er.async_get(hass)
+    entity_registry.async_get_or_create(
+        "binary_sensor",
+        "test",
+        "window_4",
+        device_id=device.id,
+        suggested_object_id="window_4",
+    )
+
+    hass.states.async_set(
+        "binary_sensor.window_4", "on", {"friendly_name": "Front Window"}
+    )
+    await hass.async_block_till_done()
+
+    alarm_entity = SimpleNamespace(
+        open_sensors={
+            "binary_sensor.window_4": STATE_OPEN,
+        },
+        bypassed_sensors=[],
+        arm_mode="armed_away",
+        changed_by="Alice",
+        delay=15,
+    )
+
+    result = await handler.replace_wildcards_in_string(
+        "Open: {{open_sensors_with_area}}; "
+        "Short: {{open_sensors_with_area|format=short}}",
+        alarm_entity,
+    )
+
+    assert result == "Open: Front Window is open; Short: Front Window"
+
+
+@pytest.mark.asyncio
+async def test_replace_wildcards_opens_sensors_with_area_without_area(
+    hass: Any,
+) -> None:
+    """Ensure {{open_sensors_with_area}} falls back when sensor has no area."""
+    store = _DummyStore(automations={})
+    hass.data[const.DOMAIN] = {
+        "coordinator": _DummyCoordinator(store),
+        "areas": {"area_1": object()},
+        "master": None,
+    }
+
+    handler = AutomationHandler(hass)
+
+    hass.states.async_set(
+        "binary_sensor.front_door", "on", {"friendly_name": "Front Door"}
+    )
+    await hass.async_block_till_done()
+
+    alarm_entity = SimpleNamespace(
+        open_sensors={
+            "binary_sensor.front_door": STATE_OPEN,
+        },
+        bypassed_sensors=[],
+        arm_mode="armed_away",
+        changed_by="Alice",
+        delay=15,
+    )
+
+    result = await handler.replace_wildcards_in_string(
+        "Open: {{open_sensors_with_area}}; "
+        "Short: {{open_sensors_with_area|format=short}}",
+        alarm_entity,
+    )
+
+    assert result == "Open: Front Door is open; Short: Front Door"
+
+
+@pytest.mark.asyncio
+async def test_replace_wildcards_opens_sensors_with_area_empty(
+    hass: Any,
+) -> None:
+    """Ensure {{open_sensors_with_area}} is replaced even when no sensors are open."""
+    store = _DummyStore(automations={})
+    hass.data[const.DOMAIN] = {
+        "coordinator": _DummyCoordinator(store),
+        "areas": {"area_1": object()},
+        "master": None,
+    }
+
+    handler = AutomationHandler(hass)
+
+    alarm_entity = SimpleNamespace(
+        open_sensors={},
+        bypassed_sensors=[],
+        arm_mode="armed_away",
+        changed_by="Alice",
+        delay=15,
+    )
+
+    result = await handler.replace_wildcards_in_string(
+        "Open: {{open_sensors_with_area}}", alarm_entity
+    )
+
+    assert result == "Open: "
 
 
 @pytest.mark.asyncio
@@ -287,9 +688,7 @@ async def test_notification_fires_once_per_event_with_master(
     await hass.async_block_till_done()
     assert len(calls) == 0, f"Expected 0 for area dispatch, got {len(calls)}"
 
-    async_dispatcher_send(
-        hass, "alarmo_state_updated", None, "disarmed", "armed_away"
-    )
+    async_dispatcher_send(hass, "alarmo_state_updated", None, "disarmed", "armed_away")
     await hass.async_block_till_done()
     assert len(calls) == 1, f"Expected 1 for master dispatch, got {len(calls)}"
     assert calls[0][0] == "notify_1"
