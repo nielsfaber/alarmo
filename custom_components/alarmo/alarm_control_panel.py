@@ -59,6 +59,26 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     return True
 
 
+def _purge_stale_state_entries(hass, entity_ids: list[str]) -> None:
+    """Remove stale state-machine entries that would block entity registration.
+
+    Other integrations (e.g. autoarm) may call hass.states.async_set()
+    directly on alarmo entity_ids, creating state entries that survive
+    alarmo reloads. HA's entity platform rejects new entities whose
+    entity_id is already taken in the state machine, which causes HA to
+    rename the new entity to master_alarm_2 / area_2. Clear those stale
+    entries before calling async_add_devices.
+    """
+    for entity_id in entity_ids:
+        if not hass.states.async_available(entity_id):
+            _LOGGER.info(
+                "Removing stale state-machine entry for %s"
+                " before entity registration",
+                entity_id,
+            )
+            hass.states.async_remove(entity_id)
+
+
 async def async_setup_entry(hass, config_entry, async_add_devices):
     """Set up the Alarmo entities."""
 
@@ -123,6 +143,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
             area_id=config["area_id"],
         )
         hass.data[const.DOMAIN]["areas"][config["area_id"]] = alarm_entity
+        _purge_stale_state_entries(hass, [entity_id])
         async_add_devices([alarm_entity])
 
     unsub_area = async_dispatcher_connect(
@@ -134,11 +155,6 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
         """Add each entity as Alarm Control Panel."""
         entity_id = f"{PLATFORM}.{slugify(config['name'])}"
         new_unique_id = f"{const.DOMAIN}_master"
-        _LOGGER.warning(
-            "DEBUG async_add_alarm_master called: entity_id=%s master_in_hass=%s",
-            entity_id,
-            getattr(hass.data[const.DOMAIN].get("master"), "entity_id", None),
-        )
 
         entity_registry = er.async_get(hass)
         deleted_key = (PLATFORM, const.DOMAIN, new_unique_id)
@@ -192,16 +208,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
             name=config["name"],
         )
         hass.data[const.DOMAIN]["master"] = alarm_entity
-        # DEBUG: log platform entity state before async_add_devices
-        from homeassistant.helpers import entity_platform as _ep
-        _current_platform = _ep.current_platform.get()
-        if _current_platform:
-            _LOGGER.warning(
-                "DEBUG before async_add_devices: platform entities=%s",
-                list(_current_platform.entities.keys()),
-            )
-        else:
-            _LOGGER.warning("DEBUG before async_add_devices: no current platform")
+        _purge_stale_state_entries(hass, [entity_id])
         async_add_devices([alarm_entity])
 
     unsub_master = async_dispatcher_connect(
