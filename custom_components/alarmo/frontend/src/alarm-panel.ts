@@ -9,7 +9,7 @@ import './views/actions/view-actions.ts';
 
 import { commonStyle } from './styles';
 import { VERSION } from './const';
-import { fetchUsers } from './data/websockets';
+import { fetchUsers, fetchAlarmoPanelUsers } from './data/websockets';
 import { AlarmoUser, Dictionary, HomeAssistant } from './types';
 import { localize } from '../localize/localize';
 import { exportPath, getPath, Path } from './common/navigation';
@@ -29,6 +29,8 @@ export class MyAlarmPanel extends LitElement {
   @property({ type: Boolean, reflect: true }) public narrow!: boolean;
 
   @property({ attribute: false }) userConfig?: Dictionary<AlarmoUser>;
+
+  @property({ attribute: false }) panelAccessUsers: string[] = [];
 
   async firstUpdated() {
     window.addEventListener('location-changed', () => {

@@ -11,6 +11,14 @@ import {
   HomeAssistant,
 } from '../types';
 
+export const fetchAlarmoPanelUsers = async (hass: HomeAssistant): Promise<string[]> => {
+  const result = await hass.callApi<{ user_ids: string[] }>('GET', 'alarmo/panel_access');
+  return result.user_ids;
+};
+
+export const saveAlarmoPanelUsers = (hass: HomeAssistant, userIds: string[]): Promise<boolean> =>
+  hass.callApi('POST', 'alarmo/panel_access', { user_ids: userIds });
+
 export const fetchConfig = (hass: HomeAssistant): Promise<AlarmoConfig> =>
   hass.callWS({
     type: 'alarmo/config',
