@@ -1477,13 +1477,6 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
                         code=code, skip_code=True, context_id=context_id
                     )
 
-            dispatcher_send(
-                self.hass,
-                "alarmo_event",
-                const.EVENT_DISARM,
-                self.area_id,
-                {const.ATTR_CONTEXT_ID: context_id},
-            )
             return True
         return False
 
