@@ -4,6 +4,7 @@ from typing import Any
 from unittest.mock import AsyncMock
 
 import pytest
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
 from tests.helpers import (
     advance_time,
@@ -487,3 +488,91 @@ async def test_alarm_master_disarm_auth_resolved_once(
         assert_alarm_state(hass, "alarm_control_panel.test_area_1_auth", "disarmed")
         assert_alarm_state(hass, "alarm_control_panel.test_area_2_auth", "disarmed")
         assert_alarm_state(hass, "alarm_control_panel.master", "disarmed")
+
+
+@pytest.mark.asyncio
+async def test_alarm_master_disarm_dispatches_single_event(
+    hass: Any, enable_custom_integrations: Any
+) -> None:
+    """Master disarm dispatches one DISARM event for the master (issue #1480)."""
+    backend_events: list[dict[str, Any]] = []
+
+    def capture_backend_event(
+        event_type: str, area_id: str | None, args: dict[str, Any]
+    ) -> None:
+        """Capture backend dispatcher events."""
+        backend_events.append(
+            {"event_type": event_type, "area_id": area_id, "args": args}
+        )
+
+    area1 = AreaFactory.create_area(
+        area_id="area_1",
+        name="Test Area 1 Single Event",
+        modes=["armed_away"],
+        armed_away_enabled=True,
+        armed_away_exit_time=0,
+    )
+    area2 = AreaFactory.create_area(
+        area_id="area_2",
+        name="Test Area 2 Single Event",
+        modes=["armed_away"],
+        armed_away_enabled=True,
+        armed_away_exit_time=0,
+    )
+
+    sensor1 = SensorFactory.create_door_sensor(
+        entity_id="binary_sensor.area_1_door", area="area_1"
+    )
+    sensor2 = SensorFactory.create_door_sensor(
+        entity_id="binary_sensor.area_2_door", area="area_2"
+    )
+
+    storage, entry = setup_alarmo_entry(
+        hass,
+        areas=[area1, area2],
+        sensors=[sensor1, sensor2],
+        entry_id="test_master_disarm_single_event",
+        master_enabled=True,
+    )
+
+    with patch_alarmo_integration_dependencies(storage):
+        await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+        async_dispatcher_connect(hass, "alarmo_event", capture_backend_event)
+
+        hass.states.async_set("binary_sensor.area_1_door", "off")
+        hass.states.async_set("binary_sensor.area_2_door", "off")
+        await hass.async_block_till_done()
+
+        await hass.services.async_call(
+            "alarm_control_panel",
+            "alarm_arm_away",
+            {"entity_id": "alarm_control_panel.master", "code": "1234"},
+            blocking=True,
+        )
+        await advance_time(hass, 1)
+        assert_alarm_state(hass, "alarm_control_panel.master", "armed_away")
+
+        backend_events.clear()
+
+        await hass.services.async_call(
+            "alarm_control_panel",
+            "alarm_disarm",
+            {"entity_id": "alarm_control_panel.master", "code": "1234"},
+            blocking=True,
+        )
+        await hass.async_block_till_done()
+
+        disarm_events = [
+            e for e in backend_events if e["event_type"] == const.EVENT_DISARM
+        ]
+        master_events = [e for e in disarm_events if e["area_id"] is None]
+        area_events = sorted(
+            e["area_id"] for e in disarm_events if e["area_id"] is not None
+        )
+        assert len(master_events) == 1
+        assert area_events == ["area_1", "area_2"]
+        assert_alarm_state(hass, "alarm_control_panel.master", "disarmed")
+
+        await cleanup_timers(hass)
