@@ -27,6 +27,7 @@ from homeassistant.helpers.event import (
     async_track_state_change_event,
 )
 from homeassistant.components.lock import LockState
+from homeassistant.helpers.storage import Store
 from homeassistant.helpers.dispatcher import (
     async_dispatcher_connect,
 )
@@ -50,6 +51,10 @@ ATTR_ENTITIES = "entities"
 ATTR_NEW_ENTITY_ID = "new_entity_id"
 ATTR_ENTRY_DELAY = "entry_delay"
 ATTR_DELAY_ON = "delay_on"
+
+UNAVAILABLE_STATE_STORAGE_KEY = f"{const.DOMAIN}.unavailable_state_mem"
+UNAVAILABLE_STATE_STORAGE_VERSION = 1
+UNAVAILABLE_STATE_SAVE_DELAY = 1
 
 SENSOR_STATES_OPEN = [STATE_ON, STATE_OPEN, LockState.UNLOCKED]
 SENSOR_STATES_CLOSED = [STATE_OFF, STATE_CLOSED, LockState.LOCKED]
@@ -144,6 +149,12 @@ class SensorHandler:
         self._group_events = {}
         self._startup_complete = False
         self._unavailable_state_mem = {}
+        # The prior state of unavailable sensors must survive a restart: a
+        # sensor that drops out while open and returns open days later (after
+        # HA was restarted in between) would otherwise be seen as a new opening.
+        self._unavailable_state_store = Store(
+            hass, UNAVAILABLE_STATE_STORAGE_VERSION, UNAVAILABLE_STATE_STORAGE_KEY
+        )
 
         @callback
         def async_update_sensor_config():
@@ -186,17 +197,40 @@ class SensorHandler:
                     self._async_evaluate_armed_state_on_startup(area_id)
                 )
 
+        async def _async_setup_sensor_listeners():
+            """Restore the unavailable state memory, then register listeners."""
+            await self._async_load_unavailable_state_mem()
+            _setup_sensor_listeners()
+
+        @callback
+        def _schedule_setup():
+            hass.async_create_task(_async_setup_sensor_listeners())
+
         def handle_startup(_event):
             self._startup_complete = True
             # Schedule the setup to run in the event loop (from thread pool executor)
-            hass.loop.call_soon_threadsafe(_setup_sensor_listeners)
+            hass.loop.call_soon_threadsafe(_schedule_setup)
 
         if hass.state == CoreState.running:
             self._startup_complete = True
             # Schedule in event loop since we're in __init__ (sync context)
-            hass.loop.call_soon_threadsafe(_setup_sensor_listeners)
+            hass.loop.call_soon_threadsafe(_schedule_setup)
         else:
             hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STARTED, handle_startup)
+
+    async def _async_load_unavailable_state_mem(self):
+        """Restore the prior states of sensors that were unavailable at shutdown."""
+        data = await self._unavailable_state_store.async_load()
+        if isinstance(data, dict):
+            # entries recorded since startup are more recent than the stored ones
+            self._unavailable_state_mem = {**data, **self._unavailable_state_mem}
+
+    @callback
+    def _async_save_unavailable_state_mem(self):
+        """Persist the prior states of unavailable sensors."""
+        self._unavailable_state_store.async_delay_save(
+            lambda: dict(self._unavailable_state_mem), UNAVAILABLE_STATE_SAVE_DELAY
+        )
 
     def __del__(self):
         """Prepare for removal."""
@@ -425,10 +459,12 @@ class SensorHandler:
         ):
             # temporarily store the prior state until the sensor becomes available again
             self._unavailable_state_mem[entity] = old_state
+            self._async_save_unavailable_state_mem()
         elif entity in self._unavailable_state_mem:
             # if sensor was unavailable, check the state before that,
             #   do not act if the sensor reverted to its prior state.
             prior_state = self._unavailable_state_mem.pop(entity)
+            self._async_save_unavailable_state_mem()
             if old_state == STATE_UNAVAILABLE and prior_state == new_state:
                 _LOGGER.debug(
                     "state transition from %s to %s to %s detected, ignoring.",
