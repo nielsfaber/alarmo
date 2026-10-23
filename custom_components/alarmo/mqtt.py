@@ -171,12 +171,20 @@ class MqttHandler:
             async_dispatcher_connect(self.hass, "alarmo_event", async_handle_event)
         )
 
-    def __del__(self):
-        """Prepare for removal."""
+    def _unsubscribe_all(self):
+        """Remove every MQTT and dispatcher subscription."""
         while len(self._subscribed_topics):
             self._subscribed_topics.pop()()
         while len(self._subscriptions):
             self._subscriptions.pop()()
+
+    def __del__(self):
+        """Prepare for removal."""
+        self._unsubscribe_all()
+
+    async def async_unload(self):
+        """Stop listening for MQTT commands and configuration changes."""
+        self._unsubscribe_all()
 
     async def _async_subscribe_topics(self):
         """Install a listener for the command topic."""
