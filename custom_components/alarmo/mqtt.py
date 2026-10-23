@@ -28,6 +28,34 @@ _LOGGER = logging.getLogger(__name__)
 CONF_EVENT_TOPIC = "event_topic"
 
 
+def _parse_bool(value, field_name: str) -> bool:
+    """Return a tolerant boolean for common JSON and string values."""
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return bool(value)
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        if normalized in ("true", "1", "on", "yes"):
+            return True
+        if normalized in ("false", "0", "off", "no", ""):
+            return False
+    _LOGGER.warning("Ignoring invalid boolean value for %s", field_name)
+    return False
+
+
+def _parse_code(value) -> str | None:
+    """Return a usable access code, coercing numeric JSON values."""
+    if value is None:
+        return None
+    if isinstance(value, str):
+        return value
+    if isinstance(value, int):
+        return str(value)
+    _LOGGER.warning("Ignoring an access code with an unsupported type")
+    return None
+
+
 class MqttHandler:
     """Class to handle MQTT integration."""
 
@@ -211,7 +239,10 @@ class MqttHandler:
 
         try:
             payload = json.loads(msg.payload)
-            payload = {k.lower(): v for k, v in payload.items()}
+            if not isinstance(payload, dict):
+                _LOGGER.warning("Received MQTT payload that is not an object")
+                return
+            payload = {str(k).lower(): v for k, v in payload.items()}
 
             if "command" in payload:
                 command = payload["command"]
@@ -223,22 +254,29 @@ class MqttHandler:
                 command = payload["state"]
 
             if "code" in payload:
-                code = payload["code"]
+                code = _parse_code(payload["code"])
             elif "pin" in payload:
-                code = payload["pin"]
+                code = _parse_code(payload["pin"])
             elif "password" in payload:
-                code = payload["password"]
+                code = _parse_code(payload["password"])
             elif "pincode" in payload:
-                code = payload["pincode"]
+                code = _parse_code(payload["pincode"])
 
             if payload.get("area"):
-                area = payload["area"]
+                area_value = payload["area"]
+                if isinstance(area_value, str):
+                    area = area_value
+                else:
+                    _LOGGER.warning("Ignoring an area with an unsupported type")
+                    return
 
             if (payload.get("bypass_open_sensors")) or (payload.get("force")):
                 bypass_open_sensors = payload["bypass_open_sensors"]
 
-            if payload.get(const.ATTR_SKIP_DELAY):
-                skip_delay = payload[const.ATTR_SKIP_DELAY]
+            if const.ATTR_SKIP_DELAY in payload:
+                skip_delay = _parse_bool(
+                    payload[const.ATTR_SKIP_DELAY], const.ATTR_SKIP_DELAY
+                )
 
         except ValueError:
             # no JSON structure found
