@@ -480,13 +480,15 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
                     self.name,
                 )
 
-            dispatcher_send(
-                self.hass,
-                "alarmo_event",
-                const.EVENT_DISARM,
-                self.area_id,
-                {const.ATTR_CONTEXT_ID: context_id},
-            )
+            # a caller passing skip_event sends its own event later
+            if not kwargs.get("skip_event", False):
+                dispatcher_send(
+                    self.hass,
+                    "alarmo_event",
+                    const.EVENT_DISARM,
+                    self.area_id,
+                    {const.ATTR_CONTEXT_ID: context_id},
+                )
             return True
 
     @callback
@@ -1467,7 +1469,10 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
         if skip_code or res:
             # code has been validated or skip_code is True, proceed with disarm
             if not await super().async_alarm_disarm(
-                code=code, skip_code=True, context_id=context_id
+                code=code,
+                skip_code=True,
+                context_id=context_id,
+                skip_event=True,
             ):
                 _LOGGER.error("Failed to disarm master alarm.")
                 return False
@@ -1476,7 +1481,8 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
                     await item.async_alarm_disarm(
                         code=code, skip_code=True, context_id=context_id
                     )
-
+            # dispatch the master's EVENT_DISARM only now that the areas are
+            # disarmed (the base class call above was told not to send it)
             dispatcher_send(
                 self.hass,
                 "alarmo_event",
