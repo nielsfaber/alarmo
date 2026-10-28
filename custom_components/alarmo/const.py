@@ -98,6 +98,9 @@ EVENT_NO_CODE_PROVIDED = "no_code_provided"
 EVENT_TRIGGER_TIME_EXPIRED = "trigger_time_expired"
 EVENT_READY_TO_ARM_MODES_CHANGED = "ready_to_arm_modes_changed"
 
+# event fired on the HA bus for every alarm action, used by the logbook
+EVENT_ACTIVITY = "alarmo_activity"
+
 ATTR_MODES = "modes"
 ATTR_ARM_MODE = "arm_mode"
 ATTR_CODE_DISARM_REQUIRED = "code_disarm_required"
