@@ -12,7 +12,7 @@ import { commonStyle } from '../../styles';
 import { localize } from '../../../localize/localize';
 import { SubscribeMixin } from '../../subscribe-mixin';
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
-import { fetchConfig, fetchUsers, saveConfig, saveUser } from '../../data/websockets';
+import { fetchConfig, fetchUsers, saveConfig, saveUser, fetchAlarmoPanelUsers, saveAlarmoPanelUsers } from '../../data/websockets';
 import { TableData, TableColumn } from '../../components/alarmo-table';
 import { exportPath, Path } from '../../common/navigation';
 
@@ -33,6 +33,9 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
   @property()
   users: Dictionary<AlarmoUser> = {};
 
+  @property()
+  panelAccessUsers: string[] = [];
+
   public hassSubscribe(): Promise<UnsubscribeFunc>[] {
     this._fetchData();
     return [this.hass!.connection.subscribeMessage(() => this._fetchData(), { type: 'alarmo_config_updated' })];
@@ -47,6 +50,7 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
 
     const users = await fetchUsers(this.hass);
     this.users = users;
+    this.panelAccessUsers = await fetchAlarmoPanelUsers(this.hass);
   }
 
   render() {
@@ -150,6 +154,7 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
         </ha-card>
 
         ${this.usersPanel()}
+        ${this.panelAccessPanel()}
       `;
     }
   }
@@ -243,6 +248,45 @@ export class AlarmViewCodes extends SubscribeMixin(LitElement) {
     `;
   }
 
+  panelAccessPanel() {
+    if (!this.hass) return html``;
+
+    const users = Object.values(this.users).filter(user => user.user_id);
+    users.sort(sortAlphabetically);
+
+    return html`
+      <ha-card header="${localize('panels.codes.cards.panel_access.title', this.hass.language)}">
+        <div class="card-content">
+          ${localize('panels.codes.cards.panel_access.description', this.hass.language)}
+        </div>
+        ${users.map(user => html`
+          <alarmo-settings-row .narrow=${this.narrow}>
+            <span slot="heading">${prettyPrint(user.name)}</span>
+            <span slot="description">@${user.user_id}</span>
+            <ha-switch
+              ?checked=${this.panelAccessUsers.includes(user.user_id!)}
+              @change=${(ev: Event) => this.togglePanelAccess(user.user_id!, (ev.target as HTMLInputElement).checked)}
+            ></ha-switch>
+          </alarmo-settings-row>
+        `)}
+      </ha-card>
+    `;
+  }
+
+  async togglePanelAccess(userId: string, allowed: boolean) {
+    if (!this.hass) return;
+    this.panelAccessUsers = allowed
+      ? [...new Set([...this.panelAccessUsers, userId])]
+      : this.panelAccessUsers.filter(id => id !== userId);
+
+    try {
+      await saveAlarmoPanelUsers(this.hass, this.panelAccessUsers);
+    } catch (e) {
+      handleError(e, this.shadowRoot!.querySelector('ha-card') as HTMLElement);
+      this.panelAccessUsers = await fetchAlarmoPanelUsers(this.hass);
+      this.requestUpdate();
+    }
+  }
   addUserClick() {
     navigate(this, exportPath('codes', 'new_user'), true);
   }
