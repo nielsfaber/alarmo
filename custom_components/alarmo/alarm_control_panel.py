@@ -729,6 +729,12 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
 
     async def async_will_remove_from_hass(self):
         """Disconnect entity object when removed."""
+        # Area entities keep an exit/entry/trigger timer. The callback holds a
+        # reference to the entity, so leaving it registered leaks the entity
+        # and lets the timer fire during/after a reload.
+        clear_timer = getattr(self, "async_clear_timer", None)
+        if clear_timer is not None:
+            clear_timer()
         await super().async_will_remove_from_hass()
         _LOGGER.debug(
             "%s is removed from hass",
