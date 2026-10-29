@@ -234,7 +234,7 @@ class MigratableStore(Store):
             return attr.asdict(AutomationEntry(**parse_automation_entry(data)))
 
         if old_major_version == 1:
-            area_id = str(int(time.time()))
+            area_id = str(time.time_ns())
             data["areas"] = [
                 attr.asdict(
                     AreaEntry(
@@ -519,7 +519,7 @@ class AlarmoStorage:
     @callback
     def async_create_area(self, data: dict) -> AreaEntry:
         """Create a new AreaEntry."""
-        area_id = str(int(time.time()))
+        area_id = str(time.time_ns())
         new_area = AreaEntry(**data, area_id=area_id)
         self.areas[area_id] = new_area
         self.async_schedule_save()
@@ -600,7 +600,7 @@ class AlarmoStorage:
     @callback
     def async_create_user(self, data: dict) -> UserEntry:
         """Create a new UserEntry."""
-        user_id = str(int(time.time()))
+        user_id = str(time.time_ns())
         new_user = UserEntry(**data, user_id=user_id)
         self.users[user_id] = new_user
         self.async_schedule_save()
@@ -634,7 +634,7 @@ class AlarmoStorage:
     @callback
     def async_create_automation(self, data: dict) -> AutomationEntry:
         """Create a new AutomationEntry."""
-        automation_id = str(int(time.time()))
+        automation_id = str(time.time_ns())
         new_automation = AutomationEntry(
             **parse_automation_entry(data), automation_id=automation_id
         )
@@ -680,7 +680,7 @@ class AlarmoStorage:
     @callback
     def async_create_sensor_group(self, data: dict) -> SensorGroupEntry:
         """Create a new SensorGroupEntry."""
-        group_id = str(int(time.time()))
+        group_id = str(time.time_ns())
         new_group = SensorGroupEntry(**data, group_id=group_id)
         self.sensor_groups[group_id] = new_group
         self.async_schedule_save()
