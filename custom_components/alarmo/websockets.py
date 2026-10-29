@@ -38,7 +38,7 @@ from .mqtt import (
     CONF_EVENT_TOPIC,
 )
 from .sensors import (
-    ATTR_GROUP,
+    ATTR_GROUPS,
     ATTR_TIMEOUT,
     SENSOR_TYPES,
     ATTR_DELAY_ON,
@@ -234,7 +234,9 @@ class AlarmoSensorView(HomeAssistantView):
                 ),
                 vol.Optional(const.ATTR_AREA): cv.string,
                 vol.Optional(const.ATTR_ENABLED): cv.boolean,
-                vol.Optional(ATTR_GROUP): vol.Any(cv.string, None),
+                vol.Optional(ATTR_GROUPS): vol.Any(
+                    vol.All(cv.ensure_list, [cv.string]), None
+                ),
                 vol.Optional(ATTR_ENTRY_DELAY): vol.Any(cv.positive_int, None),
                 vol.Optional(ATTR_DELAY_ON): vol.Any(cv.positive_int, None),
                 vol.Optional(ATTR_NEW_ENTITY_ID): cv.string,
@@ -411,8 +413,8 @@ def websocket_get_sensors(hass, connection, msg):
     coordinator = hass.data[const.DOMAIN]["coordinator"]
     sensors = coordinator.store.async_get_sensors()
     for entity_id in sensors.keys():
-        group = coordinator.async_get_group_for_sensor(entity_id)
-        sensors[entity_id]["group"] = group
+        groups = coordinator.async_get_groups_for_sensor(entity_id)
+        sensors[entity_id][ATTR_GROUPS] = groups
     connection.send_result(msg["id"], sensors)
 
 
