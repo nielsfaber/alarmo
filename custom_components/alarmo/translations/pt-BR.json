@@ -81,5 +81,8 @@
         "custom": "Armado Custom"
       }
     }
+  },
+  "open_sensor_area": {
+    "in_area": "em {area}"
   }
 }

@@ -496,7 +496,9 @@
               "description": "Choose which sensor information in inserted in the message",
               "options": {
                 "default": "Names and states",
-                "short": "Names only"
+                "short": "Names only",
+                "with_area": "Nimed ja olekud koos alaga",
+                "short_with_area": "Ainult nimed koos alaga"
               }
             },
             "arm_mode_format": {

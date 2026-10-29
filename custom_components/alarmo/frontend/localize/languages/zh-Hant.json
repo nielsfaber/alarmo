@@ -496,7 +496,9 @@
               "description": "選擇在信息中插入哪些傳感器信息",
               "options": {
                 "default": "名稱和狀態",
-                "short": "僅名稱"
+                "short": "僅名稱",
+                "with_area": "包含區域的名稱和狀態",
+                "short_with_area": "僅包含區域的名稱"
               }
             },
             "arm_mode_format": {

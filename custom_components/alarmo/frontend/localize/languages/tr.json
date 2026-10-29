@@ -496,7 +496,9 @@
               "description": "Mesaja hangi sensör bilgilerinin ekleneceğini seçin",
               "options": {
                 "default": "İsimler ve durumlar",
-                "short": "Sadece isimler"
+                "short": "Sadece isimler",
+                "with_area": "İsimler ve durumlar alanla birlikte",
+                "short_with_area": "Sadece isimler alanla birlikte"
               }
             },
             "arm_mode_format": {

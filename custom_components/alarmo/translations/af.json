@@ -81,5 +81,8 @@
         "custom": "Gestel | Pasmaak"
       }
     }
+  },
+  "open_sensor_area": {
+    "in_area": "in {area}"
   }
 }

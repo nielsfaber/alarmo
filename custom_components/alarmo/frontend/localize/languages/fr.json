@@ -496,7 +496,9 @@
               "description": "Choisissez les informations du capteur à insérer dans le message",
               "options": {
                 "default": "Noms et états",
-                "short": "Noms seulement"
+                "short": "Noms seulement",
+                "with_area": "Noms et états avec la zone",
+                "short_with_area": "Noms seulement avec la zone"
               }
             },
             "arm_mode_format": {

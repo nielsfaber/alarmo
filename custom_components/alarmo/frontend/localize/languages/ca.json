@@ -496,7 +496,9 @@
               "description": "Choose which sensor information in inserted in the message",
               "options": {
                 "default": "Names and states",
-                "short": "Names only"
+                "short": "Names only",
+                "with_area": "Noms i estats amb àrea",
+                "short_with_area": "Només noms amb àrea"
               }
             },
             "arm_mode_format": {
