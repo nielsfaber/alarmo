@@ -41,6 +41,7 @@ from homeassistant.components.alarm_control_panel import (
 )
 
 from . import const
+from .helpers import is_valid_access_code
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -359,9 +360,9 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             self._changed_by = None
             return True, None
 
-        if not code or len(code) < 1:
-            _LOGGER.debug("No code provided, but code is required. Rejecting command.")
-            return False, const.EVENT_NO_CODE_PROVIDED
+        if not is_valid_access_code(code):
+            _LOGGER.debug("No or invalid code provided, but code is required.")
+            return False, const.EVENT_INVALID_CODE_PROVIDED
         # resolve user
         user = await self.hass.data[const.DOMAIN][
             "coordinator"
