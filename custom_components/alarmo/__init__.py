@@ -39,7 +39,7 @@ from .panel import (
 )
 from .store import async_get_registry
 from .sensors import (
-    ATTR_GROUP,
+    ATTR_GROUPS,
     ATTR_ENTITIES,
     ATTR_NEW_ENTITY_ID,
     SensorHandler,
@@ -246,29 +246,29 @@ class AlarmoCoordinator(DataUpdateCoordinator):
 
     def async_update_sensor_config(self, entity_id: str, data: dict):
         """Update sensor configuration."""
-        group = None
-        if ATTR_GROUP in data:
-            group = data[ATTR_GROUP]
-            del data[ATTR_GROUP]
+        groups = None
+        if ATTR_GROUPS in data:
+            groups = data[ATTR_GROUPS]
+            del data[ATTR_GROUPS]
 
         if ATTR_NEW_ENTITY_ID in data:
             # delete old sensor entry when changing the entity_id
             new_entity_id = data[ATTR_NEW_ENTITY_ID]
             del data[ATTR_NEW_ENTITY_ID]
             self.store.async_delete_sensor(entity_id)
-            self.assign_sensor_to_group(new_entity_id, group)
-            self.assign_sensor_to_group(entity_id, None)
+            self.assign_sensor_to_groups(new_entity_id, groups or [])
+            self.assign_sensor_to_groups(entity_id, [])
             entity_id = new_entity_id
 
         if const.ATTR_REMOVE in data:
             self.store.async_delete_sensor(entity_id)
-            self.assign_sensor_to_group(entity_id, None)
+            self.assign_sensor_to_groups(entity_id, [])
         elif self.store.async_get_sensor(entity_id):
             self.store.async_update_sensor(entity_id, data)
-            self.assign_sensor_to_group(entity_id, group)
+            self.assign_sensor_to_groups(entity_id, groups or [])
         else:
             self.store.async_create_sensor(entity_id, data)
-            self.assign_sensor_to_group(entity_id, group)
+            self.assign_sensor_to_groups(entity_id, groups or [])
 
         async_dispatcher_send(self.hass, "alarmo_sensors_updated")
 
@@ -485,29 +485,37 @@ class AlarmoCoordinator(DataUpdateCoordinator):
         groups = self.store.async_get_sensor_groups()
         return list(groups.values())
 
-    def async_get_group_for_sensor(self, entity_id: str):
-        """Fetch the group ID for a given sensor."""
+    def async_get_groups_for_sensor(self, entity_id: str) -> list[str]:
+        """Fetch the group IDs a given sensor belongs to."""
         groups = self.async_get_sensor_groups()
-        result = next((el for el in groups if entity_id in el[ATTR_ENTITIES]), None)
-        return result["group_id"] if result else None
+        return [el["group_id"] for el in groups if entity_id in el[ATTR_ENTITIES]]
 
-    def assign_sensor_to_group(self, entity_id: str, group_id: str):
-        """Assign a sensor to a group."""
+    def assign_sensor_to_groups(self, entity_id: str, group_ids: list[str]):
+        """Assign a sensor to the given set of groups.
+
+        A sensor may belong to any number of groups at once (e.g. it may
+        corroborate with two unrelated neighbouring sensors); this replaces
+        the sensor's full group membership with `group_ids`.
+        """
         updated = False
-        old_group = self.async_get_group_for_sensor(entity_id)
-        if old_group and group_id != old_group:
-            # remove sensor from group
-            el = self.store.async_get_sensor_group(old_group)
+        old_group_ids = self.async_get_groups_for_sensor(entity_id)
+        for old_group_id in old_group_ids:
+            if old_group_id in group_ids:
+                continue
+            # remove sensor from a group it is no longer part of
+            el = self.store.async_get_sensor_group(old_group_id)
             if len(el[ATTR_ENTITIES]) > 2:
                 self.store.async_update_sensor_group(
-                    old_group,
+                    old_group_id,
                     {ATTR_ENTITIES: [x for x in el[ATTR_ENTITIES] if x != entity_id]},
                 )
             else:
-                self.store.async_delete_sensor_group(old_group)
+                self.store.async_delete_sensor_group(old_group_id)
             updated = True
-        if group_id:
-            # add sensor to group
+        for group_id in group_ids:
+            if group_id in old_group_ids:
+                continue
+            # add sensor to a newly assigned group
             group = self.store.async_get_sensor_group(group_id)
             if not group:
                 _LOGGER.error(

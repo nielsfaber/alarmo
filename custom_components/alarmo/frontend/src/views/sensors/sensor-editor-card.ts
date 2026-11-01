@@ -15,6 +15,7 @@ import { SubscribeMixin } from '../../subscribe-mixin';
 import '../../dialogs/error-dialog';
 import '../../dialogs/manage-sensor-groups-dialog';
 import '../../components/alarmo-select';
+import '../../components/alarmo-chip-set';
 import '../../components/alarmo-collapsible-section';
 import '../../components/alarmo-duration-picker';
 
@@ -212,16 +213,15 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
           <div style="padding: 8px 0px; max-width: 250px">
             ${Object.keys(this.sensorGroups).length
         ? html`
-                  <alarmo-select
+                  <alarmo-chip-set
                     .hass=${this.hass}
-                    .clearable=${true}
                     .items=${this.getSensorGroups()}
-                    value=${this.data.group}
-                    label="${localize('panels.sensors.cards.editor.fields.group.heading', this.hass.language)}"
+                    .value=${this.data.groups || []}
+                    toggleable
                     @value-changed=${(ev: CustomEvent) => {
-            this.data = { ...this.data!, group: ev.detail.value };
+            this.data = { ...this.data!, groups: ev.detail };
           }}
-                  ></alarmo-select>
+                  ></alarmo-chip-set>
                 `
         : ''}
             <ha-button appearance="filled" @click=${this.manageGroupsClick} style="margin-top: 4px">

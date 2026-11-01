@@ -7,7 +7,7 @@ import { dialogStyle } from '../styles';
 import { localize } from '../../localize/localize';
 import { UnsubscribeFunc } from 'home-assistant-js-websocket';
 import { SubscribeMixin } from '../subscribe-mixin';
-import { computeName, handleError, isDefined, prettyPrint, showErrorDialog, sortAlphabetically } from '../helpers';
+import { computeName, handleError, prettyPrint, showErrorDialog, sortAlphabetically } from '../helpers';
 import { ESensorIcons, ESensorTypes } from '../const';
 import { Option } from '../components/alarmo-select';
 
@@ -172,8 +172,9 @@ export class CreateSensorGroupDialog extends SubscribeMixin(LitElement) {
   }
 
   renderSensorOptions() {
+    // a sensor may belong to any number of groups at once, so no
+    // exclusivity filtering is needed here - every sensor is selectable
     const sensors = Object.keys(this.sensors)
-      .filter(e => !isDefined(this.sensors[e].group) || this.sensors[e].group === this.data.group_id)
       .map(e => {
         const stateObj = this.hass!.states[e];
         const type = Object.entries(ESensorTypes).find(([, v]) => v == this.sensors[e].type)![0];
