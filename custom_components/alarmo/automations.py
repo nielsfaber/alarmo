@@ -174,10 +174,18 @@ class AutomationHandler:
             async_dispatcher_connect(self.hass, "alarmo_event", async_handle_event)
         )
 
-    def __del__(self):
-        """Prepare for removal."""
+    def _unsubscribe_all(self):
+        """Remove every dispatcher subscription."""
         while len(self._subscriptions):
             self._subscriptions.pop()()
+
+    def __del__(self):
+        """Prepare for removal."""
+        self._unsubscribe_all()
+
+    async def async_unload(self):
+        """Stop executing configured automations."""
+        self._unsubscribe_all()
 
     async def async_execute_automation(
         self, automation_id: str, alarm_entity: AlarmoBaseEntity
