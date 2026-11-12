@@ -175,20 +175,36 @@ class SensorGroupEntry:
     event_count = attr.ib(type=int, default=2)
 
 
+def _filter_fields(cls: type, data: dict) -> dict:
+    """Return only the keys the attrs class declares.
+
+    Unknown keys can appear after a downgrade, a manual restore or a future
+    release. Passing them to the attrs constructor raises TypeError and the
+    whole integration fails to load, so drop them with a debug message.
+    """
+    known = {field.name for field in attr.fields(cls)}
+    unknown = sorted(set(data) - known)
+    if unknown:
+        _LOGGER.debug("Ignoring unknown %s fields: %s", cls.__name__, unknown)
+    return {key: value for key, value in data.items() if key in known}
+
+
 def parse_automation_entry(data: dict):
     """Parse automation entry from dict to proper types."""
 
     def create_trigger_entity(config: dict):
         if "event" in config:
-            return AlarmoTriggerEntry(**config)
+            return AlarmoTriggerEntry(**_filter_fields(AlarmoTriggerEntry, config))
         else:
-            return EntityTriggerEntry(**config)
+            return EntityTriggerEntry(**_filter_fields(EntityTriggerEntry, config))
 
     output = {}
     if "triggers" in data:
         output["triggers"] = list(map(create_trigger_entity, data["triggers"]))
     if "actions" in data:
-        output["actions"] = list(map(lambda el: ActionEntry(**el), data["actions"]))
+        output["actions"] = [
+            ActionEntry(**_filter_fields(ActionEntry, el)) for el in data["actions"]
+        ]
     if "automation_id" in data:
         output["automation_id"] = data["automation_id"]
     if "name" in data:
@@ -231,7 +247,11 @@ class MigratableStore(Store):
                     for el in data["actions"]
                 ]
 
-            return attr.asdict(AutomationEntry(**parse_automation_entry(data)))
+            return attr.asdict(
+                AutomationEntry(
+                    **_filter_fields(AutomationEntry, parse_automation_entry(data))
+                )
+            )
 
         if old_major_version == 1:
             area_id = str(int(time.time()))
@@ -394,21 +414,30 @@ class AlarmoStorage:
 
             if "sensors" in data:
                 for sensor in data["sensors"]:
-                    sensors[sensor["entity_id"]] = SensorEntry(**sensor)
+                    sensors[sensor["entity_id"]] = SensorEntry(
+                        **_filter_fields(SensorEntry, sensor)
+                    )
 
             if "users" in data:
                 for user in data["users"]:
-                    users[user["user_id"]] = UserEntry(**omit(user, ["is_admin"]))
+                    users[user["user_id"]] = UserEntry(
+                        **_filter_fields(UserEntry, omit(user, ["is_admin"]))
+                    )
 
             if "automations" in data:
                 for automation in data["automations"]:
                     automations[automation["automation_id"]] = AutomationEntry(
-                        **parse_automation_entry(automation)
+                        **_filter_fields(
+                            AutomationEntry,
+                            parse_automation_entry(automation),
+                        )
                     )
 
             if "sensor_groups" in data:
                 for group in data["sensor_groups"]:
-                    sensor_groups[group["group_id"]] = SensorGroupEntry(**group)
+                    sensor_groups[group["group_id"]] = SensorGroupEntry(
+                        **_filter_fields(SensorGroupEntry, group)
+                    )
 
         self.config = config
         self.areas = areas
@@ -520,7 +549,7 @@ class AlarmoStorage:
     def async_create_area(self, data: dict) -> AreaEntry:
         """Create a new AreaEntry."""
         area_id = str(int(time.time()))
-        new_area = AreaEntry(**data, area_id=area_id)
+        new_area = AreaEntry(**_filter_fields(AreaEntry, data), area_id=area_id)
         self.areas[area_id] = new_area
         self.async_schedule_save()
         return attr.asdict(new_area)
@@ -538,7 +567,9 @@ class AlarmoStorage:
     def async_update_area(self, area_id: str, changes: dict) -> AreaEntry:
         """Update existing self."""
         old = self.areas[area_id]
-        new = self.areas[area_id] = attr.evolve(old, **changes)
+        new = self.areas[area_id] = attr.evolve(
+            old, **_filter_fields(AreaEntry, changes)
+        )
         self.async_schedule_save()
         return attr.asdict(new)
 
@@ -561,7 +592,9 @@ class AlarmoStorage:
         """Create a new SensorEntry."""
         if entity_id in self.sensors:
             return False
-        new_sensor = SensorEntry(**data, entity_id=entity_id)
+        new_sensor = SensorEntry(
+            **_filter_fields(SensorEntry, data), entity_id=entity_id
+        )
         self.sensors[entity_id] = new_sensor
         self.async_schedule_save()
         return new_sensor
@@ -579,7 +612,9 @@ class AlarmoStorage:
     def async_update_sensor(self, entity_id: str, changes: dict) -> SensorEntry:
         """Update existing SensorEntry."""
         old = self.sensors[entity_id]
-        new = self.sensors[entity_id] = attr.evolve(old, **changes)
+        new = self.sensors[entity_id] = attr.evolve(
+            old, **_filter_fields(SensorEntry, changes)
+        )
         self.async_schedule_save()
         return new
 
@@ -601,7 +636,7 @@ class AlarmoStorage:
     def async_create_user(self, data: dict) -> UserEntry:
         """Create a new UserEntry."""
         user_id = str(int(time.time()))
-        new_user = UserEntry(**data, user_id=user_id)
+        new_user = UserEntry(**_filter_fields(UserEntry, data), user_id=user_id)
         self.users[user_id] = new_user
         self.async_schedule_save()
         return new_user
@@ -619,7 +654,9 @@ class AlarmoStorage:
     def async_update_user(self, user_id: str, changes: dict) -> UserEntry:
         """Update existing UserEntry."""
         old = self.users[user_id]
-        new = self.users[user_id] = attr.evolve(old, **changes)
+        new = self.users[user_id] = attr.evolve(
+            old, **_filter_fields(UserEntry, changes)
+        )
         self.async_schedule_save()
         return new
 
@@ -636,7 +673,8 @@ class AlarmoStorage:
         """Create a new AutomationEntry."""
         automation_id = str(int(time.time()))
         new_automation = AutomationEntry(
-            **parse_automation_entry(data), automation_id=automation_id
+            **_filter_fields(AutomationEntry, parse_automation_entry(data)),
+            automation_id=automation_id,
         )
         self.automations[automation_id] = new_automation
         self.async_schedule_save()
@@ -658,7 +696,8 @@ class AlarmoStorage:
         """Update existing AutomationEntry."""
         old = self.automations[automation_id]
         new = self.automations[automation_id] = attr.evolve(
-            old, **parse_automation_entry(changes)
+            old,
+            **_filter_fields(AutomationEntry, parse_automation_entry(changes)),
         )
         self.async_schedule_save()
         return new
@@ -681,7 +720,9 @@ class AlarmoStorage:
     def async_create_sensor_group(self, data: dict) -> SensorGroupEntry:
         """Create a new SensorGroupEntry."""
         group_id = str(int(time.time()))
-        new_group = SensorGroupEntry(**data, group_id=group_id)
+        new_group = SensorGroupEntry(
+            **_filter_fields(SensorGroupEntry, data), group_id=group_id
+        )
         self.sensor_groups[group_id] = new_group
         self.async_schedule_save()
         return group_id
@@ -701,7 +742,9 @@ class AlarmoStorage:
     ) -> SensorGroupEntry:
         """Update existing SensorGroupEntry."""
         old = self.sensor_groups[group_id]
-        new = self.sensor_groups[group_id] = attr.evolve(old, **changes)
+        new = self.sensor_groups[group_id] = attr.evolve(
+            old, **_filter_fields(SensorGroupEntry, changes)
+        )
         self.async_schedule_save()
         return new
 
