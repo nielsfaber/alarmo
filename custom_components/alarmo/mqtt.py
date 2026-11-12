@@ -270,8 +270,10 @@ class MqttHandler:
                     _LOGGER.warning("Ignoring an area with an unsupported type")
                     return
 
-            if (payload.get("bypass_open_sensors")) or (payload.get("force")):
-                bypass_open_sensors = payload["bypass_open_sensors"]
+            if payload.get("bypass_open_sensors") or payload.get("force"):
+                bypass_open_sensors = payload.get(
+                    "bypass_open_sensors", payload.get("force", False)
+                )
 
             if const.ATTR_SKIP_DELAY in payload:
                 skip_delay = _parse_bool(
