@@ -539,14 +539,13 @@ export class AutomationEditorCard extends LitElement {
         .filter(isDefined)
         .map(e => computeEntity(e))
     );
+    const stateObj = this.hass.states[entities[0]];
     let state: string | undefined = undefined;
-    if (services.length == 1 && services[0]?.includes('turn_on')) state = this.hass.localize('state.default.on');
-    if (services.length == 1 && services[0]?.includes('turn_off')) state = this.hass.localize('state.default.off');
-    if (services.length == 1 && services[0]?.includes('lock'))
-      state = this.hass.localize('component.lock.state._.locked');
-    if (services.length == 1 && services[0]?.includes('unlock'))
-      state = this.hass.localize('component.lock.state._.unlocked');
-    if (!event || !entity || !state) return '';
+    if (services.length == 1 && services[0]?.includes('turn_on')) state = 'on';
+    if (services.length == 1 && services[0]?.includes('turn_off')) state = 'off';
+    if (services.length == 1 && services[0]?.includes('lock')) state = 'locked';
+    if (services.length == 1 && services[0]?.includes('unlock')) state = 'unlocked';
+    if (!event || !entity || !state || !stateObj) return '';
     else
       return localize(
         `panels.actions.cards.new_action.fields.name.placeholders.${event}`,
@@ -554,7 +553,7 @@ export class AutomationEditorCard extends LitElement {
         'entity',
         entity,
         'state',
-        state
+        this.hass.formatEntityState(stateObj, state)
       );
   }
 
