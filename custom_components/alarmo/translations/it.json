@@ -81,5 +81,8 @@
         "custom": "Attivo Bypass Personalizzato"
       }
     }
+  },
+  "open_sensor_area": {
+    "in_area": "in {area}"
   }
 }

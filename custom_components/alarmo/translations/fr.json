@@ -81,5 +81,8 @@
         "custom": "Personnalisé"
       }
     }
+  },
+  "open_sensor_area": {
+    "in_area": "dans {area}"
   }
 }

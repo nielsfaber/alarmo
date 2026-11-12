@@ -81,5 +81,8 @@
         "custom": "Egyedi élesítés (zónák kizárásával)"
       }
     }
+  },
+  "open_sensor_area": {
+    "in_area": "a(z) {area} területén"
   }
 }

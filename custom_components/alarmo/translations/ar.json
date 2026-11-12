@@ -81,5 +81,8 @@
         "custom": "تسليح مخصص مع تجاوز"
       }
     }
+  },
+  "open_sensor_area": {
+    "in_area": "في {area}"
   }
 }

@@ -496,7 +496,9 @@
               "description": "Välj vilken sensorinformation som ska infogas i meddelandet",
               "options": {
                 "default": "Namn och tillstånd",
-                "short": "Endast namn"
+                "short": "Endast namn",
+                "with_area": "Namn och tillstånd med område",
+                "short_with_area": "Endast namn med område"
               }
             },
             "arm_mode_format": {

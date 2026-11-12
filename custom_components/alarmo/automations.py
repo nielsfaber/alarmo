@@ -14,6 +14,9 @@ from homeassistant.const import (
     ATTR_ENTITY_ID,
     CONF_SERVICE_DATA,
 )
+from homeassistant.helpers import area_registry as ar
+from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers import entity_registry as er
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.template import Template, is_template_string
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -36,6 +39,28 @@ from .alarm_control_panel import AlarmoBaseEntity
 _LOGGER = logging.getLogger(__name__)
 
 EVENT_ARM_FAILURE = "arm_failure"
+
+
+def _get_open_sensors_wildcard_options(modifiers: str | None) -> tuple[str, bool]:
+    """Parse the modifier section of an open-sensors wildcard.
+
+    Returns the requested language (default "en") and whether only sensor names
+    should be inserted. The modifiers may appear in any order.
+    """
+    lang = "en"
+    names_only = False
+    if not modifiers:
+        return lang, names_only
+
+    for modifier in modifiers.split("|"):
+        if not modifier:
+            continue
+        if modifier.startswith("lang="):
+            lang = modifier[len("lang=") :] or "en"
+        elif modifier == "format=short":
+            names_only = True
+
+    return lang, names_only
 
 
 def validate_area(trigger, area_id, hass):
@@ -86,6 +111,8 @@ class AutomationHandler:
         self._alarmTranslationCache = {}
         self._sensorTranslationLang = None
         self._alarmTranslationLang = None
+        self._sensorAreaTranslationCache = {}
+        self._sensorAreaTranslationLang = None
 
         def async_update_config():
             """Automation config updated, reload the configuration."""
@@ -274,26 +301,18 @@ class AutomationHandler:
         self, input: str, alarm_entity: AlarmoBaseEntity
     ):
         """Look for wildcards in string and replace them with content."""
-        # process wildcard '{{open_sensors}}'
-        res = re.search(r"{{open_sensors(\|lang=([^}]+))?(\|format=short)?}}", input)
-        if res:
-            lang = res.group(2) if res.group(2) else "en"
-            names_only = True if res.group(3) else False
-
-            open_sensors = ""
-            if alarm_entity.open_sensors:
-                parts = []
-                for entity_id, status in alarm_entity.open_sensors.items():
-                    if names_only:
-                        parts.append(friendly_name_for_entity_id(entity_id, self.hass))
-                    else:
-                        parts.append(
-                            await self.async_get_open_sensor_string(
-                                entity_id, status, lang
-                            )
-                        )
-                open_sensors = ", ".join(parts)
-            input = input.replace(res.group(0), open_sensors)
+        # process wildcards '{{open_sensors}}' and '{{open_sensors_with_area}}'
+        pattern = re.compile(
+            r"{{(open_sensors_with_area|open_sensors)"
+            r"((?:\|(?:lang=[^}|]+|format=short))*)}}"
+        )
+        for match in reversed(list(pattern.finditer(input))):
+            lang, names_only = _get_open_sensors_wildcard_options(match.group(2))
+            with_area = match.group(1) == "open_sensors_with_area"
+            open_sensors = await self._get_open_sensors_string(
+                alarm_entity, lang, names_only, with_area
+            )
+            input = input[: match.start()] + open_sensors + input[match.end() :]
 
         # process wildcard '{{bypassed_sensors}}'
         if "{{bypassed_sensors}}" in input:
@@ -331,8 +350,72 @@ class AutomationHandler:
 
         return input
 
+    async def _get_open_sensors_string(
+        self,
+        alarm_entity: AlarmoBaseEntity,
+        lang: str,
+        names_only: bool,
+        with_area: bool,
+    ) -> str:
+        """Return the joined text for the '{{open_sensors}}' family of wildcards."""
+        if not alarm_entity.open_sensors:
+            return ""
+
+        parts = []
+        for entity_id, status in alarm_entity.open_sensors.items():
+            if names_only:
+                name = friendly_name_for_entity_id(entity_id, self.hass)
+                if with_area:
+                    area_name = self.get_area_name(entity_id)
+                    parts.append(f"{name} ({area_name})" if area_name else name)
+                else:
+                    parts.append(name)
+            else:
+                parts.append(
+                    await self.async_get_open_sensor_string(
+                        entity_id, status, lang, with_area=with_area
+                    )
+                )
+        return ", ".join(parts)
+
+    async def _async_get_open_sensor_area_translations(
+        self, language: str
+    ) -> dict[str, str]:
+        """Get Alarmo translations for sensor states including area."""
+        if (
+            self._sensorAreaTranslationCache
+            and self._sensorAreaTranslationLang == language
+        ):
+            return self._sensorAreaTranslationCache
+
+        translations = await async_get_translations(
+            self.hass, language, "open_sensor_area", [const.DOMAIN]
+        )
+
+        self._sensorAreaTranslationCache = translations
+        self._sensorAreaTranslationLang = language
+        return translations
+
+    @callback
+    def get_area_name(self, entity_id: str) -> str | None:
+        """Get the name of the Home Assistant area an entity belongs to."""
+        entity_registry = er.async_get(self.hass)
+        device_registry = dr.async_get(self.hass)
+        area_registry = ar.async_get(self.hass)
+
+        entity = entity_registry.async_get(entity_id)
+        if not entity or not entity.device_id:
+            return None
+
+        device = device_registry.async_get(entity.device_id)
+        if not device or not device.area_id:
+            return None
+
+        area = area_registry.async_get_area(device.area_id)
+        return area.name if area else None
+
     async def async_get_open_sensor_string(
-        self, entity_id: str, state: str, language: str
+        self, entity_id: str, state: str, language: str, with_area: bool = False
     ):
         """Get translation for sensor states."""
         if self._sensorTranslationCache and self._sensorTranslationLang == language:
@@ -382,6 +465,18 @@ class AutomationHandler:
 
         name = friendly_name_for_entity_id(entity_id, self.hass)
         string = string.replace("{entity_name}", name)
+
+        if with_area:
+            area_name = self.get_area_name(entity_id)
+            if area_name:
+                translations = await self._async_get_open_sensor_area_translations(
+                    language
+                )
+                location = translations.get(
+                    f"component.{const.DOMAIN}.open_sensor_area.in_area",
+                    "in {area}",
+                )
+                string = f"{string} {location.replace('{area}', area_name)}"
 
         return string
 

@@ -81,5 +81,8 @@
         "custom": "Benutzerdefinierter Modus scharf"
       }
     }
+  },
+  "open_sensor_area": {
+    "in_area": "in {area}"
   }
 }

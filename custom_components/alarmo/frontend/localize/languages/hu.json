@@ -496,7 +496,9 @@
               "description": "Válaszd ki, milyen érzékelő-információ jelenjen meg az üzenetben",
               "options": {
                 "default": "Nevek és állapotok",
-                "short": "Csak nevek"
+                "short": "Csak nevek",
+                "with_area": "Nevek és állapotok területtel",
+                "short_with_area": "Csak nevek területtel"
               }
             },
             "arm_mode_format": {
