@@ -31,6 +31,7 @@ export interface HomeAssistant {
   states: HassEntities;
   services: HassServices;
   localize: (key: string, ...args: any[]) => string;
+  formatEntityState: (stateObj: HassEntity, state?: string) => string;
   translationMetadata: {
     fragments: string[];
     translations: {
