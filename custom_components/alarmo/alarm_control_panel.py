@@ -19,6 +19,7 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
 )
 from homeassistant.helpers import entity_platform
+from homeassistant.helpers import entity_registry as er
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.event import (
     async_call_later,
@@ -34,6 +35,7 @@ from homeassistant.components.alarm_control_panel import (
     DOMAIN as PLATFORM,
 )
 from homeassistant.components.alarm_control_panel import (
+    DATA_COMPONENT,
     ATTR_CODE_ARM_REQUIRED,
     AlarmControlPanelState,
     AlarmControlPanelEntity,
@@ -41,7 +43,6 @@ from homeassistant.components.alarm_control_panel import (
 )
 
 from . import const
-from homeassistant.helpers import entity_registry as er
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -72,14 +73,13 @@ def _purge_stale_state_entries(hass, entity_ids: list[str]) -> None:
     for entity_id in entity_ids:
         if not hass.states.async_available(entity_id):
             _LOGGER.info(
-                "Removing stale state-machine entry for %s"
-                " before entity registration",
+                "Removing stale state-machine entry for %s before entity registration",
                 entity_id,
             )
             hass.states.async_remove(entity_id)
 
 
-async def async_setup_entry(hass, config_entry, async_add_devices):
+async def async_setup_entry(hass, config_entry, async_add_devices):  # noqa: PLR0915
     """Set up the Alarmo entities."""
 
     @callback
@@ -109,7 +109,9 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
             ):
                 _LOGGER.warning(
                     "Updating stale entity %s -> %s (unique_id=%s)",
-                    ent.entity_id, entity_id, new_unique_id,
+                    ent.entity_id,
+                    entity_id,
+                    new_unique_id,
                 )
                 entity_registry.async_update_entity(
                     ent.entity_id, new_entity_id=entity_id
@@ -121,7 +123,9 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
         if registry_entry and registry_entry.unique_id != new_unique_id:
             _LOGGER.info(
                 "Migrating %s unique_id from %s to %s",
-                entity_id, registry_entry.unique_id, new_unique_id,
+                entity_id,
+                registry_entry.unique_id,
+                new_unique_id,
             )
             entity_registry.async_update_entity(entity_id, new_unique_id=new_unique_id)
 
@@ -177,7 +181,9 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
             ):
                 _LOGGER.warning(
                     "Updating stale entity %s -> %s (unique_id=%s)",
-                    ent.entity_id, entity_id, new_unique_id,
+                    ent.entity_id,
+                    entity_id,
+                    new_unique_id,
                 )
                 entity_registry.async_update_entity(
                     ent.entity_id, new_entity_id=entity_id
@@ -189,7 +195,9 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
         if registry_entry and registry_entry.unique_id != new_unique_id:
             _LOGGER.info(
                 "Migrating master %s unique_id from %s to %s",
-                entity_id, registry_entry.unique_id, new_unique_id,
+                entity_id,
+                registry_entry.unique_id,
+                new_unique_id,
             )
             entity_registry.async_update_entity(entity_id, new_unique_id=new_unique_id)
 
@@ -256,7 +264,6 @@ async def async_unload_entry(hass, config_entry):
     # Delegate to HA's EntityComponent so entities added via async_add_devices
     # are properly removed from the platform. Without this the entity objects
     # linger across reloads and the next setup hits "unique ID already in use".
-    from homeassistant.components.alarm_control_panel import DATA_COMPONENT
     component = hass.data.get(DATA_COMPONENT)
     if component:
         await component.async_unload_entry(config_entry)
@@ -1344,10 +1351,7 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
         areas = self.hass.data[const.DOMAIN].get("areas", {})
         if not areas:
             return 0
-        features_list = [
-            item.supported_features or 0
-            for item in areas.values()
-        ]
+        features_list = [item.supported_features or 0 for item in areas.values()]
         if not features_list:
             return 0
         return functools.reduce(operator.and_, features_list)
@@ -1528,11 +1532,15 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
             if item.open_sensors:
                 open_sensors.update(item.open_sensors)
 
-        if state is not None and self._ready_to_arm_modes and (
-            arm_mode == self._arm_mode
-            and state == self._state
-            and delay == self.delay
-            and open_sensors == self.open_sensors
+        if (
+            state is not None
+            and self._ready_to_arm_modes
+            and (
+                arm_mode == self._arm_mode
+                and state == self._state
+                and delay == self.delay
+                and open_sensors == self.open_sensors
+            )
         ):
             # do not update if state and properties remain unchanged
             return
