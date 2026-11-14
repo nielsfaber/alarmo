@@ -111,6 +111,7 @@ ATTR_ENTRY_TIME = "entry_time"
 
 ATTR_ENABLED = "enabled"
 ATTR_USER_ID = "user_id"
+ATTR_PANEL_ADMIN_USERS = "panel_admin_users"
 
 ATTR_CAN_ARM = "can_arm"
 ATTR_CAN_DISARM = "can_disarm"

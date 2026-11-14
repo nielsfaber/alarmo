@@ -44,7 +44,7 @@ async def async_register_panel(hass):
         module_url=f"{PANEL_URL}?v={VERSION}&m={cache_bust}",
         sidebar_title=PANEL_TITLE,
         sidebar_icon=PANEL_ICON,
-        require_admin=True,
+        require_admin=False,
         config={},
         config_panel_domain=DOMAIN,
     )

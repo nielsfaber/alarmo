@@ -643,3 +643,15 @@ async def test_mode_change_without_code_when_not_required(
         state = hass.states.get(ALARM_ENTITY)
         assert state.state == "armed_home"
         assert state.attributes.get("changed_by") is None
+
+
+
+@pytest.mark.asyncio
+async def test_panel_admin_access_storage(hass: Any) -> None:
+    """Test persistence of Alarmo panel administrator users."""
+    from custom_components.alarmo.store import AlarmoStorage
+
+    storage = AlarmoStorage(hass)
+    storage.async_set_panel_admin_users(["user_1", "user_2", "user_1"])
+    assert storage.async_get_panel_admin_users() == ["user_1", "user_2"]
+    assert storage._data_to_save()["panel_admin_users"] == ["user_1", "user_2"]
