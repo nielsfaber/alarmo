@@ -1618,6 +1618,9 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
                         code=code, skip_code=True, context_id=context_id
                     )
 
+            # the master's EVENT_DISARM is already dispatched by
+            # super().async_alarm_disarm(), so don't send it a second time
+
             return True
         return False
 
