@@ -1,13 +1,28 @@
 """fire events in HA for use with automations."""
 
+import time
 import logging
 
-from homeassistant.core import callback
+from homeassistant.core import Context, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
 from . import const
 
 _LOGGER = logging.getLogger(__name__)
+
+CONTEXT_RECENT_TIME_SECONDS = 5
+
+
+# events that are written to the logbook, with the activity action they map to
+ACTIVITY_ACTIONS = {
+    const.EVENT_ARM: "arm",
+    const.EVENT_DISARM: "disarm",
+    const.EVENT_TRIGGER: "trigger",
+    const.EVENT_FAILED_TO_ARM: "failed_to_arm",
+    const.EVENT_COMMAND_NOT_ALLOWED: "command_not_allowed",
+    const.EVENT_INVALID_CODE_PROVIDED: "invalid_code",
+    const.EVENT_NO_CODE_PROVIDED: "no_code",
+}
 
 
 class EventHandler:
@@ -24,6 +39,50 @@ class EventHandler:
         """Class destructor."""
         self._subscription()
 
+    def _fire_activity(self, event: str, area_id: str, alarm_entity, args: dict):
+        """Fire a logbook event that is linked to the cause of the action."""
+        sensors = list((args.get("open_sensors") or {}).keys())
+
+        # the cause is the sensor that changed, or else the context of the
+        # service call that is currently handled by the alarm entity
+        parent_id = None
+        for sensor in sensors:
+            sensor_state = self.hass.states.get(sensor)
+            if sensor_state is not None:
+                parent_id = sensor_state.context.id
+                break
+        if parent_id is None:
+            # only use the entity context while it is recent, like HA does
+            #   when writing the entity state
+            context_set = getattr(alarm_entity, "_context_set", None)
+            if (
+                context_set is not None
+                and time.time() - context_set < CONTEXT_RECENT_TIME_SECONDS
+                and alarm_entity._context is not None
+            ):
+                parent_id = alarm_entity._context.id
+
+        context = Context(parent_id=parent_id)
+        alarm_entity.async_set_context(context)
+
+        data = {
+            "action": ACTIVITY_ACTIONS[event],
+            "area_id": area_id,
+            "entity_id": alarm_entity.entity_id,
+            "name": alarm_entity.name,
+        }
+        if sensors:
+            data["sensors"] = sensors
+        if args.get("arm_mode"):
+            data["mode"] = const.STATE_TO_ARM_MODE[args["arm_mode"]]
+        for key in ("delay", "command", "state"):
+            if args.get(key) is not None:
+                data[key] = args[key]
+        if event in (const.EVENT_ARM, const.EVENT_DISARM) and alarm_entity.changed_by:
+            data["changed_by"] = alarm_entity.changed_by
+
+        self.hass.bus.async_fire(const.EVENT_ACTIVITY, data, context=context)
+
     @callback
     def async_handle_event(self, event: str, area_id: str, args: dict = {}):
         """Handle event."""
@@ -39,6 +98,9 @@ class EventHandler:
                 event,
             )
             return
+
+        if event in ACTIVITY_ACTIONS and (area_id or event != const.EVENT_TRIGGER):
+            self._fire_activity(event, area_id, alarm_entity, args)
 
         if event in [
             const.EVENT_FAILED_TO_ARM,
