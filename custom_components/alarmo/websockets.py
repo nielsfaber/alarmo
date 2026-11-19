@@ -58,6 +58,28 @@ from .sensors import (
 )
 
 
+def _is_panel_admin(hass, user_id: str | None) -> bool:
+    """Return whether the Home Assistant user may administer Alarmo."""
+    if not user_id:
+        return False
+    user = hass.auth.async_get_user(user_id)
+    if user is None:
+        return False
+    if user.is_admin:
+        return True
+    coordinator = hass.data[const.DOMAIN]["coordinator"]
+    return user_id in coordinator.store.async_get_panel_admin_users()
+
+
+
+def _require_panel_admin(request) -> None:
+    """Raise when the current Home Assistant user is not an Alarmo admin."""
+    hass = request.app["hass"]
+    user = request.get("hass_user")
+    user_id = user.id if user else None
+    if not _is_panel_admin(hass, user_id):
+        raise vol.Invalid("Not authorized to administer Alarmo")
+
 @callback
 @decorators.websocket_command(
     {
@@ -67,6 +89,10 @@ from .sensors import (
 @decorators.async_response
 async def handle_subscribe_updates(hass, connection, msg):
     """Handle subscribe updates."""
+
+    if not _is_panel_admin(hass, connection.user.id if connection.user else None):
+        connection.send_error(msg["id"], "unauthorized", "Not authorized to administer Alarmo")
+        return
 
     @callback
     def async_handle_event():
@@ -83,6 +109,36 @@ async def handle_subscribe_updates(hass, connection, msg):
     )
     connection.send_result(msg["id"])
 
+
+class AlarmoPanelAccessView(HomeAssistantView):
+    """Manage Home Assistant users allowed to administer Alarmo."""
+
+    url = "/api/alarmo/panel_access"
+    name = "api:alarmo:panel_access"
+
+    async def get(self, request):
+        """Return the configured Alarmo panel access list."""
+        _require_panel_admin(request)
+        hass = request.app["hass"]
+        coordinator = hass.data[const.DOMAIN]["coordinator"]
+        return self.json({"user_ids": coordinator.store.async_get_panel_admin_users()})
+
+    @RequestDataValidator(vol.Schema({
+        vol.Required("user_ids"): vol.All(cv.ensure_list, [cv.string])
+    }))
+    async def post(self, request, data):
+        """Update the Alarmo panel access list."""
+        _require_panel_admin(request)
+        hass = request.app["hass"]
+        coordinator = hass.data[const.DOMAIN]["coordinator"]
+        user_ids = list(dict.fromkeys(data["user_ids"]))
+        valid_user_ids = {user.id for user in hass.auth.async_get_users()}
+        invalid = sorted(set(user_ids) - valid_user_ids)
+        if invalid:
+            raise vol.Invalid("Unknown Home Assistant user")
+        coordinator.store.async_set_panel_admin_users(user_ids)
+        async_dispatcher_send(hass, "alarmo_panel_access_updated")
+        return self.json({"success": True})
 
 class AlarmoConfigView(HomeAssistantView):
     """Login to Home Assistant cloud."""
@@ -152,6 +208,7 @@ class AlarmoConfigView(HomeAssistantView):
         )
     )
     async def post(self, request, data):
+        _require_panel_admin(request)
         """Handle config update request."""
         hass = request.app["hass"]
         coordinator = hass.data[const.DOMAIN]["coordinator"]
@@ -194,6 +251,7 @@ class AlarmoAreaView(HomeAssistantView):
         )
     )
     async def post(self, request, data):
+        _require_panel_admin(request)
         """Handle config update request."""
         hass = request.app["hass"]
         coordinator = hass.data[const.DOMAIN]["coordinator"]
@@ -242,6 +300,7 @@ class AlarmoSensorView(HomeAssistantView):
         )
     )
     async def post(self, request, data):
+        _require_panel_admin(request)
         """Handle config update request."""
         hass = request.app["hass"]
         coordinator = hass.data[const.DOMAIN]["coordinator"]
@@ -277,6 +336,7 @@ class AlarmoUserView(HomeAssistantView):
         )
     )
     async def post(self, request, data):
+        _require_panel_admin(request)
         """Handle config update request."""
         hass = request.app["hass"]
         coordinator = hass.data[const.DOMAIN]["coordinator"]
@@ -344,6 +404,7 @@ class AlarmoAutomationView(HomeAssistantView):
         )
     )
     async def post(self, request, data):
+        _require_panel_admin(request)
         """Handle config update request."""
         hass = request.app["hass"]
         coordinator = hass.data[const.DOMAIN]["coordinator"]
@@ -377,6 +438,7 @@ class AlarmoSensorGroupView(HomeAssistantView):
         )
     )
     async def post(self, request, data):
+        _require_panel_admin(request)
         """Handle config update request."""
         hass = request.app["hass"]
         coordinator = hass.data[const.DOMAIN]["coordinator"]
@@ -508,6 +570,7 @@ def websocket_get_ready_to_arm_modes(hass, connection, msg):
 async def async_register_websockets(hass):
     """Register websocket handlers."""
     hass.http.register_view(AlarmoConfigView)
+    hass.http.register_view(AlarmoPanelAccessView)
     hass.http.register_view(AlarmoSensorView)
     hass.http.register_view(AlarmoUserView)
     hass.http.register_view(AlarmoAutomationView)

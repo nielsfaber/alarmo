@@ -332,6 +332,7 @@ class AlarmoStorage:
         self.users: MutableMapping[str, UserEntry] = {}
         self.automations: MutableMapping[str, AutomationEntry] = {}
         self.sensor_groups: MutableMapping[str, SensorGroupEntry] = {}
+        self.panel_admin_users: list[str] = []
         self._store = MigratableStore(
             hass,
             STORAGE_VERSION_MAJOR,
@@ -348,6 +349,7 @@ class AlarmoStorage:
         users: OrderedDict[str, UserEntry] = OrderedDict()
         automations: OrderedDict[str, AutomationEntry] = OrderedDict()
         sensor_groups: OrderedDict[str, SensorGroupEntry] = OrderedDict()
+        panel_admin_users: list[str] = []
 
         if data is not None:
             config = Config(
@@ -406,6 +408,8 @@ class AlarmoStorage:
                         **parse_automation_entry(automation)
                     )
 
+            panel_admin_users = list(data.get("panel_admin_users", []))
+
             if "sensor_groups" in data:
                 for group in data["sensor_groups"]:
                     sensor_groups[group["group_id"]] = SensorGroupEntry(**group)
@@ -416,6 +420,7 @@ class AlarmoStorage:
         self.automations = automations
         self.users = users
         self.sensor_groups = sensor_groups
+        self.panel_admin_users = panel_admin_users
 
         if not areas:
             await self.async_factory_default()
@@ -460,6 +465,7 @@ class AlarmoStorage:
         store_data["automations"] = [
             attr.asdict(entry) for entry in self.automations.values()
         ]
+        store_data["panel_admin_users"] = list(self.panel_admin_users)
         store_data["sensor_groups"] = [
             attr.asdict(entry) for entry in self.sensor_groups.values()
         ]
@@ -476,7 +482,19 @@ class AlarmoStorage:
         self.users = {}
         self.automations = {}
         self.sensor_groups = {}
+        self.panel_admin_users = []
         await self.async_factory_default()
+
+    @callback
+    def async_get_panel_admin_users(self) -> list[str]:
+        """Return users allowed to administer the Alarmo panel."""
+        return list(self.panel_admin_users)
+
+    @callback
+    def async_set_panel_admin_users(self, user_ids: list[str]) -> None:
+        """Set users allowed to administer the Alarmo panel."""
+        self.panel_admin_users = list(dict.fromkeys(user_ids))
+        self.async_schedule_save()
 
     @callback
     def async_get_config(self):

@@ -402,6 +402,14 @@
               "description": "Current code, leave empty to leave unchanged."
             }
           }
+        },
+        "panel_access": {
+          "title": "Alarmo panel access",
+          "description": "Select the Home Assistant users that may administer the Alarmo panel. Home Assistant administrators always have access.",
+          "actions": {
+            "save": "Save"
+          },
+          "denied": "You are not authorized to administer the Alarmo panel."
         }
       }
     },
