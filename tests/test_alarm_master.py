@@ -4,6 +4,7 @@ from typing import Any
 from unittest.mock import AsyncMock
 
 import pytest
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
 from tests.helpers import (
     advance_time,
@@ -139,6 +140,16 @@ async def test_alarm_master_propagates_commands(
         await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
 
+        backend_events: list[tuple[str, str | None]] = []
+
+        def capture_backend_event(
+            event_type: str, area_id: str | None, args: dict
+        ) -> None:
+            """Capture backend dispatcher events."""
+            backend_events.append((event_type, area_id))
+
+        async_dispatcher_connect(hass, "alarmo_event", capture_backend_event)
+
         hass.states.async_set("binary_sensor.area_1_door", "off")
         hass.states.async_set("binary_sensor.area_2_door", "off")
         await hass.async_block_till_done()
@@ -179,6 +190,7 @@ async def test_alarm_master_propagates_commands(
         assert_alarm_state(hass, "alarm_control_panel.master", "armed_away")
 
         # Disarm the master to clean up timers
+        backend_events.clear()
         await hass.services.async_call(
             "alarm_control_panel",
             "alarm_disarm",
@@ -187,6 +199,9 @@ async def test_alarm_master_propagates_commands(
         )
         await hass.async_block_till_done()
         assert_alarm_state(hass, "alarm_control_panel.master", "disarmed")
+        assert [
+            event for event in backend_events if event == (const.EVENT_DISARM, None)
+        ] == [(const.EVENT_DISARM, None)]
 
 
 @pytest.mark.asyncio

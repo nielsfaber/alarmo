@@ -19,6 +19,7 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
 )
 from homeassistant.helpers import entity_platform
+from homeassistant.helpers import entity_registry as er
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.event import (
     async_call_later,
@@ -34,6 +35,7 @@ from homeassistant.components.alarm_control_panel import (
     DOMAIN as PLATFORM,
 )
 from homeassistant.components.alarm_control_panel import (
+    DATA_COMPONENT,
     ATTR_CODE_ARM_REQUIRED,
     AlarmControlPanelState,
     AlarmControlPanelEntity,
@@ -58,13 +60,74 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     return True
 
 
-async def async_setup_entry(hass, config_entry, async_add_devices):
+def _purge_stale_state_entries(hass, entity_ids: list[str]) -> None:
+    """Remove stale state-machine entries that would block entity registration.
+
+    Other integrations (e.g. autoarm) may call hass.states.async_set()
+    directly on alarmo entity_ids, creating state entries that survive
+    alarmo reloads. HA's entity platform rejects new entities whose
+    entity_id is already taken in the state machine, which causes HA to
+    rename the new entity to master_alarm_2 / area_2. Clear those stale
+    entries before calling async_add_devices.
+    """
+    for entity_id in entity_ids:
+        if not hass.states.async_available(entity_id):
+            _LOGGER.info(
+                "Removing stale state-machine entry for %s before entity registration",
+                entity_id,
+            )
+            hass.states.async_remove(entity_id)
+
+
+async def async_setup_entry(hass, config_entry, async_add_devices):  # noqa: PLR0915
     """Set up the Alarmo entities."""
 
     @callback
     def async_add_alarm_entity(config: dict):
         """Add each entity as Alarm Control Panel."""
         entity_id = f"{PLATFORM}.{slugify(config['name'])}"
+        new_unique_id = f"{const.DOMAIN}_area_{config['area_id']}"
+
+        entity_registry = er.async_get(hass)
+        deleted_key = (PLATFORM, const.DOMAIN, new_unique_id)
+
+        # Purge any deleted-entity tombstone for our unique_id.
+        # If we don't, async_get_or_create restores the old entity_id
+        # (e.g. area_2) from deleted_entities cache.
+        if deleted_key in entity_registry.deleted_entities:
+            _LOGGER.info(
+                "Purging deleted-entity tombstone for unique_id=%s", new_unique_id
+            )
+            entity_registry.deleted_entities.pop(deleted_key)
+
+        # Fix any live entry that owns our unique_id under the wrong entity_id.
+        for ent in list(entity_registry.entities.values()):
+            if (
+                ent.entity_id != entity_id
+                and ent.unique_id == new_unique_id
+                and ent.domain == PLATFORM
+            ):
+                _LOGGER.warning(
+                    "Updating stale entity %s -> %s (unique_id=%s)",
+                    ent.entity_id,
+                    entity_id,
+                    new_unique_id,
+                )
+                entity_registry.async_update_entity(
+                    ent.entity_id, new_entity_id=entity_id
+                )
+                break
+
+        # Migrate existing entity to the new stable unique_id if needed.
+        registry_entry = entity_registry.async_get(entity_id)
+        if registry_entry and registry_entry.unique_id != new_unique_id:
+            _LOGGER.info(
+                "Migrating %s unique_id from %s to %s",
+                entity_id,
+                registry_entry.unique_id,
+                new_unique_id,
+            )
+            entity_registry.async_update_entity(entity_id, new_unique_id=new_unique_id)
 
         # Guard against duplicate registration (reloads/upgrade timing)
         if config["area_id"] in hass.data[const.DOMAIN]["areas"]:
@@ -84,6 +147,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
             area_id=config["area_id"],
         )
         hass.data[const.DOMAIN]["areas"][config["area_id"]] = alarm_entity
+        _purge_stale_state_entries(hass, [entity_id])
         async_add_devices([alarm_entity])
 
     unsub_area = async_dispatcher_connect(
@@ -94,8 +158,50 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     def async_add_alarm_master(config: dict):
         """Add each entity as Alarm Control Panel."""
         entity_id = f"{PLATFORM}.{slugify(config['name'])}"
+        new_unique_id = f"{const.DOMAIN}_master"
 
-        # Guard against duplicate master registration
+        entity_registry = er.async_get(hass)
+        deleted_key = (PLATFORM, const.DOMAIN, new_unique_id)
+
+        # Purge any deleted-entity tombstone for our unique_id.
+        # If we don't, async_get_or_create restores master_alarm_2
+        # from deleted_entities cache instead of using master_alarm.
+        if deleted_key in entity_registry.deleted_entities:
+            _LOGGER.info(
+                "Purging deleted-entity tombstone for unique_id=%s", new_unique_id
+            )
+            entity_registry.deleted_entities.pop(deleted_key)
+
+        # Fix any live entry that owns our unique_id under the wrong entity_id.
+        for ent in list(entity_registry.entities.values()):
+            if (
+                ent.entity_id != entity_id
+                and ent.unique_id == new_unique_id
+                and ent.domain == PLATFORM
+            ):
+                _LOGGER.warning(
+                    "Updating stale entity %s -> %s (unique_id=%s)",
+                    ent.entity_id,
+                    entity_id,
+                    new_unique_id,
+                )
+                entity_registry.async_update_entity(
+                    ent.entity_id, new_entity_id=entity_id
+                )
+                break
+
+        # Migrate existing entity to the new stable unique_id if needed.
+        registry_entry = entity_registry.async_get(entity_id)
+        if registry_entry and registry_entry.unique_id != new_unique_id:
+            _LOGGER.info(
+                "Migrating master %s unique_id from %s to %s",
+                entity_id,
+                registry_entry.unique_id,
+                new_unique_id,
+            )
+            entity_registry.async_update_entity(entity_id, new_unique_id=new_unique_id)
+
+        # Guard against duplicate master registration (e.g. multiple dispatches)
         if hass.data[const.DOMAIN]["master"] is not None:
             existing = hass.data[const.DOMAIN]["master"]
             if existing and getattr(existing, "entity_id", None) == entity_id:
@@ -110,6 +216,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
             name=config["name"],
         )
         hass.data[const.DOMAIN]["master"] = alarm_entity
+        _purge_stale_state_entries(hass, [entity_id])
         async_add_devices([alarm_entity])
 
     unsub_master = async_dispatcher_connect(
@@ -142,6 +249,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 
 async def async_unload_entry(hass, config_entry):
     """Unload the Alarmo alarm_control_panel platform for a config entry."""
+    # Cancel dispatcher subscriptions registered in async_setup_entry.
     unsubs = (
         hass.data.get(const.DOMAIN, {})
         .get(PLATFORM_UNSUBS, {})
@@ -152,6 +260,13 @@ async def async_unload_entry(hass, config_entry):
             unsub()
         except Exception:  # defensive: ensure unload proceeds
             _LOGGER.debug("Error while unsubscribing platform listener", exc_info=True)
+
+    # Delegate to HA's EntityComponent so entities added via async_add_devices
+    # are properly removed from the platform. Without this the entity objects
+    # linger across reloads and the next setup hits "unique ID already in use".
+    component = hass.data.get(DATA_COMPONENT)
+    if component:
+        await component.async_unload_entry(config_entry)
     return True
 
 
@@ -192,8 +307,12 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
 
     @property
     def unique_id(self):
-        """Return a unique ID to use for this entity."""
-        return f"{self.entity_id}"
+        """Return a unique ID to use for this entity.
+
+        Subclasses MUST override this with a stable identifier
+        that does not depend on the human-readable entity_id/name.
+        """
+        raise NotImplementedError("Subclasses must provide a stable unique_id")
 
     @property
     def name(self):
@@ -729,6 +848,12 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
 
     async def async_will_remove_from_hass(self):
         """Disconnect entity object when removed."""
+        # Area entities keep an exit/entry/trigger timer. The callback holds a
+        # reference to the entity, so leaving it registered leaks the entity
+        # and lets the timer fire during/after a reload.
+        clear_timer = getattr(self, "async_clear_timer", None)
+        if clear_timer is not None:
+            clear_timer()
         await super().async_will_remove_from_hass()
         _LOGGER.debug(
             "%s is removed from hass",
@@ -750,6 +875,11 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
         coordinator = self.hass.data[const.DOMAIN]["coordinator"]
         self._config = coordinator.store.async_get_config()
         self._config.update(coordinator.store.async_get_area(self.area_id))
+
+    @property
+    def unique_id(self):
+        """Return a unique ID based on the stable area identifier."""
+        return f"{const.DOMAIN}_area_{self.area_id}"
 
     @property
     def supported_features(self) -> int:
@@ -1211,13 +1341,20 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
         self._target_state = None
 
     @property
+    def unique_id(self):
+        """Return a unique ID based on a stable master identifier."""
+        return f"{const.DOMAIN}_master"
+
+    @property
     def supported_features(self) -> int:
         """Return the list of supported features."""
-        supported_features = [
-            item.supported_features or 0
-            for item in self.hass.data[const.DOMAIN]["areas"].values()
-        ]
-        return functools.reduce(operator.and_, supported_features)
+        areas = self.hass.data[const.DOMAIN].get("areas", {})
+        if not areas:
+            return 0
+        features_list = [item.supported_features or 0 for item in areas.values()]
+        if not features_list:
+            return 0
+        return functools.reduce(operator.and_, features_list)
 
     @property
     def next_state(self):
@@ -1396,10 +1533,14 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
                 open_sensors.update(item.open_sensors)
 
         if (
-            arm_mode == self._arm_mode
-            and (state == self._state or not state)
-            and delay == self.delay
-            and open_sensors == self.open_sensors
+            state is not None
+            and self._ready_to_arm_modes
+            and (
+                arm_mode == self._arm_mode
+                and state == self._state
+                and delay == self.delay
+                and open_sensors == self.open_sensors
+            )
         ):
             # do not update if state and properties remain unchanged
             return
@@ -1477,13 +1618,9 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
                         code=code, skip_code=True, context_id=context_id
                     )
 
-            dispatcher_send(
-                self.hass,
-                "alarmo_event",
-                const.EVENT_DISARM,
-                self.area_id,
-                {const.ATTR_CONTEXT_ID: context_id},
-            )
+            # the master's EVENT_DISARM is already dispatched by
+            # super().async_alarm_disarm(), so don't send it a second time
+
             return True
         return False
 

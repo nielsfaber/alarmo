@@ -350,7 +350,7 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
 
                   <alarmo-duration-picker
                     .hass=${this.hass}
-                    max="60"
+                    max="300"
                     step="5"
                     placeholder="-"
                     ?disabled=${!isDefined(this.data.delay_on)}
