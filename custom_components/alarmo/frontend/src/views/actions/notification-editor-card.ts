@@ -774,7 +774,7 @@ export class NotificationEditorCard extends LitElement {
 
   private _getOpenSensorsFormat(forceResult = false): null | string {
     const message = this.config.actions[0].data?.message || '';
-    const res = message.match(/{{open_sensors(\|[^}]+)?}}/);
+    const res = message.match(/{{(open_sensors_with_area|open_sensors)(\|[^}]+)?}}/);
     if (res !== null) return res[0];
     else return forceResult ? '{{open_sensors}}' : null;
   }
@@ -783,7 +783,7 @@ export class NotificationEditorCard extends LitElement {
     ev.stopPropagation();
     const value = String(ev.detail.value);
     let message = this.config.actions[0].data?.message || '';
-    message = message.replace(/{{open_sensors(\|[^}]+)?}}/, value);
+    message = message.replace(/{{(open_sensors_with_area|open_sensors)(\|[^}]+)?}}/, value);
 
     let actionConfig = this.config.actions;
     Object.assign(actionConfig, {
@@ -848,6 +848,8 @@ export class NotificationEditorCard extends LitElement {
     let action = { ...data.actions[0] };
 
     let message = action.data!.message;
+    message = message.replace('{{open_sensors_with_area|format=short}}', 'Some Example Sensor (Bathroom)');
+    message = message.replace(/{{open_sensors_with_area(\|[^}]+)?}}/, 'Some Example Sensor is open in Bathroom');
     message = message.replace('{{open_sensors|format=short}}', 'Some Example Sensor');
     message = message.replace(/{{open_sensors(\|[^}]+)?}}/, 'Some Example Sensor is open');
     message = message.replace('{{bypassed_sensors}}', 'Some Bypassed Sensor');

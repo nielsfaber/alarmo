@@ -496,7 +496,9 @@
               "description": "Wählen Sie, welche Sensorinformationen in die Nachricht eingefügt werden",
               "options": {
                 "default": "Namen und Zustände",
-                "short": "Nur Namen"
+                "short": "Nur Namen",
+                "with_area": "Namen und Zustände mit Bereich",
+                "short_with_area": "Nur Namen mit Bereich"
               }
             },
             "arm_mode_format": {

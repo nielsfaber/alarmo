@@ -496,7 +496,9 @@
               "description": "Scegli quale informazione è inserita nel messaggio",
               "options": {
                 "default": "Nomi e stati",
-                "short": "Nomi soltanto"
+                "short": "Nomi soltanto",
+                "with_area": "Nomi e stati con area",
+                "short_with_area": "Solo nomi con area"
               }
             },
             "arm_mode_format": {

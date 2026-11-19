@@ -346,6 +346,10 @@ export const getWildcardOptions = (event?: EAlarmEvent, alarmoConfig?: AlarmoCon
         name: 'Open Sensors',
         value: '{{open_sensors}}',
       },
+      {
+        name: 'Open Sensors with area',
+        value: '{{open_sensors_with_area}}',
+      },
     ];
 
   if (!event || [EAlarmEvent.Armed].includes(event))
@@ -421,6 +425,20 @@ export const getOpenSensorsWildCardOptions = (hass: HomeAssistant) => {
           hass.language
         )} (${hass.translationMetadata.translations[hass.language].nativeName})`,
       },
+      {
+        value: '{{open_sensors_with_area}}',
+        name: `${localize(
+          'panels.actions.cards.new_notification.fields.open_sensors_format.options.with_area',
+          hass.language
+        )} (${hass.translationMetadata.translations['en'].nativeName})`,
+      },
+      {
+        value: `{{open_sensors_with_area|lang=${hass.language}}}`,
+        name: `${localize(
+          'panels.actions.cards.new_notification.fields.open_sensors_format.options.with_area',
+          hass.language
+        )} (${hass.translationMetadata.translations[hass.language].nativeName})`,
+      },
     ];
   else
     options = [
@@ -432,6 +450,13 @@ export const getOpenSensorsWildCardOptions = (hass: HomeAssistant) => {
           hass.language
         ),
       },
+      {
+        value: '{{open_sensors_with_area}}',
+        name: localize(
+          'panels.actions.cards.new_notification.fields.open_sensors_format.options.with_area',
+          hass.language
+        ),
+      },
     ];
 
   options = [
@@ -439,6 +464,13 @@ export const getOpenSensorsWildCardOptions = (hass: HomeAssistant) => {
     {
       value: '{{open_sensors|format=short}}',
       name: localize('panels.actions.cards.new_notification.fields.open_sensors_format.options.short', hass.language),
+    },
+    {
+      value: '{{open_sensors_with_area|format=short}}',
+      name: localize(
+        'panels.actions.cards.new_notification.fields.open_sensors_format.options.short_with_area',
+        hass.language
+      ),
     },
   ];
 

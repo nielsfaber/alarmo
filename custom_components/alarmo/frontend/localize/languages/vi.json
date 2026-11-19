@@ -496,7 +496,9 @@
               "description": "Chọn thông tin cảm biến nào để chèn vào thông báo",
               "options": {
                 "default": "Tên và trạng thái",
-                "short": "Chỉ tên"
+                "short": "Chỉ tên",
+                "with_area": "Tên và trạng thái kèm khu vực",
+                "short_with_area": "Chỉ tên kèm khu vực"
               }
             },
             "arm_mode_format": {

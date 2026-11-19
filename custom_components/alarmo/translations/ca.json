@@ -81,5 +81,8 @@
         "custom": "Armat Bypass Personalitzat"
       }
     }
+  },
+  "open_sensor_area": {
+    "in_area": "a {area}"
   }
 }

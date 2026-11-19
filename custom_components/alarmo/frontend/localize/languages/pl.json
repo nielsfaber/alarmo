@@ -492,7 +492,9 @@
               "description": "Wybierz, które informacje o czujnikach są dodawane do wiadomości",
               "options": {
                 "default": "Nazwy i stany",
-                "short": "Tylko nazwy"
+                "short": "Tylko nazwy",
+                "with_area": "Nazwy i stany z obszarem",
+                "short_with_area": "Tylko nazwy z obszarem"
               }
             },
             "arm_mode_format": {

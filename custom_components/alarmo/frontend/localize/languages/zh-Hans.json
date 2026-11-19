@@ -498,7 +498,9 @@
               "description": "选择在信息中插入哪些传感器信息",
               "options": {
                 "default": "名称和状态",
-                "short": "仅名称"
+                "short": "仅名称",
+                "with_area": "包含区域的名称和状态",
+                "short_with_area": "仅包含区域的名称"
               }
             },
             "arm_mode_format": {

@@ -496,7 +496,9 @@
               "description": "Vyberte, ktoré informácie o senzore sa vložia do správy",
               "options": {
                 "default": "Meno a stav",
-                "short": "Iba mená"
+                "short": "Iba mená",
+                "with_area": "Názvy a stavy s oblasťou",
+                "short_with_area": "Iba názvy s oblasťou"
               }
             },
             "arm_mode_format": {

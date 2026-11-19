@@ -496,7 +496,9 @@
               "description": "Vyberte, které informace o senzoru budou do zprávy přidány",
               "options": {
                 "default": "Jména a stavy",
-                "short": "Pouze jména"
+                "short": "Pouze jména",
+                "with_area": "Názvy a stavy s oblastí",
+                "short_with_area": "Pouze názvy s oblastí"
               }
             },
             "arm_mode_format": {

@@ -496,7 +496,9 @@
               "description": "Kies welke sensor informatie wordt weergegeven in het bericht",
               "options": {
                 "default": "Naam en status",
-                "short": "Alleen naam"
+                "short": "Alleen naam",
+                "with_area": "Naam en status met ruimte",
+                "short_with_area": "Alleen naam met ruimte"
               }
             },
             "arm_mode_format": {
