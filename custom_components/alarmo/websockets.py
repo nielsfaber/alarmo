@@ -417,11 +417,20 @@ def websocket_get_sensors(hass, connection, msg):
 
 
 @callback
+def _sanitize_user(user: dict) -> dict:
+    """Replace the stored access-code hash with a boolean marker."""
+    sanitized = dict(user)
+    sanitized["has_code"] = bool(sanitized.pop(ATTR_CODE, None))
+    return sanitized
+
+
 def websocket_get_users(hass, connection, msg):
-    """Publish user data."""
+    """Publish user data without access-code hashes."""
     coordinator = hass.data[const.DOMAIN]["coordinator"]
     users = coordinator.store.async_get_users()
-    connection.send_result(msg["id"], users)
+    connection.send_result(
+        msg["id"], {key: _sanitize_user(user) for key, user in users.items()}
+    )
 
 
 @callback
