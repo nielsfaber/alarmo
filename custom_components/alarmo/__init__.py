@@ -38,6 +38,7 @@ from .panel import (
     async_unregister_panel,
 )
 from .store import async_get_registry
+from .helpers import is_valid_access_code
 from .sensors import (
     ATTR_GROUP,
     ATTR_ENTITIES,
@@ -273,6 +274,8 @@ class AlarmoCoordinator(DataUpdateCoordinator):
         async_dispatcher_send(self.hass, "alarmo_sensors_updated")
 
     async def _validate_user_code(self, user_id: str, data: dict):
+        if not is_valid_access_code(data[ATTR_CODE]):
+            return "Code must be at least 4 characters"
         user_with_code = await self.async_authenticate_user(data[ATTR_CODE])
         if user_id:
             if const.ATTR_OLD_CODE not in data:
