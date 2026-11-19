@@ -198,13 +198,29 @@ class SensorHandler:
         else:
             hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STARTED, handle_startup)
 
-    def __del__(self):
-        """Prepare for removal."""
-        if self._state_listener:
-            self._state_listener()
-            self._state_listener = None
+    def _unsubscribe_all(self):
+        """Remove listeners and pending sensor timers."""
+        listener = getattr(self, "_state_listener", None)
+        self._state_listener = None
+        if listener:
+            listener()
         while len(self._subscriptions):
             self._subscriptions.pop()()
+        for timers in (
+            getattr(self, "_arm_timers", {}),
+            getattr(self, "_delay_on_timers", {}),
+        ):
+            while len(timers):
+                _key, cancel = timers.popitem()
+                cancel()
+
+    def __del__(self):
+        """Prepare for removal."""
+        self._unsubscribe_all()
+
+    async def async_unload(self):
+        """Stop watching sensors and cancel pending timers."""
+        self._unsubscribe_all()
 
     def async_watch_sensor_states(
         self,

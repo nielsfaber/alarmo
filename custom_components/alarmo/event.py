@@ -20,9 +20,20 @@ class EventHandler:
             self.hass, "alarmo_event", self.async_handle_event
         )
 
+    def _cancel_subscription(self):
+        """Cancel the dispatcher subscription once."""
+        subscription = getattr(self, "_subscription", None)
+        self._subscription = None
+        if subscription is not None:
+            subscription()
+
     def __del__(self):
         """Class destructor."""
-        self._subscription()
+        self._cancel_subscription()
+
+    async def async_unload(self):
+        """Stop listening for alarm events."""
+        self._cancel_subscription()
 
     @callback
     def async_handle_event(self, event: str, area_id: str, args: dict = {}):
