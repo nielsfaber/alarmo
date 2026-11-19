@@ -1,5 +1,6 @@
 """Initialization of Alarmo alarm_control_panel platform."""
 
+import asyncio
 import logging
 import datetime
 import operator
@@ -291,6 +292,9 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
         self._revert_state = None
         self._ready_to_arm_modes = []
         self._last_triggered = None
+        # Serialise arm/disarm for this entity: validation and the state
+        # transition must not interleave with a second command.
+        self._state_lock = asyncio.Lock()
 
     @property
     def device_info(self) -> dict:
@@ -535,6 +539,11 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
         await self.async_alarm_disarm(code=code, context_id=context_id)
 
     async def async_alarm_disarm(self, code, **kwargs):
+        """Send disarm command, serialised per entity."""
+        async with self._state_lock:
+            return await self._async_alarm_disarm(code, **kwargs)
+
+    async def _async_alarm_disarm(self, code, **kwargs):
         """Send disarm command."""
         _LOGGER.debug("alarm_disarm")
         skip_code = kwargs.get("skip_code", False)
@@ -631,6 +640,11 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
         )
 
     async def async_handle_arm_request(self, arm_mode, **kwargs):
+        """Check conditions and arm, serialised per entity."""
+        async with self._state_lock:
+            return await self._async_handle_arm_request(arm_mode, **kwargs)
+
+    async def _async_handle_arm_request(self, arm_mode, **kwargs):
         """Check if conditions are met for starting arm procedure."""
         code = kwargs.get(const.CONF_CODE, "")
         skip_code = kwargs.get("skip_code", False)
