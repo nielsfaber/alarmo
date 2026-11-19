@@ -719,4 +719,11 @@ async def async_get_registry(hass: HomeAssistant) -> AlarmoStorage:
 
         task = hass.data[DATA_REGISTRY] = hass.async_create_task(_load_reg())
 
-    return cast(AlarmoStorage, await task)
+    try:
+        return cast(AlarmoStorage, await task)
+    except Exception:
+        # A failed load must not stay cached for the rest of the HA run:
+        # every later setup would await the same failed task.
+        if hass.data.get(DATA_REGISTRY) is task:
+            hass.data.pop(DATA_REGISTRY, None)
+        raise
