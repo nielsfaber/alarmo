@@ -41,6 +41,20 @@ export const computeArmModeDisplay = (val: EArmModes, hass: HomeAssistant) => {
 
 export const computeEventDisplay = (event: EAlarmEvent, hass: HomeAssistant) => {
   switch (event) {
+    case EAlarmEvent.BypassEnabled:
+      return {
+        value: EAlarmEvent.BypassEnabled,
+        name: localize('panels.actions.cards.new_notification.fields.event.choose.bypass_enabled.name', hass.language),
+        description: localize('panels.actions.cards.new_notification.fields.event.choose.bypass_enabled.description', hass.language),
+        icon: 'hass:shield-off-outline',
+      };
+    case EAlarmEvent.BypassDisabled:
+      return {
+        value: EAlarmEvent.BypassDisabled,
+        name: localize('panels.actions.cards.new_notification.fields.event.choose.bypass_disabled.name', hass.language),
+        description: localize('panels.actions.cards.new_notification.fields.event.choose.bypass_disabled.description', hass.language),
+        icon: 'hass:shield-check-outline',
+      };
     case EAlarmEvent.Armed:
       return {
         value: EAlarmEvent.Armed,

@@ -1,0 +1,55 @@
+blueprint:
+  name: Alarmo - Ring button temporary Bypass Zone
+  description: Press a Ring Gen 2 contact sensor button while armed to bypass one door until it opens and closes, or the maximum time expires. Requires the patched Alarmo integration.
+  domain: automation
+  input:
+    ring_device:
+      name: Ring contact sensor device
+      selector:
+        device:
+          integration: zwave_js
+    alarm_entity:
+      name: Alarmo area containing this door (not the master)
+      selector:
+        entity:
+          integration: alarmo
+          domain: alarm_control_panel
+    door_sensor:
+      name: Door contact entity configured in Alarmo as Door
+      selector:
+        entity:
+          domain: binary_sensor
+    bypass_timeout:
+      name: Maximum bypass time (seconds)
+      description: Protection resumes at this deadline even if the door stays open.
+      default: 30
+      selector:
+        number:
+          min: 1
+          max: 3600
+          unit_of_measurement: seconds
+          mode: box
+mode: restart
+triggers:
+  - trigger: event
+    event_type: zwave_js_notification
+    event_data:
+      device_id: !input ring_device
+      command_class: 113
+      type: 9
+      event: 5
+variables:
+  alarm: !input alarm_entity
+conditions:
+  - condition: template
+    value_template: "{{ states(alarm) in ['armed_away', 'armed_home', 'armed_night', 'armed_vacation', 'armed_custom_bypass'] }}"
+actions:
+  - action: alarmo.bypass
+    target:
+      entity_id: !input alarm_entity
+    data:
+      sensors:
+        - !input door_sensor
+      mode: enable
+      timeout: !input bypass_timeout
+      until_closed: true

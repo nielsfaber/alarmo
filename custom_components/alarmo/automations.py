@@ -104,7 +104,7 @@ class AutomationHandler:
         async def async_alarm_state_changed(
             area_id: str, old_state: str, new_state: str
         ):
-            if not old_state:
+            if not old_state or old_state == new_state:
                 # ignore automations at startup/restoring
                 return
 
@@ -147,7 +147,12 @@ class AutomationHandler:
 
         @callback
         async def async_handle_event(event: str, area_id: str, args: dict = {}):
-            if event != const.EVENT_FAILED_TO_ARM:
+            event_triggers = {
+                const.EVENT_FAILED_TO_ARM: EVENT_ARM_FAILURE,
+                const.EVENT_BYPASS_ENABLED: const.EVENT_BYPASS_ENABLED,
+                const.EVENT_BYPASS_DISABLED: const.EVENT_BYPASS_DISABLED,
+            }
+            if event not in event_triggers:
                 return
             if area_id:
                 alarm_entity = self.hass.data[const.DOMAIN]["areas"][area_id]
@@ -155,8 +160,9 @@ class AutomationHandler:
                 alarm_entity = self.hass.data[const.DOMAIN]["master"]
 
             _LOGGER.debug(
-                "%s has failed to arm",
+                "%s received event %s",
                 alarm_entity.entity_id,
+                event,
             )
 
             for automation_id, config in self._config.items():
@@ -164,9 +170,14 @@ class AutomationHandler:
                     continue
                 for trigger in config[const.ATTR_TRIGGERS]:
                     if (
-                        validate_area(trigger, area_id, self.hass)
+                        (
+                            trigger.get(const.ATTR_AREA) in (None, 0, "0", area_id)
+                            if event
+                            in (const.EVENT_BYPASS_ENABLED, const.EVENT_BYPASS_DISABLED)
+                            else validate_area(trigger, area_id, self.hass)
+                        )
                         and validate_modes(trigger, alarm_entity._arm_mode)
-                        and validate_trigger(trigger, EVENT_ARM_FAILURE)
+                        and validate_trigger(trigger, event_triggers[event])
                     ):
                         await self.async_execute_automation(automation_id, alarm_entity)
 

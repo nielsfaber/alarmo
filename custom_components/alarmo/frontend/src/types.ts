@@ -161,6 +161,8 @@ export enum EAlarmEvent {
   ArmFailure = 'arm_failure',
   Arming = 'arming',
   Pending = 'pending',
+  BypassEnabled = 'bypass_enabled',
+  BypassDisabled = 'bypass_disabled',
 }
 
 export type MqttConfig = {
