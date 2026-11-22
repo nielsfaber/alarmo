@@ -75,3 +75,43 @@ disable_user:
       required: true
       selector:
         text:
+
+bypass:
+  name: Bypass Zone
+  description: Temporarily bypass door zones in an armed Alarmo area. Ends on open then close, timeout, explicit disable, or disarm. Does not cancel an alarm already pending or triggered.
+  target:
+    entity:
+      integration: alarmo
+      domain: alarm_control_panel
+  fields:
+    sensors:
+      name: Door zones
+      required: true
+      selector:
+        entity:
+          domain: binary_sensor
+          multiple: true
+    mode:
+      name: Bypass mode
+      default: enable
+      selector:
+        select:
+          options:
+            - enable
+            - disable
+    timeout:
+      name: Maximum bypass time
+      description: Seconds until protection resumes, even if the door is still open.
+      default: 30
+      selector:
+        number:
+          min: 1
+          max: 3600
+          unit_of_measurement: seconds
+          mode: box
+    until_closed:
+      name: End when door closes
+      description: Waits for the door to open, then ends the bypass when it closes.
+      default: true
+      selector:
+        boolean:

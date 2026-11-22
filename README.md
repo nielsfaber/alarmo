@@ -397,6 +397,51 @@ This service only has effect when the alarm entity is in the `arming` or `pendin
 | ----------- | ----------------- | ----------------------- | ---------------------------- |
 | `entity_id` | Required          | Entity-ID of the alarm. | `alarm_control_panel.alarmo` |
 
+### alarmo.bypass
+Temporarily bypass one or more Door sensors in an already armed area without
+changing arm mode. No PIN is required. The target must be the area containing
+the doors, rather than the master alarm. Only enabled, non-always-on Door zones
+included in the current arm mode can be bypassed.
+
+| Setting | Optional/required | Description | Default |
+| ------- | ----------------- | ----------- | ------- |
+| `entity_id` | Required | Alarmo area entity. | |
+| `sensors` | Required | Door sensor entity IDs in this area. | |
+| `mode` | Optional | `enable` or `disable` temporary bypass. | `enable` |
+| `timeout` | Optional | Maximum bypass time in seconds, from 1 to 3600. | `30` |
+| `until_closed` | Optional | End after the door opens and then closes. | `true` |
+
+```yaml
+action: alarmo.bypass
+target:
+  entity_id: alarm_control_panel.alarmo
+data:
+  sensors:
+    - binary_sensor.front_door
+  timeout: 30
+  until_closed: true
+```
+
+A closed door waits for an open/close cycle; an already open door waits for close.
+The timeout is a hard maximum, including time with the door open. Expiring or
+disabling the bypass immediately evaluates the door through the existing
+perimeter, sensor group and entry-delay logic. A repeated enable request renews
+the timeout. Pending/triggered alarms cannot be cancelled using bypass.
+
+Temporary exclusions appear in `bypassed_sensors` and
+`temporary_bypassed_sensors`. They end on disarm/reload/restart and are not
+restored. Existing force-arm and automatic bypasses retain their normal semantics;
+`disable` removes only temporary bypasses. No existing settings migration is needed.
+
+For Ring Gen 2 contacts paired through Z-Wave JS, the included
+[automation blueprint](blueprints/automation/alarmo/ring_temporary_bypass.yaml)
+connects the device-specific `zwave_js_notification` button event
+(`command_class: 113`, `type: 9`, `event: 5`) directly to this service.
+Select the existing door sensor and Alarmo area in the blueprint; no helpers,
+template binary sensors, custom arm mode or rearming sequence are required.
+Verify the event payload on your hardware before enabling the automation.
+Other buttons/events can use any HA automation trigger with the same action.
+
 ### alarmo.enable_user
 Enable a user for operating the alarm using his/her configured code.
 
@@ -413,6 +458,28 @@ Disable a user for operating the alarm using his/her configured code.
 
 ### Events
 Alarmo exposes several [events](https://www.home-assistant.io/docs/configuration/events/) in HA, which can be used within automations or template entities for user-specific needs.
+
+#### alarmo_bypass_changed
+Fired once per door when a temporary bypass is enabled/renewed or ends on close,
+timeout, or explicit disable. Disarm/reload cleanup is silent. Existing arm-time
+bypasses do not emit this event.
+
+| Field | Description |
+| ----- | ----------- |
+| `entity_id` | Alarmo area entity ID. |
+| `area_id` | Alarmo area ID. |
+| `sensors` | List containing the affected door sensor ID. |
+| `bypassed` | `true` on enable/renew, `false` when the bypass ends. |
+| `reason` | `enabled`, `closed`, `timeout`, or `disabled`. |
+| `arm_mode` | Current armed mode. |
+
+In **Alarmo > Actions**, select **Zone bypassed** or **Zone bypass ended** for
+notifications, speech, chimes, or other actions, with the usual area/mode filters.
+A master area selection matches any child area's bypass event once. Bypass
+refreshes do not rerun Armed actions. Each repeated enable request fires the
+Zone bypassed action again. An ended bypass does not necessarily mean a door is
+closed: at timeout it may still be open and trigger the alarm normally.
+The `temporary_bypassed_sensors` attribute can also be used in HA conditions.
 
 #### alarmo_failed_to_arm
 The Failed To Arm event is sent by Alarmo in case an arming or disarming attempt was made, but could not be completed. 
@@ -869,5 +936,3 @@ disarmed => "evaluate leave delay configuration": received command;
 "^sensors?" => armed: sensors OK;
 "^sensors?" => disarmed: sensors NOK;
 -->
-
-

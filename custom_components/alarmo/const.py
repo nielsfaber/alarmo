@@ -232,3 +232,18 @@ SERVICE_TOGGLE_USER_SCHEMA = vol.Schema(
         vol.Required(ATTR_NAME, default=""): cv.string,
     }
 )
+
+
+SERVICE_BYPASS_SCHEMA = cv.make_entity_service_schema(
+    {
+        vol.Required("sensors"): vol.All(cv.entity_ids, vol.Length(min=1)),
+        vol.Optional("mode", default="enable"): vol.In(["enable", "disable"]),
+        vol.Optional("timeout", default=30): vol.All(
+            vol.Coerce(int), vol.Range(min=1, max=3600)
+        ),
+        vol.Optional("until_closed", default=True): cv.boolean,
+    }
+)
+
+EVENT_BYPASS_ENABLED = "bypass_enabled"
+EVENT_BYPASS_DISABLED = "bypass_disabled"

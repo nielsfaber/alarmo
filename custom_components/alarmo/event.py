@@ -82,6 +82,17 @@ class EventHandler:
 
             self.hass.bus.async_fire("alarmo_command_success", data)
 
+        elif event in (const.EVENT_BYPASS_ENABLED, const.EVENT_BYPASS_DISABLED):
+            self.hass.bus.async_fire(
+                "alarmo_bypass_changed",
+                {
+                    **args,
+                    "area_id": area_id,
+                    "entity_id": alarm_entity.entity_id,
+                    "bypassed": event == const.EVENT_BYPASS_ENABLED,
+                },
+            )
+
         elif event == const.EVENT_READY_TO_ARM_MODES_CHANGED:
             supported_modes = dict(
                 filter(

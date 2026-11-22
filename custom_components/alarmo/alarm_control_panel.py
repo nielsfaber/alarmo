@@ -43,6 +43,7 @@ from homeassistant.components.alarm_control_panel import (
 )
 
 from . import const
+from .bypass import ZoneBypassMixin
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -231,6 +232,9 @@ async def async_setup_entry(hass, config_entry, async_add_devices):  # noqa: PLR
     # Register services
     platform = entity_platform.current_platform.get()
     platform.async_register_entity_service(
+        "bypass", const.SERVICE_BYPASS_SCHEMA, "async_bypass"
+    )
+    platform.async_register_entity_service(
         const.SERVICE_ARM,
         const.SERVICE_ARM_SCHEMA,
         "async_service_arm_handler",
@@ -270,7 +274,7 @@ async def async_unload_entry(hass, config_entry):
     return True
 
 
-class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
+class AlarmoBaseEntity(ZoneBypassMixin, AlarmControlPanelEntity, RestoreEntity):
     """Defines a base alarm_control_panel entity."""
 
     def __init__(self, hass: HomeAssistant, name: str, entity_id: str) -> None:
@@ -285,6 +289,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
         self._open_sensors = {}
         self._bypass_open_sensors = False
         self._bypassed_sensors = []
+        self._zone_bypasses = {}
         self._delay = None
         self.expiration = None
         self.area_id = None
@@ -392,10 +397,10 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
     @property
     def bypassed_sensors(self):
         """Get bypassed sensors."""
-        if not self._bypassed_sensors:
-            return None
-        else:
-            return self._bypassed_sensors
+        return (
+            list(dict.fromkeys([*(self._bypassed_sensors or []), *self._zone_bypasses]))
+            or None
+        )
 
     @bypassed_sensors.setter
     def bypassed_sensors(self, value):
@@ -435,6 +440,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             "next_state": self.next_state,
             "open_sensors": self.open_sensors,
             "bypassed_sensors": self.bypassed_sensors,
+            "temporary_bypassed_sensors": list(self._zone_bypasses),
             "delay": self.delay,
             "last_triggered": self.last_triggered,
         }
@@ -842,12 +848,18 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             if "open_sensors" in state.attributes:
                 self.open_sensors = state.attributes["open_sensors"]
             if "bypassed_sensors" in state.attributes:
-                self._bypassed_sensors = state.attributes["bypassed_sensors"]
+                temporary = state.attributes.get("temporary_bypassed_sensors", [])
+                self._bypassed_sensors = [
+                    sensor
+                    for sensor in (state.attributes["bypassed_sensors"] or [])
+                    if sensor not in temporary
+                ]
             if "last_triggered" in state.attributes:
                 self._last_triggered = state.attributes["last_triggered"]
 
     async def async_will_remove_from_hass(self):
         """Disconnect entity object when removed."""
+        self._clear_zone_bypasses()
         # Area entities keep an exit/entry/trigger timer. The callback holds a
         # reference to the entity, so leaving it registered leaks the entity
         # and lets the timer fire during/after a reload.
@@ -963,6 +975,9 @@ class AlarmoAreaEntity(AlarmoBaseEntity):
         """Update the state or refresh state attributes."""
         if state == self._state:
             return
+
+        if state == AlarmControlPanelState.DISARMED:
+            self._clear_zone_bypasses()
 
         old_state = self._state
         self._state = state
@@ -1409,6 +1424,11 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
 
         async_dispatcher_connect(
             self.hass, "alarmo_state_updated", async_alarm_state_changed
+        )
+        self.async_on_remove(
+            async_dispatcher_connect(
+                self.hass, "alarmo_bypass_updated", async_alarm_state_changed
+            )
         )
 
         @callback

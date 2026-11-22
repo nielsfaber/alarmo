@@ -171,6 +171,11 @@ class SensorHandler:
             )
             self._subscriptions.append(
                 async_dispatcher_connect(
+                    hass, "alarmo_bypass_updated", self.async_watch_sensor_states
+                )
+            )
+            self._subscriptions.append(
+                async_dispatcher_connect(
                     hass, "alarmo_sensors_updated", self._async_update_sensor_config
                 )
             )
@@ -572,6 +577,9 @@ class SensorHandler:
         sensor_config = self._config[entity]
         alarm_entity = self.hass.data[const.DOMAIN]["areas"][sensor_config["area"]]
         alarm_state = alarm_entity.state
+        # A delayed callback may already have been queued when bypass was enabled.
+        if entity in (alarm_entity.bypassed_sensors or []):
+            return
 
         open_sensors = self.process_group_event(entity, new_state)
         if not open_sensors:

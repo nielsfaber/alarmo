@@ -455,6 +455,14 @@
                   "name": "Alarm no longer triggered",
                   "description": "The triggered state of the alarm has ended"
                 },
+                "bypass_enabled": {
+                  "name": "Zone bypassed",
+                  "description": "A door zone was temporarily bypassed while the alarm remains armed."
+                },
+                "bypass_disabled": {
+                  "name": "Zone bypass ended",
+                  "description": "A temporary bypass ended on door close, timeout, or explicit disable."
+                },
                 "arm_failure": {
                   "name": "Failed to arm",
                   "description": "The arming of the alarm failed due to one or more open sensors"
@@ -486,6 +494,8 @@
                 "disarmed": "The alarm is now OFF",
                 "triggered": "The alarm is triggered! Cause: {{open_sensors}}.",
                 "untriggered": "The alarm is no longer triggered.",
+                "bypass_enabled": "A door zone has been temporarily bypassed.",
+                "bypass_disabled": "The temporary door bypass has ended.",
                 "arm_failure": "The alarm could not be armed right now, due to: {{open_sensors}}.",
                 "arming": "The alarm will be armed soon, please leave the house.",
                 "pending": "The alarm is about to trigger, disarm it quickly!"
@@ -519,6 +529,8 @@
                 "disarmed": "Notify {target} upon disarming",
                 "triggered": "Notify {target} when triggered",
                 "untriggered": "Notify {target} when triggering stops",
+                "bypass_enabled": "Notify {target} when a zone is bypassed",
+                "bypass_disabled": "Notify {target} when a zone bypass ends",
                 "arm_failure": "Notify {target} on failure",
                 "arming": "Notify {target} when leaving",
                 "pending": "Notify {target} when arriving"
@@ -566,6 +578,8 @@
                 "disarmed": "Set {entity} to {state} upon disarming",
                 "triggered": "Set {entity} to {state} when triggered",
                 "untriggered": "Set {entity} to {state} when triggering stops",
+                "bypass_enabled": "Set {entity} to {state} when a zone is bypassed",
+                "bypass_disabled": "Set {entity} to {state} when a zone bypass ends",
                 "arm_failure": "Set {entity} to {state} on failure",
                 "arming": "Set {entity} to {state} when leaving",
                 "pending": "Set {entity} to {state} when arriving"
