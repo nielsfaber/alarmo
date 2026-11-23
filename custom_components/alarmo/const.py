@@ -165,6 +165,26 @@ EVENT_ACTIONS = [
     EVENT_ACTION_ARM_CUSTOM_BYPASS,
 ]
 
+# Alarmo appends "__<token>" to the action buttons of notifications it sends.
+PUSH_ACTION_TOKEN_SEPARATOR = "__"  # nosec B105 - separator, not a secret
+EVENT_PUSH_ACTION_REJECTED = "alarmo_push_action_rejected"
+
+CONF_PUSH_ACTIONS_ENABLED = "push_actions_enabled"
+CONF_PUSH_ACTIONS_ALLOW_UNVERIFIED = "push_actions_allow_unverified"
+CONF_PUSH_ACTIONS_SKIP_CODE = "push_actions_skip_code"
+CONF_PUSH_ACTIONS_VALIDITY = "push_actions_validity"
+
+MAX_PUSH_ACTIONS_VALIDITY = 1440  # minutes
+SERVICE_ISSUE_PUSH_ACTIONS = "issue_push_actions"
+
+DEFAULT_PUSH_ACTION_OPTIONS = {
+    CONF_PUSH_ACTIONS_ENABLED: True,
+    CONF_PUSH_ACTIONS_ALLOW_UNVERIFIED: False,
+    CONF_PUSH_ACTIONS_SKIP_CODE: False,
+    # minutes
+    CONF_PUSH_ACTIONS_VALIDITY: 30,
+}
+
 MODES_TO_SUPPORTED_FEATURES = {
     AlarmControlPanelState.ARMED_AWAY: AlarmControlPanelEntityFeature.ARM_AWAY,
     AlarmControlPanelState.ARMED_HOME: AlarmControlPanelEntityFeature.ARM_HOME,

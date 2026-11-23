@@ -527,10 +527,13 @@ async def test_push_disarm_after_environmental_trigger(
         await advance_time(hass, 1)
         assert_alarm_state(hass, ALARM_ENTITY, "triggered")
 
-        # Send ALARMO_DISARM push event
+        # Send ALARMO_DISARM push event of a notification sent by Alarmo
+        token = hass.data["alarmo"]["coordinator"].push_actions.issue(
+            "area_1", {"ALARMO_DISARM"}, 300
+        )
         hass.bus.async_fire(
             "mobile_app_notification_action",
-            {"action": "ALARMO_DISARM"},
+            {"action": f"ALARMO_DISARM__{token}", "reply_text": "1234"},
         )
         await hass.async_block_till_done()
         await advance_time(hass, 1)
@@ -579,10 +582,13 @@ async def test_push_arm_away_after_disarm_via_push(
         await advance_time(hass, armed_away_exit_time + 1)
         assert_alarm_state(hass, ALARM_ENTITY, "armed_away")
 
-        # Send ALARMO_ARM_AWAY push event
+        # Send ALARMO_ARM_AWAY push event of a notification sent by Alarmo
+        token = hass.data["alarmo"]["coordinator"].push_actions.issue(
+            "area_1", {"ALARMO_ARM_AWAY"}, 300
+        )
         hass.bus.async_fire(
             "mobile_app_notification_action",
-            {"action": "ALARMO_ARM_AWAY"},
+            {"action": f"ALARMO_ARM_AWAY__{token}", "reply_text": "1234"},
         )
         await hass.async_block_till_done()
         await advance_time(hass, 1)

@@ -631,14 +631,15 @@ Example:
 
 **Available actions**
 
-The following actions are defined in Alarmo and can be used in actionable notifications:
+The following actions are defined in Alarmo and can be used as buttons in notifications that Alarmo sends:
 
-| action                                                                                                                  | Description                                                                                                                      | Suitable events                                    |
-| ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| `ALARMO_RETRY_ARM`                                                                                                      | Repeats the command that failed before.<br>Will only succeed in case the issue blocking the arming before has been restored.     | Failed to arm                                      |
-| `ALARMO_FORCE_ARM`                                                                                                      | Repeats the command that failed before.<br>The sensor/sensors that failed, shall be ignored (bypassed) while the alarm is armed. | Failed to arm                                      |
-| `ALARMO_DISARM`                                                                                                         | Disarm the alarm.                                                                                                                | Armed, Leave, Entry, Triggered                     |
-| `ALARMO_ARM_AWAY`<br> `ALARMO_ARM_HOME`<br> `ALARMO_ARM_NIGHT`<br> `ALARMO_ARM_VACATION`<br> `ALARMO_ARM_CUSTOM_BYPASS` | Arm the alarm in the corresponding mode.                                                                                         | None (intended for automations outside of alarmo). |
+| action                                                                                                                  | Description                                                                                                                      | Suitable events                                                    |
+| ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| `ALARMO_RETRY_ARM`                                                                                                      | Repeats the command that failed before.<br>Will only succeed in case the issue blocking the arming before has been restored.     | Failed to arm                                                      |
+| `ALARMO_FORCE_ARM`                                                                                                      | Repeats the command that failed before.<br>The sensor/sensors that failed, shall be ignored (bypassed) while the alarm is armed. | Failed to arm                                                      |
+| `ALARMO_DISARM`                                                                                                         | Disarm the alarm.                                                                                                                | Armed, Leave, Entry, Triggered                                     |
+| `ALARMO_ARM_AWAY`<br> `ALARMO_ARM_HOME`<br> `ALARMO_ARM_NIGHT`<br> `ALARMO_ARM_VACATION`<br> `ALARMO_ARM_CUSTOM_BYPASS` | Arm the alarm in the corresponding mode.                                                                                         | Disarmed, or your own notifications via `alarmo.issue_push_actions` |
+
 **Set up notification with actions**
 
 In the Alarmo notifications editor, create a notification and select an event.
@@ -658,7 +659,72 @@ data:
 
 For more info about actionable notifications in HA, see [here](https://companion.home-assistant.io/docs/notifications/actionable-notifications/).
 
-**Note**: In case you have multiple areas set up, the actionable notifications only work for the [alarm master](#alarm-master) (since no area info can be sent along with the action data).
+**How Alarmo verifies the actions**
+
+When Alarmo sends a notification (only notifications created in the Alarmo notifications editor), it appends a random single-use token to each Alarmo action, for example `ALARMO_RETRY_ARM__3f9c...`. Alarmo only executes a push action if it carries a token from a notification Alarmo itself sent, the token has not been used before (one button press per notification) and has not expired. The action is applied to the area (or the master) whose event sent the notification, so actionable notifications also work with multiple areas. Retry/force arm repeat the arm mode that failed when the notification was sent.
+
+Tokens are kept in memory only. The buttons of a notification stop working when:
+- Home Assistant restarts or Alarmo is reloaded;
+- the area is armed from disarmed, or disarmed (the buttons stay valid while the alarm goes from arming to armed, pending or triggered, and while it stays disarmed after a failed arm attempt);
+- the validity set in the options has passed.
+
+**Alarm code**
+
+The code settings of Alarmo are respected. Arm actions only need a code when *Use arm code* is enabled; disarming needs a code when a disarm code is required. Such a button must let you type the code (Android and iOS):
+```yaml
+data:
+  data:
+    actions:
+      - action: ALARMO_DISARM
+        title: Disarm
+        behavior: textInput # type the code when pressing the button
+```
+If a notification has a button that needs a code without `behavior: textInput`, Alarmo raises a repair issue.
+
+> [!WARNING]
+> The typed text is sent back as `reply_text` in the `mobile_app_notification_action` event. Home Assistant stores events in the recorder database (and automation traces can show them), so **the code is stored in plain text**. Exclude the event from the recorder:
+> ```yaml
+> recorder:
+>   exclude:
+>     event_types:
+>       - mobile_app_notification_action
+> ```
+> On iOS you can instead keep the code-less button and add `authenticationRequired: true`, so the phone must be unlocked to use it, together with *Allow push actions without code* in the options. Note that this only protects the device, not your Home Assistant webhook.
+
+**Options**
+
+The behaviour can be changed under *Settings* → *Devices & services* → *Alarmo* → *Configure*:
+
+| Option                           | Default | Description                                                                                                                                                                                                                                 |
+| -------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Handle push notification actions | on      | Turn off to stop listening to push actions at all.                                                                                                                                                                                         |
+| Allow push actions without code  | off     | Execute actions from notifications sent by Alarmo without a code, even when the code is required.                                                                                                                                          |
+| Accept unverified push actions   | off     | Also accept the plain action names (without token), for example from iOS notification categories. Any registered mobile device, or anyone who knows a mobile app webhook ID, can send them. Only the master or a single area can be controlled this way. Not recommended. |
+| Action button validity (minutes) | 30      | How long the buttons of a notification remain usable (1 to 1440).                                                                                                                                                                         |
+
+Rejected push actions are logged as a warning and fire the event `alarmo_push_action_rejected` (data: `action`, `reason`, `area_id`, `suppressed`), which can be used to alert on unexpected attempts. At most one warning and one event per reason are produced per minute; `suppressed` counts the rejections in between. Reasons: `unverified`, `invalid_token` (unknown, already used or ended), `expired`, `action_mismatch`, `area_unavailable`, `ambiguous_area`, `invalid_reply` (reply text that is not text or is longer than 72 bytes) and `unknown_arm_mode`.
+
+**Your own notifications**
+
+To offer Alarmo actions in a notification you send yourself (for example from an automation), ask Alarmo for verified action ids with the admin-only action `alarmo.issue_push_actions` and use them as buttons. These actions never skip the code, whatever the options say:
+```yaml
+- action: alarmo.issue_push_actions
+  data:
+    entity_id: alarm_control_panel.alarmo
+    actions: [ALARMO_DISARM]
+  response_variable: alarmo
+- action: notify.mobile_app_my_phone
+  data:
+    message: The alarm is armed
+    data:
+      actions:
+        - action: "{{ alarmo.actions.ALARMO_DISARM }}"
+          title: Disarm
+          behavior: textInput
+```
+Alternatively, use your own action names and call `alarmo.arm` / `alarmo.disarm` (with the code) from an automation that listens to `mobile_app_notification_action`.
+
+**Breaking change**: earlier versions of Alarmo accepted the plain action names from any source and executed them without a code. Notifications with plain `ALARMO_*` action names sent by your own automations, iOS notification categories, and buttons on areas that require a code (unless they use `behavior: textInput`) stop working until you migrate as described above. Enabling *Accept unverified push actions* and *Allow push actions without code* restores the previous behaviour, including its risk.
 
 #### Actions
 

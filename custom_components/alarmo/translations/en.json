@@ -69,6 +69,20 @@
           "description": "Name of the user to disable."
         }
       }
+    },
+    "issue_push_actions": {
+      "name": "Issue push actions",
+      "description": "Return single-use action ids for a notification you send yourself. The code is never skipped for these actions.",
+      "fields": {
+        "entity_id": {
+          "name": "Entity ID",
+          "description": "Alarmo entity the actions apply to."
+        },
+        "actions": {
+          "name": "Actions",
+          "description": "Alarmo actions to offer as notification buttons."
+        }
+      }
     }
   },
   "selector": {
@@ -80,6 +94,32 @@
         "vacation": "Armed Vacation",
         "custom": "Armed Custom Bypass"
       }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Actionable push notifications",
+        "description": "Alarmo adds a single-use token to the action buttons (such as ALARMO_DISARM) of the notifications it sends, and only accepts responses to those notifications.",
+        "data": {
+          "push_actions_enabled": "Handle push notification actions",
+          "push_actions_skip_code": "Allow push actions without code",
+          "push_actions_allow_unverified": "Accept unverified push actions",
+          "push_actions_validity": "Action button validity (minutes)"
+        },
+        "data_description": {
+          "push_actions_enabled": "Turn off to ignore every ALARMO_* push notification action.",
+          "push_actions_skip_code": "When off, a push action that needs a code (for example disarming while a disarm code is required) is only executed when the code is typed in a text input action. Arm actions need a code only when a code is required to arm.",
+          "push_actions_allow_unverified": "Also accept action names without a token, for example from your own automations. Any registered mobile device, or anyone who knows a mobile app webhook ID, can send these. Not recommended.",
+          "push_actions_validity": "How long the buttons of a notification sent by Alarmo can be used. Each notification can be used once."
+        }
+      }
+    }
+  },
+  "issues": {
+    "push_action_code_input": {
+      "title": "Alarmo notification buttons need the alarm code",
+      "description": "The notifications {automations} have Alarmo action buttons that require the alarm code, but the code cannot be entered. Add `behavior: textInput` to these buttons, or allow push actions without code in the Alarmo options."
     }
   }
 }
