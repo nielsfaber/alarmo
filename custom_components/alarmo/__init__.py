@@ -50,6 +50,7 @@ from .push_actions import (
     PushActionRegistry,
     get_push_action_options,
     async_handle_push_action,
+    async_unload_push_actions,
     async_check_notification_setup,
     async_register_push_action_service,
 )
@@ -126,6 +127,7 @@ async def async_unload_entry(hass, entry):
         return False
 
     async_unregister_panel(hass)
+    async_unload_push_actions(hass)
     coordinator = hass.data[const.DOMAIN]["coordinator"]
     await coordinator.async_unload()
     return True
@@ -463,6 +465,8 @@ class AlarmoCoordinator(DataUpdateCoordinator):
             )
         elif not enabled:
             self._async_remove_push_listener()
+            # buttons sent before must not work again when re-enabled
+            self.push_actions.clear()
 
     @callback
     def _async_check_notifications(self, *_args):

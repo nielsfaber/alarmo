@@ -670,7 +670,7 @@ Tokens are kept in memory only. The buttons of a notification stop working when:
 
 **Alarm code**
 
-The code settings of Alarmo are respected. Arm actions only need a code when *Use arm code* is enabled; disarming needs a code when a disarm code is required. Such a button must let you type the code (Android and iOS):
+The code settings of Alarmo are respected. Arm actions need a code when *Use arm code* is enabled, or when *Use mode change code* is enabled and the alarm is already armed; disarming needs a code when a disarm code is required. Such a button must let you type the code (Android and iOS):
 ```yaml
 data:
   data:
@@ -697,12 +697,12 @@ The behaviour can be changed under *Settings* → *Devices & services* → *Alar
 
 | Option                           | Default | Description                                                                                                                                                                                                                                 |
 | -------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Handle push notification actions | on      | Turn off to stop listening to push actions at all.                                                                                                                                                                                         |
+| Handle push notification actions | on      | Turn off to stop listening to push actions at all; buttons sent before stop working for good.                                                                                                                                              |
 | Allow push actions without code  | off     | Execute actions from notifications sent by Alarmo without a code, even when the code is required.                                                                                                                                          |
 | Accept unverified push actions   | off     | Also accept the plain action names (without token), for example from iOS notification categories. Any registered mobile device, or anyone who knows a mobile app webhook ID, can send them. Only the master or a single area can be controlled this way. Not recommended. |
 | Action button validity (minutes) | 30      | How long the buttons of a notification remain usable (1 to 1440).                                                                                                                                                                         |
 
-Rejected push actions are logged as a warning and fire the event `alarmo_push_action_rejected` (data: `action`, `reason`, `area_id`, `suppressed`), which can be used to alert on unexpected attempts. At most one warning and one event per reason are produced per minute; `suppressed` counts the rejections in between. Reasons: `unverified`, `invalid_token` (unknown, already used or ended), `expired`, `action_mismatch`, `area_unavailable`, `ambiguous_area`, `invalid_reply` (reply text that is not text or is longer than 72 bytes) and `unknown_arm_mode`.
+Rejected push actions are logged as a warning and fire the event `alarmo_push_action_rejected` (data: `action`, `reason`, `area_id`, `suppressed`), which can be used to alert on unexpected attempts. At most one warning and one event per reason are produced per minute; `suppressed` counts the rejections in between. Reasons: `unverified`, `invalid_token` (unknown, already used, ended, or issued before the listener was turned off), `expired`, `action_mismatch`, `area_unavailable`, `ambiguous_area`, `invalid_reply` (reply text that is not text or is longer than 72 bytes) and `unknown_arm_mode`.
 
 **Your own notifications**
 
@@ -724,7 +724,7 @@ To offer Alarmo actions in a notification you send yourself (for example from an
 ```
 Alternatively, use your own action names and call `alarmo.arm` / `alarmo.disarm` (with the code) from an automation that listens to `mobile_app_notification_action`.
 
-**Breaking change**: earlier versions of Alarmo accepted the plain action names from any source and executed them without a code. Notifications with plain `ALARMO_*` action names sent by your own automations, iOS notification categories, and buttons on areas that require a code (unless they use `behavior: textInput`) stop working until you migrate as described above. Enabling *Accept unverified push actions* and *Allow push actions without code* restores the previous behaviour, including its risk.
+**Breaking change**: earlier versions of Alarmo accepted the plain action names from any source and executed them without a code. Notifications with plain `ALARMO_*` action names sent by your own automations, iOS notification categories, and buttons that need a code (disarm code, arm code, or mode change code while armed) unless they use `behavior: textInput` stop working until you migrate as described above. Enabling *Accept unverified push actions* and *Allow push actions without code* restores the previous behaviour, including its risk.
 
 #### Actions
 

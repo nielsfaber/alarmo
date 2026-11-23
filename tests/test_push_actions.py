@@ -1056,3 +1056,66 @@ def test_expiry_uses_the_monotonic_clock() -> None:
     token = registry.issue(None, {"ALARMO_DISARM"}, 60)
     now[0] += 60
     assert registry.consume(token, "ALARMO_DISARM") == (None, "expired")
+
+
+async def test_repair_issue_for_arm_buttons_when_mode_change_needs_a_code(
+    hass: HomeAssistant, enable_custom_integrations: Any
+) -> None:
+    """An arm button may be pressed while armed: mode-change code counts."""
+    automations = {
+        NOTIFY_ARMED: _notification(
+            NOTIFY_ARMED, "area_1", "armed", ["ALARMO_ARM_HOME"]
+        )
+    }
+    storage, entry = await _setup(hass, automations=automations)
+    storage.config["code_mode_change_required"] = True
+    with patch_alarmo_integration_dependencies(storage):
+        await _start(hass, storage, entry)
+        issue = ir.async_get(hass).async_get_issue(
+            const.DOMAIN, "push_action_code_input"
+        )
+        assert issue is not None
+        await cleanup_timers(hass)
+
+
+async def test_disabling_the_listener_drops_issued_tokens(
+    hass: HomeAssistant, enable_custom_integrations: Any
+) -> None:
+    """Buttons sent before the listener was disabled stay dead afterwards."""
+    storage, entry = await _setup(hass)
+    rejected = async_capture_events(hass, REJECTED)
+    with patch_alarmo_integration_dependencies(storage):
+        await _start(hass, storage, entry)
+        await _arm(hass)
+        token = _coordinator(hass).push_actions.issue("area_1", {"ALARMO_DISARM"}, 300)
+        for enabled in (False, True):
+            hass.config_entries.async_update_entry(
+                entry, options={const.CONF_PUSH_ACTIONS_ENABLED: enabled}
+            )
+            await hass.async_block_till_done()
+        await _press(hass, f"ALARMO_DISARM__{token}", reply_text="1234")
+        assert_alarm_state(hass, AREA_1, "armed_away")
+        assert rejected[-1].data["reason"] == "invalid_token"
+        await cleanup_timers(hass)
+
+
+async def test_unload_removes_the_service_and_the_repair_issue(
+    hass: HomeAssistant, enable_custom_integrations: Any
+) -> None:
+    """Nothing of the push action support survives an unload."""
+    automations = {
+        NOTIFY_ARMED: _notification(NOTIFY_ARMED, "area_1", "armed", ["ALARMO_DISARM"])
+    }
+    storage, entry = await _setup(hass, automations=automations)
+    storage.config["code_disarm_required"] = True
+    with patch_alarmo_integration_dependencies(storage):
+        await _start(hass, storage, entry)
+        issues = ir.async_get(hass)
+        assert hass.services.has_service("alarmo", "issue_push_actions")
+        assert issues.async_get_issue(const.DOMAIN, "push_action_code_input")
+        assert await hass.config_entries.async_unload(entry.entry_id)
+        await hass.async_block_till_done()
+        assert not hass.services.has_service("alarmo", "issue_push_actions")
+        assert issues.async_get_issue(const.DOMAIN, "push_action_code_input") is None
+        assert hass.bus.async_listeners().get(PUSH_EVENT, 0) == 0
+        await cleanup_timers(hass)

@@ -60,7 +60,6 @@ REJECTION_WINDOW = 60.0
 
 _TOKEN_PATTERN = re.compile(r"[0-9a-f]{32}")
 
-REASON_DISABLED = "disabled"
 REASON_UNVERIFIED = "unverified"
 REASON_INVALID_TOKEN = "invalid_token"  # nosec B105 - reason code, not a secret
 REASON_EXPIRED = "expired"
@@ -203,6 +202,10 @@ class PushActionRegistry:
             return None, REASON_ACTION_MISMATCH
         return pending, None
 
+    def clear(self) -> None:
+        """Drop every token."""
+        self._pending.clear()
+
     def invalidate_area(self, area_id: str | None) -> None:
         """Drop every token of an area (None: master)."""
         for token in [k for k, v in self._pending.items() if v.area_id == area_id]:
@@ -344,7 +347,8 @@ async def async_handle_push_action(  # noqa: PLR0911, PLR0912
     options = get_push_action_options(entry)
 
     if not options[const.CONF_PUSH_ACTIONS_ENABLED]:
-        _reject(hass, limiter, event, action, REASON_DISABLED)
+        # the listener is removed when disabled; only an event already queued
+        # at that moment can get here
         return
 
     code, reply_valid = _reply_code(event)
@@ -496,7 +500,11 @@ def _buttons_needing_code(automation: dict, config: dict) -> bool:
                 const.ATTR_CODE_DISARM_REQUIRED
             ):
                 return True
-            if name in ARM_CODE_ACTIONS and config.get("code_arm_required"):
+            # the alarm may be armed when the button is pressed (mode change)
+            if name in ARM_CODE_ACTIONS and (
+                config.get("code_arm_required")
+                or config.get(const.ATTR_CODE_MODE_CHANGE_REQUIRED)
+            ):
                 return True
     return False
 
@@ -544,3 +552,10 @@ def async_check_notification_setup(hass: HomeAssistant) -> None:
         translation_key=ISSUE_CODE_INPUT,
         translation_placeholders=placeholders,
     )
+
+
+@callback
+def async_unload_push_actions(hass: HomeAssistant) -> None:
+    """Remove the push action service and repair issue when Alarmo unloads."""
+    hass.services.async_remove(const.DOMAIN, const.SERVICE_ISSUE_PUSH_ACTIONS)
+    ir.async_delete_issue(hass, const.DOMAIN, ISSUE_CODE_INPUT)
