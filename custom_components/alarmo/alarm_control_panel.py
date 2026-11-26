@@ -630,6 +630,10 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
             context_id=context_id,
         )
 
+    def _is_already_armed(self, arm_mode: str) -> bool:
+        """Return whether the entity is already armed in the given mode."""
+        return self._state in const.ARM_MODES and self._arm_mode == arm_mode
+
     async def async_handle_arm_request(self, arm_mode, **kwargs):
         """Check if conditions are met for starting arm procedure."""
         code = kwargs.get(const.CONF_CODE, "")
@@ -675,7 +679,7 @@ class AlarmoBaseEntity(AlarmControlPanelEntity, RestoreEntity):
                 },
             )
             return False
-        elif self._state in const.ARM_MODES and self._arm_mode == arm_mode:
+        elif self._is_already_armed(arm_mode):
             _LOGGER.debug(
                 "Alarm is already set to %s, ignoring command.",
                 arm_mode,
@@ -1339,6 +1343,13 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
         super().__init__(hass, name, entity_id)
         self.area_id = None
         self._target_state = None
+        self._revert_states: dict[str, str] = {}
+        self._pre_arming_state: str | None = None
+
+    def _is_already_armed(self, arm_mode: str) -> bool:
+        """Return True only when all areas are already armed in the given mode."""
+        areas = self.hass.data[const.DOMAIN]["areas"].values()
+        return bool(areas) and all(item.state == arm_mode for item in areas)
 
     @property
     def unique_id(self):
@@ -1414,12 +1425,21 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
         @callback
         def async_handle_event(event: str, area_id: str, args: dict = {}):
             if not area_id or event not in [
+                const.EVENT_DISARM,
                 const.EVENT_FAILED_TO_ARM,
                 const.EVENT_TRIGGER,
                 const.EVENT_TRIGGER_TIME_EXPIRED,
                 const.EVENT_READY_TO_ARM_MODES_CHANGED,
             ]:
                 return
+            if event == const.EVENT_DISARM and self._target_state is not None:
+                self._revert_states.pop(area_id, None)
+                if not any(
+                    item.state == AlarmControlPanelState.ARMING
+                    for item in self.hass.data[const.DOMAIN]["areas"].values()
+                ):
+                    self._target_state = None
+                    self._revert_states = {}
             if event == const.EVENT_FAILED_TO_ARM and self._target_state is not None:
                 open_sensors = args["open_sensors"]
                 self.async_arm_failure(open_sensors)
@@ -1494,9 +1514,29 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
         ]
         arm_mode = arm_modes[0] if len(set(arm_modes)) == 1 else None
 
-        if state == self._target_state:
-            # we are transitioning to an armed state and target state is reached
+        areas = self.hass.data[const.DOMAIN]["areas"]
+        if self._target_state is not None and (
+            state == self._target_state
+            or (
+                AlarmControlPanelState.ARMING not in states
+                and all(
+                    areas[area_id].state
+                    in (self._target_state, AlarmControlPanelState.TRIGGERED)
+                    for area_id in self._revert_states
+                    if area_id in areas
+                )
+            )
+        ):
+            # target state reached, or remaining arming areas completed without failure
             self._target_state = None
+            self._revert_states = {}
+
+        if (
+            state is None
+            and self._state == AlarmControlPanelState.ARMING
+            and AlarmControlPanelState.ARMING not in states
+        ):
+            state = self._pre_arming_state or AlarmControlPanelState.DISARMED
 
         if state in [AlarmControlPanelState.ARMING, AlarmControlPanelState.PENDING]:
             # one or more areas went to arming/pending state, recalculate the delay time
@@ -1521,16 +1561,19 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
             delay = None
 
         # take open sensors by combining areas having same state
-        open_sensors = {}
-        area_filter = dict(
-            filter(
-                lambda el: el[1].state == state,
-                self.hass.data[const.DOMAIN]["areas"].items(),
+        if state is not None:
+            open_sensors = {}
+            area_filter = dict(
+                filter(
+                    lambda el: el[1].state == state,
+                    self.hass.data[const.DOMAIN]["areas"].items(),
+                )
             )
-        )
-        for item in area_filter.values():
-            if item.open_sensors:
-                open_sensors.update(item.open_sensors)
+            for item in area_filter.values():
+                if item.open_sensors:
+                    open_sensors.update(item.open_sensors)
+        else:
+            open_sensors = self._open_sensors
 
         if (
             state is not None
@@ -1554,6 +1597,10 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
 
         if new_state:
             self._state = new_state
+            if new_state == AlarmControlPanelState.ARMING:
+                self._pre_arming_state = old_state or AlarmControlPanelState.DISARMED
+            else:
+                self._pre_arming_state = None
             _LOGGER.debug(
                 "entity %s was updated from %s to %s",
                 self.entity_id,
@@ -1612,6 +1659,9 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
             ):
                 _LOGGER.error("Failed to disarm master alarm.")
                 return False
+            self._target_state = None
+            self._revert_states = {}
+            self._pre_arming_state = None
             for item in self.hass.data[const.DOMAIN]["areas"].values():
                 if item.state != AlarmControlPanelState.DISARMED:
                     await item.async_alarm_disarm(
@@ -1629,20 +1679,24 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
         skip_delay = kwargs.get("skip_delay", False)
         bypass_open_sensors = kwargs.get("bypass_open_sensors", False)
         context_id = kwargs.get("context_id", None)
+        if not (skip_delay and self._target_state == arm_mode):
+            self._revert_states = {}
         self._target_state = arm_mode
 
         open_sensors = {}
-        for item in self.hass.data[const.DOMAIN]["areas"].values():
+        for area_id, item in self.hass.data[const.DOMAIN]["areas"].items():
             if (
                 (item.state in const.ARM_MODES and item.arm_mode != arm_mode)
                 or item.state == AlarmControlPanelState.DISARMED
                 or (item.state == AlarmControlPanelState.ARMING and skip_delay)
             ):
-                item._revert_state = (
-                    item._state
-                    if item._state in const.ARM_MODES
-                    else AlarmControlPanelState.DISARMED
-                )
+                if area_id not in self._revert_states:
+                    self._revert_states[area_id] = (
+                        item._state
+                        if item._state in const.ARM_MODES
+                        else AlarmControlPanelState.DISARMED
+                    )
+                item._revert_state = self._revert_states[area_id]
                 res = item.async_arm(
                     arm_mode,
                     skip_delay=skip_delay,
@@ -1677,27 +1731,45 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
 
     def async_arm_failure(self, open_sensors: dict, context_id=None):
         """Handle arm failure."""
-        self.open_sensors = open_sensors
+        combined_open_sensors = dict(open_sensors)
+        for area_id, item in self.hass.data[const.DOMAIN]["areas"].items():
+            if area_id in self._revert_states and item.open_sensors:
+                combined_open_sensors.update(item.open_sensors)
+        self.open_sensors = combined_open_sensors
         command = self._target_state.replace("armed", "arm")
 
-        for item in self.hass.data[const.DOMAIN]["areas"].values():
-            if item.state != self._revert_state and self._revert_state:
-                item.async_update_state(self._revert_state)
+        for area_id, item in self.hass.data[const.DOMAIN]["areas"].items():
+            revert_state = self._revert_states.get(area_id)
+            if revert_state and item.state != revert_state:
+                item.async_update_state(revert_state)
+
+        self._revert_states = {}
+        reverted_from = None
+        if self._state == AlarmControlPanelState.ARMING:
+            reverted_from = self._state
+            self._state = self._pre_arming_state or AlarmControlPanelState.DISARMED
+            self._pre_arming_state = None
+            self.delay = None
+            self.update_ready_to_arm_modes()
 
         self._revert_state = self._target_state
         self._target_state = None
+        self.schedule_update_ha_state()
+        if reverted_from:
+            dispatcher_send(
+                self.hass, "alarmo_state_updated", None, reverted_from, self._state
+            )
         dispatcher_send(
             self.hass,
             "alarmo_event",
             const.EVENT_FAILED_TO_ARM,
             None,
             {
-                "open_sensors": open_sensors,
+                "open_sensors": combined_open_sensors,
                 "command": command,
                 const.ATTR_CONTEXT_ID: context_id,
             },
         )
-        self.schedule_update_ha_state()
 
     @callback
     def async_trigger(
@@ -1713,7 +1785,7 @@ class AlarmoMasterEntity(AlarmoBaseEntity):
     def update_ready_to_arm_modes(self):
         """Set arm modes which are ready for arming (no blocking sensors)."""
         modes_list = const.ARM_MODES
-        modes_list = list(filter(lambda x: x != self._state, modes_list))
+        modes_list = list(filter(lambda x: not self._is_already_armed(x), modes_list))
         for item in self.hass.data[const.DOMAIN]["areas"].values():
             modes_list = list(
                 filter(

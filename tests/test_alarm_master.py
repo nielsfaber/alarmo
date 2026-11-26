@@ -502,3 +502,400 @@ async def test_alarm_master_disarm_auth_resolved_once(
         assert_alarm_state(hass, "alarm_control_panel.test_area_1_auth", "disarmed")
         assert_alarm_state(hass, "alarm_control_panel.test_area_2_auth", "disarmed")
         assert_alarm_state(hass, "alarm_control_panel.master", "disarmed")
+
+
+def _setup_master_areas(
+    hass: Any,
+    entry_id: str,
+    *,
+    count: int = 2,
+    modes: tuple[str, ...] = ("armed_away",),
+    exit_times: int | tuple[int, ...] = 0,
+    use_exit_delay: bool = True,
+) -> tuple[Any, Any]:
+    """Create N areas with matching door sensors and master enabled."""
+    delays = (exit_times,) * count if isinstance(exit_times, int) else exit_times
+    areas = [
+        AreaFactory.create_area(
+            area_id=f"area_{i}",
+            name=f"Area {i}",
+            modes=list(modes),
+            armed_away_enabled=True,
+            armed_home_enabled="armed_home" in modes,
+            armed_away_exit_time=delays[i - 1],
+            armed_home_exit_time=0,
+        )
+        for i in range(1, count + 1)
+    ]
+    sensors = [
+        SensorFactory.create_door_sensor(
+            entity_id=f"binary_sensor.area_{i}_door",
+            area=f"area_{i}",
+            modes=list(modes),
+            use_exit_delay=use_exit_delay,
+        )
+        for i in range(1, count + 1)
+    ]
+    return setup_alarmo_entry(
+        hass,
+        areas=areas,
+        sensors=sensors,
+        entry_id=entry_id,
+        master_enabled=True,
+    )
+
+
+async def _arm_or_disarm(
+    hass: Any, service: str, entity_id: str, code: str = "1234"
+) -> None:
+    """Call an alarm_control_panel service and wait for processing."""
+    await hass.services.async_call(
+        "alarm_control_panel",
+        service,
+        {"entity_id": entity_id, "code": code},
+        blocking=True,
+    )
+    await hass.async_block_till_done()
+
+
+def _assert_states(
+    hass: Any, expected: dict[str, str], open_sensors: dict[str, str] | None = None
+) -> None:
+    """Assert entity states and optionally master open_sensors."""
+    for entity_id, state in expected.items():
+        assert_alarm_state(hass, entity_id, state)
+    if open_sensors is not None:
+        master_state = hass.states.get("alarm_control_panel.master")
+        assert master_state is not None
+        assert master_state.attributes["open_sensors"] == open_sensors
+
+
+@pytest.mark.asyncio
+async def test_alarm_master_rearms_disarmed_sub_area(
+    hass: Any, enable_custom_integrations: Any
+) -> None:
+    """Arming master in same mode should arm any disarmed sub-areas."""
+    storage, entry = _setup_master_areas(
+        hass, "test_master_rearm_sub_area", modes=("armed_away", "armed_home")
+    )
+
+    with patch_alarmo_integration_dependencies(storage):
+        await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+        backend_events: list[tuple[str, str | None]] = []
+        ready_events: list[dict[str, Any]] = []
+        async_dispatcher_connect(
+            hass,
+            "alarmo_event",
+            lambda event_type, area_id, _args: backend_events.append(
+                (event_type, area_id)
+            ),
+        )
+        hass.bus.async_listen(
+            "alarmo_ready_to_arm_modes_updated",
+            lambda ev: ready_events.append(ev.data),
+        )
+
+        hass.states.async_set("binary_sensor.area_1_door", "off")
+        hass.states.async_set("binary_sensor.area_2_door", "off")
+        await hass.async_block_till_done()
+
+        await _arm_or_disarm(hass, "alarm_arm_away", "alarm_control_panel.master")
+        assert_alarm_state(hass, "alarm_control_panel.area_1", "armed_away")
+        assert_alarm_state(hass, "alarm_control_panel.area_2", "armed_away")
+        assert_alarm_state(hass, "alarm_control_panel.master", "armed_away")
+        master_ready = [e for e in ready_events if e["area_id"] is None]
+        assert master_ready[-1]["armed_away"] is False
+
+        # Arming again when all areas are already armed_away is a no-op
+        backend_events.clear()
+        await _arm_or_disarm(hass, "alarm_arm_away", "alarm_control_panel.master")
+        assert (const.EVENT_ARM, None) not in backend_events
+
+        # Disarm area 1 only; master maintains armed_away and becomes ready for away
+        ready_events.clear()
+        await _arm_or_disarm(hass, "alarm_disarm", "alarm_control_panel.area_1")
+        assert_alarm_state(hass, "alarm_control_panel.area_1", "disarmed")
+        assert_alarm_state(hass, "alarm_control_panel.area_2", "armed_away")
+        assert_alarm_state(hass, "alarm_control_panel.master", "armed_away")
+        master_ready = [e for e in ready_events if e["area_id"] is None]
+        assert master_ready[-1]["armed_away"] is True
+
+        # Re-arming master arms only disarmed area 1 without re-arming area 2
+        backend_events.clear()
+        ready_events.clear()
+        await _arm_or_disarm(hass, "alarm_arm_away", "alarm_control_panel.master")
+        assert_alarm_state(hass, "alarm_control_panel.area_1", "armed_away")
+        assert_alarm_state(hass, "alarm_control_panel.area_2", "armed_away")
+        assert_alarm_state(hass, "alarm_control_panel.master", "armed_away")
+        assert (const.EVENT_ARM, "area_1") in backend_events
+        assert (const.EVENT_ARM, "area_2") not in backend_events
+        assert (const.EVENT_ARM, None) in backend_events
+        master_ready = [e for e in ready_events if e["area_id"] is None]
+        assert master_ready[-1]["armed_away"] is False
+
+
+@pytest.mark.asyncio
+async def test_alarm_master_rearm_failure_preserves_mixed_area_states(
+    hass: Any, enable_custom_integrations: Any
+) -> None:
+    """Failed master re-arm from mixed state reverts only areas changed by it."""
+    storage, entry = _setup_master_areas(hass, "test_master_rearm_rollback", count=3)
+
+    with patch_alarmo_integration_dependencies(storage):
+        await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+        failed_events: list[tuple[str | None, dict[str, Any]]] = []
+        async_dispatcher_connect(
+            hass,
+            "alarmo_event",
+            lambda event_type, area_id, args: (
+                failed_events.append((area_id, args))
+                if event_type == const.EVENT_FAILED_TO_ARM
+                else None
+            ),
+        )
+
+        for i in range(1, 4):
+            hass.states.async_set(f"binary_sensor.area_{i}_door", "off")
+        await hass.async_block_till_done()
+
+        await _arm_or_disarm(hass, "alarm_arm_away", "alarm_control_panel.master")
+        await _arm_or_disarm(hass, "alarm_disarm", "alarm_control_panel.area_1")
+        await _arm_or_disarm(hass, "alarm_disarm", "alarm_control_panel.area_2")
+
+        hass.states.async_set("binary_sensor.area_2_door", "on")
+        await hass.async_block_till_done()
+
+        failed_events.clear()
+        await _arm_or_disarm(hass, "alarm_arm_away", "alarm_control_panel.master")
+
+        assert_alarm_state(hass, "alarm_control_panel.area_1", "disarmed")
+        assert_alarm_state(hass, "alarm_control_panel.area_2", "disarmed")
+        assert_alarm_state(hass, "alarm_control_panel.area_3", "armed_away")
+        assert_alarm_state(hass, "alarm_control_panel.master", "armed_away")
+        master_state = hass.states.get("alarm_control_panel.master")
+        assert master_state is not None
+        assert master_state.attributes["open_sensors"] == {
+            "binary_sensor.area_2_door": "open"
+        }
+        master_failures = [args for area_id, args in failed_events if area_id is None]
+        assert len(master_failures) == 1
+        assert "binary_sensor.area_2_door" in master_failures[0]["open_sensors"]
+
+
+@pytest.mark.asyncio
+async def test_alarm_master_exit_delay_mixed_failures_and_push_force_arm(
+    hass: Any, enable_custom_integrations: Any
+) -> None:
+    """Exit-delay/skip-delay failures aggregate sensors and support push retry."""
+    storage, entry = _setup_master_areas(
+        hass, "test_master_exit_delay_failures", count=3, exit_times=10
+    )
+
+    with patch_alarmo_integration_dependencies(storage):
+        await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+        failed_events: list[tuple[str | None, dict[str, Any]]] = []
+        async_dispatcher_connect(
+            hass,
+            "alarmo_event",
+            lambda event_type, area_id, args: (
+                failed_events.append((area_id, args))
+                if event_type == const.EVENT_FAILED_TO_ARM
+                else None
+            ),
+        )
+
+        for i in range(1, 4):
+            hass.states.async_set(f"binary_sensor.area_{i}_door", "off")
+        await hass.async_block_till_done()
+
+        await _arm_or_disarm(hass, "alarm_arm_away", "alarm_control_panel.master")
+        await advance_time(hass, 11)
+        assert_alarm_state(hass, "alarm_control_panel.master", "armed_away")
+
+        # Disarm areas 1 & 2 and open both doors -> simultaneous exit-delay failure
+        await _arm_or_disarm(hass, "alarm_disarm", "alarm_control_panel.area_1")
+        await _arm_or_disarm(hass, "alarm_disarm", "alarm_control_panel.area_2")
+        hass.states.async_set("binary_sensor.area_1_door", "on")
+        hass.states.async_set("binary_sensor.area_2_door", "on")
+        await hass.async_block_till_done()
+
+        expected_mixed = {
+            "alarm_control_panel.area_1": "disarmed",
+            "alarm_control_panel.area_2": "disarmed",
+            "alarm_control_panel.area_3": "armed_away",
+            "alarm_control_panel.master": "armed_away",
+        }
+        expected_open = {
+            "binary_sensor.area_1_door": "open",
+            "binary_sensor.area_2_door": "open",
+        }
+
+        await _arm_or_disarm(hass, "alarm_arm_away", "alarm_control_panel.master")
+        assert_alarm_state(hass, "alarm_control_panel.master", "arming")
+        await advance_time(hass, 11)
+        _assert_states(hass, expected_mixed, expected_open)
+
+        # Re-arm and skip delay -> reverts areas 1 & 2, preserves master armed_away
+        await _arm_or_disarm(hass, "alarm_arm_away", "alarm_control_panel.master")
+        assert_alarm_state(hass, "alarm_control_panel.master", "arming")
+        await hass.services.async_call(
+            const.DOMAIN,
+            const.SERVICE_SKIP_DELAY,
+            {"entity_id": "alarm_control_panel.master"},
+            blocking=True,
+        )
+        await hass.async_block_till_done()
+        _assert_states(hass, expected_mixed, expected_open)
+
+        # Full failure from disarmed emits one master event and enables push force-arm
+        await _arm_or_disarm(hass, "alarm_disarm", "alarm_control_panel.area_3")
+        failed_events.clear()
+        await _arm_or_disarm(hass, "alarm_arm_away", "alarm_control_panel.master")
+        await advance_time(hass, 11)
+        assert_alarm_state(hass, "alarm_control_panel.master", "disarmed")
+        master_failures = [args for area_id, args in failed_events if area_id is None]
+        assert len(master_failures) == 1
+        assert master_failures[0]["command"] == "arm_away"
+
+        hass.bus.async_fire(const.PUSH_EVENT, {"action": const.EVENT_ACTION_FORCE_ARM})
+        await hass.async_block_till_done()
+        assert_alarm_state(hass, "alarm_control_panel.master", "arming")
+        await advance_time(hass, 11)
+        _assert_states(
+            hass,
+            {
+                "alarm_control_panel.area_1": "armed_away",
+                "alarm_control_panel.area_2": "armed_away",
+                "alarm_control_panel.area_3": "armed_away",
+                "alarm_control_panel.master": "armed_away",
+            },
+        )
+
+        await cleanup_timers(hass)
+
+
+@pytest.mark.asyncio
+async def test_alarm_master_partial_disarm_during_arming_clears_tracking(
+    hass: Any, enable_custom_integrations: Any
+) -> None:
+    """Partial disarm during arming clears master state after remaining finish."""
+    storage, entry = _setup_master_areas(
+        hass,
+        "test_master_partial_disarm_tracking",
+        exit_times=(10, 20),
+        use_exit_delay=False,
+    )
+
+    with patch_alarmo_integration_dependencies(storage):
+        await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+        failed_events: list[tuple[str | None, dict[str, Any]]] = []
+        async_dispatcher_connect(
+            hass,
+            "alarmo_event",
+            lambda event_type, area_id, args: (
+                failed_events.append((area_id, args))
+                if event_type == const.EVENT_FAILED_TO_ARM
+                else None
+            ),
+        )
+
+        hass.states.async_set("binary_sensor.area_1_door", "off")
+        hass.states.async_set("binary_sensor.area_2_door", "off")
+        await hass.async_block_till_done()
+
+        await _arm_or_disarm(hass, "alarm_arm_away", "alarm_control_panel.master")
+        await advance_time(hass, 5)
+        await _arm_or_disarm(hass, "alarm_disarm", "alarm_control_panel.area_1")
+        await advance_time(hass, 25)
+
+        assert_alarm_state(hass, "alarm_control_panel.area_1", "disarmed")
+        assert_alarm_state(hass, "alarm_control_panel.area_2", "armed_away")
+        assert_alarm_state(hass, "alarm_control_panel.master", "disarmed")
+
+        # Subsequent single-area failure on area 1 must not disarm armed area 2
+        hass.states.async_set("binary_sensor.area_1_door", "on")
+        await hass.async_block_till_done()
+        failed_events.clear()
+        await _arm_or_disarm(hass, "alarm_arm_away", "alarm_control_panel.area_1")
+
+        assert_alarm_state(hass, "alarm_control_panel.area_1", "disarmed")
+        assert_alarm_state(hass, "alarm_control_panel.area_2", "armed_away")
+        assert [e for e in failed_events if e[0] is None] == []
+
+        await cleanup_timers(hass)
+
+
+@pytest.mark.asyncio
+async def test_alarm_master_sub_area_arm_abort_restores_prior_master_state(
+    hass: Any, enable_custom_integrations: Any
+) -> None:
+    """Aborting sub-area arming restores master to its exact pre-arming state."""
+    storage, entry = _setup_master_areas(
+        hass,
+        "test_master_sub_area_abort_state",
+        modes=("armed_away", "armed_home"),
+        exit_times=10,
+        use_exit_delay=False,
+    )
+
+    with patch_alarmo_integration_dependencies(storage):
+        await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+        hass.states.async_set("binary_sensor.area_1_door", "off")
+        hass.states.async_set("binary_sensor.area_2_door", "off")
+        await hass.async_block_till_done()
+
+        # Case 2B: Areas armed individually (master never armed directly)
+        await _arm_or_disarm(hass, "alarm_arm_away", "alarm_control_panel.area_1")
+        await _arm_or_disarm(hass, "alarm_arm_away", "alarm_control_panel.area_2")
+        await advance_time(hass, 11)
+        assert_alarm_state(hass, "alarm_control_panel.master", "armed_away")
+
+        await _arm_or_disarm(hass, "alarm_disarm", "alarm_control_panel.area_1")
+        await _arm_or_disarm(hass, "alarm_arm_away", "alarm_control_panel.area_1")
+        assert_alarm_state(hass, "alarm_control_panel.master", "arming")
+        await _arm_or_disarm(hass, "alarm_disarm", "alarm_control_panel.area_1")
+        assert_alarm_state(hass, "alarm_control_panel.master", "armed_away")
+
+        # Case 2C: Failed master arm_away + mixed armed_home + aborted armed_away
+        await _arm_or_disarm(hass, "alarm_disarm", "alarm_control_panel.area_2")
+        assert_alarm_state(hass, "alarm_control_panel.master", "disarmed")
+
+        hass.states.async_set("binary_sensor.area_1_door", "on")
+        await hass.async_block_till_done()
+        await _arm_or_disarm(hass, "alarm_arm_away", "alarm_control_panel.master")
+        assert_alarm_state(hass, "alarm_control_panel.master", "disarmed")
+
+        hass.states.async_set("binary_sensor.area_1_door", "off")
+        await hass.async_block_till_done()
+        await _arm_or_disarm(hass, "alarm_arm_home", "alarm_control_panel.area_2")
+        assert_alarm_state(hass, "alarm_control_panel.master", "disarmed")
+
+        await _arm_or_disarm(hass, "alarm_arm_away", "alarm_control_panel.area_1")
+        assert_alarm_state(hass, "alarm_control_panel.master", "arming")
+        await _arm_or_disarm(hass, "alarm_disarm", "alarm_control_panel.area_1")
+        assert_alarm_state(hass, "alarm_control_panel.master", "disarmed")
+
+        # Case 2A: Master armed from disarmed, sub-area disarmed, sub-area arm aborted
+        await _arm_or_disarm(hass, "alarm_disarm", "alarm_control_panel.area_2")
+        await _arm_or_disarm(hass, "alarm_arm_away", "alarm_control_panel.master")
+        await advance_time(hass, 11)
+        assert_alarm_state(hass, "alarm_control_panel.master", "armed_away")
+
+        await _arm_or_disarm(hass, "alarm_disarm", "alarm_control_panel.area_1")
+        await _arm_or_disarm(hass, "alarm_arm_away", "alarm_control_panel.area_1")
+        assert_alarm_state(hass, "alarm_control_panel.master", "arming")
+        await _arm_or_disarm(hass, "alarm_disarm", "alarm_control_panel.area_1")
+        assert_alarm_state(hass, "alarm_control_panel.master", "armed_away")
+        assert_alarm_state(hass, "alarm_control_panel.area_2", "armed_away")
+
+        await cleanup_timers(hass)
