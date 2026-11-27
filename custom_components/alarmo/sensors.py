@@ -42,7 +42,7 @@ ATTR_ALLOW_OPEN = "allow_open"
 ATTR_TRIGGER_UNAVAILABLE = "trigger_unavailable"
 ATTR_AUTO_BYPASS = "auto_bypass"
 ATTR_AUTO_BYPASS_MODES = "auto_bypass_modes"
-ATTR_GROUP = "group"
+ATTR_GROUPS = "groups"
 ATTR_GROUP_ID = "group_id"
 ATTR_TIMEOUT = "timeout"
 ATTR_EVENT_COUNT = "event_count"
@@ -137,6 +137,7 @@ class SensorHandler:
         self._config = {}
         self.hass = hass
         self._state_listener = None
+        self._group_state_listener = None
         self._subscriptions = []
         self._arm_timers = {}
         self._delay_on_timers = {}
@@ -156,6 +157,7 @@ class SensorHandler:
                 "coordinator"
             ].store.async_get_sensor_groups()
             self._group_events = {}
+            self._async_update_group_listener()
             self.async_watch_sensor_states()
 
         # Store the callback for later registration
@@ -203,8 +205,62 @@ class SensorHandler:
         if self._state_listener:
             self._state_listener()
             self._state_listener = None
+        if self._group_state_listener:
+            self._group_state_listener()
+            self._group_state_listener = None
         while len(self._subscriptions):
             self._subscriptions.pop()()
+
+    def _async_update_group_listener(self):
+        """(Re-)subscribe to state changes of every sensor group member.
+
+        This listener is independent of each member's own `modes` config -
+        it exists purely to record when a group member last became open, so
+        that timestamp can later corroborate a fellow group member's trip
+        even in a mode this member wouldn't be individually watched for.
+        """
+        if self._group_state_listener:
+            self._group_state_listener()
+            self._group_state_listener = None
+
+        group_member_entities = sorted(
+            {
+                entity
+                for group in self._groups.values()
+                for entity in group[ATTR_ENTITIES]
+            }
+        )
+
+        if group_member_entities:
+            self._group_state_listener = async_track_state_change_event(
+                self.hass, group_member_entities, self._on_group_member_state_changed
+            )
+
+    @callback
+    def _on_group_member_state_changed(self, event):
+        """Record a group member becoming open, for later corroboration."""
+        entity = event.data["entity_id"]
+        new_state = parse_sensor_state(event.data["new_state"])
+        if new_state != STATE_OPEN:
+            return
+
+        sensor_config = self._config.get(entity)
+        if not sensor_config:
+            return
+        alarm_entity = self.hass.data[const.DOMAIN]["areas"].get(
+            sensor_config["area"]
+        )
+        if not alarm_entity or alarm_entity.state == AlarmControlPanelState.DISARMED:
+            # only meaningful while the area is actually armed/arming/pending
+            return
+
+        now = dt_util.now()
+        for group in self._groups.values():
+            if entity in group[ATTR_ENTITIES]:
+                self._group_events.setdefault(group[ATTR_GROUP_ID], {})[entity] = {
+                    ATTR_STATE: new_state,
+                    ATTR_LAST_TRIP_TIME: now,
+                }
 
     def async_watch_sensor_states(
         self,
@@ -229,20 +285,20 @@ class SensorHandler:
         else:
             self._state_listener = None
 
-        # clear previous sensor group events that are not active for current alarm state
-        if self._group_events:
-            active_sensors_list = []
-            for area in self.hass.data[const.DOMAIN]["areas"].keys():
-                active_sensors_list.extend(
-                    self.active_sensors_for_alarm_state(area, None, False)
-                )
-            for group_id in self._group_events.keys():
-                self._group_events[group_id] = dict(
-                    filter(
-                        lambda el: el[0] in active_sensors_list,
-                        self._group_events[group_id].items(),
-                    )
-                )
+        # once an area is disarmed, any pending group corroboration for its
+        # sensors is no longer relevant (the intrusion attempt is over)
+        if area_id and state == AlarmControlPanelState.DISARMED and self._group_events:
+            area_sensors = {
+                entity
+                for entity, sensor_config in self._config.items()
+                if sensor_config["area"] == area_id
+            }
+            for group_id, events in self._group_events.items():
+                self._group_events[group_id] = {
+                    entity: event
+                    for entity, event in events.items()
+                    if entity not in area_sensors
+                }
 
         # handle initial sensor states
         if area_id and old_state is None:
@@ -640,53 +696,75 @@ class SensorHandler:
         self.update_ready_to_arm_status(sensor_config["area"])
 
     def process_group_event(self, entity: str, state: str) -> dict:
-        """Check if sensor entity is member of a group to evaluate trigger."""
-        group_id = None
-        for group in self._groups.values():
-            if entity in group[ATTR_ENTITIES]:
-                group_id = group[ATTR_GROUP_ID]
-                break
+        """Check if sensor entity is member of any group(s) to evaluate trigger.
+
+        A group member's own `modes` config only gates whether it may
+        *originate* a trigger. Once some other member has originated one
+        (i.e. reached here), the rest of the group is consulted purely as
+        corroborating witnesses: has that member transitioned to open at
+        any point within the group's timeout window, regardless of whether
+        its own `modes` list includes the currently armed mode, and
+        regardless of whether it has since reverted back to closed (e.g. a
+        debouncing PIR). A sensor deliberately excluded from a mode because
+        it's unreliable as a sole trigger (e.g. a motion sensor during a
+        mode when people may be present) can still be trustworthy
+        supporting evidence for a different sensor's trip.
+        """
+        matching_groups = [
+            group for group in self._groups.values() if entity in group[ATTR_ENTITIES]
+        ]
 
         open_sensors = {entity: state}
-        if group_id is None:
+        if not matching_groups:
             return open_sensors
 
-        group = self._groups[group_id]
-        group_events = (
-            self._group_events[group_id]
-            if group_id in self._group_events.keys()
-            else {}
-        )
         now = dt_util.now()
-        group_events[entity] = {ATTR_STATE: state, ATTR_LAST_TRIP_TIME: now}
-        self._group_events[group_id] = group_events
-        recent_events = {
-            entity: (now - event[ATTR_LAST_TRIP_TIME]).total_seconds()
-            for (entity, event) in group_events.items()
-        }
-        recent_events = dict(
-            filter(lambda el: el[1] <= group[ATTR_TIMEOUT], recent_events.items())
-        )
-        if len(recent_events.keys()) < group[ATTR_EVENT_COUNT]:
-            _LOGGER.debug(
-                "tripped sensor %s was ignored since it belongs to group %s",
-                entity,
-                group[ATTR_NAME],
-            )
-            return {}
-        else:
-            # add all (recently) triggered sensors to open_sensors
-            for entity_id in recent_events.keys():
-                open_sensors[entity_id] = group_events[entity_id][ATTR_STATE]
+        triggered = False
+
+        # a sensor may belong to multiple groups (e.g. it corroborates both a
+        # neighbouring door sensor and a neighbouring motion sensor); each
+        # group is evaluated independently, and a single trip can satisfy
+        # more than one group at once
+        for group in matching_groups:
+            group_id = group[ATTR_GROUP_ID]
+            # record this entity's own trip defensively, in case the
+            # dedicated group listener hasn't processed this same event yet
+            self._group_events.setdefault(group_id, {})[entity] = {
+                ATTR_STATE: state,
+                ATTR_LAST_TRIP_TIME: now,
+            }
+
+            recent_events = {
+                other_entity: other_event[ATTR_STATE]
+                for other_entity, other_event in self._group_events[group_id].items()
+                if other_entity in group[ATTR_ENTITIES]
+                and other_event[ATTR_STATE] == STATE_OPEN
+                and (now - other_event[ATTR_LAST_TRIP_TIME]).total_seconds()
+                <= group[ATTR_TIMEOUT]
+            }
+
+            if len(recent_events.keys()) < group[ATTR_EVENT_COUNT]:
+                _LOGGER.debug(
+                    "tripped sensor %s was ignored since it belongs to group %s "
+                    "and insufficient corroboration was found",
+                    entity,
+                    group[ATTR_NAME],
+                )
+                continue
+
+            # add all corroborating sensors to open_sensors
+            open_sensors.update(recent_events)
 
             # Add group info for override delay calculation
-            open_sensors[ATTR_GROUP_ID] = group_id
+            open_sensors[ATTR_GROUP_ID] = group[ATTR_GROUP_ID]
+            triggered = True
             _LOGGER.debug(
                 "tripped sensor %s caused the triggering of group %s",
                 entity,
                 group[ATTR_NAME],
             )
-            return open_sensors
+
+        return open_sensors if triggered else {}
 
     def update_ready_to_arm_status(self, area_id):
         """Calculate whether the system is ready for arming."""
