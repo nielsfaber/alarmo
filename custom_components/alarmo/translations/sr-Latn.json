@@ -1,0 +1,85 @@
+{
+  "services": {
+    "arm": {
+      "name": "Aktiviraj",
+      "description": "Aktivirajte Alarmo entitet sa prilagođenim podešavanjima.",
+      "fields": {
+        "entity_id": {
+          "name": "ID entiteta",
+          "description": "Entitet alarma koji treba aktivirati."
+        },
+        "code": {
+          "name": "Šifra",
+          "description": "Šifra koja se koristi za aktivaciju."
+        },
+        "mode": {
+          "name": "Režim",
+          "description": "Režim u kojem se aktivira alarm."
+        },
+        "skip_delay": {
+          "name": "Preskoči odlaganje",
+          "description": "Preskoči izlazno odlaganje."
+        },
+        "force": {
+          "name": "Prinudno",
+          "description": "Automatski zaobiđi sve senzore koji sprečavaju aktivaciju alarma."
+        }
+      }
+    },
+    "disarm": {
+      "name": "Deaktiviraj",
+      "description": "Deaktivirajte Alarmo entitet.",
+      "fields": {
+        "entity_id": {
+          "name": "ID entiteta",
+          "description": "Entitet alarma koji treba deaktivirati."
+        },
+        "code": {
+          "name": "Šifra",
+          "description": "Šifra koja se koristi za deaktivaciju."
+        }
+      }
+    },
+    "skip_delay": {
+      "name": "Preskoči odlaganje",
+      "description": "Preskočite ostatak izlaznog/ulaznog odlaganja i pređite direktno u sledeće stanje. Ima efekta samo dok je alarm u stanju aktivacije ili na čekanju.",
+      "fields": {
+        "entity_id": {
+          "name": "ID entiteta",
+          "description": "Entitet alarma za koji treba preskočiti odlaganje."
+        }
+      }
+    },
+    "enable_user": {
+      "name": "Omogući korisnika",
+      "description": "Dozvolite korisniku da aktivira/deaktivira Alarmo.",
+      "fields": {
+        "name": {
+          "name": "Ime",
+          "description": "Ime korisnika kojeg treba omogućiti."
+        }
+      }
+    },
+    "disable_user": {
+      "name": "Onemogući korisnika",
+      "description": "Blokirajte korisnika da aktivira/deaktivira Alarmo.",
+      "fields": {
+        "name": {
+          "name": "Ime",
+          "description": "Ime korisnika kojeg treba onemogućiti."
+        }
+      }
+    }
+  },
+  "selector": {
+    "arm_mode": {
+      "options": {
+        "away": "Aktiviran (Odsutan)",
+        "night": "Aktiviran (Noćni)",
+        "home": "Aktiviran (Kod kuće)",
+        "vacation": "Aktiviran (Odmor)",
+        "custom": "Aktiviran (Prilagođeno zaobilaženje)"
+      }
+    }
+  }
+}
