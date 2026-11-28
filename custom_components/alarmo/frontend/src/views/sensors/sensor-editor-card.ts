@@ -202,7 +202,7 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
           </div>
         </alarmo-settings-row>
 
-        <alarmo-settings-row .narrow=${this.narrow}>
+        <alarmo-settings-row .narrow=${this.narrow} .large=${true}>
           <span slot="heading">
             ${localize('panels.sensors.cards.editor.fields.group.heading', this.hass.language)}
           </span>
@@ -210,21 +210,19 @@ export class SensorEditorCard extends SubscribeMixin(LitElement) {
             ${localize('panels.sensors.cards.editor.fields.group.description', this.hass.language)}
           </span>
 
-          <div style="padding: 8px 0px; max-width: 250px">
-            ${Object.keys(this.sensorGroups).length
-        ? html`
-                  <alarmo-chip-set
-                    .hass=${this.hass}
-                    .items=${this.getSensorGroups()}
-                    .value=${this.data.groups || []}
-                    toggleable
-                    @value-changed=${(ev: CustomEvent) => {
-            this.data = { ...this.data!, groups: ev.detail };
-          }}
-                  ></alarmo-chip-set>
-                `
-        : ''}
-            <ha-button appearance="filled" @click=${this.manageGroupsClick} style="margin-top: 4px">
+          <alarmo-selector
+            .hass=${this.hass}
+            .items=${this.getSensorGroups()}
+            label=${localize('panels.sensors.cards.editor.fields.group.heading', this.hass.language)}
+            .value=${this.data.groups || []}
+            @value-changed=${(ev: CustomEvent) => {
+        ev.stopPropagation();
+        const value = ev.detail.value as string[];
+        this.data = { ...this.data!, groups: value };
+      }}
+          ></alarmo-selector>
+          <div style="margin-top: 8px">
+            <ha-button appearance="filled" @click=${this.manageGroupsClick}>
               ${localize('panels.sensors.cards.editor.actions.setup_groups', this.hass.language)}
               <ha-icon slot="end" icon="mdi:open-in-new"></ha-icon>
             </ha-button>
