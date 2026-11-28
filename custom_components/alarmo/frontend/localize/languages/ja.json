@@ -1,0 +1,579 @@
+{
+  "common": {
+    "modes_short": {
+      "armed_away": "外出",
+      "armed_home": "在宅",
+      "armed_night": "夜間",
+      "armed_custom_bypass": "カスタム",
+      "armed_vacation": "休暇"
+    },
+    "enabled": "有効",
+    "disabled": "無効"
+  },
+  "components": {
+    "time_picker": {
+      "seconds": "秒",
+      "minutes": "分"
+    },
+    "editor": {
+      "ui_mode": "UIに切り替え",
+      "yaml_mode": "YAMLに切り替え",
+      "edit_in_yaml": "YAMLで編集"
+    },
+    "table": {
+      "filter": {
+        "label": "項目を絞り込む",
+        "item": "{name}で絞り込む",
+        "hidden_items": "{number}{number, plural,\n  other {件}\n}が非表示"
+      }
+    }
+  },
+  "title": "アラームパネル",
+  "panels": {
+    "general": {
+      "title": "一般",
+      "cards": {
+        "general": {
+          "description": "このパネルでは、アラーム全体に関する設定を行います。",
+          "fields": {
+            "disarm_after_trigger": {
+              "heading": "作動後に警戒を解除",
+              "description": "警戒状態に戻らず、アラームを自動的に解除します。"
+            },
+            "ignore_blocking_sensors_after_trigger": {
+              "heading": "再警戒時に警戒を妨げるセンサーを無視",
+              "description": "まだ反応している可能性のあるセンサーを確認せずに、警戒状態に戻ります。"
+            },
+            "enable_mqtt": {
+              "heading": "MQTTを有効化",
+              "description": "MQTT経由でアラームパネルを操作できるようにします。"
+            },
+            "enable_master": {
+              "heading": "アラームマスターを有効化",
+              "description": "すべてのエリアを同時に操作するためのエンティティを作成します。"
+            }
+          },
+          "actions": {
+            "setup_mqtt": "MQTTの設定",
+            "setup_master": "マスターの設定"
+          }
+        },
+        "modes": {
+          "title": "モード",
+          "description": "このパネルでは、アラームの警戒モードを設定します。",
+          "modes": {
+            "armed_away": "外出警戒は、全員が家を出たときに使用します。家への出入りが可能なすべてのドアと窓に加えて、家の中の人感センサーも監視します。",
+            "armed_home": "在宅警戒 (ステイ警戒とも呼ばれます) は、家に人がいる状態でアラームをセットするときに使用します。家への出入りが可能なすべてのドアと窓を監視しますが、家の中の人感センサーは監視しません。",
+            "armed_night": "夜間警戒は、就寝前にアラームをセットするときに使用します。家への出入りが可能なすべてのドアと窓に加えて、家の中の選択した人感センサー (階下など) も監視します。",
+            "armed_vacation": "休暇警戒は、長期間留守にするときに、外出警戒を拡張したものとして使用できます。遅延時間や作動時の動作は、家から離れていることに合わせて自由に調整できます。",
+            "armed_custom_bypass": "独自の警戒範囲を定義するための追加モードです。"
+          },
+          "number_sensors_active": "{number}{number, plural,\n  other {個のセンサー}\n}が有効",
+          "fields": {
+            "status": {
+              "heading": "ステータス",
+              "description": "このモードでアラームを警戒できるかどうかを設定します。"
+            },
+            "exit_delay": {
+              "heading": "退出遅延",
+              "description": "アラームの警戒を開始してから、この時間内はセンサーがまだアラームを作動させません。"
+            },
+            "entry_delay": {
+              "heading": "進入遅延",
+              "description": "いずれかのセンサーが反応してから、アラームが作動するまでの遅延時間です。"
+            },
+            "trigger_time": {
+              "heading": "作動時間",
+              "description": "作動後、アラームが作動状態を維持する時間です。"
+            }
+          }
+        },
+        "mqtt": {
+          "title": "MQTTの設定",
+          "description": "このパネルでは、MQTTインターフェースの設定を行います。",
+          "fields": {
+            "state_topic": {
+              "heading": "ステートトピック",
+              "description": "状態の更新を公開するトピック"
+            },
+            "event_topic": {
+              "heading": "イベントトピック",
+              "description": "アラームのイベントを公開するトピック"
+            },
+            "command_topic": {
+              "heading": "コマンドトピック",
+              "description": "Alarmoが警戒・解除のコマンドを受信するトピックです。"
+            },
+            "require_code": {
+              "heading": "コードを必須にする",
+              "description": "コマンドと一緒にコードを送信することを必須にします。"
+            },
+            "state_payload": {
+              "heading": "状態ごとのペイロードを設定",
+              "item": "状態 ''{state}'' のペイロードを定義"
+            },
+            "command_payload": {
+              "heading": "コマンドごとのペイロードを設定",
+              "item": "コマンド ''{command}'' のペイロードを定義"
+            }
+          }
+        },
+        "areas": {
+          "title": "エリア",
+          "description": "エリアを使うと、アラームシステムを複数の区画に分けられます。",
+          "no_items": "エリアはまだ定義されていません。",
+          "table": {
+            "remarks": "備考",
+            "summary": "このエリアには、{summary_sensors}と{summary_automations}があります。",
+            "summary_sensors": "{number}{number, plural,\n  other {個のセンサー}\n}",
+            "summary_automations": "{number}{number, plural,\n  other {個のオートメーション}\n}"
+          },
+          "actions": {
+            "add": "追加"
+          }
+        }
+      },
+      "dialogs": {
+        "create_area": {
+          "title": "新しいエリア",
+          "fields": {
+            "copy_from": "設定のコピー元"
+          }
+        },
+        "edit_area": {
+          "title": "エリア ''{area}'' を編集",
+          "name_warning": "注意: 名前を変更すると、エンティティIDも変更されます"
+        },
+        "remove_area": {
+          "title": "エリアを削除しますか？",
+          "description": "このエリアを削除してもよろしいですか？このエリアには{sensors}個のセンサーと{automations}個のオートメーションがあり、これらも一緒に削除されます。"
+        },
+        "edit_master": {
+          "title": "マスターの設定"
+        },
+        "disable_master": {
+          "title": "マスターを無効にしますか？",
+          "description": "アラームマスターを削除してもよろしいですか？このエリアには{automations}個のオートメーションがあり、この操作によって削除されます。"
+        }
+      }
+    },
+    "sensors": {
+      "title": "センサー",
+      "cards": {
+        "sensors": {
+          "description": "現在設定されているセンサーです。項目をクリックすると変更できます。",
+          "table": {
+            "no_items": "ここに表示できるセンサーはありません。",
+            "no_area_warning": "センサーがどのエリアにも割り当てられていません。",
+            "arm_modes": "警戒モード",
+            "always_on": "(常時)"
+          }
+        },
+        "add_sensors": {
+          "title": "センサーを追加",
+          "description": "センサーを追加します。見分けやすいように、センサーには適切な名前を付けてください。",
+          "no_items": "アラームに設定できるHAのエンティティがありません。binary_sensorタイプのエンティティが含まれていることを確認してください。",
+          "table": {
+            "type": "検出されたタイプ"
+          },
+          "actions": {
+            "add_to_alarm": "アラームに追加",
+            "filter_supported": "タイプ不明の項目を非表示"
+          }
+        },
+        "editor": {
+          "title": "センサーを編集",
+          "description": "''{entity}'' のセンサー設定を行っています。",
+          "fields": {
+            "entity": {
+              "heading": "エンティティ",
+              "description": "このセンサーに関連付けられたエンティティ"
+            },
+            "area": {
+              "heading": "エリア",
+              "description": "このセンサーが含まれるエリアを選択します。"
+            },
+            "group": {
+              "heading": "グループ",
+              "description": "ほかのセンサーとグループ化して、組み合わせで作動させます。"
+            },
+            "device_type": {
+              "heading": "デバイスタイプ",
+              "description": "デバイスタイプを選ぶと、適切な設定が自動的に適用されます。",
+              "choose": {
+                "door": {
+                  "name": "ドア",
+                  "description": "家への出入りに使うドア、ゲート、その他の出入口です。"
+                },
+                "window": {
+                  "name": "窓",
+                  "description": "窓、またはバルコニーなど家への出入りに使わないドアです。"
+                },
+                "motion": {
+                  "name": "人感",
+                  "description": "在室センサーなど、反応の間に遅延があるデバイスです。"
+                },
+                "tamper": {
+                  "name": "改ざん",
+                  "description": "センサーカバーの取り外しや、ガラス破壊などの検知器です。"
+                },
+                "environmental": {
+                  "name": "環境",
+                  "description": "煙・ガスセンサー、漏水検知器など (防犯とは関係ないもの) です。"
+                },
+                "other": {
+                  "name": "汎用"
+                }
+              }
+            },
+            "always_on": {
+              "heading": "常時有効",
+              "description": "このセンサーは常にアラームを作動させます。"
+            },
+            "modes": {
+              "heading": "有効なモード",
+              "description": "このセンサーが有効になるアラームのモードです。"
+            },
+            "arm_on_close": {
+              "heading": "閉じたあとに警戒",
+              "description": "このセンサーが反応しなくなると、残りの退出遅延が自動的にスキップされます。"
+            },
+            "use_exit_delay": {
+              "heading": "退出遅延を使用",
+              "description": "退出遅延の開始時に、このセンサーが反応していても構いません。"
+            },
+            "use_entry_delay": {
+              "heading": "進入遅延を使用",
+              "description": "センサーが反応しても、すぐにではなく進入遅延のあとにアラームが作動します。"
+            },
+            "entry_delay": {
+              "heading": "進入遅延",
+              "description": "警戒モードで設定された進入遅延を、このセンサー専用の遅延で上書きします。"
+            },
+            "delay_on": {
+              "heading": "作動までの遅延",
+              "description": "作動するには、センサーがこの時間だけ反応し続ける必要があります。センサーが反応しなくなるとリセットされます。"
+            },
+            "allow_open": {
+              "heading": "最初は開いていてもよい",
+              "description": "警戒開始時に開いている状態は無視されます (その後にセンサーが反応するとアラームが作動します)。"
+            },
+            "auto_bypass": {
+              "heading": "自動でバイパス",
+              "description": "警戒開始時に開いている場合、このセンサーをアラームの対象から除外します。",
+              "modes": "センサーをバイパスできるモード"
+            },
+            "trigger_unavailable": {
+              "heading": "利用不可のときに作動",
+              "description": "センサーの状態が「unavailable」になると、このセンサーが反応します。"
+            }
+          },
+          "actions": {
+            "toggle_advanced": "詳細設定",
+            "remove": "削除",
+            "setup_groups": "グループを設定"
+          },
+          "errors": {
+            "description": "次のエラーを修正してください。",
+            "no_area": "エリアが選択されていません",
+            "no_modes": "センサーを有効にするモードが選択されていません",
+            "no_auto_bypass_modes": "センサーを自動でバイパスできるモードが選択されていません"
+          }
+        }
+      },
+      "dialogs": {
+        "manage_groups": {
+          "title": "センサーグループを管理",
+          "description": "センサーグループでは、一定時間内に複数のセンサーが反応した場合にアラームが作動します。",
+          "no_items": "グループはまだありません",
+          "actions": {
+            "new_group": "新しいグループ"
+          }
+        },
+        "create_group": {
+          "title": "新しいセンサーグループ",
+          "fields": {
+            "name": {
+              "heading": "名前",
+              "description": "センサーグループの名前"
+            },
+            "timeout": {
+              "heading": "タイムアウト",
+              "description": "この時間内に続けてセンサーが反応すると、アラームが作動します。"
+            },
+            "event_count": {
+              "heading": "数",
+              "description": "アラームを作動させるために反応する必要がある、異なるセンサーの数です。"
+            },
+            "sensors": {
+              "heading": "センサー",
+              "description": "このグループに含めるセンサーを選択します。"
+            }
+          },
+          "errors": {
+            "invalid_name": "名前が無効です。",
+            "insufficient_sensors": "センサーを2つ以上選択してください。"
+          }
+        },
+        "edit_group": {
+          "title": "センサーグループ ''{name}'' を編集"
+        }
+      }
+    },
+    "codes": {
+      "title": "コード",
+      "cards": {
+        "codes": {
+          "description": "コードに関する設定を変更します。",
+          "fields": {
+            "code_arm_required": {
+              "heading": "警戒開始にコードを必須にする",
+              "description": "アラームを警戒するには、有効なコードの入力が必要です。"
+            },
+            "code_disarm_required": {
+              "heading": "警戒解除にコードを必須にする",
+              "description": "アラームを解除するには、有効なコードの入力が必要です。"
+            },
+            "code_mode_change_required": {
+              "heading": "モード切り替えにコードを必須にする",
+              "description": "現在の警戒モードを変更するには、有効なコードの入力が必要です。"
+            },
+            "code_format": {
+              "heading": "コードの形式",
+              "description": "Lovelaceのアラームカードの入力タイプを設定します。",
+              "code_format_number": "暗証番号",
+              "code_format_text": "パスワード"
+            }
+          }
+        },
+        "user_management": {
+          "title": "ユーザー管理",
+          "description": "ユーザーごとに、アラームの警戒・解除に使う専用のコードがあります。",
+          "no_items": "ユーザーはまだいません",
+          "actions": {
+            "new_user": "新しいユーザー"
+          }
+        },
+        "new_user": {
+          "title": "新しいユーザーを作成",
+          "description": "アラームを操作できるようにするために、ユーザーを作成できます。",
+          "fields": {
+            "name": {
+              "heading": "名前",
+              "description": "ユーザーの名前です。"
+            },
+            "code": {
+              "heading": "コード",
+              "description": "このユーザーのコードです。"
+            },
+            "confirm_code": {
+              "heading": "コードの確認",
+              "description": "コードをもう一度入力してください。"
+            },
+            "can_arm": {
+              "heading": "警戒開始にコードを許可",
+              "description": "このコードを入力するとアラームが警戒を開始します"
+            },
+            "can_disarm": {
+              "heading": "警戒解除にコードを許可",
+              "description": "このコードを入力するとアラームの警戒が解除されます"
+            },
+            "is_override_code": {
+              "heading": "強制警戒コード",
+              "description": "このコードを入力すると、アラームを強制的に警戒します"
+            },
+            "area_limit": {
+              "heading": "制限するエリア",
+              "description": "選択したエリアのみ操作できるようにユーザーを制限します"
+            }
+          },
+          "errors": {
+            "no_name": "名前が入力されていません。",
+            "no_code": "コードは4文字または4桁以上にしてください。",
+            "code_mismatch": "コードが一致しません。"
+          }
+        },
+        "edit_user": {
+          "title": "ユーザーを編集",
+          "description": "ユーザー ''{name}'' の設定を変更します。",
+          "fields": {
+            "old_code": {
+              "heading": "現在のコード",
+              "description": "現在のコードです。変更しない場合は空のままにしてください。"
+            }
+          }
+        }
+      }
+    },
+    "actions": {
+      "title": "アクション",
+      "cards": {
+        "notifications": {
+          "title": "通知",
+          "description": "このパネルでは、特定のアラームイベントが発生したときに送信する通知を管理できます。",
+          "table": {
+            "no_items": "通知はまだ作成されていません。",
+            "no_area_warning": "アクションがどのエリアにも割り当てられていません。"
+          },
+          "actions": {
+            "new_notification": "新しい通知"
+          }
+        },
+        "actions": {
+          "description": "このパネルでは、アラームの状態が変わったときにデバイスを切り替えられます。",
+          "table": {
+            "no_items": "アクションはまだ作成されていません。"
+          },
+          "actions": {
+            "new_action": "新しいアクション"
+          }
+        },
+        "new_notification": {
+          "title": "通知を設定",
+          "description": "アラームの警戒開始・解除時や作動時などに通知を受け取ります。",
+          "trigger": "条件",
+          "action": "タスク",
+          "options": "オプション",
+          "fields": {
+            "event": {
+              "heading": "イベント",
+              "description": "通知を送信するタイミング",
+              "choose": {
+                "armed": {
+                  "name": "アラームが警戒状態になったとき",
+                  "description": "アラームの警戒が正常に開始されました"
+                },
+                "disarmed": {
+                  "name": "アラームが解除されたとき",
+                  "description": "アラームが解除されました"
+                },
+                "triggered": {
+                  "name": "アラームが作動したとき",
+                  "description": "アラームが作動しました"
+                },
+                "untriggered": {
+                  "name": "アラームの作動が終了したとき",
+                  "description": "アラームの作動状態が終了しました"
+                },
+                "arm_failure": {
+                  "name": "警戒の開始に失敗したとき",
+                  "description": "1つ以上のセンサーが開いているため、アラームの警戒開始に失敗しました"
+                },
+                "arming": {
+                  "name": "退出遅延が始まったとき",
+                  "description": "退出遅延が始まりました。家を出る準備をしてください。"
+                },
+                "pending": {
+                  "name": "進入遅延が始まったとき",
+                  "description": "進入遅延が始まりました。まもなくアラームが作動します。"
+                }
+              }
+            },
+            "mode": {
+              "heading": "モード",
+              "description": "アクションを特定の警戒モードに限定します (任意)"
+            },
+            "title": {
+              "heading": "タイトル",
+              "description": "通知メッセージのタイトル"
+            },
+            "message": {
+              "heading": "メッセージ",
+              "description": "通知メッセージの内容",
+              "insert_wildcard": "ワイルドカードを挿入",
+              "placeholders": {
+                "armed": "アラームを{{arm_mode}}に設定しました",
+                "disarmed": "アラームをオフにしました",
+                "triggered": "アラームが作動しました！原因: {{open_sensors}}。",
+                "untriggered": "アラームの作動は終了しました。",
+                "arm_failure": "次の理由により、現在アラームを警戒できません: {{open_sensors}}。",
+                "arming": "まもなくアラームが警戒状態になります。家から出てください。",
+                "pending": "まもなくアラームが作動します。すぐに解除してください！"
+              }
+            },
+            "open_sensors_format": {
+              "heading": "open_sensorsワイルドカードの形式",
+              "description": "メッセージに挿入するセンサー情報を選択します",
+              "options": {
+                "default": "名前と状態",
+                "short": "名前のみ"
+              }
+            },
+            "arm_mode_format": {
+              "heading": "arm_modeワイルドカードの翻訳",
+              "description": "メッセージに挿入する警戒モードの言語を選択します"
+            },
+            "target": {
+              "heading": "ターゲット",
+              "description": "通知の送信先デバイス"
+            },
+            "media_player_entity": {
+              "heading": "メディアプレーヤーのエンティティ",
+              "description": "メッセージを再生するメディアプレーヤー"
+            },
+            "name": {
+              "heading": "名前",
+              "description": "この通知の説明",
+              "placeholders": {
+                "armed": "警戒開始時に{target}へ通知",
+                "disarmed": "警戒解除時に{target}へ通知",
+                "triggered": "作動時に{target}へ通知",
+                "untriggered": "作動が終了したときに{target}へ通知",
+                "arm_failure": "失敗時に{target}へ通知",
+                "arming": "外出時に{target}へ通知",
+                "pending": "帰宅時に{target}へ通知"
+              }
+            },
+            "delete": {
+              "heading": "オートメーションを削除",
+              "description": "このオートメーションを完全に削除します"
+            }
+          },
+          "actions": {
+            "test": "試す"
+          }
+        },
+        "new_action": {
+          "title": "アクションを設定",
+          "description": "アラームの警戒開始・解除時や作動時などに、照明やデバイス (サイレンなど) を切り替えます。",
+          "fields": {
+            "event": {
+              "heading": "イベント",
+              "description": "アクションを実行するタイミング"
+            },
+            "area": {
+              "heading": "エリア",
+              "description": "イベントが適用されるアラームのエリアです。"
+            },
+            "mode": {
+              "heading": "モード",
+              "description": "アクションを特定の警戒モードに限定します (任意)"
+            },
+            "entity": {
+              "heading": "エンティティ",
+              "description": "アクションを実行するエンティティ"
+            },
+            "action": {
+              "heading": "アクション",
+              "description": "エンティティに対して実行するアクション",
+              "no_common_actions": "選択したエンティティのアクションは、YAMLモードでのみ割り当てられます。"
+            },
+            "name": {
+              "heading": "名前",
+              "description": "このアクションの説明",
+              "placeholders": {
+                "armed": "警戒開始時に{entity}を{state}に設定",
+                "disarmed": "警戒解除時に{entity}を{state}に設定",
+                "triggered": "作動時に{entity}を{state}に設定",
+                "untriggered": "作動が終了したときに{entity}を{state}に設定",
+                "arm_failure": "失敗時に{entity}を{state}に設定",
+                "arming": "外出時に{entity}を{state}に設定",
+                "pending": "帰宅時に{entity}を{state}に設定"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

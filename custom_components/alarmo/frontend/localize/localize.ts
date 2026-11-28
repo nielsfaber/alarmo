@@ -20,6 +20,7 @@ import * as tr from './languages/tr.json';
 import * as pl from './languages/pl.json';
 import * as pt from './languages/pt.json';
 import * as pt_BR from './languages/pt-BR.json';
+import * as ja from './languages/ja.json';
 
 import IntlMessageFormat from 'intl-messageformat';
 
@@ -46,6 +47,7 @@ var languages: any = {
   pl: pl,
   pt: pt,
   'pt-BR': pt_BR,
+  ja: ja,
 };
 
 export function localize(string: string, language: string, ...args: any[]): string {
