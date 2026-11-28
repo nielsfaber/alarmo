@@ -12,6 +12,8 @@ import * as it from './languages/it.json';
 import * as nl from './languages/nl.json';
 import * as sk from './languages/sk.json';
 import * as sv from './languages/sv.json';
+import * as sr from './languages/sr.json';
+import * as sr_Latn from './languages/sr-Latn.json';
 import * as vi from './languages/vi.json';
 import * as zh_Hans from './languages/zh-Hans.json';
 import * as zh_Hant from './languages/zh-Hant.json';
@@ -38,6 +40,8 @@ var languages: any = {
   nl: nl,
   sk: sk,
   sv: sv,
+  sr: sr,
+  'sr-Latn': sr_Latn,
   tr: tr,
   vi: vi,
   'zh-Hans': zh_Hans,
