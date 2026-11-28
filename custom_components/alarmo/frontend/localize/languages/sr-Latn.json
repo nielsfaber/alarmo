@@ -1,0 +1,579 @@
+{
+  "common": {
+    "modes_short": {
+      "armed_away": "Odsutan",
+      "armed_home": "Kod kuće",
+      "armed_night": "Noćni",
+      "armed_custom_bypass": "Prilagođeno",
+      "armed_vacation": "Odmor"
+    },
+    "enabled": "Omogućeno",
+    "disabled": "Onemogućeno"
+  },
+  "components": {
+    "time_picker": {
+      "seconds": "sekundi",
+      "minutes": "minuta"
+    },
+    "editor": {
+      "ui_mode": "U UI",
+      "yaml_mode": "U YAML",
+      "edit_in_yaml": "Izmeni u YAML-u"
+    },
+    "table": {
+      "filter": {
+        "label": "Filtriraj stavke",
+        "item": "Filtriraj po {name}",
+        "hidden_items": "{number} {number, plural,\n  one {stavka je skrivena}\n  few {stavke su skrivene}\n  other {stavki je skriveno}\n}"
+      }
+    }
+  },
+  "title": "Alarmni panel",
+  "panels": {
+    "general": {
+      "title": "Opšte",
+      "cards": {
+        "general": {
+          "description": "Ovaj panel definiše globalna podešavanja alarma.",
+          "fields": {
+            "disarm_after_trigger": {
+              "heading": "Deaktiviraj nakon okidanja",
+              "description": "Automatski deaktiviraj alarm umesto povratka u aktivirano stanje."
+            },
+            "ignore_blocking_sensors_after_trigger": {
+              "heading": "Ignoriši blokirajuće senzore pri ponovnoj aktivaciji",
+              "description": "Vrati se u aktivirano stanje bez provere senzora koji su možda još uvek aktivni."
+            },
+            "enable_mqtt": {
+              "heading": "Omogući MQTT",
+              "description": "Dozvoli upravljanje alarmnim panelom putem MQTT-a."
+            },
+            "enable_master": {
+              "heading": "Omogući glavni alarm (Master)",
+              "description": "Kreira entitet za istovremeno upravljanje svim zonama."
+            }
+          },
+          "actions": {
+            "setup_mqtt": "MQTT konfiguracija",
+            "setup_master": "Master konfiguracija"
+          }
+        },
+        "modes": {
+          "title": "Režimi",
+          "description": "Ovaj panel se koristi za podešavanje režima aktivacije alarma.",
+          "modes": {
+            "armed_away": "Režim „Odsutan“ se koristi kada svi napuste kuću. Sva vrata i prozori koji omogućavaju pristup kući biće pod nadzorom, kao i senzori pokreta unutar kuće.",
+            "armed_home": "Režim „Kod kuće“ se koristi kada se alarm uključuje dok su ukućani unutra. Sva vrata i prozori koji omogućavaju pristup kući biće pod nadzorom, ali ne i senzori pokreta unutar kuće.",
+            "armed_night": "Režim „Noćni“ se koristi prilikom aktivacije alarma pre spavanja. Sva vrata i prozori koji omogućavaju pristup kući biće pod nadzorom, kao i odabrani senzori pokreta (npr. u prizemlju) unutar kuće.",
+            "armed_vacation": "Režim „Odmor“ se može koristiti kao proširenje režima „Odsutan“ u slučaju dužeg odsustva. Vremena odlaganja i reakcije na okidanje mogu se prilagoditi (po želji) boravku daleko od kuće.",
+            "armed_custom_bypass": "Dodatni režim za definisanje sopstvenog bezbednosnog perimetra."
+          },
+          "number_sensors_active": "{number} {number, plural,\n  one {aktivan senzor}\n  few {aktivna senzora}\n  other {aktivnih senzora}\n}",
+          "fields": {
+            "status": {
+              "heading": "Status",
+              "description": "Određuje da li alarm može biti aktiviran u ovom režimu."
+            },
+            "exit_delay": {
+              "heading": "Izlazno odlaganje",
+              "description": "Prilikom aktivacije alarma, tokom ovog vremenskog perioda senzori još uvek neće okinuti alarm."
+            },
+            "entry_delay": {
+              "heading": "Ulazno odlaganje",
+              "description": "Vreme odlaganja do okidanja alarma nakon što se aktivira jedan od senzora."
+            },
+            "trigger_time": {
+              "heading": "Vreme trajanja alarma",
+              "description": "Vreme tokom kojeg će alarm ostati u stanju uzbune nakon okidanja."
+            }
+          }
+        },
+        "mqtt": {
+          "title": "MQTT konfiguracija",
+          "description": "Ovaj panel se koristi za konfiguraciju MQTT interfejsa.",
+          "fields": {
+            "state_topic": {
+              "heading": "Tema stanja (State topic)",
+              "description": "Tema na kojoj se objavljuju promene stanja"
+            },
+            "event_topic": {
+              "heading": "Tema događaja (Event topic)",
+              "description": "Tema na kojoj se objavljuju događaji alarma"
+            },
+            "command_topic": {
+              "heading": "Tema komandi (Command topic)",
+              "description": "Tema koju Alarmo prati za komande aktivacije/deaktivacije."
+            },
+            "require_code": {
+              "heading": "Zahtevaj šifru",
+              "description": "Zahtevaj da se šifra pošalje zajedno sa komandom."
+            },
+            "state_payload": {
+              "heading": "Konfiguriši sadržaj (payload) po stanju",
+              "item": "Definiši sadržaj (payload) za stanje ''{state}''"
+            },
+            "command_payload": {
+              "heading": "Konfiguriši sadržaj (payload) po komandi",
+              "item": "Definiši sadržaj (payload) za komandu ''{command}''"
+            }
+          }
+        },
+        "areas": {
+          "title": "Zone",
+          "description": "Zone se mogu koristiti za podelu vašeg alarmnog sistema na više delova.",
+          "no_items": "Još uvek nema definisanih zona.",
+          "table": {
+            "remarks": "Napomene",
+            "summary": "Ova zona sadrži {summary_sensors} i {summary_automations}.",
+            "summary_sensors": "{number} {number, plural,\n  one {senzor}\n  few {senzora}\n  other {senzora}\n}",
+            "summary_automations": "{number} {number, plural,\n  one {automatizaciju}\n  few {automatizacije}\n  other {automatizacija}\n}"
+          },
+          "actions": {
+            "add": "Dodaj"
+          }
+        }
+      },
+      "dialogs": {
+        "create_area": {
+          "title": "Nova zona",
+          "fields": {
+            "copy_from": "Kopiraj podešavanja iz"
+          }
+        },
+        "edit_area": {
+          "title": "Izmena zone ''{area}''",
+          "name_warning": "Napomena: promena naziva će promeniti ID entiteta"
+        },
+        "remove_area": {
+          "title": "Ukloniti zonu?",
+          "description": "Da li ste sigurni da želite da uklonite ovu zonu? Ova zona sadrži {sensors} senzora i {automations} automatizacija, koji će takođe biti uklonjeni."
+        },
+        "edit_master": {
+          "title": "Master konfiguracija"
+        },
+        "disable_master": {
+          "title": "Onemogućiti glavni alarm (Master)?",
+          "description": "Da li ste sigurni da želite da uklonite glavni alarm (Master)? Ova zona sadrži {automations} automatizacija, koje će biti uklonjene ovom radnjom."
+        }
+      }
+    },
+    "sensors": {
+      "title": "Senzori",
+      "cards": {
+        "sensors": {
+          "description": "Trenutno konfigurisani senzori. Kliknite na stavku da biste napravili izmene.",
+          "table": {
+            "no_items": "Ovde nema senzora za prikaz.",
+            "no_area_warning": "Senzor nije dodeljen nijednoj zoni.",
+            "arm_modes": "Režimi aktivacije",
+            "always_on": "(Uvek)"
+          }
+        },
+        "add_sensors": {
+          "title": "Dodaj senzore",
+          "description": "Dodajte još senzora. Uverite se da vaši senzori imaju odgovarajući naziv kako biste mogli da ih prepoznate.",
+          "no_items": "Nema dostupnih HA entiteta koji se mogu konfigurisati za alarm. Uverite se da ste uključili entitete tipa binary_sensor.",
+          "table": {
+            "type": "Otkriveni tip"
+          },
+          "actions": {
+            "add_to_alarm": "Dodaj u alarm",
+            "filter_supported": "Sakrij stavke sa nepoznatim tipom"
+          }
+        },
+        "editor": {
+          "title": "Izmeni senzor",
+          "description": "Konfigurisanje podešavanja senzora ''{entity}''.",
+          "fields": {
+            "entity": {
+              "heading": "Entitet",
+              "description": "Entitet povezan sa ovim senzorom"
+            },
+            "area": {
+              "heading": "Zona",
+              "description": "Izaberite zonu koja sadrži ovaj senzor."
+            },
+            "group": {
+              "heading": "Grupa",
+              "description": "Grupišite sa drugim senzorima za kombinovano okidanje."
+            },
+            "device_type": {
+              "heading": "Tip uređaja",
+              "description": "Izaberite tip uređaja da biste automatski primenili odgovarajuća podešavanja.",
+              "choose": {
+                "door": {
+                  "name": "Vrata",
+                  "description": "Vrata, kapija ili drugi ulaz koji se koristi za ulazak/izlazak iz kuće."
+                },
+                "window": {
+                  "name": "Prozor",
+                  "description": "Prozor ili vrata koja se ne koriste za ulazak u kuću, kao što su balkonska."
+                },
+                "motion": {
+                  "name": "Pokret",
+                  "description": "Senzor prisustva ili sličan uređaj koji ima pauzu između aktivacija."
+                },
+                "tamper": {
+                  "name": "Sabotaža (Tamper)",
+                  "description": "Detektor skidanja poklopca senzora, senzor loma stakla itd."
+                },
+                "environmental": {
+                  "name": "Spoljni uslovi",
+                  "description": "Senzor dima/gasa, detektor curenja vode itd. (nije povezano sa zaštitom od provale)."
+                },
+                "other": {
+                  "name": "Opšti"
+                }
+              }
+            },
+            "always_on": {
+              "heading": "Uvek uključen",
+              "description": "Senzor treba uvek da okine alarm."
+            },
+            "modes": {
+              "heading": "Omogućeni režimi",
+              "description": "Režimi alarma u kojima je ovaj senzor aktivan."
+            },
+            "arm_on_close": {
+              "heading": "Aktiviraj nakon zatvaranja",
+              "description": "Nakon deaktivacije ovog senzora, preostalo izlazno odlaganje će biti automatski preskočeno."
+            },
+            "use_exit_delay": {
+              "heading": "Koristi izlazno odlaganje",
+              "description": "Senzoru je dozvoljeno da bude aktivan kada započne izlazno odlaganje."
+            },
+            "use_entry_delay": {
+              "heading": "Koristi ulazno odlaganje",
+              "description": "Aktivacija senzora okida alarm nakon ulaznog odlaganja umesto direktno."
+            },
+            "entry_delay": {
+              "heading": "Ulazno odlaganje",
+              "description": "Zameni ulazno odlaganje (podešeno za režim aktivacije) odlaganjem specifičnim za ovaj senzor."
+            },
+            "delay_on": {
+              "heading": "Odlaganje aktivacije",
+              "description": "Senzor mora ostati aktivan tokom ovog vremena pre nego što okine alarm. Resetuje se ako se senzor deaktivira."
+            },
+            "allow_open": {
+              "heading": "Dozvoli otvoreno na početku",
+              "description": "Otvoreno stanje tokom aktivacije alarma se ignoriše (naknadna aktivacija senzora će okinuti alarm)."
+            },
+            "auto_bypass": {
+              "heading": "Automatski zaobiđi",
+              "description": "Isključi ovaj senzor iz alarma ako je otvoren tokom aktivacije.",
+              "modes": "Režimi u kojima senzor može biti zaobiđen"
+            },
+            "trigger_unavailable": {
+              "heading": "Okini kada je nedostupan",
+              "description": "Kada stanje senzora postane 'nedostupno' (unavailable), to će aktivirati senzor."
+            }
+          },
+          "actions": {
+            "toggle_advanced": "Napredna podešavanja",
+            "remove": "Ukloni",
+            "setup_groups": "Podesi grupe"
+          },
+          "errors": {
+            "description": "Ispravite sledeće greške:",
+            "no_area": "Nije izabrana nijedna zona",
+            "no_modes": "Nisu izabrani režimi u kojima senzor treba da bude aktivan",
+            "no_auto_bypass_modes": "Nisu izabrani režimi u kojima senzor može biti automatski zaobiđen"
+          }
+        }
+      },
+      "dialogs": {
+        "manage_groups": {
+          "title": "Upravljanje grupama senzora",
+          "description": "U grupi senzora više senzora mora biti aktivirano u određenom vremenskom periodu pre nego što se alarm okine.",
+          "no_items": "Još uvek nema grupa",
+          "actions": {
+            "new_group": "Nova grupa"
+          }
+        },
+        "create_group": {
+          "title": "Nova grupa senzora",
+          "fields": {
+            "name": {
+              "heading": "Naziv",
+              "description": "Naziv grupe senzora"
+            },
+            "timeout": {
+              "heading": "Vremensko ograničenje (Time-out)",
+              "description": "Vremenski period tokom kojeg uzastopne aktivacije senzora okidaju alarm."
+            },
+            "event_count": {
+              "heading": "Broj senzora",
+              "description": "Broj različitih senzora koji moraju biti aktivirani da bi se alarm okinuo."
+            },
+            "sensors": {
+              "heading": "Senzori",
+              "description": "Izaberite senzore koji su deo ove grupe."
+            }
+          },
+          "errors": {
+            "invalid_name": "Unet je neispravan naziv.",
+            "insufficient_sensors": "Potrebno je izabrati najmanje 2 senzora."
+          }
+        },
+        "edit_group": {
+          "title": "Izmeni grupu senzora ''{name}''"
+        }
+      }
+    },
+    "codes": {
+      "title": "Šifre",
+      "cards": {
+        "codes": {
+          "description": "Izmenite podešavanja za šifru.",
+          "fields": {
+            "code_arm_required": {
+              "heading": "Zahtevaj šifru za aktivaciju",
+              "description": "Za aktivaciju alarma mora biti uneta ispravna šifra."
+            },
+            "code_disarm_required": {
+              "heading": "Zahtevaj šifru za deaktivaciju",
+              "description": "Za deaktivaciju alarma mora biti uneta ispravna šifra."
+            },
+            "code_mode_change_required": {
+              "heading": "Zahtevaj šifru za promenu režima",
+              "description": "Za promenu aktivnog režima alarma mora biti uneta ispravna šifra."
+            },
+            "code_format": {
+              "heading": "Format šifre",
+              "description": "Određuje tip unosa za Lovelace karticu alarma.",
+              "code_format_number": "PIN kod",
+              "code_format_text": "Lozinka"
+            }
+          }
+        },
+        "user_management": {
+          "title": "Upravljanje korisnicima",
+          "description": "Svaki korisnik ima sopstvenu šifru za aktivaciju/deaktivaciju alarma.",
+          "no_items": "Još uvek nema korisnika",
+          "actions": {
+            "new_user": "Novi korisnik"
+          }
+        },
+        "new_user": {
+          "title": "Kreiraj novog korisnika",
+          "description": "Korisnici se mogu kreirati radi omogućavanja pristupa upravljanju alarmom.",
+          "fields": {
+            "name": {
+              "heading": "Ime",
+              "description": "Ime korisnika."
+            },
+            "code": {
+              "heading": "Šifra",
+              "description": "Šifra za ovog korisnika."
+            },
+            "confirm_code": {
+              "heading": "Potvrdi šifru",
+              "description": "Ponovite šifru."
+            },
+            "can_arm": {
+              "heading": "Dozvoli šifru za aktivaciju",
+              "description": "Unos ove šifre aktivira alarm"
+            },
+            "can_disarm": {
+              "heading": "Dozvoli šifru za deaktivaciju",
+              "description": "Unos ove šifre deaktivira alarm"
+            },
+            "is_override_code": {
+              "heading": "Šifra za prinudnu aktivaciju",
+              "description": "Unos ove šifre će prinudno aktivirati alarm"
+            },
+            "area_limit": {
+              "heading": "Ograničene zone",
+              "description": "Ograniči korisnika da upravlja samo izabranim zonama"
+            }
+          },
+          "errors": {
+            "no_name": "Nije uneto ime.",
+            "no_code": "Šifra mora imati najmanje 4 znaka/broja.",
+            "code_mismatch": "Šifre se ne podudaraju."
+          }
+        },
+        "edit_user": {
+          "title": "Izmeni korisnika",
+          "description": "Izmenite konfiguraciju za korisnika ''{name}''.",
+          "fields": {
+            "old_code": {
+              "heading": "Trenutna šifra",
+              "description": "Trenutna šifra, ostavite prazno ako ne želite da je menjate."
+            }
+          }
+        }
+      }
+    },
+    "actions": {
+      "title": "Akcije",
+      "cards": {
+        "notifications": {
+          "title": "Obaveštenja",
+          "description": "Pomoću ovog panela možete upravljati obaveštenjima koja se šalju kada dođe do određenog događaja alarma.",
+          "table": {
+            "no_items": "Još uvek nema kreiranih obaveštenja.",
+            "no_area_warning": "Akcija nije dodeljena nijednoj zoni."
+          },
+          "actions": {
+            "new_notification": "Novo obaveštenje"
+          }
+        },
+        "actions": {
+          "description": "Ovaj panel se može koristiti za upravljanje uređajem kada se promeni stanje alarma.",
+          "table": {
+            "no_items": "Još uvek nema kreiranih akcija."
+          },
+          "actions": {
+            "new_action": "Nova akcija"
+          }
+        },
+        "new_notification": {
+          "title": "Konfiguriši obaveštenje",
+          "description": "Primite obaveštenje prilikom aktivacije/deaktivacije alarma, okidanja itd.",
+          "trigger": "Uslov",
+          "action": "Zadatak",
+          "options": "Opcije",
+          "fields": {
+            "event": {
+              "heading": "Događaj",
+              "description": "Kada treba poslati obaveštenje",
+              "choose": {
+                "armed": {
+                  "name": "Alarm je aktiviran",
+                  "description": "Alarm je uspešno aktiviran"
+                },
+                "disarmed": {
+                  "name": "Alarm je deaktiviran",
+                  "description": "Alarm je deaktiviran"
+                },
+                "triggered": {
+                  "name": "Alarm je okinut",
+                  "description": "Alarm je okinut"
+                },
+                "untriggered": {
+                  "name": "Alarm više nije u stanju uzbune",
+                  "description": "Stanje uzbune alarma je završeno"
+                },
+                "arm_failure": {
+                  "name": "Neuspela aktivacija",
+                  "description": "Aktivacija alarma nije uspela zbog jednog ili više otvorenih senzora"
+                },
+                "arming": {
+                  "name": "Započeto izlazno odlaganje",
+                  "description": "Izlazno odlaganje je počelo, spremni ste za izlazak iz kuće."
+                },
+                "pending": {
+                  "name": "Započeto ulazno odlaganje",
+                  "description": "Ulazno odlaganje je počelo, alarm će se uskoro okinuti."
+                }
+              }
+            },
+            "mode": {
+              "heading": "Režim",
+              "description": "Ograničite akciju na određene režime aktivacije (opciono)"
+            },
+            "title": {
+              "heading": "Naslov",
+              "description": "Naslov poruke obaveštenja"
+            },
+            "message": {
+              "heading": "Poruka",
+              "description": "Sadržaj poruke obaveštenja",
+              "insert_wildcard": "Ubaci promenljivu (wildcard)",
+              "placeholders": {
+                "armed": "Alarm je podešen na {{arm_mode}}",
+                "disarmed": "Alarm je sada ISKLJUČEN",
+                "triggered": "Alarm je okinut! Uzrok: {{open_sensors}}.",
+                "untriggered": "Alarm više nije u stanju uzbune.",
+                "arm_failure": "Alarm trenutno nije moguće aktivirati zbog: {{open_sensors}}.",
+                "arming": "Alarm će uskoro biti aktiviran, molimo napustite kuću.",
+                "pending": "Alarm će se uskoro okinuti, brzo ga deaktivirajte!"
+              }
+            },
+            "open_sensors_format": {
+              "heading": "Format za promenljivu open_sensors",
+              "description": "Izaberite koje informacije o senzoru se ubacuju u poruku",
+              "options": {
+                "default": "Nazivi i stanja",
+                "short": "Samo nazivi"
+              }
+            },
+            "arm_mode_format": {
+              "heading": "Prevod za promenljivu arm_mode",
+              "description": "Izaberite na kojem jeziku se režim aktivacije ubacuje u poruku"
+            },
+            "target": {
+              "heading": "Odredište (Target)",
+              "description": "Uređaj na koji se šalje obaveštenje"
+            },
+            "media_player_entity": {
+              "heading": "Entitet medija plejera",
+              "description": "Medija plejer na kojem će se reprodukovati poruka"
+            },
+            "name": {
+              "heading": "Naziv",
+              "description": "Opis ovog obaveštenja",
+              "placeholders": {
+                "armed": "Obavesti {target} prilikom aktivacije",
+                "disarmed": "Obavesti {target} prilikom deaktivacije",
+                "triggered": "Obavesti {target} kada se alarm okine",
+                "untriggered": "Obavesti {target} kada uzbuna prestane",
+                "arm_failure": "Obavesti {target} o neuspeloj aktivaciji",
+                "arming": "Obavesti {target} prilikom odlaska",
+                "pending": "Obavesti {target} prilikom dolaska"
+              }
+            },
+            "delete": {
+              "heading": "Obriši automatizaciju",
+              "description": "Trajno uklonite ovu automatizaciju"
+            }
+          },
+          "actions": {
+            "test": "Isprobaj"
+          }
+        },
+        "new_action": {
+          "title": "Konfiguriši akciju",
+          "description": "Uključite/isključite svetla ili uređaje (kao što su sirene) prilikom aktivacije/deaktivacije alarma, okidanja itd.",
+          "fields": {
+            "event": {
+              "heading": "Događaj",
+              "description": "Kada treba izvršiti akciju"
+            },
+            "area": {
+              "heading": "Zona",
+              "description": "Zona alarma na koju se događaj odnosi."
+            },
+            "mode": {
+              "heading": "Režim",
+              "description": "Ograničite akciju na određene režime aktivacije (opciono)"
+            },
+            "entity": {
+              "heading": "Entitet",
+              "description": "Entitet nad kojim se izvršava akcija"
+            },
+            "action": {
+              "heading": "Akcija",
+              "description": "Akcija koju treba izvršiti nad entitetom",
+              "no_common_actions": "Za izabrane entitete akcije se mogu dodeliti samo u YAML režimu."
+            },
+            "name": {
+              "heading": "Naziv",
+              "description": "Opis ove akcije",
+              "placeholders": {
+                "armed": "Postavi {entity} na {state} prilikom aktivacije",
+                "disarmed": "Postavi {entity} na {state} prilikom deaktivacije",
+                "triggered": "Postavi {entity} na {state} kada se alarm okine",
+                "untriggered": "Postavi {entity} na {state} kada uzbuna prestane",
+                "arm_failure": "Postavi {entity} na {state} o neuspeloj aktivaciji",
+                "arming": "Postavi {entity} na {state} prilikom odlaska",
+                "pending": "Postavi {entity} na {state} prilikom dolaska"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
