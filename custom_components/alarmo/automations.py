@@ -31,6 +31,11 @@ from .sensors import (
     STATE_CLOSED,
     STATE_UNAVAILABLE,
 )
+from .push_actions import (
+    pending_arm_mode,
+    find_push_actions,
+    get_push_action_options,
+)
 from .alarm_control_panel import AlarmoBaseEntity
 
 _LOGGER = logging.getLogger(__name__)
@@ -203,6 +208,10 @@ class AutomationHandler:
                         service_data,
                         alarm_entity,
                     )
+                    if find_push_actions(service_data):
+                        service_data = self._bind_push_actions(
+                            service_data, alarm_entity
+                        )
 
                 domain, service = action[ATTR_SERVICE].split(".")
 
@@ -221,6 +230,19 @@ class AutomationHandler:
                     automation_id,
                     e,
                 )
+
+    def _bind_push_actions(
+        self, service_data: dict, alarm_entity: AlarmoBaseEntity
+    ) -> dict:
+        """Tie the Alarmo action buttons of a notification to this alarm entity."""
+        coordinator = self.hass.data[const.DOMAIN]["coordinator"]
+        options = get_push_action_options(coordinator.entry)
+        return coordinator.push_actions.bind_service_data(
+            service_data,
+            alarm_entity.area_id,
+            options[const.CONF_PUSH_ACTIONS_VALIDITY] * 60,
+            arm_mode=pending_arm_mode(alarm_entity),
+        )
 
     async def _process_service_data(
         self, obj, alarm_entity, depth: int = 0, max_depth: int = 10

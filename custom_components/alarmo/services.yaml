@@ -75,3 +75,27 @@ disable_user:
       required: true
       selector:
         text:
+issue_push_actions:
+  fields:
+    entity_id:
+      example: "alarm_control_panel.alarm"
+      required: true
+      selector:
+        entity:
+          integration: alarmo
+          domain: alarm_control_panel
+    actions:
+      example: "ALARMO_DISARM"
+      required: true
+      selector:
+        select:
+          multiple: true
+          options:
+            - ALARMO_DISARM
+            - ALARMO_RETRY_ARM
+            - ALARMO_FORCE_ARM
+            - ALARMO_ARM_AWAY
+            - ALARMO_ARM_HOME
+            - ALARMO_ARM_NIGHT
+            - ALARMO_ARM_VACATION
+            - ALARMO_ARM_CUSTOM_BYPASS

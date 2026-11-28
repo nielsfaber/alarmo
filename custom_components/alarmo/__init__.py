@@ -1,6 +1,5 @@
 """The Alarmo Integration."""
 
-import re
 import base64
 import logging
 import concurrent.futures
@@ -46,6 +45,15 @@ from .sensors import (
 )
 from .websockets import async_register_websockets
 from .automations import AutomationHandler
+from .push_actions import (
+    RejectionLimiter,
+    PushActionRegistry,
+    get_push_action_options,
+    async_handle_push_action,
+    async_unload_push_actions,
+    async_check_notification_setup,
+    async_register_push_action_service,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -94,8 +102,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     # Register custom services
     register_services(hass)
+    async_register_push_action_service(hass)
+
+    entry.async_on_unload(entry.add_update_listener(async_options_updated))
 
     return True
+
+
+async def async_options_updated(hass: HomeAssistant, entry: ConfigEntry):
+    """Apply changed push action options without a reload."""
+    coordinator = hass.data[const.DOMAIN]["coordinator"]
+    coordinator.async_update_push_listener()
+    async_check_notification_setup(hass)
 
 
 async def async_unload_entry(hass, entry):
@@ -109,6 +127,7 @@ async def async_unload_entry(hass, entry):
         return False
 
     async_unregister_panel(hass)
+    async_unload_push_actions(hass)
     coordinator = hass.data[const.DOMAIN]["coordinator"]
     await coordinator.async_unload()
     return True
@@ -137,6 +156,9 @@ class AlarmoCoordinator(DataUpdateCoordinator):
         self.entry = entry
         self.store = store
         self._subscriptions = []
+        self.push_actions = PushActionRegistry()
+        self.push_rejections = RejectionLimiter()
+        self._push_listener = None
 
         self._subscriptions.append(
             async_dispatcher_connect(
@@ -156,6 +178,7 @@ class AlarmoCoordinator(DataUpdateCoordinator):
         )
         self.hass.data[const.DOMAIN]["mqtt_handler"] = MqttHandler(self.hass)
         self.hass.data[const.DOMAIN]["event_handler"] = EventHandler(self.hass)
+        async_check_notification_setup(self.hass)
 
         areas = self.store.async_get_areas()
         config = self.store.async_get_config()
@@ -403,70 +426,57 @@ class AlarmoCoordinator(DataUpdateCoordinator):
 
     def register_events(self):
         """Register event handlers."""
-
-        # handle push notifications with action buttons
-        @callback
-        async def async_handle_push_event(event):
-            if not event.data:
-                return
-            action = (
-                event.data.get("actionName")
-                if "actionName" in event.data
-                else event.data.get("action")
-            )
-
-            if action not in const.EVENT_ACTIONS:
-                return
-
-            if self.hass.data[const.DOMAIN]["master"]:
-                alarm_entity = self.hass.data[const.DOMAIN]["master"]
-            elif len(self.hass.data[const.DOMAIN]["areas"]) == 1:
-                alarm_entity = next(
-                    iter(self.hass.data[const.DOMAIN]["areas"].values())
-                )
-            else:
-                _LOGGER.info(
-                    "Cannot process the push action, since there are multiple areas."
-                )
-                return
-
-            if action == const.EVENT_ACTION_DISARM:
-                _LOGGER.info("Received request for disarming")
-                await alarm_entity.async_alarm_disarm(None, skip_code=True)
-                return
-
-            arm_mode = (
-                alarm_entity._revert_state
-                if alarm_entity._revert_state in const.ARM_MODES
-                else alarm_entity._arm_mode
-            )
-            res = re.search(r"^ALARMO_ARM_", action)
-            if res:
-                arm_mode = action.replace("ALARMO_", "").lower().replace("arm", "armed")
-            if not arm_mode:
-                _LOGGER.info(
-                    "Cannot process the push action, since the arm mode is not known."
-                )
-                return
-
-            if action == const.EVENT_ACTION_FORCE_ARM:
-                _LOGGER.info("Received request for force arming")
-                await alarm_entity.async_handle_arm_request(
-                    arm_mode, skip_code=True, bypass_open_sensors=True
-                )
-            elif action == const.EVENT_ACTION_RETRY_ARM:
-                _LOGGER.info("Received request for retry arming")
-                await alarm_entity.async_handle_arm_request(arm_mode, skip_code=True)
-            else:
-                _LOGGER.info(
-                    "Received request for arming with mode %s",
-                    arm_mode,
-                )
-                await alarm_entity.async_handle_arm_request(arm_mode, skip_code=True)
-
+        # tokens of an area end when it is armed from disarmed or disarmed
         self._subscriptions.append(
-            self.hass.bus.async_listen(const.PUSH_EVENT, async_handle_push_event)
+            async_dispatcher_connect(
+                self.hass,
+                "alarmo_state_updated",
+                self.push_actions.async_state_changed,
+            )
         )
+        for signal in ("alarmo_automations_updated", "alarmo_config_updated"):
+            self._subscriptions.append(
+                async_dispatcher_connect(
+                    self.hass,
+                    signal,
+                    self._async_check_notifications,
+                )
+            )
+        self._subscriptions.append(self._async_remove_push_listener)
+        self.async_update_push_listener()
+
+    @callback
+    def async_update_push_listener(self):
+        """Listen to push notification actions only while they are enabled."""
+        enabled = get_push_action_options(self.entry)[const.CONF_PUSH_ACTIONS_ENABLED]
+        if enabled and self._push_listener is None:
+
+            async def async_handle_push_event(event):
+                await async_handle_push_action(
+                    self.hass,
+                    self.entry,
+                    self.push_actions,
+                    self.push_rejections,
+                    event,
+                )
+
+            self._push_listener = self.hass.bus.async_listen(
+                const.PUSH_EVENT, async_handle_push_event
+            )
+        elif not enabled:
+            self._async_remove_push_listener()
+            # buttons sent before must not work again when re-enabled
+            self.push_actions.clear()
+
+    @callback
+    def _async_check_notifications(self, *_args):
+        async_check_notification_setup(self.hass)
+
+    @callback
+    def _async_remove_push_listener(self):
+        if self._push_listener is not None:
+            self._push_listener()
+            self._push_listener = None
 
     async def async_remove_entity(self, area_id: str):
         """Remove an alarm_control_panel entity."""
